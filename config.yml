@@ -1,16 +1,25 @@
 accounts:
   - name: alice
-    coins: ["20000token", "200000000stake"]
+    coins: [ "100know" ]
   - name: bob
-    coins: ["10000token", "100000000stake"]
+    coins: [ "50know" ]
+  - name: dao
+    coins: [ "10000000000know" ]
+  - name: validator
+    coins: [ "1000001know" ]
 validator:
-  name: alice
-  staked: "100000000stake"
+  name: validator
+  staked: "1000000know"
 client:
   openapi:
     path: "docs/static/openapi.yml"
-  vuex:
-    path: "vue/src/store"
 faucet:
-  name: bob
-  coins: ["5token", "100000stake"]
+  name: dao
+  coins_max: [ "1000know" ]
+  coins: [ "100know" ]
+genesis:
+  chain_id: "okp4-localnet-1"
+  app_state:
+    staking:
+      params:
+        bond_denom: "know"
