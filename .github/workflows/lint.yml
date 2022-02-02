@@ -40,3 +40,14 @@ jobs:
 
       - name: Lint yaml files
         uses: ibiqlik/action-yamllint@v3.1.0
+
+  lint-go:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Lint go code (golangci-lint)
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.44
