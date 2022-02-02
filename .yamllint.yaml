@@ -1,4 +1,6 @@
 extends: default
+ignore: |
+  openapi.yml
 rules:
   document-start: disable
   line-length:
