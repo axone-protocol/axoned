@@ -1,5 +1,6 @@
 vue/
 release/
+target/
 okp4d
 .idea/
 .vscode/
