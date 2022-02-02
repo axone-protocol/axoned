@@ -1,5 +1,10 @@
-# Freely based on: https://gist.github.com/thomaspoignant/5b72d579bd5f311904d973652180c705
-DOCKER_IMAGE_GOLANG_CI=golangci/golangci-lint:v1.44.0
+# ℹ Freely based on: https://gist.github.com/thomaspoignant/5b72d579bd5f311904d973652180c705
+
+# Constants
+BINARY_NAME             = okp4d
+TARGET_FOLDER           = target
+DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.44.0
+CMD_ROOT               :=./cmd/${BINARY_NAME}
 
 # Some colors
 COLOR_GREEN  = $(shell tput -Txterm setaf 2)
@@ -7,6 +12,16 @@ COLOR_YELLOW = $(shell tput -Txterm setaf 3)
 COLOR_WHITE  = $(shell tput -Txterm setaf 7)
 COLOR_CYAN   = $(shell tput -Txterm setaf 6)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
+
+# Flags
+VERSION  :=$(shell cat version)
+COMMIT   :=$(shell git log -1 --format='%H')
+LD_FLAGS  = -X github.com/cosmos/cosmos-sdk/version.Name=okp4d         \
+		    -X github.com/cosmos/cosmos-sdk/version.ServerName=okp4d   \
+		    -X github.com/cosmos/cosmos-sdk/version.ClientName=okp4d   \
+		    -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+		    -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
+BUILD_FLAGS := -ldflags '$(LD_FLAGS)'
 
 .PHONY: all lint lint-go help
 
@@ -16,12 +31,26 @@ all: help
 lint: lint-go ## Lint all available linters
 
 lint-go: ## Lint go source code
-	@echo "${COLOR_CYAN}Linting go source code...${COLOR_RESET}"
+	@echo "${COLOR_CYAN}🔍 Inspecting go source code${COLOR_RESET}"
 	@docker run --rm \
   		-v `pwd`:/app:ro \
   		-w /app \
   		${DOCKER_IMAGE_GOLANG_CI} \
   		golangci-lint run -v
+
+## Build
+install: # Install node executable
+	@echo "${COLOR_CYAN} 🚚 Installing project ${BINARY_NAME}${COLOR_RESET}"
+	@go build ${BUILD_FLAGS} ${CMD_ROOT}
+
+build: # Build node executable
+	@echo "${COLOR_CYAN} 🏗️ Building project ${CMD_ROOT} into ${TARGET_FOLDER}/${COLOR_RESET}"
+	go build -o ${TARGET_FOLDER}/${BINARY_NAME} ${BUILD_FLAGS} ${CMD_ROOT}
+
+## Start
+start: install
+	@echo "${COLOR_CYAN} 🚀 Starting project ${COLOR_RESET}"
+	@okp4d start
 
 ## Help:
 help: ## Show this help.
