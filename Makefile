@@ -55,6 +55,13 @@ start: install ## Start the blockchain node
 	@echo "${COLOR_CYAN} 🚀 Starting project ${COLOR_RESET}"
 	@okp4d start
 
+## Test:
+test: test-go ## Pass all the tests
+
+test-go: build ## Pass the test for the go source code
+	@echo "${COLOR_CYAN} 🧪 Passing go tests${COLOR_RESET}"
+	@go test -v -covermode=count -coverprofile ./target/coverage.out ./...
+
 ## Help:
 help: ## Show this help.
 	@echo ''
