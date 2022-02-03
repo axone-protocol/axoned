@@ -38,17 +38,18 @@ lint-go: ## Lint go source code
   		${DOCKER_IMAGE_GOLANG_CI} \
   		golangci-lint run -v
 
-## Build
-install: # Install node executable
-	@echo "${COLOR_CYAN} 🚚 Installing project ${BINARY_NAME}${COLOR_RESET}"
-	@go build ${BUILD_FLAGS} ${CMD_ROOT}
-
-build: # Build node executable
+## Build:
+build: ## Build node executable
 	@echo "${COLOR_CYAN} 🏗️ Building project ${CMD_ROOT} into ${TARGET_FOLDER}/${COLOR_RESET}"
 	go build -o ${TARGET_FOLDER}/${BINARY_NAME} ${BUILD_FLAGS} ${CMD_ROOT}
 
-## Start
-start: install
+## Install:
+install: ## Install node executable
+	@echo "${COLOR_CYAN} 🚚 Installing project ${BINARY_NAME}${COLOR_RESET}"
+	@go build ${BUILD_FLAGS} ${CMD_ROOT}
+
+## Start:
+start: install ## Start the blockchain node
 	@echo "${COLOR_CYAN} 🚀 Starting project ${COLOR_RESET}"
 	@okp4d start
 
