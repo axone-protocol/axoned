@@ -4,5 +4,10 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    reviewers:
-      - "maintainers"
+
+  - package-ecosystem: gomod
+    directory: "/"
+    schedule:
+      interval: daily
+    open-pull-requests-limit: 5
+
