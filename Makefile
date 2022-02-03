@@ -16,11 +16,12 @@ COLOR_RESET  = $(shell tput -Txterm sgr0)
 # Flags
 VERSION  :=$(shell cat version)
 COMMIT   :=$(shell git log -1 --format='%H')
-LD_FLAGS  = -X github.com/cosmos/cosmos-sdk/version.Name=okp4d         \
-		    -X github.com/cosmos/cosmos-sdk/version.ServerName=okp4d   \
-		    -X github.com/cosmos/cosmos-sdk/version.ClientName=okp4d   \
-		    -X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-		    -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
+LD_FLAGS  = \
+	-X github.com/cosmos/cosmos-sdk/version.Name=okp4d         \
+	-X github.com/cosmos/cosmos-sdk/version.ServerName=okp4d   \
+	-X github.com/cosmos/cosmos-sdk/version.ClientName=okp4d   \
+	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
+	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
 BUILD_FLAGS := -ldflags '$(LD_FLAGS)'
 
 .PHONY: all lint lint-go build build-go help
