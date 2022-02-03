@@ -23,7 +23,7 @@ LD_FLAGS  = -X github.com/cosmos/cosmos-sdk/version.Name=okp4d         \
 		    -X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
 BUILD_FLAGS := -ldflags '$(LD_FLAGS)'
 
-.PHONY: all lint lint-go help
+.PHONY: all lint lint-go build build-go help
 
 all: help
 
@@ -39,9 +39,11 @@ lint-go: ## Lint go source code
   		golangci-lint run -v
 
 ## Build:
-build: ## Build node executable
+build: build-go ## Build all available artefacts (executable, docker image, etc.)
+
+build-go: ## Build node executable
 	@echo "${COLOR_CYAN} 🏗️ Building project ${CMD_ROOT} into ${TARGET_FOLDER}/${COLOR_RESET}"
-	go build -o ${TARGET_FOLDER}/${BINARY_NAME} ${BUILD_FLAGS} ${CMD_ROOT}
+	@go build -o ${TARGET_FOLDER}/${BINARY_NAME} ${BUILD_FLAGS} ${CMD_ROOT}
 
 ## Install:
 install: ## Install node executable
@@ -65,7 +67,7 @@ help: ## Show this help.
 		else if (/^## .*$$/) {printf "  ${COLOR_CYAN}%s${COLOR_RESET}\n", substr($$1,4)} \
 		}' $(MAKEFILE_LIST)
 	@echo ''
-	@echo 'This Makefile depends on ${COLOR_CYAN}docker${COLOR_RESET}. To install jt, please follow the instructions:'
+	@echo 'This Makefile depends on ${COLOR_CYAN}docker${COLOR_RESET}. To install it, please follow the instructions:'
 	@echo '- for ${COLOR_YELLOW}macOS${COLOR_RESET}: https://docs.docker.com/docker-for-mac/install/'
 	@echo '- for ${COLOR_YELLOW}Windows${COLOR_RESET}: https://docs.docker.com/docker-for-windows/install/'
 	@echo '- for ${COLOR_YELLOW}Linux${COLOR_RESET}: https://docs.docker.com/engine/install/'
