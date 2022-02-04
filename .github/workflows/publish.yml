@@ -19,36 +19,39 @@ jobs:
         run: |
           echo ${{ secrets.DOCKER_REGISTRY_TOKEN }} | docker login ghcr.io -u ${{ secrets.DOCKER_REGISTRY_ID }} --password-stdin
 
-      - name: Set up target version
+      - name: Set up context
         id: project_context
+        uses: FranzDiebold/github-env-vars-action@v2.3.1
+
+      - name: Set up versions
+        id: project_version
         run: |
           version=`head -n 1 version`
           echo "::set-output name=version::$version"
-          echo "::set-output name=major=$(echo $version | cut -d. -f1)"
-          echo "::set-output name=minor=$(echo $version | cut -d. -f2)"
-          echo "::set-output name=revision=$(echo $version | cut -d. -f3)"
+          echo "::set-output name=major::$(echo $version | cut -d. -f1)"
+          echo "::set-output name=minor::$(echo $version | cut -d. -f2)"
+          echo "::set-output name=revision::$(echo $version | cut -d. -f3)"
           echo "::set-output name=image::$GITHUB_REPOSITORY"
-          echo "::set-output name=branch=$(echo ${GITHUB_REF#refs/heads/})"
 
       - name: Build and publish image(s)
         run: |
           if [[ $GITHUB_REF == refs/tags/v* ]]; then
             echo "Publish docker image for branch"
             docker build \
-              -t ghcr.io/${{ steps.project_context.outputs.image }}:${{ steps.project_context.outputs.major }} \
-              -t ghcr.io/${{ steps.project_context.outputs.image }}:${{ steps.project_context.outputs.major }}.${{ steps.project_context.outputs.minor }} \
-              -t ghcr.io/${{ steps.project_context.outputs.image }}:${{ steps.project_context.outputs.version }} \
-              -t ghcr.io/${{ steps.project_context.outputs.image }}:latest \
+              -t ghcr.io/${{ steps.project_version.outputs.image }}:${{ steps.project_version.outputs.major }} \
+              -t ghcr.io/${{ steps.project_version.outputs.image }}:${{ steps.project_version.outputs.major }}.${{ steps.project_version.outputs.minor }} \
+              -t ghcr.io/${{ steps.project_version.outputs.image }}:${{ steps.project_version.outputs.version }} \
+              -t ghcr.io/${{ steps.project_version.outputs.image }}:latest \
               .
           elif [[ $GITHUB_EVENT_NAME == pull_request ]]; then
             echo "Publish docker image for branch"
             docker build \
-              -t ghcr.io/${{ steps.project_context.outputs.image }}:${{ steps.project_context.outputs.branch }} \
+              -t ghcr.io/${{ steps.project_version.outputs.image }}:$CI_ACTION_REF_NAME_SLUG \
               .
           else
             echo "Publish docker image for nightly"
             docker build \
-              -t ghcr.io/${{ steps.project_context.outputs.image }}:nightly \
+              -t ghcr.io/${{ steps.project_version.outputs.image }}:nightly \
               .
           fi
-          docker push ghcr.io/${{ steps.project_context.outputs.image }} --all-tags
+          docker push ghcr.io/${{ steps.project_version.outputs.image }} --all-tags
