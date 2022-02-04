@@ -3,18 +3,22 @@ accounts:
     coins: [ "100know" ]
   - name: bob
     coins: [ "50know" ]
-  - name: dao
+  - name: safe-1
     coins: [ "10000000000know" ]
-  - name: validator
+  - name: safe-2
+    coins: [ "10000000000know" ]
+  - name: safe-3
+    coins: [ "10000000000know" ]
+  - name: validator-1
     coins: [ "1000001know" ]
 validator:
-  name: validator
+  name: validator-1
   staked: "1000000know"
 client:
   openapi:
     path: "docs/static/openapi.yml"
 faucet:
-  name: dao
+  name: safe-1
   coins_max: [ "1000know" ]
   coins: [ "100know" ]
 genesis:
