@@ -8,7 +8,7 @@ COPY . /src/
 RUN make build CGO_ENABLED=0 GOOS=linux GOARCH=amd64
 
 #--- Image stage
-FROM scratch
+FROM alpine:3.15
 
 COPY --from=go-builder /src/target/okp4d /usr/bin/okp4d
 
