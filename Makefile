@@ -49,7 +49,7 @@ build-go: ## Build node executable
 ## Install:
 install: ## Install node executable
 	@echo "${COLOR_CYAN} 🚚 Installing project ${BINARY_NAME}${COLOR_RESET}"
-	@go build ${BUILD_FLAGS} ${CMD_ROOT}
+	@go install ${BUILD_FLAGS} ${CMD_ROOT}
 
 ## Start:
 start: install ## Start the blockchain node
