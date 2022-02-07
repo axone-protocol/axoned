@@ -1,0 +1,43 @@
+name: Release
+
+on:
+  workflow_dispatch:
+
+jobs:
+  lint:
+    if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
+    uses: ./.github/workflows/lint.yaml
+
+  build:
+    if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
+    uses: ./.github/workflows/build.yaml
+
+  test:
+    if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
+    uses: ./.github/workflows/test.yaml
+
+  perfom-release:
+    if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
+    needs:
+      - lint
+      - build
+      - test
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+        with:
+          token: ${{ secrets.OKP4_TOKEN }}
+
+      - name: Release project
+        uses: cycjimmy/semantic-release-action@v2
+        with:
+          semantic_version: 19.0.2
+          branch: main
+          extra_plugins: |
+            @semantic-release/changelog
+            @semantic-release/exec
+            @semantic-release/git
+            @google/semantic-release-replace-plugin
+        env:
+          GITHUB_TOKEN: ${{ secrets.OKP4_TOKEN }}

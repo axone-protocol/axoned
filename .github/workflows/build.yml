@@ -1,6 +1,8 @@
 name: Build
 
 on:
+  workflow_call:
+
   push:
     branches: [ main ]
 
@@ -19,7 +21,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v2.1.5
         with:
-          go-version: '1.17.6'
+          go-version: "1.17.6"
 
       - name: Build go project
         run: |
