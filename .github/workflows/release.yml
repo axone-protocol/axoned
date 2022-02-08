@@ -6,15 +6,15 @@ on:
 jobs:
   lint:
     if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
-    uses: ./.github/workflows/lint.yaml
+    uses: ./.github/workflows/lint.yml
 
   build:
     if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
-    uses: ./.github/workflows/build.yaml
+    uses: ./.github/workflows/build.yml
 
   test:
     if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
-    uses: ./.github/workflows/test.yaml
+    uses: ./.github/workflows/test.yml
 
   perfom-release:
     if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
