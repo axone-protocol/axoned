@@ -4,10 +4,10 @@ on:
   workflow_call:
 
   push:
-    branches: [ main ]
+    branches: [main]
 
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
   workflow_dispatch:
 
@@ -70,3 +70,37 @@ jobs:
           target: Dockerfile
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  lint-branch-name:
+    runs-on: ubuntu-20.04
+    if: github.actor != 'dependabot[bot]' && github.event_name == 'pull_request'
+    steps:
+      - name: Check branch name conventions
+        uses: AlbertHernandez/branch-name-action@v1.0.2
+        with:
+          branch_pattern: "feat|fix|hotfix|docs|ci|chore"
+          comment_for_invalid_branch_name: |
+            🙋‍ Oops! This branch name is not following the naming convention.
+
+            <hr>
+
+            Please, see the following branch naming convention:
+
+            Branch naming convention | Purpose
+            ------------------------ | -------
+            `feat/**`                | A new feature
+            `fix/**`                 | A bug fix
+            `hotfix/**`              | A hotfix
+            `docs/**`                | Documentation only changes
+            `ci/**`                  | Changes to the CI configuration
+            `chore/**`               | Other changes that don't modify source
+          fail_if_invalid_branch_name: "true"
+          ignore_branch_pattern: "main"
+      - name: Close non-compliant branch
+        if: ${{ failure() }}
+        uses: codelytv/no-pull-requests@v1
+        with:
+          GITHUB_TOKEN: ${{ secrets.OKP4_TOKEN }}
+          message: 🙅 Closing the PR because it does not respect naming conventions. Edit the branch name and submit a new PR.
+    env:
+      GITHUB_TOKEN: ${{ secrets.OKP4_TOKEN }}
