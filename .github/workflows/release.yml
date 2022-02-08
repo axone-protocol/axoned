@@ -41,3 +41,7 @@ jobs:
             @google/semantic-release-replace-plugin
         env:
           GITHUB_TOKEN: ${{ secrets.OKP4_TOKEN }}
+          GIT_AUTHOR_NAME: ${{ secrets.OKP4_BOT_GIT_AUTHOR_NAME }}
+          GIT_AUTHOR_EMAIL: ${{ secrets.OKP4_BOT_GIT_AUTHOR_EMAIL }}
+          GIT_COMMITTER_NAME: ${{ secrets.OKP4_BOT_GIT_COMMITTER_NAME }}
+          GIT_COMMITTER_EMAIL: ${{ secrets.OKP4_BOT_GIT_COMMITTER_EMAIL }}
