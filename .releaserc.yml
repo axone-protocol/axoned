@@ -1,0 +1,27 @@
+branches:
+  - main
+
+plugins:
+  - "@semantic-release/commit-analyzer"
+  - "@semantic-release/release-notes-generator"
+  - - "@semantic-release/changelog"
+    - changelogFile: CHANGELOG.md
+      changelogTitle: "# ØKP4 protocol changelog"
+  - - "@google/semantic-release-replace-plugin"
+    - replacements:
+        - files: [version]
+          from: ^.+$
+          to: ${nextRelease.version}
+          countMatches: true
+          results:
+            - file: version
+              hasChanged: true
+              numMatches: 1
+              numReplacements: 1
+
+  - "@semantic-release/github"
+  - - "@semantic-release/git"
+    - assets:
+        - CHANGELOG.md
+        - version
+      message: "chore(release): perform release ${nextRelease.version}"

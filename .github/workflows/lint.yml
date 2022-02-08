@@ -1,6 +1,8 @@
 name: Lint
 
 on:
+  workflow_call:
+
   push:
     branches: [ main ]
 
@@ -40,3 +42,30 @@ jobs:
 
       - name: Lint yaml files
         uses: ibiqlik/action-yamllint@v3.1.0
+
+  lint-go:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Lint go code (golangci-lint)
+        uses: golangci/golangci-lint-action@v2
+        with:
+          version: v1.44
+
+  lint-dockerfile:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Lint dockerfile (hadolint)
+        uses: hadolint/hadolint-action@v1.6.0
+
+      - name: Lint dockerfile (docker-lint)
+        uses: luke142367/Docker-Lint-Action@v1.1.1
+        with:
+          target: Dockerfile
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

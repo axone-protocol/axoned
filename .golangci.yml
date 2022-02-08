@@ -1,0 +1,102 @@
+run:
+  timeout: 5m
+linters:
+  disable-all: true
+  enable:
+    - deadcode
+    - errcheck
+    - gosimple
+    - govet
+    - ineffassign
+    - staticcheck
+    - structcheck
+    - typecheck
+    - unused
+    - varcheck
+    - asciicheck
+    - bidichk
+    - bodyclose
+    - contextcheck
+    - cyclop
+    - dupl
+    - durationcheck
+    - errname
+    - errorlint
+    - exhaustive
+    - exportloopref
+    - funlen
+    - forbidigo
+    - gocognit
+    - goconst
+    - gocritic
+    - gocyclo
+    - godot
+    - goimports
+    - gomodguard
+    - goprintffuncname
+    - gosec
+    - lll
+    - makezero
+    - nakedret
+    - nestif
+    - nilerr
+    - nilnil
+    - noctx
+    - nolintlint
+    - prealloc
+    - predeclared
+    - promlinter
+    - revive
+    - rowserrcheck
+    - sqlclosecheck
+    - stylecheck
+    - tenv
+    - testpackage
+    - tparallel
+    - unconvert
+    - unparam
+    - wastedassign
+    - whitespace
+
+linters-settings:
+  cyclop:
+    max-complexity: 20
+    skip-tests: true
+  funlen:
+    statements: 65
+  godot:
+    scope: declarations # comments to be checked: `declarations` (default), `toplevel`, or `all`
+    exclude:
+      - "this line is used by starport scaffolding .*"
+  lll:
+    line-length: 135
+output:
+  uniq-by-line: false
+
+issues:
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude-rules:
+    - source: "^//\\s*go:generate\\s"
+      linters:
+        - lll
+    - source: "(noinspection|TODO)"
+      linters:
+        - godot
+    - source: "//noinspection"
+      linters:
+        - gocritic
+    - source: "^\\s+if _, ok := err\\.\\([^.]+\\.InternalError\\); ok {"
+      linters:
+        - errorlint
+    - path: "_test\\.go"
+      linters:
+        - bodyclose
+        - deadcode
+        - dupl
+        - funlen
+        - goconst
+        - noctx
+        - unused
+        - varcheck
+        - wrapcheck

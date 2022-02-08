@@ -1,1 +1,7 @@
+vue/
+release/
+target/
+okp4d
+.idea/
 .vscode/
+.DS_Store

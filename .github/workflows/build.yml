@@ -1,0 +1,38 @@
+name: Build
+
+on:
+  workflow_call:
+
+  push:
+    branches: [ main ]
+
+  pull_request:
+    branches: [ main ]
+
+  workflow_dispatch:
+
+jobs:
+  build-go:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v2.1.5
+        with:
+          go-version: "1.17.6"
+
+      - name: Build go project
+        run: |
+          make build
+
+  build-docker:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v2
+
+      - name: Build docker image
+        run: |
+          docker build .
