@@ -90,7 +90,7 @@ import (
 	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
 	"github.com/tendermint/starport/starport/pkg/openapiconsole"
 
-	"github.com/okp4/okp4/docs"
+	"github.com/okp4/okp4d/docs"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 

@@ -1,4 +1,4 @@
-module github.com/okp4/okp4
+module github.com/okp4/okp4d
 
 go 1.16
 
