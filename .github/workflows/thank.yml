@@ -23,7 +23,7 @@ jobs:
             go.mod
 
       - name: Give thanks!
-        if: steps.changed-dependencies.outputs.any_changed || github.event_name == 'workflow_dispatch'
+        if: steps.changed-dependencies.outputs.any_changed == 'true' || github.event_name == 'workflow_dispatch'
         run: |
           docker run --rm \
             -v $(pwd):/home \
