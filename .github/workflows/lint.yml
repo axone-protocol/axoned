@@ -58,6 +58,7 @@ jobs:
 
   lint-dockerfile:
     runs-on: ubuntu-20.04
+    if: github.actor != 'dependabot[bot]'
     steps:
       - name: Check out repository
         uses: actions/checkout@v2
