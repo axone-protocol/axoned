@@ -18,8 +18,11 @@ plugins:
               hasChanged: true
               numMatches: 1
               numReplacements: 1
-
-  - "@semantic-release/github"
+  - - "@semantic-release/github"
+    - assets:
+        - name: chains
+          label: chains
+          path: "./chains/**/*"
   - - "@semantic-release/git"
     - assets:
         - CHANGELOG.md
