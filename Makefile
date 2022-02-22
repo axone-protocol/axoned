@@ -3,7 +3,7 @@
 # Constants
 BINARY_NAME             = okp4d
 TARGET_FOLDER           = target
-DIST_FOLDER				= $(TARGET_FOLDER)/dist
+DIST_FOLDER             = $(TARGET_FOLDER)/dist
 DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.44.0
 CMD_ROOT               :=./cmd/${BINARY_NAME}
 
