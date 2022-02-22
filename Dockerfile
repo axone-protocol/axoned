@@ -5,12 +5,12 @@ WORKDIR /src
 
 COPY . /src/
 
-RUN make build CGO_ENABLED=0 GOOS=linux GOARCH=amd64
+RUN make build CGO_ENABLED=0
 
 #--- Image stage
 FROM alpine:3.15
 
-COPY --from=go-builder /src/target/okp4d /usr/bin/okp4d
+COPY --from=go-builder /src/target/dist/okp4d /usr/bin/okp4d
 
 WORKDIR /opt
 

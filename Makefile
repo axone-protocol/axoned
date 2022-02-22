@@ -54,7 +54,9 @@ lint-go: ## Lint go source code
 ## Build:
 build: build-go ## Build all available artefacts (executable, docker image, etc.)
 
-build-go: build-go-linux-amd64 ## Build node executable for the current environment (default build)
+build-go: ## Build node executable for the current environment (default build)
+	@echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN}${COLOR_RESET} into ${COLOR_YELLOW}${DIST_FOLDER}${COLOR_RESET}"
+	@$(call build-go,"","",${DIST_FOLDER}/${BINARY_NAME})
 
 build-go-all: $(ENVIRONMENTS_TARGETS) ## Build node executables for all available environments
 
@@ -67,7 +69,8 @@ $(ENVIRONMENTS_TARGETS):
     fi; \
     FILENAME=$$FOLDER/${BINARY_NAME}$$EXTENSION; \
 	echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN} for environment ${COLOR_YELLOW}$$GOOS ($$GOARCH)${COLOR_RESET} into ${COLOR_YELLOW}$$FOLDER${COLOR_RESET}" && \
-	$(GO_BUiLD) -o $$FILENAME ${CMD_ROOT}
+	$(call build-go,$$GOOS,$$GOARCH,$$FILENAME)
+
 
 ## Install:
 install: ## Install node executable
@@ -106,3 +109,11 @@ help: ## Show this help.
 	@echo '- for ${COLOR_YELLOW}macOS${COLOR_RESET}: https://docs.docker.com/docker-for-mac/install/'
 	@echo '- for ${COLOR_YELLOW}Windows${COLOR_RESET}: https://docs.docker.com/docker-for-windows/install/'
 	@echo '- for ${COLOR_YELLOW}Linux${COLOR_RESET}: https://docs.docker.com/engine/install/'
+
+# Build go executable
+# $1: operating system (GOOS)
+# $2: architecture (GOARCH)
+# $3: filename of the executable generated
+define build-go
+	GOOS=$1 GOARCH=$2 $(GO_BUiLD) -o $3 ${CMD_ROOT}
+endef
