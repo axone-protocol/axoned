@@ -3,6 +3,7 @@
 # Constants
 BINARY_NAME             = okp4d
 TARGET_FOLDER           = target
+DIST_FOLDER				= $(TARGET_FOLDER)/dist
 DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.44.0
 CMD_ROOT               :=./cmd/${BINARY_NAME}
 
@@ -14,8 +15,8 @@ COLOR_CYAN   = $(shell tput -Txterm setaf 6)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
 
 # Flags
-VERSION  :=$(shell cat version)
-COMMIT   :=$(shell git log -1 --format='%H')
+VERSION  := $(shell cat version)
+COMMIT   := $(shell git log -1 --format='%H')
 LD_FLAGS  = \
 	-X github.com/cosmos/cosmos-sdk/version.Name=okp4d         \
 	-X github.com/cosmos/cosmos-sdk/version.ServerName=okp4d   \
@@ -23,6 +24,17 @@ LD_FLAGS  = \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
 BUILD_FLAGS := -ldflags '$(LD_FLAGS)'
+
+# Commands
+GO_BUiLD := CGO_ENABLED=0 go build $(BUILD_FLAGS)
+
+# Environments
+ENVIRONMENTS = \
+	darwin-amd64 \
+	darwin-arm64 \
+	linux-amd64 \
+	windows-amd64
+ENVIRONMENTS_TARGETS = $(addprefix build-go-, $(ENVIRONMENTS))
 
 .PHONY: all lint lint-go build build-go help
 
@@ -42,9 +54,20 @@ lint-go: ## Lint go source code
 ## Build:
 build: build-go ## Build all available artefacts (executable, docker image, etc.)
 
-build-go: ## Build node executable
-	@echo "${COLOR_CYAN} 🏗️ Building project ${CMD_ROOT} into ${TARGET_FOLDER}/${COLOR_RESET}"
-	@go build -o ${TARGET_FOLDER}/${BINARY_NAME} ${BUILD_FLAGS} ${CMD_ROOT}
+build-go: build-go-linux-amd64 ## Build node executable for the current environment (default build)
+
+build-go-all: $(ENVIRONMENTS_TARGETS) ## Build node executables for all available environments
+
+$(ENVIRONMENTS_TARGETS):
+	@GOOS=$(word 3, $(subst -, ,$@)); \
+    GOARCH=$(word 4, $(subst -, ,$@)); \
+    FOLDER=${DIST_FOLDER}/$$GOOS/$$GOARCH; \
+    if [ $$GOOS = "windows" ]; then \
+      EXTENSION=".exe"; \
+    fi; \
+    FILENAME=$$FOLDER/${BINARY_NAME}$$EXTENSION; \
+	echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN} for environment ${COLOR_YELLOW}$$GOOS ($$GOARCH)${COLOR_RESET} into ${COLOR_YELLOW}$$FOLDER${COLOR_RESET}" && \
+	$(GO_BUiLD) -o $$FILENAME ${CMD_ROOT}
 
 ## Install:
 install: ## Install node executable
