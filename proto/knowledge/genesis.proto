@@ -1,0 +1,14 @@
+syntax = "proto3";
+package okp4.okp4d.knowledge;
+
+import "gogoproto/gogo.proto";
+import "knowledge/params.proto";
+// this line is used by starport scaffolding # genesis/proto/import
+
+option go_package = "github.com/okp4/okp4d/x/knowledge/types";
+
+// GenesisState defines the knowledge module's genesis state.
+message GenesisState {
+  Params params = 1 [(gogoproto.nullable) = false];
+  // this line is used by starport scaffolding # genesis/proto/state
+}
