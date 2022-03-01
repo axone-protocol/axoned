@@ -14,7 +14,7 @@ import (
 	"github.com/okp4/okp4d/x/knowledge/types"
 )
 
-// avoid unused import issue
+// avoid unused import issue.
 var (
 	_ = sample.AccAddress
 	_ = knowledgesimulation.FindAccount
@@ -24,10 +24,15 @@ var (
 )
 
 const (
-// this line is used by starport scaffolding # simapp/module/const
+	//nolint:gosec
+	opWeightMsgBangDataspace = "op_weight_msg_create_chain"
+	// TODO: Determine the simulation weight value
+	defaultWeightMsgBangDataspace int = 100
+
+	// this line is used by starport scaffolding # simapp/module/const
 )
 
-// GenerateGenesisState creates a randomized GenState of the module
+// GenerateGenesisState creates a randomized GenState of the module.
 func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	accs := make([]string, len(simState.Accounts))
 	for i, acc := range simState.Accounts {
@@ -39,23 +44,33 @@ func (AppModule) GenerateGenesisState(simState *module.SimulationState) {
 	simState.GenState[types.ModuleName] = simState.Cdc.MustMarshalJSON(&knowledgeGenesis)
 }
 
-// ProposalContents doesn't return any content functions for governance proposals
+// ProposalContents doesn't return any content functions for governance proposals.
 func (AppModule) ProposalContents(_ module.SimulationState) []simtypes.WeightedProposalContent {
 	return nil
 }
 
-// RandomizedParams creates randomized  param changes for the simulator
+// RandomizedParams creates randomized  param changes for the simulator.
 func (am AppModule) RandomizedParams(_ *rand.Rand) []simtypes.ParamChange {
-
 	return []simtypes.ParamChange{}
 }
 
-// RegisterStoreDecoder registers a decoder
+// RegisterStoreDecoder registers a decoder.
 func (am AppModule) RegisterStoreDecoder(_ sdk.StoreDecoderRegistry) {}
 
 // WeightedOperations returns the all the gov module operations with their respective weights.
 func (am AppModule) WeightedOperations(simState module.SimulationState) []simtypes.WeightedOperation {
 	operations := make([]simtypes.WeightedOperation, 0)
+
+	var weightMsgBangDataspace int
+	simState.AppParams.GetOrGenerate(simState.Cdc, opWeightMsgBangDataspace, &weightMsgBangDataspace, nil,
+		func(_ *rand.Rand) {
+			weightMsgBangDataspace = defaultWeightMsgBangDataspace
+		},
+	)
+	operations = append(operations, simulation.NewWeightedOperation(
+		weightMsgBangDataspace,
+		knowledgesimulation.SimulateMsgBangDataspace(am.accountKeeper, am.bankKeeper, am.keeper),
+	))
 
 	// this line is used by starport scaffolding # simapp/module/operation
 

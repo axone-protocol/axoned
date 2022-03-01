@@ -7,7 +7,25 @@ option go_package = "github.com/okp4/okp4d/x/knowledge/types";
 
 // Msg defines the Msg service.
 service Msg {
-    // this line is used by starport scaffolding # proto/tx/rpc
+  // BangDataspace defines a method for creating a new Dataspace in the knowledge space.
+  rpc BangDataspace(MsgBangDataspace) returns (MsgBangDataspaceResponse);
+  // this line is used by starport scaffolding # proto/tx/rpc
+}
+
+// MsgBangDataspace represents a message to create a new dataspace in the knowledge space..
+message MsgBangDataspace {
+  // creator is the creator of the dataspace (the originator of the request).
+  string creator = 1;
+  // id is the unique id of the dataspace.
+  string id = 2;
+  // name is the (short) name, human readable, of the dataspace.
+  string name = 3;
+  // description is the descirption, human readable, of the dataspace, with markdown support.
+  string description = 4;
+}
+
+// MsgBangDataspaceResponse is the response given after a successful Dataspace creation.
+message MsgBangDataspaceResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message

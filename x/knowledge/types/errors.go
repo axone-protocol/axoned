@@ -6,7 +6,7 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
-// x/knowledge module sentinel errors
+// x/knowledge module sentinel errors.
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
+	ErrEntityAlreadyExists = sdkerrors.Register(ModuleName, 1100, "entity already exists")
 )
