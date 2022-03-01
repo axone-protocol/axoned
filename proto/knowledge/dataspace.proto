@@ -6,8 +6,8 @@ option go_package = "github.com/okp4/okp4d/x/knowledge/types";
 
 // Dataspace describes the Dataspace entity in the keeper.
 message Dataspace {
-  // id is the unique identifier of the dataspace.
+  // Id is the unique identifier of the dataspace.
   string id = 1;
-  // name is the (short) name, human readable, of the dataspace.
+  // Name is the (short) name, human readable, of the dataspace.
   string name = 2;
 }

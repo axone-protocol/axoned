@@ -27,10 +27,15 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
+// MsgBangDataspace represents a message to create a new dataspace in the knowledge space.
 type MsgBangDataspace struct {
-	Creator     string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
-	Id          string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
-	Name        string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// Creator is the creator of the dataspace (the originator of the request).
+	Creator string `protobuf:"bytes,1,opt,name=creator,proto3" json:"creator,omitempty"`
+	// Id is the unique id of the dataspace.
+	Id string `protobuf:"bytes,2,opt,name=id,proto3" json:"id,omitempty"`
+	// Name is the (short) name, human readable, of the dataspace.
+	Name string `protobuf:"bytes,3,opt,name=name,proto3" json:"name,omitempty"`
+	// Description is the descirption, human readable, of the dataspace, with markdown support.
 	Description string `protobuf:"bytes,4,opt,name=description,proto3" json:"description,omitempty"`
 }
 
@@ -95,6 +100,7 @@ func (m *MsgBangDataspace) GetDescription() string {
 	return ""
 }
 
+// MsgBangDataspaceResponse is the response given after a successful Dataspace creation.
 type MsgBangDataspaceResponse struct {
 }
 
@@ -170,6 +176,7 @@ const _ = grpc.SupportPackageIsVersion4
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://godoc.org/google.golang.org/grpc#ClientConn.NewStream.
 type MsgClient interface {
+	// BangDataspace defines a method for creating a new Dataspace in the knowledge space.
 	BangDataspace(ctx context.Context, in *MsgBangDataspace, opts ...grpc.CallOption) (*MsgBangDataspaceResponse, error)
 }
 
@@ -192,6 +199,7 @@ func (c *msgClient) BangDataspace(ctx context.Context, in *MsgBangDataspace, opt
 
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
+	// BangDataspace defines a method for creating a new Dataspace in the knowledge space.
 	BangDataspace(context.Context, *MsgBangDataspace) (*MsgBangDataspaceResponse, error)
 }
 
