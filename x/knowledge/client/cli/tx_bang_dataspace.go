@@ -14,12 +14,13 @@ var _ = strconv.Itoa(0)
 
 func CmdBangDataspace() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "bang-dataspace [name] [description]",
-		Short: "Broadcast message bang-dataspace",
-		Args:  cobra.ExactArgs(2),
+		Use:   "bang-dataspace [id] [name] [description]",
+		Short: "Create a new dataspace given its identifier (unique), name and description.",
+		Args:  cobra.ExactArgs(3),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argName := args[0]
-			argDescription := args[1]
+			argID := args[0]
+			argName := args[1]
+			argDescription := args[2]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -28,6 +29,7 @@ func CmdBangDataspace() *cobra.Command {
 
 			msg := types.NewMsgBangDataspace(
 				clientCtx.GetFromAddress().String(),
+				argID,
 				argName,
 				argDescription,
 			)

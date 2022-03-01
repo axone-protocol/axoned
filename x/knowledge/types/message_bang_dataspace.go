@@ -9,9 +9,10 @@ const TypeMsgBangDataspace = "bang_dataspace"
 
 var _ sdk.Msg = &MsgBangDataspace{}
 
-func NewMsgBangDataspace(creator string, name string, description string) *MsgBangDataspace {
+func NewMsgBangDataspace(creator string, id string, name string, description string) *MsgBangDataspace {
 	return &MsgBangDataspace{
 		Creator:     creator,
+		Id:          id,
 		Name:        name,
 		Description: description,
 	}
