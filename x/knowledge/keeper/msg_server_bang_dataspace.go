@@ -17,7 +17,5 @@ func (k msgServer) BangDataspace(goCtx context.Context, msg *types.MsgBangDatasp
 		return nil, sdkerrors.Wrap(types.ErrEntityAlreadyExists, fmt.Sprintf("dataspace %s", msg.Id))
 	}
 
-	k.SaveDataspace(ctx, msg.Id, msg.Name)
-
-	return &types.MsgBangDataspaceResponse{}, nil
+	return k.SaveDataspace(ctx, msg.Id, msg.Name)
 }
