@@ -1,5 +1,5 @@
 {
-    "genesis_time": "2022-03-01T20:06:45.544175Z",
+    "genesis_time": "2022-03-03T10:21:06.586389Z",
     "chain_id": "okp4-testnet-1",
     "initial_height": "1",
     "consensus_params": {
@@ -31,28 +31,28 @@
             "accounts": [
                 {
                     "@type": "/cosmos.auth.v1beta1.BaseAccount",
-                    "address": "okp41fyk58t8w5q9qsp972syexvaydt6vfkcjklkxz9",
+                    "address": "okp418m8pg88n9yyr6hsrwylcy34cz3fgar3gragzzj",
                     "pub_key": null,
                     "account_number": "0",
                     "sequence": "0"
                 },
                 {
                     "@type": "/cosmos.auth.v1beta1.BaseAccount",
-                    "address": "okp41fnm43tetefgv2wpqmafgzn9wheundwwjdly9kc",
+                    "address": "okp41rhd8744u4vqvcjuvyfm8fea4k9mefe3k57qz27",
                     "pub_key": null,
                     "account_number": "0",
                     "sequence": "0"
                 },
                 {
                     "@type": "/cosmos.auth.v1beta1.BaseAccount",
-                    "address": "okp4123wz5fwwgs4evqsck8hnty90xygtwlul72nacl",
+                    "address": "okp41s8f32q6aapgvjerjy4k2tvw37505ytz2xejkj2",
                     "pub_key": null,
                     "account_number": "0",
                     "sequence": "0"
                 },
                 {
                     "@type": "/cosmos.auth.v1beta1.BaseAccount",
-                    "address": "okp41hzpzus3wj8sj7ref8vs2aagxrd25rr04yscujx",
+                    "address": "okp4153jwdu7gytt476jhpxk49c26yaxt0cx54g43tp",
                     "pub_key": null,
                     "account_number": "0",
                     "sequence": "0"
@@ -66,7 +66,16 @@
             },
             "balances": [
                 {
-                    "address": "okp41fyk58t8w5q9qsp972syexvaydt6vfkcjklkxz9",
+                    "address": "okp41rhd8744u4vqvcjuvyfm8fea4k9mefe3k57qz27",
+                    "coins": [
+                        {
+                            "denom": "know",
+                            "amount": "10000000000"
+                        }
+                    ]
+                },
+                {
+                    "address": "okp418m8pg88n9yyr6hsrwylcy34cz3fgar3gragzzj",
                     "coins": [
                         {
                             "denom": "know",
@@ -75,7 +84,7 @@
                     ]
                 },
                 {
-                    "address": "okp41fnm43tetefgv2wpqmafgzn9wheundwwjdly9kc",
+                    "address": "okp41s8f32q6aapgvjerjy4k2tvw37505ytz2xejkj2",
                     "coins": [
                         {
                             "denom": "know",
@@ -84,16 +93,7 @@
                     ]
                 },
                 {
-                    "address": "okp4123wz5fwwgs4evqsck8hnty90xygtwlul72nacl",
-                    "coins": [
-                        {
-                            "denom": "know",
-                            "amount": "10000000000"
-                        }
-                    ]
-                },
-                {
-                    "address": "okp41hzpzus3wj8sj7ref8vs2aagxrd25rr04yscujx",
+                    "address": "okp4153jwdu7gytt476jhpxk49c26yaxt0cx54g43tp",
                     "coins": [
                         {
                             "denom": "know",
@@ -160,11 +160,11 @@
                                     "max_change_rate": "0.010000000000000000"
                                 },
                                 "min_self_delegation": "1",
-                                "delegator_address": "okp41fyk58t8w5q9qsp972syexvaydt6vfkcjklkxz9",
-                                "validator_address": "okp4valoper1fyk58t8w5q9qsp972syexvaydt6vfkcjrcx0uy",
+                                "delegator_address": "okp418m8pg88n9yyr6hsrwylcy34cz3fgar3gragzzj",
+                                "validator_address": "okp4valoper18m8pg88n9yyr6hsrwylcy34cz3fgar3gk6ctun",
                                 "pubkey": {
                                     "@type": "/cosmos.crypto.ed25519.PubKey",
-                                    "key": "e+7o+cFm8F31rHxRxm0P9M1qz5cRqpE3J9Lgw9V/4Eg="
+                                    "key": "PSDwW1xRB+0YY9TsqOBwSNSVI8MxRL5A5Q3Uw+78/ho="
                                 },
                                 "value": {
                                     "denom": "know",
@@ -172,7 +172,7 @@
                                 }
                             }
                         ],
-                        "memo": "efbd2107ec9e45369cb91d9ce14d2d27dc05b429@192.168.1.5:26656",
+                        "memo": "bacd26b00053c9b679f3ced98128b16d8aa6499b@10.0.4.86:26656",
                         "timeout_height": "0",
                         "extension_options": [],
                         "non_critical_extension_options": []
@@ -182,7 +182,7 @@
                             {
                                 "public_key": {
                                     "@type": "/cosmos.crypto.secp256k1.PubKey",
-                                    "key": "A4mljXv+o+ptbRNQbTwBdXGyAGGPaPX7yQOMlBByjVd8"
+                                    "key": "Az5yfT5ivc18EOjkdrgZuhWi9M7kiMPWnnOCW1Tkrx9m"
                                 },
                                 "mode_info": {
                                     "single": {
@@ -200,7 +200,7 @@
                         }
                     },
                     "signatures": [
-                        "1c1PiL1Uo9zalcWhp3CQes+OYE9ewWvTIXm/lkuRS3IT+4tLS11monypgqHrdWAzCy7h6UMh0pJw7zP2wdblPA=="
+                        "aSehsYkPTe7wiGHPYD43+Cq4gvnUj51CAZffj4WzGhh7SOj3VcMeNs5DBssWrCtqX6/wX6mQgWU7L74uQPoLwA=="
                     ]
                 }
             ]
