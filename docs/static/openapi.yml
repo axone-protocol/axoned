@@ -12574,6 +12574,42 @@ paths:
                         }
       tags:
         - Query
+  /okp4/okp4d/knowledge/params:
+    get:
+      summary: Parameters queries the parameters of the module.
+      operationId: Okp4Okp4DKnowledgeParams
+      responses:
+        '200':
+          description: A successful response.
+          schema:
+            type: object
+            properties:
+              params:
+                description: params holds all the parameters of this module.
+                type: object
+            description: >-
+              QueryParamsResponse is response type for the Query/Params RPC
+              method.
+        default:
+          description: An unexpected error response.
+          schema:
+            type: object
+            properties:
+              code:
+                type: integer
+                format: int32
+              message:
+                type: string
+              details:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    '@type':
+                      type: string
+                  additionalProperties: {}
+      tags:
+        - Query
 definitions:
   cosmos.authz.v1beta1.Grant:
     type: object
@@ -19924,3 +19960,18 @@ definitions:
       and
 
       freezing clients
+  okp4.okp4d.knowledge.MsgBangDataspaceResponse:
+    type: object
+    description: >-
+      MsgBangDataspaceResponse is the response given after a successful
+      Dataspace creation.
+  okp4.okp4d.knowledge.Params:
+    type: object
+    description: Params defines the parameters for the module.
+  okp4.okp4d.knowledge.QueryParamsResponse:
+    type: object
+    properties:
+      params:
+        description: params holds all the parameters of this module.
+        type: object
+    description: QueryParamsResponse is response type for the Query/Params RPC method.
