@@ -52,8 +52,18 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v2
 
+      - name: Find changed go files
+        id: changed-go-files
+        uses: tj-actions/changed-files@v17.2
+        with:
+          files: |
+            **/*.go
+            go.mod
+            go.sum
+
       - name: Lint go code (golangci-lint)
         uses: golangci/golangci-lint-action@v2
+        if: steps.changed-go-files.outputs.any-changed == 'true'
         with:
           version: v1.44
 
