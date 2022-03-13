@@ -5,13 +5,31 @@ updates:
     schedule:
       interval: daily
     open-pull-requests-limit: 2
+    reviewers:
+      - amimart
+      - ccamel
+    assignees:
+      - amimart
+      - ccamel
   - package-ecosystem: gomod
     directory: /
     schedule:
       interval: daily
     open-pull-requests-limit: 5
+    reviewers:
+      - amimart
+      - ccamel
+    assignees:
+      - amimart
+      - ccamel
   - package-ecosystem: docker
     directory: /
     schedule:
       interval: daily
     open-pull-requests-limit: 2
+    reviewers:
+      - amimart
+      - ccamel
+    assignees:
+      - amimart
+      - ccamel
