@@ -23,16 +23,23 @@ plugins:
         make build-go-all
   - - "@semantic-release/github"
     - assets:
-        - name: chains
-          label: chains
-          path: "./chains/**/*"
-        - label: Binary - Darwin amd64
+        - name: testnet-genesis.json
+          label: testnet
+          path: "./chains/testnet/genesis.json"
+        - name: localnet-genesis.json
+          label: localnet
+          path: "./chains/localnet/genesis.json"
+        - name: okp4d_darwin_amd64
+          label: Binary - Darwin amd64
           path: "./target/dist/darwin/amd64/okp4d"
-        - label: Binary - Darwin arm64
+        - name: okp4d_darwin_arm64
+          label: Binary - Darwin arm64
           path: "./target/dist/darwin/arm64/okp4d"
-        - label: Binary - Linux amd64
+        - name: okp4d_linux_amd64
+          label: Binary - Linux amd64
           path: "./target/dist/linux/amd64/okp4d"
-        - label: Binary - Windows amd64
+        - name: okp4d_windows_amd64.exe
+          label: Binary - Windows amd64
           path: "./target/dist/windows/amd64/okp4d.exe"
   - - "@semantic-release/git"
     - assets:
