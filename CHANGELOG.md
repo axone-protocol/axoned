@@ -1,5 +1,19 @@
 # ØKP4 protocol changelog
 
+# [1.1.0](https://github.com/okp4/okp4d/compare/v1.0.0...v1.1.0) (2022-03-16)
+
+
+### Bug Fixes
+
+* fix missing `id` in message ([c8f81fe](https://github.com/okp4/okp4d/commit/c8f81febc74622397ffb2b2a4e103ef28511bb92))
+
+
+### Features
+
+* implement dataspace creation ([8ec1074](https://github.com/okp4/okp4d/commit/8ec10742fd6271720f98fce93e20626447008841))
+* scaffold module knowledge ([82c95e7](https://github.com/okp4/okp4d/commit/82c95e7acebf30df7ca924383ad8e5de3da533bc))
+* update openapi documentation ([03a541c](https://github.com/okp4/okp4d/commit/03a541c732f8fd94701015317c5d1fcb0574c688))
+
 # 1.0.0 (2022-02-08)
 
 
