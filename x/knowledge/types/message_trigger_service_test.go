@@ -26,6 +26,20 @@ func TestMsgTriggerService_ValidateBasic(t *testing.T) {
 				Creator: sample.AccAddress(),
 			},
 		},
+		{
+			name: "invalid uri",
+			msg: MsgTriggerService{
+				Creator: sample.AccAddress(),
+				Uri:     "é:// ",
+			},
+			err: ErrInvalidURI,
+		}, {
+			name: "valid uri",
+			msg: MsgTriggerService{
+				Creator: sample.AccAddress(),
+				Uri:     "okp4:service#coucou?target=okp4",
+			},
+		},
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {

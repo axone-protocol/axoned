@@ -1,6 +1,8 @@
 package types
 
 import (
+	"net/url"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
@@ -41,6 +43,10 @@ func (msg *MsgTriggerService) ValidateBasic() error {
 	_, err := sdk.AccAddressFromBech32(msg.Creator)
 	if err != nil {
 		return sdkerrors.Wrapf(sdkerrors.ErrInvalidAddress, "invalid creator address (%s)", err)
+	}
+
+	if _, err := url.Parse(msg.Uri); err != nil {
+		return sdkerrors.Wrapf(ErrInvalidURI, "invalid service uri (%s)", err)
 	}
 	return nil
 }
