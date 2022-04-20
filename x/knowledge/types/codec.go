@@ -9,12 +9,16 @@ import (
 
 func RegisterCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgBangDataspace{}, "knowledge/BangDataspace", nil)
+	cdc.RegisterConcrete(&MsgTriggerService{}, "knowledge/TriggerService", nil)
 	// this line is used by starport scaffolding # 2
 }
 
 func RegisterInterfaces(registry cdctypes.InterfaceRegistry) {
 	registry.RegisterImplementations((*sdk.Msg)(nil),
 		&MsgBangDataspace{},
+	)
+	registry.RegisterImplementations((*sdk.Msg)(nil),
+		&MsgTriggerService{},
 	)
 	// this line is used by starport scaffolding # 3
 

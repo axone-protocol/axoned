@@ -9,7 +9,9 @@ option go_package = "github.com/okp4/okp4d/x/knowledge/types";
 service Msg {
   // BangDataspace defines a method for creating a new Dataspace in the knowledge space.
   rpc BangDataspace(MsgBangDataspace) returns (MsgBangDataspaceResponse);
-  // this line is used by starport scaffolding # proto/tx/rpc
+  // TriggerService defines a method to trigger a new Service execution in the knowledge space.
+  rpc TriggerService(MsgTriggerService) returns (MsgTriggerServiceResponse);
+// this line is used by starport scaffolding # proto/tx/rpc
 }
 
 // MsgBangDataspace represents a message to create a new dataspace in the knowledge space.
@@ -26,6 +28,16 @@ message MsgBangDataspace {
 
 // MsgBangDataspaceResponse is the response given after a successful Dataspace creation.
 message MsgBangDataspaceResponse {
+}
+
+// MsgTriggerService represents a message to trigger a new Service execution in the knowledge space
+message MsgTriggerService {
+  string creator = 1;
+  string uri = 2;
+}
+
+// MsgTriggerServiceResponse is the response given after a successful trigger Service
+message MsgTriggerServiceResponse {
 }
 
 // this line is used by starport scaffolding # proto/tx/message
