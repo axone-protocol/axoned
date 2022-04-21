@@ -1,5 +1,15 @@
 # ØKP4 protocol changelog
 
+# [1.2.0](https://github.com/okp4/okp4d/compare/v1.1.0...v1.2.0) (2022-04-21)
+
+
+### Features
+
+* check uri format on trigger service msg ([b9ae987](https://github.com/okp4/okp4d/commit/b9ae987b081ee7b2dca5da09cabe088d19c2a728))
+* extend debug cmd adding decode-blocks ([2959444](https://github.com/okp4/okp4d/commit/29594444e8c749f975e28316dddb0b1322bfebfa))
+* implements debug blocks proto base64 decode ([1749e70](https://github.com/okp4/okp4d/commit/1749e70151ae16b0abfe326b70501ab64ca42d2a))
+* scaffold trigger-service message ([57a54eb](https://github.com/okp4/okp4d/commit/57a54eb49cff5ee66957a1d2d795af5edab45bde))
+
 # [1.1.0](https://github.com/okp4/okp4d/compare/v1.0.0...v1.1.0) (2022-03-16)
 
 
