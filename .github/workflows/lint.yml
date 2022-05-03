@@ -63,7 +63,7 @@ jobs:
 
       - name: Lint go code (golangci-lint)
         uses: golangci/golangci-lint-action@v2
-        if: steps.changed-go-files.outputs.any-changed == 'true'
+        if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
           version: v1.44
 
