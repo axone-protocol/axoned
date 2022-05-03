@@ -9,8 +9,6 @@ on:
   pull_request:
     branches: [ main ]
 
-  workflow_dispatch:
-
 jobs:
   test-go:
     runs-on: ubuntu-20.04

@@ -8,8 +8,6 @@ on:
   pull_request:
     branches: [ main ]
 
-  workflow_dispatch:
-
 jobs:
   publish-docker-images:
     runs-on: ubuntu-20.04
