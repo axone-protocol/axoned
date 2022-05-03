@@ -9,6 +9,10 @@ on:
   pull_request:
     branches: [ main ]
 
+concurrency:
+  group: test-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test-go:
     runs-on: ubuntu-20.04
