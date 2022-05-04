@@ -8,7 +8,9 @@ on:
   pull_request:
     branches: [ main ]
 
-  workflow_dispatch:
+concurrency:
+  group: publish-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   publish-docker-images:
