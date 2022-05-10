@@ -56,7 +56,7 @@ jobs:
 
       - name: Find changed go files
         id: changed-go-files
-        uses: tj-actions/changed-files@v17.2
+        uses: tj-actions/changed-files@v19
         with:
           files: |
             **/*.go
