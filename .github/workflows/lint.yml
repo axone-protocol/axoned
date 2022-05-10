@@ -93,9 +93,9 @@ jobs:
       - name: Check branch name conventions
         uses: AlbertHernandez/branch-name-action@v1.0.2
         with:
-          branch_pattern: "feat|fix|hotfix|docs|ci|chore"
+          branch_pattern: "feat|fix|build|ci|docs|style|refactor|perf|test|chore"
           comment_for_invalid_branch_name: |
-            🙋‍ Oops! This branch name is not following the naming convention.
+            🙋‍ Oops! This branch name does not follow the naming convention.
 
             <hr>
 
@@ -105,9 +105,13 @@ jobs:
             ------------------------ | -------
             `feat/**`                | A new feature
             `fix/**`                 | A bug fix
-            `hotfix/**`              | A hotfix
-            `docs/**`                | Documentation only changes
+            `build/**`               | Changes that affect the build system (npm, mavem, poetry)
             `ci/**`                  | Changes to the CI configuration
+            `docs/**`                | Documentation only changes
+            `style/**`               | Changes that do not affect the meaning of the code (white-space, formatting, missing semi-colons, etc)
+            `refactor/**`            | Code changes that neither fixe a bug nor adds a feature
+            `perf/**`                | Code changes that improve performance
+            `test/**`                | When adding tests or correcting existing tests
             `chore/**`               | Other changes that don't modify source
           fail_if_invalid_branch_name: "true"
           ignore_branch_pattern: "main"
