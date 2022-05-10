@@ -11,13 +11,13 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
       - name: Find changed dependencies
         id: changed-dependencies
-        uses: tj-actions/changed-files@v15
+        uses: tj-actions/changed-files@v19
         with:
           files: |
             go.mod

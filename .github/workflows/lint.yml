@@ -19,7 +19,7 @@ jobs:
     if: github.actor != 'dependabot[bot]'
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -30,7 +30,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Lint markdown files
         uses: avto-dev/markdown-lint@v1.5.0
@@ -42,7 +42,7 @@ jobs:
     runs-on: ubuntu-20.04
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Lint yaml files
         uses: ibiqlik/action-yamllint@v3.1.0
@@ -52,11 +52,11 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Find changed go files
         id: changed-go-files
-        uses: tj-actions/changed-files@v17.2
+        uses: tj-actions/changed-files@v19
         with:
           files: |
             **/*.go
@@ -64,7 +64,7 @@ jobs:
             go.sum
 
       - name: Lint go code (golangci-lint)
-        uses: golangci/golangci-lint-action@v2
+        uses: golangci/golangci-lint-action@v3
         if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
           version: v1.44
@@ -74,7 +74,7 @@ jobs:
     if: github.actor != 'dependabot[bot]'
     steps:
       - name: Check out repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       - name: Lint dockerfile (hadolint)
         uses: hadolint/hadolint-action@v1.6.0
