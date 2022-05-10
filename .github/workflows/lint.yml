@@ -47,6 +47,30 @@ jobs:
       - name: Lint yaml files
         uses: ibiqlik/action-yamllint@v3.1.0
 
+  lint-json:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Lint json files
+        run: |
+          sudo apt install -y jsonlint
+
+          find ./ -type f -name "*.json" -exec sh -c '
+            for file do
+              if ! jsonlint-php -q "$file"; then
+                echo "❌ $file"
+                export FAILED=1
+              else
+                echo "✅ $file"
+              fi
+            done
+            if [ "${FAILED}" = "1" ]; then
+              exit 1
+            fi
+          ' sh {} +
+
   lint-go:
     runs-on: ubuntu-20.04
     timeout-minutes: 10
