@@ -18,7 +18,7 @@ func CmdTriggerService() *cobra.Command {
 		Short: "Trigger a service execution from an invocation URI",
 		Args:  cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) (err error) {
-			argUri := args[0]
+			argURI := args[0]
 
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
@@ -27,7 +27,7 @@ func CmdTriggerService() *cobra.Command {
 
 			msg := types.NewMsgTriggerService(
 				clientCtx.GetFromAddress().String(),
-				argUri,
+				argURI,
 			)
 			if err := msg.ValidateBasic(); err != nil {
 				return err

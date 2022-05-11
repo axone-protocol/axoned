@@ -29,6 +29,7 @@ const (
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgBangDataspace int = 100
 
+	//nolint:gosec
 	opWeightMsgTriggerService = "op_weight_msg_create_chain"
 	// TODO: Determine the simulation weight value
 	defaultWeightMsgTriggerService int = 100
