@@ -1,5 +1,5 @@
 #--- Build stage
-FROM golang:1.18.1-stretch AS go-builder
+FROM golang:1.18.2-stretch AS go-builder
 
 WORKDIR /src
 
