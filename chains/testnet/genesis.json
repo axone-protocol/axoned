@@ -105,7 +105,29 @@
         }
       ],
       "supply": [],
-      "denom_metadata": []
+      "denom_metadata": [
+        {
+          "base": "uknow",
+          "name": "OKP4 Network",
+          "description": "The native token of ØKP4",
+          "display": "know",
+          "symbol": "KNOW",
+          "denom_units": [
+            {
+              "aliases": [
+                "microknow"
+              ],
+              "denom": "uknow",
+              "exponent": 0
+            },
+            {
+              "aliases": [],
+              "denom": "know",
+              "exponent": 6
+            }
+          ]
+        }
+      ]
     },
     "capability": {
       "index": "1",
