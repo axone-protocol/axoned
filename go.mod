@@ -4,7 +4,7 @@ go 1.16
 
 require (
 	github.com/cosmos/cosmos-sdk v0.45.4
-	github.com/cosmos/ibc-go/v2 v2.0.2
+	github.com/cosmos/ibc-go/v2 v2.2.0
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/gorilla/mux v1.8.0
