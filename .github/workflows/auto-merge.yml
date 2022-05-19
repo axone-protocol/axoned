@@ -11,5 +11,5 @@ jobs:
       - name: Auto merge PR
         uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
-          target: minor
+          target: patch
           github-token: ${{ secrets.OKP4_TOKEN }}
