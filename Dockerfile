@@ -8,7 +8,7 @@ COPY . /src/
 RUN make build CGO_ENABLED=0
 
 #--- Image stage
-FROM alpine:3.15
+FROM alpine:3.16.0
 
 COPY --from=go-builder /src/target/dist/okp4d /usr/bin/okp4d
 
