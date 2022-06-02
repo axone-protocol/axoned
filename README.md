@@ -6,3 +6,7 @@
 
 
 > `OKP4` is a public [dPoS](https://en.bitcoinwiki.org/wiki/DPoS) layer 1 specifically designed to enable communities to trustlessly share data, algorithms and resources to build the Dataverse - An open world where everybody can create or participate in custom ecosystems (with common governance mechanisms, sharing rules, business models...) to build a new generation of dApps way beyond Decentralized Finance.
+
+## The protocol
+
+`OKP4d` is the node of the OKP4 network built using [Cosmos SDK](https://v1.cosmos.network/sdk) 💫 and [Tendermint](https://tendermint.com/).
