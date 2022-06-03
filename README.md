@@ -12,9 +12,33 @@
 
 [![lint](https://img.shields.io/github/workflow/status/okp4/okp4d/Lint?label=lint&style=for-the-badge)](https://github.com/okp4/okp4d/actions/workflows/lint.yml) [![build](https://img.shields.io/github/workflow/status/okp4/okp4d/Build?label=build&style=for-the-badge)](https://github.com/okp4/okp4d/actions/workflows/build.yml) [![test](https://img.shields.io/github/workflow/status/okp4/okp4d/Test?label=test&style=for-the-badge)](https://github.com/okp4/okp4d/actions/workflows/test.yml) [![conventional commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=for-the-badge)](https://conventionalcommits.org)[![license](https://img.shields.io/badge/License-BSD_3--Clause-blue.svg?style=for-the-badge)](https://opensource.org/licenses/BSD-3-Clause)
 
-
 > `OKP4` is a public [dPoS](https://en.bitcoinwiki.org/wiki/DPoS) layer 1 specifically designed to enable communities to trustlessly share data, algorithms and resources to build the Dataverse - An open world where everybody can create or participate in custom ecosystems (with common governance mechanisms, sharing rules, business models...) to build a new generation of dApps way beyond Decentralized Finance.
 
 ## The protocol
 
-`OKP4d` is the node of the OKP4 network built using [Cosmos SDK](https://v1.cosmos.network/sdk) 💫 and [Tendermint](https://tendermint.com/).
+`okp4d` is the node of the OKP4 network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, and designed to become a hub of incentivized data providers, developers, data scientists & users collaborating to generate value from data and algorithms.
+
+## Developing & contributing
+
+`okp4d` is written in [Go] and built using [Cosmos SDK].
+
+### Prerequisites
+
+- install [Go] `1.18+` following instructions from the [official Go documentation](https://golang.org/doc/install);
+- verify that [Docker] is properly installed and if not, follow the [instructions](https://docs.docker.com) for your environment;
+- the project comes with a convenient `Makefile` so verify that [`make`](https://fr.wikipedia.org/wiki/Make) is properly installed.
+
+### Build
+
+To build the `okp4d` node, invoke the goal `build` of the `Makefile`:
+
+```sh
+make build
+```
+
+The binary will be generated under the folder `target/dist`.
+
+[Cosmos SDK]: https://v1.cosmos.network/sdk
+[Docker]: https://www.docker.com/
+[Go]: https://go.dev
+[Tendermint]: https://tendermint.com/
