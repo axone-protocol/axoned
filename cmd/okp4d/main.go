@@ -5,9 +5,9 @@ import (
 	"os"
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	"github.com/ignite-hq/cli/ignite/pkg/cosmoscmd"
 	"github.com/okp4/okp4d/app"
 	"github.com/spf13/cobra"
-	"github.com/tendermint/starport/starport/pkg/cosmoscmd"
 )
 
 func main() {
