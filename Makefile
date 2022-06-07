@@ -77,15 +77,6 @@ install: ## Install node executable
 	@echo "${COLOR_CYAN} 🚚 Installing project ${BINARY_NAME}${COLOR_RESET}"
 	@go install ${BUILD_FLAGS} ${CMD_ROOT}
 
-init: install ## Starport init.
-	@echo "${COLOR_CYAN} 🏁 Starport init ${BINARY_NAME}${COLOR_RESET}"
-	@docker run -w /app -v ${PWD}:/app -ti starport/cli chain init --home /app/target/home
-
-## Start:
-start: install ## Start the blockchain node
-	@echo "${COLOR_CYAN} 🚀 Starting project ${COLOR_RESET}"
-	@${TARGET_FOLDER}/okp4d start --home ./target/home
-
 ## Test:
 test: test-go ## Pass all the tests
 
