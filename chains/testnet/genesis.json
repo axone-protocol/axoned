@@ -285,9 +285,6 @@
         "next_channel_sequence": "0"
       }
     },
-    "knowledge": {
-      "params": {}
-    },
     "mint": {
       "minter": {
         "inflation": "0.130000000000000000",
