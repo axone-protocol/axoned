@@ -3,7 +3,7 @@ module github.com/okp4/okp4d
 go 1.18
 
 require (
-	github.com/cosmos/cosmos-sdk v0.45.4
+	github.com/cosmos/cosmos-sdk v0.45.5
 	github.com/cosmos/ibc-go/v2 v2.0.3
 	github.com/ignite-hq/cli v0.20.3
 	github.com/spf13/cast v1.4.1
