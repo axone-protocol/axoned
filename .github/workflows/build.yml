@@ -4,10 +4,10 @@ on:
   workflow_call:
 
   push:
-    branches: [ main ]
+    branches: [main]
 
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 concurrency:
   group: build-${{ github.ref }}
@@ -15,6 +15,9 @@ concurrency:
 
 jobs:
   build-go:
+    strategy:
+      matrix:
+        environment: [darwin-amd64, darwin-arm64, linux-amd64]
     runs-on: ubuntu-20.04
     steps:
       - name: Check out repository
@@ -27,7 +30,7 @@ jobs:
 
       - name: Build go project
         run: |
-          make build
+          make build-go-${{ matrix.environment }}
 
   build-docker:
     runs-on: ubuntu-20.04
