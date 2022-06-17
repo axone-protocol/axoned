@@ -4,10 +4,10 @@ on:
   workflow_call:
 
   push:
-    branches: [ main ]
+    branches: [main]
 
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
 concurrency:
   group: test-${{ github.ref }}
@@ -28,3 +28,67 @@ jobs:
       - name: Test go project
         run: |
           make test-go
+
+  test-blockchain:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v3.2.0
+        with:
+          go-version: "1.18.2"
+
+      - name: Install OKP4 blockchain
+        run: |
+          make install
+
+      - name: Initialze blockchain
+        run: |
+          okp4d init okp4-node \
+            --chain-id=okp4-testnet-1 \
+            --home ./target/deployment/testnet
+
+          cp ./chains/testnet/pre-genesis.json ./target/deployment/testnet/config/genesis.json
+
+          okp4d keys add validator \
+              --home ./target/deployment/testnet \
+              --keyring-backend test
+
+          okp4d add-genesis-account validator 1000000000uknow \
+              --home ./target/deployment/testnet \
+              --keyring-backend test
+
+          okp4d gentx validator 1000000uknow --node-id $(okp4d tendermint show-node-id --home ./target/deployment/testnet) \
+              --chain-id okp4-testnet-1 \
+              --home ./target/deployment/testnet \
+              --keyring-backend test
+
+          okp4d collect-gentxs \
+              --home ./target/deployment/testnet
+
+          okp4d start --moniker okp4-node \
+              --home ./target/deployment/testnet
+
+      - name: Start the blockchain
+        run: |
+          okp4d start --moniker okp4-node \
+            --home ./target/deployment/testnet &
+
+      - name: Wait for test blockchain to start
+        uses: ifaxity/wait-on-action@v1
+        with:
+          resource: http://0.0.0.0:26657/status
+          timeout: 10000 # ms
+
+      - name: Verify blockchain startup
+        run: |
+          STATUS=$(curl http://0.0.0.0:26657/status)
+          CHECK=$(echo $STATUS | jq '.result.validator_info | has("address")')
+
+          if [ $CHECK != "true" ]; then
+            echo "❌ Blockchain test failed"
+            echo "$STATUS"
+            exit -1
+          fi
