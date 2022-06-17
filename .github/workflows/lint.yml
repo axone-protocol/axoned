@@ -147,3 +147,33 @@ jobs:
           message: 🙅 Closing the PR because it does not respect naming conventions. Edit the branch name and submit a new PR.
     env:
       GITHUB_TOKEN: ${{ secrets.OKP4_TOKEN }}
+
+  lint-generated:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: "0"
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v3.2.0
+        with:
+          go-version: "1.18.2"
+
+      - name: Install Ignite CLI
+        run: |
+          curl https://get.ignite.com/cli! | bash
+
+      - name: Generate OpenAPI spec for the chain
+        run: |
+          ignite version
+          ignite generate openapi --yes
+
+      - name: Check Git diff in generated files (openapi.yml)
+        run: |
+          if [[ $(git status -s) != "" ]]; then
+            >&2 echo "❌ There is a diff between generated files and source code"
+            >&2 git status
+            exit 1
+          fi
