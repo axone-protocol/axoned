@@ -240,25 +240,6 @@
         "blocks_per_year": "6311520"
       }
     },
-    "monitoringp": {
-      "port_id": "monitoringp",
-      "consumerClientID": null,
-      "connectionChannelID": null,
-      "monitoringInfo": null,
-      "params": {
-        "lastBlockHeight": "1",
-        "consumerChainID": "spn-1",
-        "consumerConsensusState": {
-          "nextValidatorsHash": "",
-          "timestamp": "",
-          "root": {
-            "hash": ""
-          }
-        },
-        "consumerUnbondingPeriod": "1814400",
-        "consumerRevisionHeight": "1"
-      }
-    },
     "params": null,
     "slashing": {
       "params": {
