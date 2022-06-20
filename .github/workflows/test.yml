@@ -35,6 +35,9 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
+      - name: Install jq
+        run: sudo apt-get install jq
+
       - name: Setup Go environment
         uses: actions/setup-go@v3.2.0
         with:
