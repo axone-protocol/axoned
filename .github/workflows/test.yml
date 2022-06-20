@@ -31,6 +31,7 @@ jobs:
 
   test-blockchain:
     runs-on: ubuntu-20.04
+    timeout-minutes: 5
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -71,9 +72,6 @@ jobs:
           okp4d collect-gentxs \
               --home ./target/deployment/testnet
 
-          okp4d start --moniker okp4-node \
-              --home ./target/deployment/testnet
-
       - name: Start the blockchain
         run: |
           okp4d start --moniker okp4-node \
@@ -95,3 +93,7 @@ jobs:
             echo "$STATUS"
             exit -1
           fi
+
+      - name: Stop the blockchain
+        run: |
+          ps -ef | grep 'okp4d' | grep -v grep | awk '{print $2}' | xargs -r kill -9
