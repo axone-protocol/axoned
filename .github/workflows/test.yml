@@ -44,7 +44,7 @@ jobs:
         run: |
           make install
 
-      - name: Initialze blockchain
+      - name: Initialize blockchain
         run: |
           okp4d init okp4-node \
             --chain-id=okp4-testnet-1 \
@@ -76,7 +76,7 @@ jobs:
           okp4d start --moniker okp4-node \
             --home ./target/deployment/testnet &
 
-      - name: Wait for test blockchain to start
+      - name: Wait for blockchain to start
         uses: ifaxity/wait-on-action@v1
         with:
           resource: http://0.0.0.0:26657/status
