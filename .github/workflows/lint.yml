@@ -192,7 +192,7 @@ jobs:
 
       - name: Check Git diff in generated files (openapi.yml)
         run: |
-          if [[ $(git status -s) != "" ]]; then
+          if [[ $(git status -s | grep -v 'go.mod$' | grep -v 'go.sum$' ) != "" ]]; then
             >&2 echo "❌ There is a diff between generated files and source code"
             >&2 git status
             exit 1
