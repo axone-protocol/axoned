@@ -1,4 +1,4 @@
-![okp4 github banner](./docs/okp4-banner.png)
+[![okp4 github banner](./docs/okp4-banner.png)](https://okp4.network)
 
 <p align="center">
   <a href="https://discord.gg/GHNZh4SaJ3"><img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" /></a> &nbsp;
@@ -16,7 +16,9 @@
 
 ## The protocol
 
-`okp4d` is the node of the OKP4 network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, and designed to become a hub of incentivized data providers, developers, data scientists & users collaborating to generate value from data and algorithms.
+`okp4d` is the node of the [OKP4](https://docs.okp4.network) network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, and designed to become a hub of incentivized data providers, developers, data scientists & users collaborating to generate value from data and algorithms.
+
+For a high-level overview of the OKP4 protocol and network economics, check out the [whitepaper](https://docs.okp4.network/docs/whitepaper/abstract).
 
 ## Developing & contributing
 
