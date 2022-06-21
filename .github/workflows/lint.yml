@@ -163,10 +163,10 @@ jobs:
         run: |
           make build
 
-      - name: Check testnet genesis files
+      - name: Check devnet genesis files
         run: |
-          ./target/dist/okp4d validate-genesis ./chains/testnet/pre-genesis.json
-          ./target/dist/okp4d validate-genesis ./chains/testnet/genesis.json
+          ./target/dist/okp4d validate-genesis ./chains/devnet-1/pre-genesis.json
+          ./target/dist/okp4d validate-genesis ./chains/devnet-1/genesis.json
 
   lint-generated:
     runs-on: ubuntu-20.04
