@@ -26,7 +26,7 @@ LD_FLAGS  = \
 BUILD_FLAGS := -ldflags '$(LD_FLAGS)'
 
 # Commands
-GO_BUiLD := CGO_ENABLED=0 go build $(BUILD_FLAGS)
+GO_BUiLD := CGO_ENABLED=1 go build $(BUILD_FLAGS)
 
 # Environments
 ENVIRONMENTS = \
