@@ -65,8 +65,6 @@ linters-settings:
     statements: 65
   godot:
     scope: declarations # comments to be checked: `declarations` (default), `toplevel`, or `all`
-    exclude:
-      - "this line is used by starport scaffolding .*"
   lll:
     line-length: 135
 output:
