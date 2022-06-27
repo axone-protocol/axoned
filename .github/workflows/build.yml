@@ -15,9 +15,6 @@ concurrency:
 
 jobs:
   build-go:
-    strategy:
-      matrix:
-        environment: [darwin-amd64, darwin-arm64, linux-amd64]
     runs-on: ubuntu-20.04
     steps:
       - name: Check out repository
@@ -30,7 +27,7 @@ jobs:
 
       - name: Build go project
         run: |
-          make build-go-${{ matrix.environment }}
+          make build
 
   build-docker:
     runs-on: ubuntu-20.04
