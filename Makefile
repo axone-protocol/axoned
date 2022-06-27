@@ -14,7 +14,13 @@ COLOR_WHITE  = $(shell tput -Txterm setaf 7)
 COLOR_CYAN   = $(shell tput -Txterm setaf 6)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
 
+BUILD_TAGS += netgo
+BUILD_TAGS := $(strip $(BUILD_TAGS))
+
 # Flags
+WHITESPACE := $(subst ,, )
+COMMA := ,
+BUILD_TAGS_COMMA_SEP := $(subst $(WHITESPACE),$(COMMA),$(BUILD_TAGS))
 VERSION  := $(shell cat version)
 COMMIT   := $(shell git log -1 --format='%H')
 LD_FLAGS  = \
@@ -22,11 +28,15 @@ LD_FLAGS  = \
 	-X github.com/cosmos/cosmos-sdk/version.ServerName=okp4d   \
 	-X github.com/cosmos/cosmos-sdk/version.ClientName=okp4d   \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
-BUILD_FLAGS := -ldflags '$(LD_FLAGS)'
+	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+    -X github.com/cosmos/cosmos-sdk/version.BuildTags=$(BUILD_TAGS_COMMA_SEP)
+
+LD_FLAGS := $(strip $(LD_FLAGS))
+
+BUILD_FLAGS := -tags "$(BUILD_TAGS)" -ldflags '$(LD_FLAGS)' -trimpath
 
 # Commands
-GO_BUiLD := CGO_ENABLED=1 go build $(BUILD_FLAGS)
+GO_BUiLD := go build $(BUILD_FLAGS)
 
 # Environments
 ENVIRONMENTS = \
