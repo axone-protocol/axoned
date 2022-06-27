@@ -31,6 +31,10 @@ LD_FLAGS  = \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
     -X github.com/cosmos/cosmos-sdk/version.BuildTags=$(BUILD_TAGS_COMMA_SEP)
 
+ifeq ($(LINK_STATICALLY),true)
+	LD_FLAGS += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
+endif
+
 LD_FLAGS := $(strip $(LD_FLAGS))
 
 BUILD_FLAGS := -tags "$(BUILD_TAGS)" -ldflags '$(LD_FLAGS)' -trimpath
