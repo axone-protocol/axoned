@@ -5,7 +5,7 @@ import (
 	"github.com/okp4/okp4d/app/params"
 )
 
-// MakeEncodingConfig creates a new EncodingConfig with all modules registered
+// MakeEncodingConfig creates a new EncodingConfig with all modules registered.
 func MakeEncodingConfig() params.EncodingConfig {
 	encodingConfig := params.MakeEncodingConfig()
 	std.RegisterLegacyAminoCodec(encodingConfig.Amino)

@@ -146,17 +146,17 @@ var (
 	// DefaultNodeHome default home directories for the application daemon.
 	DefaultNodeHome string
 
-	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address
+	// Bech32PrefixAccAddr defines the Bech32 prefix of an account's address.
 	Bech32PrefixAccAddr = AccountAddressPrefix
-	// Bech32PrefixAccPub defines the Bech32 prefix of an account's public key
+	// Bech32PrefixAccPub defines the Bech32 prefix of an account's public key.
 	Bech32PrefixAccPub = AccountAddressPrefix + sdk.PrefixPublic
-	// Bech32PrefixValAddr defines the Bech32 prefix of a validator's operator address
+	// Bech32PrefixValAddr defines the Bech32 prefix of a validator's operator address.
 	Bech32PrefixValAddr = AccountAddressPrefix + sdk.PrefixValidator + sdk.PrefixOperator
-	// Bech32PrefixValPub defines the Bech32 prefix of a validator's operator public key
+	// Bech32PrefixValPub defines the Bech32 prefix of a validator's operator public key.
 	Bech32PrefixValPub = AccountAddressPrefix + sdk.PrefixValidator + sdk.PrefixOperator + sdk.PrefixPublic
-	// Bech32PrefixConsAddr defines the Bech32 prefix of a consensus node address
+	// Bech32PrefixConsAddr defines the Bech32 prefix of a consensus node address.
 	Bech32PrefixConsAddr = AccountAddressPrefix + sdk.PrefixValidator + sdk.PrefixConsensus
-	// Bech32PrefixConsPub defines the Bech32 prefix of a consensus node public key
+	// Bech32PrefixConsPub defines the Bech32 prefix of a consensus node public key.
 	Bech32PrefixConsPub = AccountAddressPrefix + sdk.PrefixValidator + sdk.PrefixConsensus + sdk.PrefixPublic
 
 	// ModuleBasics defines the module BasicManager is in charge of setting up basic,
@@ -223,7 +223,7 @@ func init() {
 	DefaultNodeHome = filepath.Join(userHomeDir, "."+Name)
 }
 
-// App extends an ABCI application, but with most of its parameters exported.
+// OKP4App extends an ABCI application, but with most of its parameters exported.
 // They are exported for convenience in creating helper functions, as object
 // capabilities aren't needed for testing.
 type OKP4App struct {
@@ -262,7 +262,7 @@ type OKP4App struct {
 	FeeGrantKeeper      feegrantkeeper.Keeper
 	WasmKeeper          wasm.Keeper
 
-	// make scoped keepers public for test purposes
+	// make scoped keepers public for test purposes.
 	ScopedIBCKeeper           capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper       capabilitykeeper.ScopedKeeper
 	ScopedICAControllerKeeper capabilitykeeper.ScopedKeeper
@@ -270,14 +270,15 @@ type OKP4App struct {
 	ScopedTransferKeeper      capabilitykeeper.ScopedKeeper
 	ScopedWasmKeeper          capabilitykeeper.ScopedKeeper
 
-	// mm is the module manager
+	// mm is the module manager.
 	mm *module.Manager
 
-	// sm is the simulation manager
+	// sm is the simulation manager.
 	sm *module.SimulationManager
 }
 
-// NewOKP4App returns a reference to an initialized OKP4 blockchain app
+// NewOKP4App returns a reference to an initialized OKP4 blockchain app.
+// nolint:funlen
 func NewOKP4App(
 	logger log.Logger,
 	db dbm.DB,
@@ -671,7 +672,7 @@ func NewOKP4App(
 			wasmkeeper.NewWasmSnapshotter(app.CommitMultiStore(), &app.WasmKeeper),
 		)
 		if err != nil {
-			panic(fmt.Errorf("failed to register snapshot extension: %s", err))
+			panic(fmt.Errorf("failed to register snapshot extension: %w", err))
 		}
 	}
 

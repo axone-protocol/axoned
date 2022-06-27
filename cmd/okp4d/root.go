@@ -37,7 +37,7 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 )
 
-// NewRootCmd creates a new root command for the OKP4 application
+// NewRootCmd creates a new root command for the OKP4 application.
 func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 	cfg := sdk.GetConfig()
 	cfg.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
@@ -80,7 +80,6 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 
 			if err := server.InterceptConfigsPreRunHandler(cmd, "", nil); err != nil {
 				return err
-
 			}
 
 			return nil
