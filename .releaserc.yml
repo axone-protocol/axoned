@@ -20,7 +20,7 @@ plugins:
               numReplacements: 1
   - - "@semantic-release/exec"
     - prepareCmd: |
-        make build-go-linux-amd64 && make build-go-linux-arm64
+        make build-go-linux-amd64
   - - "@semantic-release/github"
     - assets:
         - name: testnet-genesis.json
