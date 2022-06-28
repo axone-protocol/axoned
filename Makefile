@@ -98,6 +98,11 @@ test-go: build ## Pass the test for the go source code
 	@echo "${COLOR_CYAN} 🧪 Passing go tests${COLOR_RESET}"
 	@go test -v -covermode=count -coverprofile ./target/coverage.out ./...
 
+## Clean:
+clean: ## Remove all the files from the target folder
+	@echo "${COLOR_CYAN} 🗑 Cleaning folder $(TARGET_FOLDER)${COLOR_RESET}"
+	@rm -rf $(TARGET_FOLDER)/
+
 ## Help:
 help: ## Show this help.
 	@echo ''
