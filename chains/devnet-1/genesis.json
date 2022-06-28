@@ -107,7 +107,12 @@
           ]
         }
       ],
-      "supply": [],
+      "supply": [
+        {
+          "denom": "uknow",
+          "amount": "30000001000000000"
+        }
+      ],
       "denom_metadata": [
         {
           "base": "uknow",
@@ -288,6 +293,26 @@
         "next_channel_sequence": "0"
       }
     },
+    "interchainaccounts": {
+      "controller_genesis_state": {
+        "active_channels": [],
+        "interchain_accounts": [],
+        "ports": [],
+        "params": {
+          "controller_enabled": true
+        }
+      },
+      "host_genesis_state": {
+        "active_channels": [],
+        "interchain_accounts": [],
+        "port": "icahost",
+        "params": {
+          "host_enabled": true,
+          "allow_messages": []
+        }
+      }
+    },
+    "intertx": null,
     "mint": {
       "minter": {
         "inflation": "0.130000000000000000",
@@ -339,6 +364,19 @@
       }
     },
     "upgrade": {},
-    "vesting": {}
+    "vesting": {},
+    "wasm": {
+      "params": {
+        "code_upload_access": {
+          "permission": "Everybody",
+          "address": ""
+        },
+        "instantiate_default_permission": "Everybody"
+      },
+      "codes": [],
+      "contracts": [],
+      "sequences": [],
+      "gen_msgs": []
+    }
   }
 }
