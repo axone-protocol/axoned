@@ -59,8 +59,9 @@ func NewRootCmd() (*cobra.Command, params.EncodingConfig) {
 		WithViper(app.Name)
 
 	rootCmd := &cobra.Command{
-		Use:   app.Name,
-		Short: "OKP4 App",
+		Use: app.Name,
+		Short: `OKP4 Daemon - a revolutionary public PoS layer 1 specifically designed to enable communities to trustlessly share data,
+algorithms and resources to build the Dataverse.`,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs
 			cmd.SetOut(cmd.OutOrStdout())
