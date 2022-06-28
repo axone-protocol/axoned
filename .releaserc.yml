@@ -23,12 +23,9 @@ plugins:
         make build-go-linux-amd64
   - - "@semantic-release/github"
     - assets:
-        - name: testnet-genesis.json
-          label: testnet
-          path: "./chains/testnet/genesis.json"
-        - name: localnet-genesis.json
-          label: localnet
-          path: "./chains/localnet/genesis.json"
+        - name: devnet-1-genesis.json
+          label: devnet-1
+          path: "./chains/devnet-1/genesis.json"
         - name: okp4d_linux_amd64
           label: Binary - Linux amd64
           path: "./target/dist/linux/amd64/okp4d"
