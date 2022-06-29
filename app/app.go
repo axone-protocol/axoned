@@ -126,7 +126,7 @@ const (
 )
 
 // GetEnabledProposals parses the ProposalsEnabled / EnableSpecificProposals values to
-// produce a list of enabled proposals to pass into wasmd app.
+// produce a list of enabled proposals to pass into okp4d app.
 func GetEnabledProposals() []wasm.ProposalType {
 	if EnableSpecificProposals == "" {
 		if ProposalsEnabled == "true" {
@@ -432,7 +432,7 @@ func NewOKP4App(
 	icaModule := ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper)
 	icaHostIBCModule := icahost.NewIBCModule(app.ICAHostKeeper)
 
-	// For wasmd we use the demo controller from https://github.com/cosmos/interchain-accounts but see notes below
+	// For okp4d we use the demo controller from https://github.com/cosmos/interchain-accounts but see notes below
 	app.InterTxKeeper = intertxkeeper.NewKeeper(appCodec, keys[intertxtypes.StoreKey], app.ICAControllerKeeper, scopedInterTxKeeper)
 	// Note: please do your research before using this in production app, this is a demo and not an officially
 	// supported IBC team implementation. Do your own research before using it.
