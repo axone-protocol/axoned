@@ -47,7 +47,7 @@ ENVIRONMENTS = \
 	darwin-amd64 \
 	darwin-arm64 \
 	linux-amd64 \
-	windows-amd64
+	linux-arm64
 ENVIRONMENTS_TARGETS = $(addprefix build-go-, $(ENVIRONMENTS))
 
 .PHONY: all lint lint-go build build-go help
@@ -77,11 +77,19 @@ build-go-all: $(ENVIRONMENTS_TARGETS) ## Build node executables for all availabl
 $(ENVIRONMENTS_TARGETS):
 	@GOOS=$(word 3, $(subst -, ,$@)); \
     GOARCH=$(word 4, $(subst -, ,$@)); \
-    FOLDER=${DIST_FOLDER}/$$GOOS/$$GOARCH; \
-    if [ $$GOOS = "windows" ]; then \
-      EXTENSION=".exe"; \
+    if [ $$GOARCH = "amd64" ]; then \
+    	TARGET_ARCH="x86_64"; \
+    elif [ $$GOARCH = "arm64" ]; then \
+    	TARGET_ARCH="aarch64"; \
     fi; \
-    FILENAME=$$FOLDER/${BINARY_NAME}$$EXTENSION; \
+    HOST_OS=`uname -s | tr A-Z a-z`; \
+    HOST_ARCH=`uname -m`; \
+    if [ $$GOOS != $$HOST_OS ] || [ $$TARGET_ARCH != $$HOST_ARCH ]; then \
+      echo "Cross compilation impossible" >&2; \
+      exit 1; \
+    fi; \
+    FOLDER=${DIST_FOLDER}/$$GOOS/$$GOARCH; \
+    FILENAME=$$FOLDER/${BINARY_NAME}; \
 	echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN} for environment ${COLOR_YELLOW}$$GOOS ($$GOARCH)${COLOR_RESET} into ${COLOR_YELLOW}$$FOLDER${COLOR_RESET}" && \
 	$(call build-go,$$GOOS,$$GOARCH,$$FILENAME)
 
