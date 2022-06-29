@@ -12,6 +12,7 @@ COLOR_GREEN  = $(shell tput -Txterm setaf 2)
 COLOR_YELLOW = $(shell tput -Txterm setaf 3)
 COLOR_WHITE  = $(shell tput -Txterm setaf 7)
 COLOR_CYAN   = $(shell tput -Txterm setaf 6)
+COLOR_RED    = $(shell tput -Txterm setaf 1)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
 
 BUILD_TAGS += netgo
@@ -85,7 +86,7 @@ $(ENVIRONMENTS_TARGETS):
     HOST_OS=`uname -s | tr A-Z a-z`; \
     HOST_ARCH=`uname -m`; \
     if [ $$GOOS != $$HOST_OS ] || [ $$TARGET_ARCH != $$HOST_ARCH ]; then \
-      echo "Cross compilation impossible" >&2; \
+      echo "${COLOR_RED} ❌ Cross compilation impossible${COLOR_RESET}" >&2; \
       exit 1; \
     fi; \
     FOLDER=${DIST_FOLDER}/$$GOOS/$$GOARCH; \
