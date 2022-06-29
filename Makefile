@@ -12,9 +12,16 @@ COLOR_GREEN  = $(shell tput -Txterm setaf 2)
 COLOR_YELLOW = $(shell tput -Txterm setaf 3)
 COLOR_WHITE  = $(shell tput -Txterm setaf 7)
 COLOR_CYAN   = $(shell tput -Txterm setaf 6)
+COLOR_RED    = $(shell tput -Txterm setaf 1)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
 
+BUILD_TAGS += netgo
+BUILD_TAGS := $(strip $(BUILD_TAGS))
+
 # Flags
+WHITESPACE := $(subst ,, )
+COMMA := ,
+BUILD_TAGS_COMMA_SEP := $(subst $(WHITESPACE),$(COMMA),$(BUILD_TAGS))
 VERSION  := $(shell cat version)
 COMMIT   := $(shell git log -1 --format='%H')
 LD_FLAGS  = \
@@ -22,18 +29,26 @@ LD_FLAGS  = \
 	-X github.com/cosmos/cosmos-sdk/version.ServerName=okp4d   \
 	-X github.com/cosmos/cosmos-sdk/version.ClientName=okp4d   \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)
-BUILD_FLAGS := -ldflags '$(LD_FLAGS)'
+	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+    -X github.com/cosmos/cosmos-sdk/version.BuildTags=$(BUILD_TAGS_COMMA_SEP)
+
+ifeq ($(LINK_STATICALLY),true)
+	LD_FLAGS += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
+endif
+
+LD_FLAGS := $(strip $(LD_FLAGS))
+
+BUILD_FLAGS := -tags "$(BUILD_TAGS)" -ldflags '$(LD_FLAGS)' -trimpath
 
 # Commands
-GO_BUiLD := CGO_ENABLED=0 go build $(BUILD_FLAGS)
+GO_BUiLD := go build $(BUILD_FLAGS)
 
 # Environments
 ENVIRONMENTS = \
 	darwin-amd64 \
 	darwin-arm64 \
 	linux-amd64 \
-	windows-amd64
+	linux-arm64
 ENVIRONMENTS_TARGETS = $(addprefix build-go-, $(ENVIRONMENTS))
 
 .PHONY: all lint lint-go build build-go help
@@ -63,11 +78,19 @@ build-go-all: $(ENVIRONMENTS_TARGETS) ## Build node executables for all availabl
 $(ENVIRONMENTS_TARGETS):
 	@GOOS=$(word 3, $(subst -, ,$@)); \
     GOARCH=$(word 4, $(subst -, ,$@)); \
-    FOLDER=${DIST_FOLDER}/$$GOOS/$$GOARCH; \
-    if [ $$GOOS = "windows" ]; then \
-      EXTENSION=".exe"; \
+    if [ $$GOARCH = "amd64" ]; then \
+    	TARGET_ARCH="x86_64"; \
+    elif [ $$GOARCH = "arm64" ]; then \
+    	TARGET_ARCH="aarch64"; \
     fi; \
-    FILENAME=$$FOLDER/${BINARY_NAME}$$EXTENSION; \
+    HOST_OS=`uname -s | tr A-Z a-z`; \
+    HOST_ARCH=`uname -m`; \
+    if [ $$GOOS != $$HOST_OS ] || [ $$TARGET_ARCH != $$HOST_ARCH ]; then \
+      echo "${COLOR_RED} ❌ Cross compilation impossible${COLOR_RESET}" >&2; \
+      exit 1; \
+    fi; \
+    FOLDER=${DIST_FOLDER}/$$GOOS/$$GOARCH; \
+    FILENAME=$$FOLDER/${BINARY_NAME}; \
 	echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN} for environment ${COLOR_YELLOW}$$GOOS ($$GOARCH)${COLOR_RESET} into ${COLOR_YELLOW}$$FOLDER${COLOR_RESET}" && \
 	$(call build-go,$$GOOS,$$GOARCH,$$FILENAME)
 
@@ -83,6 +106,11 @@ test: test-go ## Pass all the tests
 test-go: build ## Pass the test for the go source code
 	@echo "${COLOR_CYAN} 🧪 Passing go tests${COLOR_RESET}"
 	@go test -v -covermode=count -coverprofile ./target/coverage.out ./...
+
+## Clean:
+clean: ## Remove all the files from the target folder
+	@echo "${COLOR_CYAN} 🗑 Cleaning folder $(TARGET_FOLDER)${COLOR_RESET}"
+	@rm -rf $(TARGET_FOLDER)/
 
 ## Help:
 help: ## Show this help.
