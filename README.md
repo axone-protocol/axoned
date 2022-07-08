@@ -69,6 +69,13 @@ you're willing to give!
 > Don't hesitate to ask if you are having trouble setting up your project repository, creating your first branch or
 > configuring your development environment. Mentors are here to help!
 
+## Community
+
+The [**OKP4 Discord Server**](https://discord.gg/GHNZh4SaJ3) is our primary chat channel for the open-source community,
+software developers and node operators.
+
+Please reach out to us and say hi, we're happy to help there.
+
 [Cosmos SDK]: https://v1.cosmos.network/sdk
 [Docker]: https://www.docker.com/
 [Go]: https://go.dev
