@@ -40,6 +40,21 @@ make build
 
 The binary will be generated under the folder `target/dist`.
 
+## Supported platforms
+
+The `okp4d` blockchain currently supports the following builds:
+
+| **Platform** | **Arch** |         **Status**         |
+|--------------|----------|:--------------------------:|
+| Darwin       | amd64    |             ✅              |
+| Darwin       | arm64    |             ✅              |
+| Linux        | amd64    |             ✅              |
+| Linux        | arm64    |             ✅              |
+| Windows      | amd64    | ️🚫<br/> **Not supported** |
+
+> Note: as the blockchain depends on [CosmWasm/wasmvm](https://github.com/CosmWasm/wasmvm), we only support the targets
+> supported by this project.
+
 [Cosmos SDK]: https://v1.cosmos.network/sdk
 [Docker]: https://www.docker.com/
 [Go]: https://go.dev
