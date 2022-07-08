@@ -55,6 +55,11 @@ The `okp4d` blockchain currently supports the following builds:
 > Note: as the blockchain depends on [CosmWasm/wasmvm](https://github.com/CosmWasm/wasmvm), we only support the targets
 > supported by this project.
 
+## Versioning
+
+`okp4d` follows the [Semantic Versioning 2.0.0](https://semver.org/) to determine when and how the 
+version changes.
+
 [Cosmos SDK]: https://v1.cosmos.network/sdk
 [Docker]: https://www.docker.com/
 [Go]: https://go.dev
