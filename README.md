@@ -20,6 +20,14 @@
 
 For a high-level overview of the OKP4 protocol and network economics, check out the [whitepaper](https://docs.okp4.network/docs/whitepaper/abstract).
 
+## OKP4 Networks
+
+| **Network** | Status | Description                                                                                                                                                                                |    Chain-ID     | URL                                                                                                  |
+|-------------|:------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------:|------------------------------------------------------------------------------------------------------|
+| `devnet`    |   ✅    | Developers-focused network of our blockchain for build/test purposes.                                                                                                                      | `okp4-devnet-1` | api:&nbsp;<https://api.devnet.okp4.network> <br/>rpc:&nbsp;<https://api.devnet.okp4.network:443/rpc> |
+| `testnet`   |   🚧   | The easiest place to create test Data Spaces if you're not quite ready yet to dive into building applications on our main network. It is also the ideal place to start as a node operator. |        -        | -                                                                                                    |
+| `mainnet`   |   🔜   |                                                                                                                                                                                            |        -        | -                                                                                                    |
+
 ## Developing & contributing
 
 `okp4d` is written in [Go] and built using [Cosmos SDK].
@@ -44,13 +52,13 @@ The binary will be generated under the folder `target/dist`.
 
 The `okp4d` blockchain currently supports the following builds:
 
-| **Platform** | **Arch** |         **Status**         |
-|--------------|----------|:--------------------------:|
-| Darwin       | amd64    |             ✅              |
-| Darwin       | arm64    |             ✅              |
-| Linux        | amd64    |             ✅              |
-| Linux        | arm64    |             ✅              |
-| Windows      | amd64    | ️🚫<br/> **Not supported** |
+| **Platform** | **Arch** |       **Status**       |
+|--------------|----------|:----------------------:|
+| Darwin       | amd64    |           ✅            |
+| Darwin       | arm64    |           ✅            |
+| Linux        | amd64    |           ✅            |
+| Linux        | arm64    |           ✅            |
+| Windows      | amd64    | ️🚫<br/> Not supported |
 
 > Note: as the blockchain depends on [CosmWasm/wasmvm](https://github.com/CosmWasm/wasmvm), we only support the targets
 > supported by this project.
