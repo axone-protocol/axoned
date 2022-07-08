@@ -55,26 +55,28 @@ The `okp4d` blockchain currently supports the following builds:
 > Note: as the blockchain depends on [CosmWasm/wasmvm](https://github.com/CosmWasm/wasmvm), we only support the targets
 > supported by this project.
 
-## Versioning
+## Releases
 
-`okp4d` follows the [Semantic Versioning 2.0.0](https://semver.org/) to determine when and how the 
-version changes.
+All releases can be found [here](https://github.com/okp4/okp4d/releases).
+
+`okp4d` follows the [Semantic Versioning 2.0.0](https://semver.org/) to determine when and how the version changes, and
+we also apply the philosophical principles of [release early - release often](https://en.wikipedia.org/wiki/Release_early,_release_often).
 
 ## Bug reports & feature requests
 
-If you notice anything not behaving how you expected, if you would like to make a suggestion or would like 
+If you notice anything not behaving how you expected, if you would like to make a suggestion or would like
 to request a new feature, please open a [**new issue**](https://github.com/okp4/okp4d/issues/new/choose). We appreciate any help
 you're willing to give!
 
 > Don't hesitate to ask if you are having trouble setting up your project repository, creating your first branch or
-> configuring your development environment. Mentors are here to help!
+> configuring your development environment. Mentors and maintainers are here to help!
 
 ## Community
 
 The [**OKP4 Discord Server**](https://discord.gg/GHNZh4SaJ3) is our primary chat channel for the open-source community,
 software developers and node operators.
 
-Please reach out to us and say hi, we're happy to help there.
+Please reach out to us and say hi 👋, we're happy to help there.
 
 [Cosmos SDK]: https://v1.cosmos.network/sdk
 [Docker]: https://www.docker.com/
