@@ -21,7 +21,7 @@ jobs:
 
       - name: Set up context
         id: project_context
-        uses: FranzDiebold/github-env-vars-action@v2.3.1
+        uses: FranzDiebold/github-env-vars-action@v2.4.0
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
