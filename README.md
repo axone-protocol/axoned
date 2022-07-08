@@ -60,6 +60,15 @@ The `okp4d` blockchain currently supports the following builds:
 `okp4d` follows the [Semantic Versioning 2.0.0](https://semver.org/) to determine when and how the 
 version changes.
 
+## Bug reports & feature requests
+
+If you notice anything not behaving how you expected, if you would like to make a suggestion or would like 
+to request a new feature, please open a [**new issue**](https://github.com/okp4/okp4d/issues/new/choose). We appreciate any help
+you're willing to give!
+
+> Don't hesitate to ask if you are having trouble setting up your project repository, creating your first branch or
+> configuring your development environment. Mentors are here to help!
+
 [Cosmos SDK]: https://v1.cosmos.network/sdk
 [Docker]: https://www.docker.com/
 [Go]: https://go.dev
