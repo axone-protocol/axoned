@@ -16,9 +16,9 @@
 
 ## The protocol
 
-`okp4d` is the node of the [OKP4](https://docs.okp4.network) network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, and designed to become a hub of incentivized data providers, developers, data scientists & users collaborating to generate value from data and algorithms.
+`okp4d` is the node of the [OKP4](https://okp4.network) network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, and designed to become a hub of incentivized data providers, developers, data scientists & users collaborating to generate value from data and algorithms.
 
-For a high-level overview of the OKP4 protocol and network economics, check out the [whitepaper](https://docs.okp4.network/docs/whitepaper/abstract).
+Read more in the [introduction blog post](https://blog.okp4.network/what-is-okp4-b6bb058ae221). For a high-level overview of the OKP4 protocol and network economics, check out the [white paper](https://docs.okp4.network/docs/whitepaper/abstract).
 
 ## OKP4 Networks
 
