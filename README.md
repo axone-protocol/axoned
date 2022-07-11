@@ -16,9 +16,17 @@
 
 ## The protocol
 
-`okp4d` is the node of the [OKP4](https://docs.okp4.network) network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, and designed to become a hub of incentivized data providers, developers, data scientists & users collaborating to generate value from data and algorithms.
+`okp4d` is the node of the [OKP4](https://okp4.network) network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, and designed to become a hub of incentivized data providers, developers, data scientists & users collaborating to generate value from data and algorithms.
 
-For a high-level overview of the OKP4 protocol and network economics, check out the [whitepaper](https://docs.okp4.network/docs/whitepaper/abstract).
+Read more in the [introduction blog post](https://blog.okp4.network/what-is-okp4-b6bb058ae221). For a high-level overview of the OKP4 protocol and network economics, check out the [white paper](https://docs.okp4.network/docs/whitepaper/abstract).
+
+## OKP4 Networks
+
+| **Network** | Status | Description                                                                                                                                                                                |    Chain-ID     | URL                                                                                                  |
+|-------------|:------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------:|------------------------------------------------------------------------------------------------------|
+| `devnet`    |   ✅    | Developers-focused network of our blockchain for build/test purposes.                                                                                                                      | `okp4-devnet-1` | api:&nbsp;<https://api.devnet.okp4.network> <br/>rpc:&nbsp;<https://api.devnet.okp4.network:443/rpc> |
+| `testnet`   |   🚧   | The easiest place to create test Data Spaces if you're not quite ready yet to dive into building applications on our main network. It is also the ideal place to start as a node operator. |        -        | -                                                                                                    |
+| `mainnet`   |   🔜   |                                                                                                                                                                                            |        -        | -                                                                                                    |
 
 ## Developing & contributing
 
@@ -39,6 +47,44 @@ make build
 ```
 
 The binary will be generated under the folder `target/dist`.
+
+## Supported platforms
+
+The `okp4d` blockchain currently supports the following builds:
+
+| **Platform** | **Arch** |       **Status**       |
+|--------------|----------|:----------------------:|
+| Darwin       | amd64    |           ✅            |
+| Darwin       | arm64    |           ✅            |
+| Linux        | amd64    |           ✅            |
+| Linux        | arm64    |           ✅            |
+| Windows      | amd64    | ️🚫<br/> Not supported |
+
+> Note: as the blockchain depends on [CosmWasm/wasmvm](https://github.com/CosmWasm/wasmvm), we only support the targets
+> supported by this project.
+
+## Releases
+
+All releases can be found [here](https://github.com/okp4/okp4d/releases).
+
+`okp4d` follows the [Semantic Versioning 2.0.0](https://semver.org/) to determine when and how the version changes, and
+we also apply the philosophical principles of [release early - release often](https://en.wikipedia.org/wiki/Release_early,_release_often).
+
+## Bug reports & feature requests
+
+If you notice anything not behaving how you expected, if you would like to make a suggestion or would like
+to request a new feature, please open a [**new issue**](https://github.com/okp4/okp4d/issues/new/choose). We appreciate any help
+you're willing to give!
+
+> Don't hesitate to ask if you are having trouble setting up your project repository, creating your first branch or
+> configuring your development environment. Mentors and maintainers are here to help!
+
+## Community
+
+The [**OKP4 Discord Server**](https://discord.gg/GHNZh4SaJ3) is our primary chat channel for the open-source community,
+software developers and node operators.
+
+Please reach out to us and say hi 👋, we're happy to help there.
 
 [Cosmos SDK]: https://v1.cosmos.network/sdk
 [Docker]: https://www.docker.com/
