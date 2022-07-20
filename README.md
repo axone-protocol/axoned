@@ -1,7 +1,7 @@
 [![okp4 github banner](./docs/okp4-banner.png)](https://okp4.network)
 
 <p align="center">
-  <a href="https://discord.gg/GHNZh4SaJ3"><img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" /></a> &nbsp;
+  <a href="https://discord.gg/okp4"><img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" /></a> &nbsp;
   <a href="https://www.linkedin.com/company/okp4-open-knowledge-protocol-for"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" /></a> &nbsp;
   <a href="https://twitter.com/OKP4_Protocol"><img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white" /></a> &nbsp;
   <a href="https://medium.com/okp4"><img src="https://img.shields.io/badge/Medium-12100E?style=for-the-badge&logo=medium&logoColor=white" /></a> &nbsp;
