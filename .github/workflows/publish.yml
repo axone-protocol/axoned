@@ -39,6 +39,12 @@ jobs:
           username: ${{ secrets.DOCKER_REGISTRY_ID }}
           password: ${{ secrets.DOCKER_REGISTRY_TOKEN }}
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v2
+        with:
+          username: okp4
+          password: ${{ secrets.DOCKER_HUB_REGISTRY_TOKEN }}
+
       - name: Build and publish image(s)
         uses: docker/build-push-action@v3
         with:
