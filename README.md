@@ -28,6 +28,12 @@ Read more in the [introduction blog post](https://blog.okp4.network/what-is-okp4
 | `testnet`   |   🚧   | The easiest place to create test Data Spaces if you're not quite ready yet to dive into building applications on our main network. It is also the ideal place to start as a node operator. |        -        | -                                                                                                    |
 | `mainnet`   |   🔜   |                                                                                                                                                                                            |        -        | -                                                                                                    |
 
+## Want to become a validator?
+
+Validators are responsible for securing the okp4 network. Validator responsibilities include maintaining a functional [node](https://docs.okp4.network/docs/nodes/run-node) with constant uptime and providing a sufficient amount of $KNOW as stake. In exchange for this service, validators receive block rewards and transaction fees.
+
+Want to become a validator? 👉 [Checkout the documentation!](https://docs.okp4.network/docs/nodes/introduction)
+
 ## Developing & contributing
 
 `okp4d` is written in [Go] and built using [Cosmos SDK].
