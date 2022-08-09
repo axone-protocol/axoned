@@ -53,3 +53,33 @@ jobs:
           push: true
           tags: ${{ steps.docker_metadata.outputs.tags }}
           labels: ${{ steps.docker_metadata.outputs.labels }}
+
+  dockerhub-description:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 2
+
+      - name: Find change in docker readme file
+        id: docker-readme-change
+        uses: tj-actions/changed-files@v24
+        with:
+          files: |
+            docker-readme.md
+
+      - name: add changelog
+        if: steps.docker-readme-change.outputs.any_changed == 'true'
+        run: |
+          cat CHANGELOG.md >> docker-readme.md
+
+      - name: Docker Hub Description
+        if: steps.docker-readme-change.outputs.any_changed == 'true'
+        uses: peter-evans/dockerhub-description@v3
+        with:
+          username: okp4
+          description: Docker image for https://github.com/okp4/okp4d
+          password: ${{ secrets.DOCKER_HUB_REGISTRY_TOKEN }}
+          repository: okp4/okp4d
+          readme-filepath: docker-readme.md
