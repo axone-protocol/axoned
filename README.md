@@ -92,7 +92,7 @@ docker pull okp4/okp4d:latest
 ### Get the documentation
 
 ```bash
-docker run okp4/okp4d:latest okp4d --help
+docker run okp4/okp4d:latest --help
 ```
 
 ### Query a running network
@@ -103,13 +103,13 @@ Example:
 API_URL=https://api.devnet.okp4.network:443/rpc
 WALLET=okp41pmkq300lrngpkeprygfrtag0xpgp9z92c7eskm
 
-docker run okp4/okp4d:latest okp4d query bank balances $WALLET --chain-id okp4-devnet-1 --node $API_URL
+docker run okp4/okp4d:latest query bank balances $WALLET --chain-id okp4-devnet-1 --node $API_URL
  ```
 
 ### Create a wallet
 
 ```bash
-docker run -v $(pwd)/home:/home okp4/okp4d:latest okp4d keys add my-wallet --keyring-backend test --home /home 
+docker run -v $(pwd)/home:/home okp4/okp4d:latest keys add my-wallet --keyring-backend test --home /home 
 ```
 
 ### Start a node
@@ -120,7 +120,7 @@ Everything you need to start a node and even more is explained here : <https://d
 MONIKER=node-in-my-name
 CHAIN_ID=localnet-okp4-1
 
-docker run -v $(pwd)/home:/home okp4/okp4d:latest okp4d init $MONIKER --chain-id $CHAIN_ID --home /home 
+docker run -v $(pwd)/home:/home okp4/okp4d:latest init $MONIKER --chain-id $CHAIN_ID --home /home 
 ```
 
 This will create a home folder, you can then update the `config/genesis.json` with one of this ones : <https://github.com/okp4/okp4d/tree/main/chains/>
@@ -132,7 +132,7 @@ Set `persistent_peers` in `config/config.toml` file.
 #### Then start the node
 
 ```bash
-docker run -v $(pwd)/home:/home okp4/okp4d:latest okp4d start --home /home
+docker run -v $(pwd)/home:/home okp4/okp4d:latest start --home /home
 ```
 
 ## Bug reports & feature requests
