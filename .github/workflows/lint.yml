@@ -80,7 +80,7 @@ jobs:
 
       - name: Find changed go files
         id: changed-go-files
-        uses: tj-actions/changed-files@v25
+        uses: tj-actions/changed-files@v26.1
         with:
           files: |
             **/*.go
