@@ -73,7 +73,7 @@ jobs:
         if: steps.readme-change.outputs.any_changed == 'true'
         uses: peter-evans/dockerhub-description@v3
         with:
-          username: okp4
+          username: ${{ secrets.DOCKER_HUB_REGISTRY_ID }}
           description: Docker image for https://github.com/okp4/okp4d
           password: ${{ secrets.DOCKER_HUB_REGISTRY_TOKEN }}
           repository: okp4/okp4d
