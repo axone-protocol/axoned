@@ -25,4 +25,4 @@ COPY --from=go-builder /src/target/dist/okp4d /usr/bin/okp4d
 
 WORKDIR /opt
 
-CMD ["/usr/bin/okp4d", "version"]
+ENTRYPOINT ["okp4d"]
