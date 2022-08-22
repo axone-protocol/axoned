@@ -17,7 +17,7 @@ jobs:
 
       - name: Find changed dependencies
         id: changed-dependencies
-        uses: tj-actions/changed-files@v26.1
+        uses: tj-actions/changed-files@v28
         with:
           files: |
             go.mod
