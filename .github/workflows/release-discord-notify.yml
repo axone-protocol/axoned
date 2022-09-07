@@ -18,7 +18,6 @@ jobs:
         🚨 A new version of @${{github.repository}} ${{ github.event.tagName }} has been released! 🎉
 
         👉 Changelog: https://github.com/${{ github.repository }/releases/tag/${{ github.event.tagName }}
-        👉 Documentation: https://
         👉 Official repo: https://github.com/${{ github.repository }
 
         "}'
