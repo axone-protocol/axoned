@@ -1,0 +1,24 @@
+name: release-discord-notify
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify:
+    runs-on: ubuntu-22.04
+    steps:
+    - name: Notify Discord
+      uses: fjogeleit/http-request-action@v1
+      with:
+        url: ${{ secrets.discord_webhook }}
+        method: 'POST'
+        customHeaders: '{"Content-Type": "application/json"}'
+        data: '{"content": "
+        🚨 A new version of @${{github.repository}} ${{ github.event.tagName }} has been released! 🎉
+
+        👉 Changelog: https://github.com/${{ github.repository }/releases/tag/${{ github.event.tagName }}
+        👉 Documentation: https://
+        👉 Official repo: https://github.com/${{ github.repository }
+
+        "}'
