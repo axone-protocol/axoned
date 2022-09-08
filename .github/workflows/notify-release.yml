@@ -14,7 +14,7 @@ jobs:
           url: ${{ secrets.OKP4_DISCORD_WEBHOOK }}
           method: 'POST'
           customHeaders: '{"Content-Type": "application/json"}'
-          data: |- 
+          data: |-
             {
               "avatar_url": "https://avatars.githubusercontent.com/u/98603954?v=4",
               "username": "Bot Anik",
