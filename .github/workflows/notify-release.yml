@@ -1,11 +1,11 @@
-name: release-discord-notify
+name: notify-release
 
 on:
   release:
     types: [published]
 
 jobs:
-  notify:
+  notify-discord:
     runs-on: ubuntu-22.04
     steps:
       - name: Notify Discord
@@ -14,13 +14,9 @@ jobs:
           url: ${{ secrets.OKP4_DISCORD_WEBHOOK }}
           method: 'POST'
           customHeaders: '{"Content-Type": "application/json"}'
-          data: '{
+          data: |- 
+            {
               "avatar_url": "https://avatars.githubusercontent.com/u/98603954?v=4",
               "username": "Bot Anik",
-              "content": "
-              🚨 A new version of @${{github.repository}} ${{ github.event.tagName }} has been released! 🎉
-
-              👉 Changelog: https://github.com/${{ github.repository }/releases/tag/${{ github.event.tagName }}
-              👉 Official repo: https://github.com/${{ github.repository }
-
-          "}'
+              "content": " 🚨 A new version of @${{github.repository}} ${{ github.event.tagName }} has been released! 🎉 \n \n 👉 Changelog: https://github.com/${{ github.repository }/releases/tag/${{ github.event.tagName }} \n 👉 Official repo: https://github.com/${{ github.repository }"
+            }
