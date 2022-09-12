@@ -1,0 +1,22 @@
+name: notify-release
+
+on:
+  release:
+    types: [published]
+
+jobs:
+  notify-discord:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Notify Discord
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: ${{ secrets.OKP4_DISCORD_WEBHOOK }}
+          method: 'POST'
+          customHeaders: '{"Content-Type": "application/json"}'
+          data: |-
+            {
+              "avatar_url": "https://avatars.githubusercontent.com/u/98603954?v=4",
+              "username": "Bot Anik",
+              "content": "🚨 A new version of @${{github.repository}} ${{ github.event.release.tag_name }} has been released! 🎉\n\n👉 Changelog: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}\n👉 Official repo: https://github.com/${{ github.repository }}"
+            }
