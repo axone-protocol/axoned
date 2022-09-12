@@ -18,5 +18,5 @@ jobs:
             {
               "avatar_url": "https://avatars.githubusercontent.com/u/98603954?v=4",
               "username": "Bot Anik",
-              "content": " 🚨 A new version of @${{github.repository}} ${{ github.event.release.tag_name }} has been released! 🎉 \n \n 👉 Changelog: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }} \n 👉 Official repo: https://github.com/${{ github.repository }}"
+              "content": "🚨 A new version of @${{github.repository}} ${{ github.event.release.tag_name }} has been released! 🎉\n\n👉 Changelog: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}\n👉 Official repo: https://github.com/${{ github.repository }}"
             }
