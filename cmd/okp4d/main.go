@@ -1,6 +1,7 @@
 package main
 
 import (
+	_ "embed"
 	"os"
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
@@ -18,6 +19,11 @@ func main() {
 		app.ModuleBasics,
 		app.New,
 	)
+
+	rootCmd.Use = app.Name
+	rootCmd.Short = Resource.Short
+	rootCmd.Long = Resource.Long
+
 	if err := svrcmd.Execute(rootCmd, "", app.DefaultNodeHome); err != nil {
 		os.Exit(1)
 	}
