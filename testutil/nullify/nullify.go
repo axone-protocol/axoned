@@ -16,7 +16,6 @@ var (
 // Fill analyze all struct fields and slices with
 // reflection and initialize the nil and empty slices,
 // structs, and pointers.
-// nolint: exhaustive
 func Fill(x interface{}) interface{} {
 	v := reflect.Indirect(reflect.ValueOf(x))
 	switch v.Kind() {
