@@ -105,7 +105,6 @@ import (
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 
 	"github.com/okp4/okp4d/docs"
-	// this line is used by starport scaffolding # stargate/app/moduleImport.
 )
 
 const (
@@ -113,11 +112,8 @@ const (
 	Name                 = "okp4d"
 )
 
-// this line is used by starport scaffolding # stargate/wasm/app/enabledProposals
-
 func getGovProposalHandlers() []govclient.ProposalHandler {
 	var govProposalHandlers []govclient.ProposalHandler
-	// this line is used by starport scaffolding # stargate/app/govProposalHandlers
 
 	govProposalHandlers = append(govProposalHandlers,
 		paramsclient.ProposalHandler,
@@ -126,7 +122,6 @@ func getGovProposalHandlers() []govclient.ProposalHandler {
 		upgradeclient.LegacyCancelProposalHandler,
 		ibcclientclient.UpdateClientProposalHandler,
 		ibcclientclient.UpgradeProposalHandler,
-		// this line is used by starport scaffolding # stargate/app/govProposalHandler.
 	)
 
 	return govProposalHandlers
@@ -160,7 +155,6 @@ var (
 		transfer.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
 	// module account permissions.
@@ -173,7 +167,6 @@ var (
 		stakingtypes.NotBondedPoolName: {authtypes.Burner, authtypes.Staking},
 		govtypes.ModuleName:            {authtypes.Burner},
 		ibctransfertypes.ModuleName:    {authtypes.Minter, authtypes.Burner},
-		// this line is used by starport scaffolding # stargate/app/maccPerms
 	}
 )
 
@@ -234,8 +227,6 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
-	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
-
 	// mm is the module manager
 	mm *module.Manager
 
@@ -273,7 +264,6 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey, govtypes.StoreKey,
 		paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey, evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey, icahosttypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
-		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -310,7 +300,6 @@ func New(
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
-	// this line is used by starport scaffolding # stargate/app/scopedKeeper
 
 	// add keepers
 	app.AccountKeeper = authkeeper.NewAccountKeeper(
@@ -481,13 +470,10 @@ func New(
 		govConfig,
 	)
 
-	// this line is used by starport scaffolding # stargate/app/keeperDefinition
-
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
 		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
-	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
 	/****  Module Options ****/
@@ -523,7 +509,6 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		icaModule,
-		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -552,7 +537,6 @@ func New(
 		group.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -576,7 +560,6 @@ func New(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -605,7 +588,6 @@ func New(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
-		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
 	// Uncomment if you want to set a custom migration order here.
@@ -634,7 +616,6 @@ func New(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
 
@@ -673,7 +654,6 @@ func New(
 
 	app.ScopedIBCKeeper = scopedIBCKeeper
 	app.ScopedTransferKeeper = scopedTransferKeeper
-	// this line is used by starport scaffolding # stargate/app/beforeInitReturn
 
 	return app
 }
@@ -834,7 +814,6 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
-	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper
 }

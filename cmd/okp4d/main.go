@@ -17,7 +17,6 @@ func main() {
 		xstrings.NoDash(app.Name),
 		app.ModuleBasics,
 		app.New,
-		// this line is used by starport scaffolding # root/arguments
 	)
 	if err := svrcmd.Execute(rootCmd, "", app.DefaultNodeHome); err != nil {
 		os.Exit(1)
