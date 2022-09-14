@@ -45,7 +45,7 @@ Want to become a validator? 👉 [Checkout the documentation!](https://docs.okp4
 
 ### Prerequisites
 
-- install [Go] `1.18+` following instructions from the [official Go documentation](https://golang.org/doc/install);
+- install [Go] `1.19+` following instructions from the [official Go documentation](https://golang.org/doc/install);
 - verify that [Docker] is properly installed and if not, follow the [instructions](https://docs.docker.com) for your environment;
 - the project comes with a convenient `Makefile` so verify that [`make`](https://fr.wikipedia.org/wiki/Make) is properly installed.
 

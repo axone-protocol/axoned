@@ -91,7 +91,7 @@ jobs:
         uses: actions/setup-go@v3.3.0
         if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
-          go-version: "1.18.2"
+          go-version: "1.19"
 
       - name: Lint go code (golangci-lint)
         uses: golangci/golangci-lint-action@v3
@@ -163,7 +163,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v3.3.0
         with:
-          go-version: "1.18.2"
+          go-version: "1.19"
 
       - name: Build go project
         run: |
@@ -185,7 +185,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v3.3.0
         with:
-          go-version: "1.18.2"
+          go-version: "1.19"
 
       - name: Install Ignite CLI
         run: |
