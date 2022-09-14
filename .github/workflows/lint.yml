@@ -189,7 +189,7 @@ jobs:
 
       - name: Install Ignite CLI
         run: |
-          curl https://get.ignite.com/cli@v0.22.2! | bash
+          curl https://get.ignite.com/cli@v0.24.0! | bash
 
       - name: Generate OpenAPI spec for the chain
         run: |
