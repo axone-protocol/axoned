@@ -108,10 +108,6 @@
         }
       ],
       "supply": [
-        {
-          "denom": "uknow",
-          "amount": "30000001000000000"
-        }
       ],
       "denom_metadata": [
         {
@@ -198,6 +194,16 @@
         "veto_threshold": "0.334000000000000000"
       }
     },
+    "group": {
+      "group_seq": "0",
+      "groups": [],
+      "group_members": [],
+      "group_policy_seq": "0",
+      "group_policies": [],
+      "proposal_seq": "0",
+      "proposals": [],
+      "votes": []
+    },
     "ibc": {
       "client_genesis": {
         "clients": [],
@@ -250,7 +256,6 @@
         }
       }
     },
-    "intertx": null,
     "mint": {
       "minter": {
         "inflation": "0.130000000000000000",
@@ -283,7 +288,8 @@
         "max_validators": 100,
         "max_entries": 7,
         "historical_entries": 10000,
-        "bond_denom": "uknow"
+        "bond_denom": "uknow",
+        "min_commission_rate": "0.000000000000000000"
       },
       "last_total_power": "0",
       "last_validator_powers": [],
@@ -302,19 +308,6 @@
       }
     },
     "upgrade": {},
-    "vesting": {},
-    "wasm": {
-      "params": {
-        "code_upload_access": {
-          "permission": "Everybody",
-          "address": ""
-        },
-        "instantiate_default_permission": "Everybody"
-      },
-      "codes": [],
-      "contracts": [],
-      "sequences": [],
-      "gen_msgs": []
-    }
+    "vesting": {}
   }
 }

@@ -87,11 +87,17 @@ jobs:
             go.mod
             go.sum
 
+      - name: Setup Go environment
+        uses: actions/setup-go@v3.3.0
+        if: steps.changed-go-files.outputs.any_changed == 'true'
+        with:
+          go-version: "1.19"
+
       - name: Lint go code (golangci-lint)
         uses: golangci/golangci-lint-action@v3
         if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
-          version: v1.44
+          version: v1.49
 
   lint-dockerfile:
     runs-on: ubuntu-20.04
@@ -157,7 +163,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v3.3.0
         with:
-          go-version: "1.18.2"
+          go-version: "1.19"
 
       - name: Build go project
         run: |
@@ -179,11 +185,11 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v3.3.0
         with:
-          go-version: "1.18.2"
+          go-version: "1.19"
 
       - name: Install Ignite CLI
         run: |
-          curl https://get.ignite.com/cli@v0.22.2! | bash
+          curl https://get.ignite.com/cli@v0.24.0! | bash
 
       - name: Generate OpenAPI spec for the chain
         run: |

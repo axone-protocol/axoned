@@ -1,4 +1,4 @@
-[![okp4 github banner](https://raw.githubusercontent.com/okp4/okp4d/main/docs/okp4-banner.png)](https://okp4.network)
+[![okp4 github banner](https://raw.githubusercontent.com/okp4/okp4d/main/etc/okp4-banner.png)](https://okp4.network)
 
 <p align="center">
   <a href="https://discord.gg/okp4"><img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" /></a> &nbsp;
@@ -45,7 +45,7 @@ Want to become a validator? 👉 [Checkout the documentation!](https://docs.okp4
 
 ### Prerequisites
 
-- install [Go] `1.18+` following instructions from the [official Go documentation](https://golang.org/doc/install);
+- install [Go] `1.19+` following instructions from the [official Go documentation](https://golang.org/doc/install);
 - verify that [Docker] is properly installed and if not, follow the [instructions](https://docs.docker.com) for your environment;
 - the project comes with a convenient `Makefile` so verify that [`make`](https://fr.wikipedia.org/wiki/Make) is properly installed.
 
