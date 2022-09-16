@@ -10,7 +10,7 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
-func setupMsgServer(t testing.TB) (types.MsgServer, context.Context) {
+func setupMsgServer(t testing.TB) (types.MsgServiceServer, context.Context) {
 	k, ctx := keepertest.LogicKeeper(t)
 	return keeper.NewMsgServerImpl(*k), sdk.WrapSDKContext(ctx)
 }
