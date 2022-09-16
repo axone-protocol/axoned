@@ -3,12 +3,10 @@ package okp4.okp4d.logic;
 
 import "gogoproto/gogo.proto";
 import "logic/params.proto";
-// this line is used by starport scaffolding # genesis/proto/import
 
 option go_package = "github.com/okp4/okp4d/x/logic/types";
 
 // GenesisState defines the logic module's genesis state.
 message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
-  // this line is used by starport scaffolding # genesis/proto/state
 }
