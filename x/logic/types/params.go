@@ -12,15 +12,15 @@ var _ paramtypes.ParamSet = (*Params)(nil)
 var (
 	KeyFoo = []byte("Foo")
 	// TODO: Determine the default value
-	DefaultFoo string = "foo"
+	DefaultFoo = "foo"
 )
 
-// ParamKeyTable the param key table for launch module
+// ParamKeyTable the param key table for launch module.
 func ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
 }
 
-// NewParams creates a new Params instance
+// NewParams creates a new Params instance.
 func NewParams(
 	foo string,
 ) Params {
@@ -29,21 +29,21 @@ func NewParams(
 	}
 }
 
-// DefaultParams returns a default set of parameters
+// DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
 	return NewParams(
 		DefaultFoo,
 	)
 }
 
-// ParamSetPairs get the params.ParamSet
+// ParamSetPairs get the params.ParamSet.
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyFoo, &p.Foo, validateFoo),
 	}
 }
 
-// Validate validates the set of params
+// Validate validates the set of params.
 func (p Params) Validate() error {
 	if err := validateFoo(p.Foo); err != nil {
 		return err
@@ -58,7 +58,7 @@ func (p Params) String() string {
 	return string(out)
 }
 
-// validateFoo validates the Foo param
+// validateFoo validates the Foo param.
 func validateFoo(v interface{}) error {
 	foo, ok := v.(string)
 	if !ok {
