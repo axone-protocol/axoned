@@ -1,0 +1,13 @@
+syntax = "proto3";
+package okp4.okp4d.logic;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/okp4/okp4d/x/logic/types";
+
+// Params defines the parameters for the module.
+message Params {
+  option (gogoproto.goproto_stringer) = false;
+
+  string foo = 1 [(gogoproto.moretags) = "yaml:\"foo\""];
+}
