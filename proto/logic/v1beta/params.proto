@@ -1,5 +1,5 @@
 syntax = "proto3";
-package okp4.okp4d.logic;
+package logic.v1beta;
 
 import "gogoproto/gogo.proto";
 
