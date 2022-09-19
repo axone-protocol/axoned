@@ -67,6 +67,14 @@ lint-go: ## Lint go source code
   		${DOCKER_IMAGE_GOLANG_CI} \
   		golangci-lint run -v
 
+lint-proto:
+	@echo "${COLOR_CYAN}🔍️ lint proto${COLOR_RESET}"
+	@docker run --rm \
+  		-v `pwd`:/proto \
+  		-w /proto \
+  		${DOCKER_IMAGE_BUF} \
+  		lint proto -v
+
 ## Build:
 build: build-go ## Build all available artefacts (executable, docker image, etc.)
 
