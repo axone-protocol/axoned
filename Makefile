@@ -5,6 +5,7 @@ BINARY_NAME             = okp4d
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.49
+DOCKER_IMAGE_BUF  		= bufbuild/buf
 CMD_ROOT               :=./cmd/${BINARY_NAME}
 
 # Some colors
@@ -111,6 +112,20 @@ test-go: build ## Pass the test for the go source code
 clean: ## Remove all the files from the target folder
 	@echo "${COLOR_CYAN} 🗑 Cleaning folder $(TARGET_FOLDER)${COLOR_RESET}"
 	@rm -rf $(TARGET_FOLDER)/
+
+generate-proto:
+	@echo "${COLOR_CYAN}📝 Generate proto${COLOR_RESET}"
+	@buf generate proto --template buf.gen.proto.yaml
+	@cp -r github.com/okp4/${BINARY_NAME}/x/* x/
+	@rm -rf github.com
+
+build-proto:
+	@echo "${COLOR_CYAN}⚙️ Build proto${COLOR_RESET}"
+	@docker run --rm \
+  		-v `pwd`:/proto \
+  		-w /proto \
+  		${DOCKER_IMAGE_BUF} \
+  		build proto -v
 
 ## Help:
 help: ## Show this help.
