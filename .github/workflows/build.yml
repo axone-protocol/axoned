@@ -14,7 +14,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  
+
   build-proto:
     runs-on: ubuntu-20.04
     steps:
@@ -41,10 +41,13 @@ jobs:
         with:
           go-version: "1.19"
 
+      - name: Setup buf
+        uses: bufbuild/buf-setup-action@v1
+
       - name: Generate proto
         run: |
-          make generate-proto       
-    
+          make generate-proto
+
   build-go:
     runs-on: ubuntu-20.04
     steps:
