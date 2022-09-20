@@ -32,9 +32,6 @@ jobs:
   test-blockchain:
     runs-on: ubuntu-20.04
     timeout-minutes: 10
-    strategy:
-      matrix:
-        genesis-file: ["pre-genesis.json", "genesis.json"]
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -57,25 +54,23 @@ jobs:
             --chain-id=okp4-devnet-1 \
             --home ./target/deployment/devnet
 
-          cp ./chains/devnet-1/${{ matrix.genesis-file }} ./target/deployment/devnet/config/genesis.json
+          sed -ie "s/\"stake\"/\"uknow\"/g" target/deployment/devnet/config/genesis.json
 
-          if [ "${{ matrix.genesis-file }}" = "pre-genesis.json" ]; then
-            okp4d keys add validator \
-                --home ./target/deployment/devnet \
-                --keyring-backend test
+          okp4d keys add validator \
+              --home ./target/deployment/devnet \
+              --keyring-backend test
 
-            okp4d add-genesis-account validator 1000000000uknow \
-                --home ./target/deployment/devnet \
-                --keyring-backend test
+          okp4d add-genesis-account validator 1000000000uknow \
+              --home ./target/deployment/devnet \
+              --keyring-backend test
 
-            okp4d gentx validator 1000000uknow --node-id $(okp4d tendermint show-node-id --home ./target/deployment/devnet) \
-                --chain-id okp4-devnet-1 \
-                --home ./target/deployment/devnet \
-                --keyring-backend test
+          okp4d gentx validator 1000000uknow --node-id $(okp4d tendermint show-node-id --home ./target/deployment/devnet) \
+              --chain-id okp4-devnet-1 \
+              --home ./target/deployment/devnet \
+              --keyring-backend test
 
-            okp4d collect-gentxs \
-                --home ./target/deployment/devnet
-          fi
+          okp4d collect-gentxs \
+              --home ./target/deployment/devnet
 
       - name: Start the blockchain
         run: |
