@@ -25,19 +25,13 @@
 
 Read more in the [introduction blog post](https://blog.okp4.network/what-is-okp4-b6bb058ae221). For a high-level overview of the OKP4 protocol and network economics, check out the [white paper](https://docs.okp4.network/docs/whitepaper/abstract).
 
-## OKP4 Networks
-
-| **Network** | Status | Description                                                                                                                                                                                |    Chain-ID     | URL                                                                                                  |
-|-------------|:------:|--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|:---------------:|------------------------------------------------------------------------------------------------------|
-| `devnet`    |   ✅    | Developers-focused network of our blockchain for build/test purposes.                                                                                                                      | `okp4-devnet-1` | api:&nbsp;<https://api.devnet.okp4.network> <br/>rpc:&nbsp;<https://api.devnet.okp4.network:443/rpc> |
-| `testnet`   |   🚧   | The easiest place to create test Data Spaces if you're not quite ready yet to dive into building applications on our main network. It is also the ideal place to start as a node operator. |        -        | -                                                                                                    |
-| `mainnet`   |   🔜   |                                                                                                                                                                                            |        -        | -                                                                                                    |
-
 ## Want to become a validator?
 
 Validators are responsible for securing the okp4 network. Validator responsibilities include maintaining a functional [node](https://docs.okp4.network/docs/nodes/run-node) with constant uptime and providing a sufficient amount of $KNOW as stake. In exchange for this service, validators receive block rewards and transaction fees.
 
 Want to become a validator? 👉 [Checkout the documentation!](https://docs.okp4.network/docs/nodes/introduction)
+
+Looking for a network to join ? 👉 [Checkout the networks!](https://github.com/okp4/networks)
 
 ## Developing & contributing
 
