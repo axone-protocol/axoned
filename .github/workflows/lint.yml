@@ -154,26 +154,6 @@ jobs:
     env:
       GITHUB_TOKEN: ${{ secrets.OKP4_TOKEN }}
 
-  lint-genesis:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-
-      - name: Setup Go environment
-        uses: actions/setup-go@v3.3.0
-        with:
-          go-version: "1.19"
-
-      - name: Build go project
-        run: |
-          make build
-
-      - name: Check devnet genesis files
-        run: |
-          ./target/dist/okp4d validate-genesis ./chains/devnet-1/pre-genesis.json
-          ./target/dist/okp4d validate-genesis ./chains/devnet-1/genesis.json
-
   lint-generated:
     runs-on: ubuntu-20.04
     steps:
