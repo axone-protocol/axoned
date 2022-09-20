@@ -15,21 +15,6 @@ concurrency:
 
 jobs:
 
-  build-proto:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-
-      - name: Setup Go environment
-        uses: actions/setup-go@v3.3.0
-        with:
-          go-version: "1.19"
-
-      - name: Build proto
-        run: |
-          make build-proto
-
   generate-proto:
     runs-on: ubuntu-20.04
     steps:
@@ -41,18 +26,11 @@ jobs:
         with:
           go-version: "1.19"
 
-      - name: Add protobuf dependencies
-        run: |
-          go install google.golang.org/protobuf/cmd/protoc-gen-go@v1.28 \
-          && go install google.golang.org/grpc/cmd/protoc-gen-go-grpc@v1.2 \
-          && go install github.com/grpc-ecosystem/grpc-gateway/v2/protoc-gen-openapiv2
-
-      - name: Setup buf
-        uses: bufbuild/buf-setup-action@v1
+      - name: Build proto docker image
+        run: make proto-image-build
 
       - name: Generate proto
-        run: |
-          make generate-proto
+        run: make proto-gen
 
   build-go:
     runs-on: ubuntu-20.04

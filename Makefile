@@ -76,7 +76,7 @@ lint-proto:
   		lint proto -v
 
 ## Build:
-build: generate-proto build-go ## Build all available artefacts (executable, docker image, etc.)
+build: build-go ## Build all available artefacts (executable, docker image, etc.)
 
 build-go: ## Build node executable for the current environment (default build)
 	@echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN}${COLOR_RESET} into ${COLOR_YELLOW}${DIST_FOLDER}${COLOR_RESET}"
@@ -121,19 +121,20 @@ clean: ## Remove all the files from the target folder
 	@echo "${COLOR_CYAN} 🗑 Cleaning folder $(TARGET_FOLDER)${COLOR_RESET}"
 	@rm -rf $(TARGET_FOLDER)/
 
-generate-proto: build-proto ## Generate all protobuf files and move it in the corresponding folder
-	@echo "${COLOR_CYAN}📝 Generate proto${COLOR_RESET}"
-	@buf generate proto --template buf.gen.proto.yaml
-	@cp -r github.com/okp4/${BINARY_NAME}/x/* x/
-	@rm -rf github.com
 
-build-proto: ## Build protobuf files
-	@echo "${COLOR_CYAN}⚙️ Build proto${COLOR_RESET}"
-	@docker run --rm \
-  		-v `pwd`:/proto \
-  		-w /proto \
-  		${DOCKER_IMAGE_BUF} \
-  		build proto -v
+protoName=okp4/okp4-proto-gen
+containerName=okp4-proto-gen
+
+proto-all: proto-gen
+
+proto-gen:
+	@echo "📝️ Generating Protobuf files"
+	@if docker ps -a --format '{{.Names}}' | grep -Eq "^${containerName}$$"; then docker start -a $(containerName); else docker run --rm --name $(containerName) -v $(CURDIR):/workspace --workdir /workspace $(protoName) \
+		sh ./scripts/protocgen.sh --debug; fi
+
+proto-image-build:
+	@echo "${COLOR_CYAN} 🏗 Building proto generation docker image ${COLOR_RESET}"
+	@DOCKER_BUILDKIT=1 docker build -t $(protoName) -f ./proto/Dockerfile ./proto
 
 ## Help:
 help: ## Show this help.
