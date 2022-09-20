@@ -57,7 +57,7 @@ ENVIRONMENTS_TARGETS = $(addprefix build-go-, $(ENVIRONMENTS))
 all: help
 
 ## Lint:
-lint: lint-go ## Lint all available linters
+lint: lint-go lint-proto ## Lint all available linters
 
 lint-go: ## Lint go source code
 	@echo "${COLOR_CYAN}🔍 Inspecting go source code${COLOR_RESET}"
@@ -76,7 +76,7 @@ lint-proto:
   		lint proto -v
 
 ## Build:
-build: build-go ## Build all available artefacts (executable, docker image, etc.)
+build: generate-proto build-go ## Build all available artefacts (executable, docker image, etc.)
 
 build-go: ## Build node executable for the current environment (default build)
 	@echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN}${COLOR_RESET} into ${COLOR_YELLOW}${DIST_FOLDER}${COLOR_RESET}"
@@ -121,13 +121,13 @@ clean: ## Remove all the files from the target folder
 	@echo "${COLOR_CYAN} 🗑 Cleaning folder $(TARGET_FOLDER)${COLOR_RESET}"
 	@rm -rf $(TARGET_FOLDER)/
 
-generate-proto:
+generate-proto: build-proto ## Generate all protobuf files and move it in the corresponding folder
 	@echo "${COLOR_CYAN}📝 Generate proto${COLOR_RESET}"
 	@buf generate proto --template buf.gen.proto.yaml
 	@cp -r github.com/okp4/${BINARY_NAME}/x/* x/
 	@rm -rf github.com
 
-build-proto:
+build-proto: ## Build protobuf files
 	@echo "${COLOR_CYAN}⚙️ Build proto${COLOR_RESET}"
 	@docker run --rm \
   		-v `pwd`:/proto \
