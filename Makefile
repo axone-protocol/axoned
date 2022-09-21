@@ -5,7 +5,7 @@ BINARY_NAME             = okp4d
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.49
-DOCKER_IMAGE_BUF  		= bufbuild/buf
+DOCKER_IMAGE_BUF  		= okp4/buf-cosmos:1.4.2
 CMD_ROOT               :=./cmd/${BINARY_NAME}
 
 # Some colors
@@ -67,9 +67,10 @@ lint-go: ## Lint go source code
   		${DOCKER_IMAGE_GOLANG_CI} \
   		golangci-lint run -v
 
-lint-proto:
+lint-proto: ## Lint proto files
 	@echo "${COLOR_CYAN}🔍️ lint proto${COLOR_RESET}"
 	@docker run --rm \
+		-v ${HOME}/.cache:/root/.cache \
   		-v `pwd`:/proto \
   		-w /proto \
   		${DOCKER_IMAGE_BUF} \
@@ -121,20 +122,35 @@ clean: ## Remove all the files from the target folder
 	@echo "${COLOR_CYAN} 🗑 Cleaning folder $(TARGET_FOLDER)${COLOR_RESET}"
 	@rm -rf $(TARGET_FOLDER)/
 
+## Proto:
+proto-format: ## Format Protobuf files
+	@echo "${COLOR_CYAN} 📐 Formatting Protobuf files${COLOR_RESET}"
+	@docker run --rm \
+    		-v ${HOME}/.cache:/root/.cache \
+    		-v `pwd`:/proto \
+    		-w /proto \
+    		${DOCKER_IMAGE_BUF} \
+    		format -w -v
 
-protoName=okp4/okp4-proto-gen
-containerName=okp4-proto-gen
+proto-build: ## Build all Protobuf files
+	@echo "${COLOR_CYAN} 🔨️Build Protobuf files${COLOR_RESET}"
+	@docker run --rm \
+		-v ${HOME}/.cache:/root/.cache \
+		-v `pwd`:/proto \
+		-w /proto \
+		${DOCKER_IMAGE_BUF} \
+		build proto -v
 
-proto-all: proto-gen
-
-proto-gen:
-	@echo "📝️ Generating Protobuf files"
-	@if docker ps -a --format '{{.Names}}' | grep -Eq "^${containerName}$$"; then docker start -a $(containerName); else docker run --rm --name $(containerName) -v $(CURDIR):/workspace --workdir /workspace $(protoName) \
-		sh ./scripts/protocgen.sh --debug; fi
-
-proto-image-build:
-	@echo "${COLOR_CYAN} 🏗 Building proto generation docker image ${COLOR_RESET}"
-	@DOCKER_BUILDKIT=1 docker build -t $(protoName) -f ./proto/Dockerfile ./proto
+proto-gen: proto-build ## Generate all the code from the Protobuf files
+	@echo "${COLOR_CYAN} 📝 Generating code from Protobuf files${COLOR_RESET}"
+	@docker run --rm \
+		-v ${HOME}/.cache:/root/.cache \
+		-v `pwd`:/proto \
+		-w /proto \
+		${DOCKER_IMAGE_BUF} \
+		generate proto --template buf.gen.proto.yaml -v
+	@cp -r github.com/okp4/okp4d/x/* x/
+	@rm -rf github.com
 
 ## Help:
 help: ## Show this help.

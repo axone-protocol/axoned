@@ -14,24 +14,6 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-
-  generate-proto:
-    runs-on: ubuntu-20.04
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v3
-
-      - name: Setup Go environment
-        uses: actions/setup-go@v3.3.0
-        with:
-          go-version: "1.19"
-
-      - name: Build proto docker image
-        run: make proto-image-build
-
-      - name: Generate proto
-        run: make proto-gen
-
   build-go:
     runs-on: ubuntu-20.04
     steps:
