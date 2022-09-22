@@ -1,0 +1,13 @@
+syntax = "proto3";
+package logic.v1beta;
+
+import "gogoproto/gogo.proto";
+import "logic/v1beta/params.proto";
+
+option go_package = "github.com/okp4/okp4d/x/logic/types";
+
+// GenesisState defines the logic module's genesis state.
+message GenesisState {
+  // The state parameters for the logic module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}

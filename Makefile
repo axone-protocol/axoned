@@ -5,6 +5,7 @@ BINARY_NAME             = okp4d
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.49
+DOCKER_IMAGE_BUF  		= okp4/buf-cosmos:1.4.2
 CMD_ROOT               :=./cmd/${BINARY_NAME}
 
 # Some colors
@@ -56,7 +57,7 @@ ENVIRONMENTS_TARGETS = $(addprefix build-go-, $(ENVIRONMENTS))
 all: help
 
 ## Lint:
-lint: lint-go ## Lint all available linters
+lint: lint-go lint-proto ## Lint all available linters
 
 lint-go: ## Lint go source code
 	@echo "${COLOR_CYAN}🔍 Inspecting go source code${COLOR_RESET}"
@@ -65,6 +66,15 @@ lint-go: ## Lint go source code
   		-w /app \
   		${DOCKER_IMAGE_GOLANG_CI} \
   		golangci-lint run -v
+
+lint-proto: ## Lint proto files
+	@echo "${COLOR_CYAN}🔍️ lint proto${COLOR_RESET}"
+	@docker run --rm \
+		-v ${HOME}/.cache:/root/.cache \
+  		-v `pwd`:/proto \
+  		-w /proto \
+  		${DOCKER_IMAGE_BUF} \
+  		lint proto -v
 
 ## Build:
 build: build-go ## Build all available artefacts (executable, docker image, etc.)
@@ -111,6 +121,36 @@ test-go: build ## Pass the test for the go source code
 clean: ## Remove all the files from the target folder
 	@echo "${COLOR_CYAN} 🗑 Cleaning folder $(TARGET_FOLDER)${COLOR_RESET}"
 	@rm -rf $(TARGET_FOLDER)/
+
+## Proto:
+proto-format: ## Format Protobuf files
+	@echo "${COLOR_CYAN} 📐 Formatting Protobuf files${COLOR_RESET}"
+	@docker run --rm \
+    		-v ${HOME}/.cache:/root/.cache \
+    		-v `pwd`:/proto \
+    		-w /proto \
+    		${DOCKER_IMAGE_BUF} \
+    		format -w -v
+
+proto-build: ## Build all Protobuf files
+	@echo "${COLOR_CYAN} 🔨️Build Protobuf files${COLOR_RESET}"
+	@docker run --rm \
+		-v ${HOME}/.cache:/root/.cache \
+		-v `pwd`:/proto \
+		-w /proto \
+		${DOCKER_IMAGE_BUF} \
+		build proto -v
+
+proto-gen: proto-build ## Generate all the code from the Protobuf files
+	@echo "${COLOR_CYAN} 📝 Generating code from Protobuf files${COLOR_RESET}"
+	@docker run --rm \
+		-v ${HOME}/.cache:/root/.cache \
+		-v `pwd`:/proto \
+		-w /proto \
+		${DOCKER_IMAGE_BUF} \
+		generate proto --template buf.gen.proto.yaml -v
+	@cp -r github.com/okp4/okp4d/x/* x/
+	@rm -rf github.com
 
 ## Help:
 help: ## Show this help.

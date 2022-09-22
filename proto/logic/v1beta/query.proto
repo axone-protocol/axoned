@@ -1,0 +1,26 @@
+syntax = "proto3";
+package logic.v1beta;
+
+import "gogoproto/gogo.proto";
+import "google/api/annotations.proto";
+import "logic/v1beta/params.proto";
+
+option go_package = "github.com/okp4/okp4d/x/logic/types";
+
+// QueryService defines the gRPC querier service.
+service QueryService {
+  // Parameters queries the parameters of the module.
+  rpc Params(QueryServiceParamsRequest) returns (QueryServiceParamsResponse) {
+    option (google.api.http).get = "/okp4/okp4d/logic/params";
+  }
+}
+
+// QueryServiceParamsRequest is request type for the QueryService/Params RPC method.
+message QueryServiceParamsRequest {}
+
+// QueryServiceParamsResponse is response type for the QueryService/Params RPC method.
+message QueryServiceParamsResponse {
+  // params holds all the parameters of this module.
+  Params params = 1 [(gogoproto.nullable) = false];
+}
+

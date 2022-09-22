@@ -94,6 +94,9 @@ import (
 	ibcporttypes "github.com/cosmos/ibc-go/v5/modules/core/05-port/types"
 	ibchost "github.com/cosmos/ibc-go/v5/modules/core/24-host"
 	ibckeeper "github.com/cosmos/ibc-go/v5/modules/core/keeper"
+	logicmodule "github.com/okp4/okp4d/x/logic"
+	logicmodulekeeper "github.com/okp4/okp4d/x/logic/keeper"
+	logicmoduletypes "github.com/okp4/okp4d/x/logic/types"
 	"github.com/spf13/cast"
 	abci "github.com/tendermint/tendermint/abci/types"
 	tmjson "github.com/tendermint/tendermint/libs/json"
@@ -155,6 +158,7 @@ var (
 		transfer.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		vesting.AppModuleBasic{},
+		logicmodule.AppModuleBasic{},
 	)
 
 	// module account permissions.
@@ -221,6 +225,7 @@ type App struct {
 	ICAHostKeeper    icahostkeeper.Keeper
 	FeeGrantKeeper   feegrantkeeper.Keeper
 	GroupKeeper      groupkeeper.Keeper
+	LogicKeeper      logicmodulekeeper.Keeper
 
 	// make scoped keepers public for test purposes
 	ScopedIBCKeeper      capabilitykeeper.ScopedKeeper
@@ -264,6 +269,7 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey, govtypes.StoreKey,
 		paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey, evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey, icahosttypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
+		logicmoduletypes.StoreKey,
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
 	memKeys := sdk.NewMemoryStoreKeys(capabilitytypes.MemStoreKey)
@@ -470,6 +476,14 @@ func New(
 		govConfig,
 	)
 
+	app.LogicKeeper = *logicmodulekeeper.NewKeeper(
+		appCodec,
+		keys[logicmoduletypes.StoreKey],
+		keys[logicmoduletypes.MemStoreKey],
+		app.GetSubspace(logicmoduletypes.ModuleName),
+	)
+	logicModule := logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper)
+
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
@@ -509,6 +523,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		icaModule,
+		logicModule,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -537,6 +552,7 @@ func New(
 		group.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
+		logicmoduletypes.ModuleName,
 	)
 
 	app.mm.SetOrderEndBlockers(
@@ -560,6 +576,7 @@ func New(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
+		logicmoduletypes.ModuleName,
 	)
 
 	// NOTE: The genutils module must occur after staking so that pools are
@@ -588,6 +605,7 @@ func New(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
+		logicmoduletypes.ModuleName,
 	)
 
 	// Uncomment if you want to set a custom migration order here.
@@ -616,6 +634,7 @@ func New(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
+		logicModule,
 	)
 	app.sm.RegisterStoreDecoders()
 
@@ -814,6 +833,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
+	paramsKeeper.Subspace(logicmoduletypes.ModuleName)
 
 	return paramsKeeper
 }

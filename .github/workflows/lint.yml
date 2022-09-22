@@ -116,6 +116,16 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
+  lint-proto:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Lint proto files
+        run: |
+          make lint-proto
+
   lint-generated:
     runs-on: ubuntu-20.04
     steps:
