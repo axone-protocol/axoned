@@ -179,6 +179,13 @@ $(RELEASE_TARGETS): ensure-buildx-builder
 	docker rm -f tmp-okp4d; \
 	tar -zcvf ${RELEASE_FOLDER}/$$BINARY_NAME.tar.gz ${RELEASE_FOLDER}/$$BINARY_NAME;
 
+release-checksums:
+	@echo "${COLOR_CYAN} 🐾 Generating release binary checksums${COLOR_RESET} into ${COLOR_YELLOW}${RELEASE_FOLDER}${COLOR_RESET}"
+	@rm ${RELEASE_FOLDER}/sha256sum.txt; \
+	for asset in `ls ${RELEASE_FOLDER}`; do \
+		shasum -a 256 ${RELEASE_FOLDER}/$$asset >> ${RELEASE_FOLDER}/sha256sum.txt; \
+	done;
+
 ensure-buildx-builder:
 	@echo "${COLOR_CYAN} 👷 Ensuring docker buildx builder${COLOR_RESET}"
 	@docker buildx ls | sed '1 d' | cut -f 1 -d ' ' | grep -q ${DOCKER_BUILDX_BUILDER} || \
