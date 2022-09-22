@@ -5,7 +5,7 @@ BINARY_NAME             = okp4d
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.49
-DOCKER_IMAGE_BUF  		= okp4/buf-cosmos:1.4.2
+DOCKER_IMAGE_BUF  		= okp4/buf-cosmos:0.3.1
 CMD_ROOT               :=./cmd/${BINARY_NAME}
 
 # Some colors
