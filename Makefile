@@ -160,6 +160,9 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 	@cp -r github.com/okp4/okp4d/x/* x/
 	@rm -rf github.com
 
+## Release:
+release-assets: release-binary-all release-checksums ## Generate release assets
+
 release-binary-all: $(RELEASE_TARGETS)
 
 $(RELEASE_TARGETS): ensure-buildx-builder
