@@ -25,21 +25,11 @@ plugins:
         make release-assets
   - - "@semantic-release/github"
     - assets:
-        - name: okp4d-${nextRelease.version}-linux-amd64
-          label: okp4d-${nextRelease.version}-linux-amd64
-          path: "./target/release/okp4d-${nextRelease.version}-linux-amd64"
-        - name: okp4d-${nextRelease.version}-linux-amd64.tar.gz
-          label: okp4d-${nextRelease.version}-linux-amd64.tar.gz
-          path: "./target/release/okp4d-${nextRelease.version}-linux-amd64.tar.gz"
-        - name: okp4d-${nextRelease.version}-linux-arm64
-          label: okp4d-${nextRelease.version}-linux-arm64
-          path: "./target/release/okp4d-${nextRelease.version}-linux-arm64"
-        - name: okp4d-${nextRelease.version}-linux-arm64.tar.gz
-          label: okp4d-${nextRelease.version}-linux-arm64.tar.gz
-          path: "./target/release/okp4d-${nextRelease.version}-linux-arm64.tar.gz"
-        - name: sha256sum.txt
-          label: sha256sum.txt
-          path: "./target/release/sha256sum.txt"
+        - path: "./target/release/okp4d-*-linux-amd64"
+        - path: "./target/release/okp4d-*-linux-amd64.tar.gz"
+        - path: "./target/release/okp4d-*-linux-arm64"
+        - path: "./target/release/okp4d-*-linux-arm64.tar.gz"
+        - path: "./target/release/sha256sum.txt"
   - - "@semantic-release/git"
     - assets:
         - CHANGELOG.md
