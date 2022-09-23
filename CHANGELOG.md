@@ -1,5 +1,32 @@
 # ØKP4 protocol changelog
 
+## [2.0.0](https://github.com/okp4/okp4d/compare/v1.3.0...v2.0.0) (2022-09-23)
+
+
+### ⚠ BREAKING CHANGES
+
+* reboot chain with ignite cli v0.24.0
+
+### Features
+
+* add logic module params to genesis files ([9ac7ef8](https://github.com/okp4/okp4d/commit/9ac7ef8a7ecbe72fd8efd983ed138fd375aaf1fa))
+* scaffold logic module using ignite ([81ee269](https://github.com/okp4/okp4d/commit/81ee26997d3e941fa24655ea89ce3dad93b6cfd2))
+* update openapi documentation (synced with code) ([787ff01](https://github.com/okp4/okp4d/commit/787ff01148f1721f75594824c6da715ade5f18ea))
+* **wasm:** prepare ante handler with wasm decorators ([afb4748](https://github.com/okp4/okp4d/commit/afb4748f5ea7b3b6723226235d9d93e171605c9f))
+* **wasm:** wire wasm module in app ([b163790](https://github.com/okp4/okp4d/commit/b163790cb60c2221793742eed6fecc22d4254315))
+
+
+### Bug Fixes
+
+* fix (pre-)genesis files after 0.46 cosmos sdk migration ([da284a0](https://github.com/okp4/okp4d/commit/da284a0d4993f2231794ddbfae16b8151b23fbfc))
+* use proper versions of buf protoc plugins ([1ca5e1d](https://github.com/okp4/okp4d/commit/1ca5e1d6127d255cf8f11375a7256e5c07efedf0))
+* **workflow:** use secret for dockerhub user ([0d95c94](https://github.com/okp4/okp4d/commit/0d95c945e7c0e858ae22a2e7d573853e889d4473))
+
+
+### Code Refactoring
+
+* reboot chain with ignite cli v0.24.0 ([423179e](https://github.com/okp4/okp4d/commit/423179e5028de57b7859bbd6ebcb5d12a4b42fb5))
+
 # [1.3.0](https://github.com/okp4/okp4d/compare/v1.2.0...v1.3.0) (2022-07-08)
 
 
