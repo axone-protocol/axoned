@@ -4,8 +4,10 @@
 BINARY_NAME             = okp4d
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
+RELEASE_FOLDER          = $(TARGET_FOLDER)/release
 DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.49
 DOCKER_IMAGE_BUF  		= okp4/buf-cosmos:0.3.1
+DOCKER_BUILDX_BUILDER   = okp4-builder
 CMD_ROOT               :=./cmd/${BINARY_NAME}
 
 # Some colors
@@ -51,6 +53,11 @@ ENVIRONMENTS = \
 	linux-amd64 \
 	linux-arm64
 ENVIRONMENTS_TARGETS = $(addprefix build-go-, $(ENVIRONMENTS))
+
+# Release binaries
+RELEASE_BINARIES = \
+	linux-amd64
+RELEASE_TARGETS = $(addprefix release-binary-, $(RELEASE_BINARIES))
 
 .PHONY: all lint lint-go build build-go help
 
@@ -151,6 +158,41 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 		generate proto --template buf.gen.proto.yaml -v
 	@cp -r github.com/okp4/okp4d/x/* x/
 	@rm -rf github.com
+
+## Release:
+release-assets: release-binary-all release-checksums ## Generate release assets
+
+release-binary-all: $(RELEASE_TARGETS)
+
+$(RELEASE_TARGETS): ensure-buildx-builder
+	@GOOS=$(word 3, $(subst -, ,$@)); \
+    GOARCH=$(word 4, $(subst -, ,$@)); \
+    BINARY_NAME="okp4d-${VERSION}-$$GOOS-$$GOARCH"; \
+	echo "${COLOR_CYAN} 🎁 Building ${COLOR_GREEN}$$GOOS $$GOARCH ${COLOR_CYAN}release binary${COLOR_RESET} into ${COLOR_YELLOW}${RELEASE_FOLDER}${COLOR_RESET}"; \
+	docker buildx use ${DOCKER_BUILDX_BUILDER}; \
+	docker buildx build \
+		--platform $$GOOS/$$GOARCH \
+		-t $$BINARY_NAME \
+		--load \
+		.; \
+	mkdir -p ${RELEASE_FOLDER}; \
+	docker rm -f tmp-okp4d || true; \
+	docker create -ti --name tmp-okp4d $$BINARY_NAME; \
+	docker cp tmp-okp4d:/usr/bin/okp4d ${RELEASE_FOLDER}/$$BINARY_NAME; \
+	docker rm -f tmp-okp4d; \
+	tar -zcvf ${RELEASE_FOLDER}/$$BINARY_NAME.tar.gz ${RELEASE_FOLDER}/$$BINARY_NAME;
+
+release-checksums:
+	@echo "${COLOR_CYAN} 🐾 Generating release binary checksums${COLOR_RESET} into ${COLOR_YELLOW}${RELEASE_FOLDER}${COLOR_RESET}"
+	@rm ${RELEASE_FOLDER}/sha256sum.txt; \
+	for asset in `ls ${RELEASE_FOLDER}`; do \
+		shasum -a 256 ${RELEASE_FOLDER}/$$asset >> ${RELEASE_FOLDER}/sha256sum.txt; \
+	done;
+
+ensure-buildx-builder:
+	@echo "${COLOR_CYAN} 👷 Ensuring docker buildx builder${COLOR_RESET}"
+	@docker buildx ls | sed '1 d' | cut -f 1 -d ' ' | grep -q ${DOCKER_BUILDX_BUILDER} || \
+	docker buildx create --name ${DOCKER_BUILDX_BUILDER}
 
 ## Help:
 help: ## Show this help.
