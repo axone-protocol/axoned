@@ -56,8 +56,7 @@ ENVIRONMENTS_TARGETS = $(addprefix build-go-, $(ENVIRONMENTS))
 
 # Release binaries
 RELEASE_BINARIES = \
-	linux-amd64 \
-	linux-arm64
+	linux-amd64
 RELEASE_TARGETS = $(addprefix release-binary-, $(RELEASE_BINARIES))
 
 .PHONY: all lint lint-go build build-go help
