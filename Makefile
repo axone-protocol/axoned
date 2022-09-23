@@ -177,6 +177,7 @@ $(RELEASE_TARGETS): ensure-buildx-builder
 		--load \
 		.; \
 	mkdir -p ${RELEASE_FOLDER}; \
+	docker rm -f tmp-okp4d || true; \
 	docker create -ti --name tmp-okp4d $$BINARY_NAME; \
 	docker cp tmp-okp4d:/usr/bin/okp4d ${RELEASE_FOLDER}/$$BINARY_NAME; \
 	docker rm -f tmp-okp4d; \
