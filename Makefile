@@ -159,7 +159,6 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 		generate proto --template buf.gen.proto.yaml -v
 	@cp -r github.com/okp4/okp4d/x/* x/
 	@rm -rf github.com
-
 ## Release:
 release-assets: release-binary-all release-checksums ## Generate release assets
 
