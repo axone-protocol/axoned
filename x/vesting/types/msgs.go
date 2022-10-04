@@ -16,13 +16,19 @@ const TypeMsgCreatePermanentLockedAccount = "msg_create_permanent_locked_account
 // TypeMsgCreatePeriodicVestingAccount defines the type value for a MsgCreateVestingAccount.
 const TypeMsgCreatePeriodicVestingAccount = "msg_create_periodic_vesting_account"
 
+// TypeMsgCreateCliffVestingAccount defines the type value for a MsgCreateCliffVestingAccount.
+const TypeMsgCreateCliffVestingAccount = "msg_create_cliff_vesting_account"
+
 var _ sdk.Msg = &MsgCreateVestingAccount{}
 
 var _ sdk.Msg = &MsgCreatePermanentLockedAccount{}
 
 var _ sdk.Msg = &MsgCreatePeriodicVestingAccount{}
 
+var _ sdk.Msg = &MsgCreateCliffVestingAccount{}
+
 // NewMsgCreateVestingAccount returns a reference to a new MsgCreateVestingAccount.
+//
 //nolint:interfacer
 func NewMsgCreateVestingAccount(fromAddr, toAddr sdk.AccAddress, amount sdk.Coins, endTime int64, delayed bool) *MsgCreateVestingAccount {
 	return &MsgCreateVestingAccount{
@@ -77,6 +83,7 @@ func (msg MsgCreateVestingAccount) GetSigners() []sdk.AccAddress {
 }
 
 // NewMsgCreatePermanentLockedAccount returns a reference to a new MsgCreatePermanentLockedAccount.
+//
 //nolint:interfacer
 func NewMsgCreatePermanentLockedAccount(fromAddr, toAddr sdk.AccAddress, amount sdk.Coins) *MsgCreatePermanentLockedAccount {
 	return &MsgCreatePermanentLockedAccount{
@@ -125,6 +132,7 @@ func (msg MsgCreatePermanentLockedAccount) GetSigners() []sdk.AccAddress {
 }
 
 // NewMsgCreatePeriodicVestingAccount returns a reference to a new MsgCreatePeriodicVestingAccount.
+//
 //nolint:interfacer
 func NewMsgCreatePeriodicVestingAccount(fromAddr, toAddr sdk.AccAddress, startTime int64, periods []Period) *MsgCreatePeriodicVestingAccount {
 	return &MsgCreatePeriodicVestingAccount{
@@ -185,4 +193,59 @@ func (msg MsgCreatePeriodicVestingAccount) ValidateBasic() error {
 	}
 
 	return nil
+}
+
+// NewMsgCreateCliffVestingAccount returns a reference to a new MsgCreateCliffVestingAccount.
+//
+//nolint:interfacer
+func NewMsgCreateCliffVestingAccount(fromAddr, toAddr sdk.AccAddress, amount sdk.Coins, endTime, cliffTime int64) *MsgCreateCliffVestingAccount {
+	return &MsgCreateCliffVestingAccount{
+		FromAddress: fromAddr.String(),
+		ToAddress:   toAddr.String(),
+		Amount:      amount,
+		EndTime:     endTime,
+		CliffTime:   cliffTime,
+	}
+}
+
+// Route returns the message route for a MsgCreateVestingAccount.
+func (msg MsgCreateCliffVestingAccount) Route() string { return RouterKey }
+
+// Type returns the message type for a MsgCreateVestingAccount.
+func (msg MsgCreateCliffVestingAccount) Type() string { return TypeMsgCreateVestingAccount }
+
+// ValidateBasic Implements Msg.
+func (msg MsgCreateCliffVestingAccount) ValidateBasic() error {
+	if _, err := sdk.AccAddressFromBech32(msg.FromAddress); err != nil {
+		return sdkerrors.ErrInvalidAddress.Wrapf("invalid 'from' address: %s", err)
+	}
+	if _, err := sdk.AccAddressFromBech32(msg.ToAddress); err != nil {
+		return sdkerrors.ErrInvalidAddress.Wrapf("invalid 'to' address: %s", err)
+	}
+
+	if !msg.Amount.IsValid() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
+	}
+
+	if !msg.Amount.IsAllPositive() {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidCoins, msg.Amount.String())
+	}
+
+	if msg.EndTime <= 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid end time")
+	}
+
+	return nil
+}
+
+// GetSignBytes returns the bytes all expected signers must sign over for a
+// MsgCreateVestingAccount.
+func (msg MsgCreateCliffVestingAccount) GetSignBytes() []byte {
+	return sdk.MustSortJSON(ModuleCdc.MustMarshalJSON(&msg))
+}
+
+// GetSigners returns the expected signers for a MsgCreateVestingAccount.
+func (msg MsgCreateCliffVestingAccount) GetSigners() []sdk.AccAddress {
+	addr, _ := sdk.AccAddressFromBech32(msg.FromAddress)
+	return []sdk.AccAddress{addr}
 }

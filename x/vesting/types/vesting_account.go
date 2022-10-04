@@ -9,7 +9,7 @@ import (
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	vestexported "github.com/cosmos/cosmos-sdk/x/auth/vesting/exported"
+	vestexported "github.com/okp4/okp4d/x/vesting/exported"
 )
 
 // Compile-time type assertions
@@ -18,6 +18,7 @@ var (
 	_ vestexported.VestingAccount = (*ContinuousVestingAccount)(nil)
 	_ vestexported.VestingAccount = (*PeriodicVestingAccount)(nil)
 	_ vestexported.VestingAccount = (*DelayedVestingAccount)(nil)
+	_ vestexported.VestingAccount = (*CliffVestingAccount)(nil)
 )
 
 // Base Vesting Account

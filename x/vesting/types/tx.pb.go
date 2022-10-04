@@ -39,7 +39,7 @@ type MsgCreateVestingAccount struct {
 	ToAddress   string                                   `protobuf:"bytes,2,opt,name=to_address,json=toAddress,proto3" json:"to_address,omitempty"`
 	Amount      github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,3,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
 	EndTime     int64                                    `protobuf:"varint,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Delayed     bool                                     `protobuf:"varint,5,opt,name=delayed,proto3" json:"delayed,omitempty"`
+	Delayed     bool                                     `protobuf:"varint,6,opt,name=delayed,proto3" json:"delayed,omitempty"`
 }
 
 func (m *MsgCreateVestingAccount) Reset()         { *m = MsgCreateVestingAccount{} }
@@ -366,6 +366,121 @@ func (m *MsgCreatePeriodicVestingAccountResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreatePeriodicVestingAccountResponse proto.InternalMessageInfo
 
+// MsgCreateCliffVestingAccount defines a message that enables creating a cliff vesting
+// account.
+type MsgCreateCliffVestingAccount struct {
+	FromAddress string                                   `protobuf:"bytes,1,opt,name=from_address,json=fromAddress,proto3" json:"from_address,omitempty"`
+	ToAddress   string                                   `protobuf:"bytes,2,opt,name=to_address,json=toAddress,proto3" json:"to_address,omitempty"`
+	Amount      github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,3,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
+	EndTime     int64                                    `protobuf:"varint,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
+	CliffTime   int64                                    `protobuf:"varint,5,opt,name=cliff_time,json=cliffTime,proto3" json:"cliff_time,omitempty"`
+}
+
+func (m *MsgCreateCliffVestingAccount) Reset()         { *m = MsgCreateCliffVestingAccount{} }
+func (m *MsgCreateCliffVestingAccount) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateCliffVestingAccount) ProtoMessage()    {}
+func (*MsgCreateCliffVestingAccount) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c66d8e2aee35e411, []int{6}
+}
+func (m *MsgCreateCliffVestingAccount) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateCliffVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateCliffVestingAccount.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateCliffVestingAccount) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateCliffVestingAccount.Merge(m, src)
+}
+func (m *MsgCreateCliffVestingAccount) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateCliffVestingAccount) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateCliffVestingAccount.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateCliffVestingAccount proto.InternalMessageInfo
+
+func (m *MsgCreateCliffVestingAccount) GetFromAddress() string {
+	if m != nil {
+		return m.FromAddress
+	}
+	return ""
+}
+
+func (m *MsgCreateCliffVestingAccount) GetToAddress() string {
+	if m != nil {
+		return m.ToAddress
+	}
+	return ""
+}
+
+func (m *MsgCreateCliffVestingAccount) GetAmount() github_com_cosmos_cosmos_sdk_types.Coins {
+	if m != nil {
+		return m.Amount
+	}
+	return nil
+}
+
+func (m *MsgCreateCliffVestingAccount) GetEndTime() int64 {
+	if m != nil {
+		return m.EndTime
+	}
+	return 0
+}
+
+func (m *MsgCreateCliffVestingAccount) GetCliffTime() int64 {
+	if m != nil {
+		return m.CliffTime
+	}
+	return 0
+}
+
+// MsgCreateCliffVestingAccountResponse defines the Msg/CreateVestingAccount response type.
+type MsgCreateCliffVestingAccountResponse struct {
+}
+
+func (m *MsgCreateCliffVestingAccountResponse) Reset()         { *m = MsgCreateCliffVestingAccountResponse{} }
+func (m *MsgCreateCliffVestingAccountResponse) String() string { return proto.CompactTextString(m) }
+func (*MsgCreateCliffVestingAccountResponse) ProtoMessage()    {}
+func (*MsgCreateCliffVestingAccountResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_c66d8e2aee35e411, []int{7}
+}
+func (m *MsgCreateCliffVestingAccountResponse) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *MsgCreateCliffVestingAccountResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_MsgCreateCliffVestingAccountResponse.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *MsgCreateCliffVestingAccountResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_MsgCreateCliffVestingAccountResponse.Merge(m, src)
+}
+func (m *MsgCreateCliffVestingAccountResponse) XXX_Size() int {
+	return m.Size()
+}
+func (m *MsgCreateCliffVestingAccountResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_MsgCreateCliffVestingAccountResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_MsgCreateCliffVestingAccountResponse proto.InternalMessageInfo
+
 func init() {
 	proto.RegisterType((*MsgCreateVestingAccount)(nil), "vesting.v1beta1.MsgCreateVestingAccount")
 	proto.RegisterType((*MsgCreateVestingAccountResponse)(nil), "vesting.v1beta1.MsgCreateVestingAccountResponse")
@@ -373,49 +488,54 @@ func init() {
 	proto.RegisterType((*MsgCreatePermanentLockedAccountResponse)(nil), "vesting.v1beta1.MsgCreatePermanentLockedAccountResponse")
 	proto.RegisterType((*MsgCreatePeriodicVestingAccount)(nil), "vesting.v1beta1.MsgCreatePeriodicVestingAccount")
 	proto.RegisterType((*MsgCreatePeriodicVestingAccountResponse)(nil), "vesting.v1beta1.MsgCreatePeriodicVestingAccountResponse")
+	proto.RegisterType((*MsgCreateCliffVestingAccount)(nil), "vesting.v1beta1.MsgCreateCliffVestingAccount")
+	proto.RegisterType((*MsgCreateCliffVestingAccountResponse)(nil), "vesting.v1beta1.MsgCreateCliffVestingAccountResponse")
 }
 
 func init() { proto.RegisterFile("vesting/v1beta1/tx.proto", fileDescriptor_c66d8e2aee35e411) }
 
 var fileDescriptor_c66d8e2aee35e411 = []byte{
-	// 578 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xbc, 0x54, 0x3d, 0x6f, 0xd3, 0x40,
-	0x18, 0xce, 0xd5, 0xa1, 0x1f, 0x57, 0x04, 0xc2, 0xb4, 0x8a, 0x13, 0x11, 0x3b, 0xb5, 0x84, 0x30,
-	0x48, 0xd8, 0x6d, 0xe9, 0x80, 0xb2, 0xa0, 0xba, 0x12, 0x13, 0x95, 0x90, 0x85, 0x18, 0x58, 0x22,
-	0xc7, 0x77, 0x18, 0x2b, 0xb5, 0xcf, 0xf2, 0x5d, 0xab, 0x66, 0x65, 0x44, 0x0c, 0x48, 0xfc, 0x01,
-	0x66, 0x26, 0x7e, 0x46, 0xc7, 0x8e, 0x4c, 0x01, 0x92, 0x01, 0xe6, 0xfe, 0x00, 0x84, 0x7c, 0x77,
-	0x0e, 0x4d, 0xe2, 0xa6, 0x20, 0x21, 0x96, 0x5c, 0xee, 0x7d, 0xde, 0xcf, 0xc7, 0xcf, 0x7b, 0x50,
-	0x3b, 0xc2, 0x94, 0x45, 0x49, 0xe8, 0x1c, 0x6d, 0x75, 0x31, 0xf3, 0xb7, 0x1c, 0x76, 0x6c, 0xa7,
-	0x19, 0x61, 0x44, 0xbd, 0x2e, 0x11, 0x5b, 0x22, 0x8d, 0xb5, 0x90, 0x84, 0x84, 0x63, 0x4e, 0xfe,
-	0x4f, 0xb8, 0x35, 0xf4, 0x80, 0xd0, 0x98, 0x50, 0xa7, 0xeb, 0x53, 0x3c, 0x4e, 0x12, 0x90, 0x28,
-	0x91, 0x78, 0x5d, 0xe0, 0x1d, 0x11, 0x28, 0x2e, 0x12, 0x6a, 0x4e, 0xd7, 0x2e, 0x2a, 0x0a, 0xb8,
-	0x26, 0x33, 0xc7, 0x34, 0xf7, 0xc8, 0x0f, 0x01, 0x98, 0x6f, 0x17, 0x60, 0x6d, 0x9f, 0x86, 0x7b,
-	0x19, 0xf6, 0x19, 0x7e, 0x2e, 0x62, 0x76, 0x83, 0x80, 0x1c, 0x26, 0x4c, 0xdd, 0x80, 0x57, 0x5f,
-	0x66, 0x24, 0xee, 0xf8, 0x08, 0x65, 0x98, 0x52, 0x0d, 0xb4, 0x80, 0xb5, 0xe2, 0xad, 0xe6, 0xb6,
-	0x5d, 0x61, 0x52, 0x9b, 0x10, 0x32, 0x32, 0x76, 0x58, 0xe0, 0x0e, 0x2b, 0x8c, 0x14, 0x70, 0x00,
-	0x17, 0xfd, 0x38, 0xcf, 0xa5, 0x29, 0x2d, 0xc5, 0x5a, 0xdd, 0xae, 0xdb, 0xb2, 0xe9, 0x7c, 0xc2,
-	0x82, 0x0c, 0x7b, 0x8f, 0x44, 0x89, 0xbb, 0x79, 0x32, 0x30, 0x2a, 0x1f, 0xbf, 0x18, 0x56, 0x18,
-	0xb1, 0x57, 0x87, 0x5d, 0x3b, 0x20, 0xb1, 0x9c, 0x50, 0x1e, 0xf7, 0x29, 0xea, 0x39, 0xac, 0x9f,
-	0x62, 0xca, 0x03, 0xa8, 0x27, 0x53, 0xab, 0x75, 0xb8, 0x8c, 0x13, 0xd4, 0x61, 0x51, 0x8c, 0xb5,
-	0x6a, 0x0b, 0x58, 0x8a, 0xb7, 0x84, 0x13, 0xf4, 0x2c, 0x8a, 0xb1, 0xaa, 0xc1, 0x25, 0x84, 0x0f,
-	0xfc, 0x3e, 0x46, 0xda, 0x95, 0x16, 0xb0, 0x96, 0xbd, 0xe2, 0xda, 0x5e, 0xff, 0xf1, 0xc1, 0x00,
-	0xaf, 0xbf, 0x7f, 0xba, 0x37, 0x31, 0xa2, 0xb9, 0x01, 0x8d, 0x0b, 0xd8, 0xf0, 0x30, 0x4d, 0x49,
-	0x42, 0xb1, 0xf9, 0x13, 0x9c, 0xf3, 0x79, 0x8a, 0xb3, 0xd8, 0x4f, 0x70, 0xc2, 0x9e, 0x90, 0xa0,
-	0x87, 0x51, 0xc1, 0x5c, 0xbb, 0x8c, 0x39, 0xb7, 0x76, 0x36, 0x30, 0x6e, 0xf6, 0xfd, 0xf8, 0xa0,
-	0x6d, 0x4e, 0x14, 0x9d, 0xa4, 0x74, 0x67, 0x96, 0x52, 0x77, 0xfd, 0x6c, 0x60, 0xdc, 0x10, 0x91,
-	0xbf, 0x31, 0xf3, 0x7f, 0x33, 0xdd, 0xae, 0xe6, 0xa4, 0x99, 0x77, 0xe1, 0x9d, 0x4b, 0xe6, 0x1f,
-	0x73, 0xf5, 0x6d, 0x8a, 0xab, 0x88, 0xa0, 0x28, 0xf8, 0xe7, 0x2a, 0x6b, 0x42, 0x48, 0x99, 0x9f,
-	0x31, 0x21, 0x01, 0x85, 0x4b, 0x60, 0x85, 0x5b, 0xb8, 0x08, 0x1e, 0xc3, 0x62, 0xfd, 0x3a, 0x29,
-	0x6f, 0x81, 0x6a, 0x55, 0xce, 0x51, 0xcd, 0x9e, 0x5a, 0x4b, 0x5b, 0xb4, 0xe8, 0x56, 0x73, 0x86,
-	0xbc, 0x6b, 0x12, 0x15, 0x46, 0xca, 0x25, 0x53, 0x99, 0x95, 0xcc, 0x14, 0x1d, 0x25, 0x23, 0x16,
-	0x74, 0x6c, 0xbf, 0x57, 0xa0, 0xb2, 0x4f, 0x43, 0x35, 0x83, 0x6b, 0xa5, 0x0b, 0x67, 0xcd, 0x34,
-	0x74, 0x81, 0x18, 0x1b, 0x9b, 0x7f, 0xea, 0x59, 0xd4, 0x56, 0xdf, 0x00, 0x78, 0x6b, 0xae, 0x66,
-	0xe7, 0xa4, 0x2c, 0x8f, 0x68, 0x3c, 0xfc, 0xdb, 0x88, 0xf2, 0x66, 0xca, 0x44, 0x31, 0xbf, 0x99,
-	0x92, 0x88, 0x4b, 0x9a, 0x99, 0xf3, 0x55, 0xdc, 0x47, 0x27, 0x43, 0x1d, 0x9c, 0x0e, 0x75, 0xf0,
-	0x75, 0xa8, 0x83, 0x77, 0x23, 0xbd, 0x72, 0x3a, 0xd2, 0x2b, 0x9f, 0x47, 0x7a, 0xe5, 0xc5, 0xed,
-	0x73, 0x1b, 0x42, 0x7a, 0xe9, 0x0e, 0xff, 0x41, 0xce, 0x71, 0xf1, 0xb8, 0x8a, 0x25, 0xe9, 0x2e,
-	0xf2, 0xa7, 0xf4, 0xc1, 0xaf, 0x00, 0x00, 0x00, 0xff, 0xff, 0x88, 0x42, 0x01, 0xa3, 0x00, 0x06,
-	0x00, 0x00,
+	// 637 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0xdc, 0x55, 0xbf, 0x6f, 0xd3, 0x40,
+	0x14, 0xce, 0x25, 0x21, 0x6d, 0xae, 0x08, 0x84, 0x69, 0x15, 0x27, 0x6a, 0xec, 0xd4, 0xe2, 0x87,
+	0x41, 0xaa, 0xdd, 0x96, 0x22, 0xa1, 0x2c, 0xa8, 0x89, 0xc4, 0x44, 0x25, 0x64, 0x21, 0x06, 0x96,
+	0xc8, 0xb1, 0x2f, 0xc6, 0x4a, 0xec, 0x8b, 0x7c, 0xd7, 0xaa, 0x19, 0x61, 0x44, 0x0c, 0x4c, 0xb0,
+	0x32, 0x33, 0xf1, 0x67, 0x74, 0xec, 0xc8, 0x14, 0x20, 0x19, 0x60, 0xee, 0x1f, 0x80, 0x90, 0xef,
+	0xec, 0xd0, 0x24, 0x8e, 0x4b, 0x25, 0xc4, 0xc0, 0x12, 0xc7, 0xef, 0xfb, 0xde, 0xbb, 0xf7, 0x3e,
+	0x7f, 0xcf, 0x86, 0xe2, 0x21, 0x22, 0xd4, 0xf5, 0x1d, 0xfd, 0x70, 0xbb, 0x8d, 0xa8, 0xb9, 0xad,
+	0xd3, 0x23, 0xad, 0x1f, 0x60, 0x8a, 0x85, 0xab, 0x11, 0xa2, 0x45, 0x48, 0x65, 0xd5, 0xc1, 0x0e,
+	0x66, 0x98, 0x1e, 0xfe, 0xe3, 0xb4, 0x8a, 0x64, 0x61, 0xe2, 0x61, 0xa2, 0xb7, 0x4d, 0x82, 0x26,
+	0x45, 0x2c, 0xec, 0xfa, 0x11, 0x5e, 0xe6, 0x78, 0x8b, 0x27, 0xf2, 0x9b, 0x08, 0xaa, 0xce, 0x9e,
+	0x1d, 0x9f, 0xc8, 0xe1, 0x52, 0x54, 0xd9, 0x23, 0x21, 0x23, 0xbc, 0x70, 0x40, 0x79, 0x93, 0x85,
+	0xa5, 0x7d, 0xe2, 0x34, 0x03, 0x64, 0x52, 0xf4, 0x8c, 0xe7, 0xec, 0x59, 0x16, 0x3e, 0xf0, 0xa9,
+	0xb0, 0x01, 0x2f, 0x77, 0x02, 0xec, 0xb5, 0x4c, 0xdb, 0x0e, 0x10, 0x21, 0x22, 0xa8, 0x01, 0xb5,
+	0x68, 0xac, 0x84, 0xb1, 0x3d, 0x1e, 0x12, 0xaa, 0x10, 0x52, 0x3c, 0x21, 0x64, 0x19, 0xa1, 0x48,
+	0x71, 0x0c, 0x5b, 0xb0, 0x60, 0x7a, 0x61, 0x2d, 0x31, 0x57, 0xcb, 0xa9, 0x2b, 0x3b, 0x65, 0x2d,
+	0x6a, 0x3a, 0x9c, 0x30, 0x16, 0x43, 0x6b, 0x62, 0xd7, 0x6f, 0x6c, 0x1d, 0x0f, 0xe5, 0xcc, 0xc7,
+	0x2f, 0xb2, 0xea, 0xb8, 0xf4, 0xc5, 0x41, 0x5b, 0xb3, 0xb0, 0x17, 0x4d, 0x18, 0x5d, 0x36, 0x89,
+	0xdd, 0xd5, 0xe9, 0xa0, 0x8f, 0x08, 0x4b, 0x20, 0x46, 0x54, 0x5a, 0x28, 0xc3, 0x65, 0xe4, 0xdb,
+	0x2d, 0xea, 0x7a, 0x48, 0xcc, 0xd7, 0x80, 0x9a, 0x33, 0x96, 0x90, 0x6f, 0x3f, 0x75, 0x3d, 0x24,
+	0x88, 0x70, 0xc9, 0x46, 0x3d, 0x73, 0x80, 0x6c, 0xb1, 0x50, 0x03, 0xea, 0xb2, 0x11, 0xdf, 0xd6,
+	0xd7, 0x7e, 0x7c, 0x90, 0xc1, 0xab, 0xef, 0x9f, 0xee, 0x4e, 0x8d, 0xa8, 0x6c, 0x40, 0x79, 0x81,
+	0x1a, 0x06, 0x22, 0x7d, 0xec, 0x13, 0xa4, 0xfc, 0x04, 0x67, 0x38, 0x4f, 0x50, 0xe0, 0x99, 0x3e,
+	0xf2, 0xe9, 0x63, 0x6c, 0x75, 0x91, 0x1d, 0x2b, 0x57, 0x4f, 0x52, 0xae, 0x51, 0x3a, 0x1d, 0xca,
+	0xd7, 0x07, 0xa6, 0xd7, 0xab, 0x2b, 0x53, 0x87, 0x4e, 0x4b, 0xba, 0x3b, 0x2f, 0x69, 0x63, 0xed,
+	0x74, 0x28, 0x5f, 0xe3, 0x99, 0xbf, 0x31, 0xe5, 0x5f, 0x2b, 0x5d, 0xcf, 0x87, 0xa2, 0x29, 0x77,
+	0xe0, 0xed, 0x73, 0xe6, 0x9f, 0x68, 0xf5, 0x6d, 0x46, 0x2b, 0x17, 0xdb, 0xae, 0xf5, 0xd7, 0x5d,
+	0x56, 0x85, 0x90, 0x50, 0x33, 0xa0, 0xdc, 0x02, 0x39, 0x66, 0x81, 0x22, 0x8b, 0x30, 0x13, 0x3c,
+	0x82, 0xf1, 0xfa, 0xb5, 0xfa, 0xac, 0x05, 0x22, 0xe6, 0x99, 0x46, 0x25, 0x6d, 0x66, 0x2d, 0x35,
+	0xde, 0x62, 0x23, 0x1f, 0x2a, 0x64, 0x5c, 0x89, 0x50, 0x1e, 0x24, 0xcc, 0x32, 0x99, 0x79, 0xcb,
+	0xcc, 0xc8, 0x91, 0x30, 0xe2, 0x44, 0x8e, 0x77, 0x59, 0xb8, 0x3e, 0xe1, 0x36, 0x7b, 0x6e, 0xa7,
+	0xf3, 0xdf, 0x6d, 0x5c, 0x15, 0x42, 0x2b, 0x1c, 0x8c, 0x83, 0x97, 0xf8, 0xb3, 0x60, 0x91, 0x10,
+	0x5e, 0xb4, 0x76, 0xb7, 0xe0, 0x8d, 0x34, 0x5d, 0x62, 0x01, 0x77, 0xde, 0xe7, 0x61, 0x6e, 0x9f,
+	0x38, 0x42, 0x00, 0x57, 0x13, 0xdf, 0x58, 0xea, 0xdc, 0x13, 0x5d, 0xb0, 0xcd, 0x95, 0xad, 0x3f,
+	0x65, 0xc6, 0x67, 0x0b, 0xaf, 0x01, 0x5c, 0x4f, 0x5d, 0xfa, 0x94, 0x92, 0xc9, 0x19, 0x95, 0x07,
+	0x17, 0xcd, 0x48, 0x6e, 0x26, 0x69, 0xab, 0xd2, 0x9b, 0x49, 0xc8, 0x38, 0xa7, 0x99, 0x14, 0x5b,
+	0x0b, 0x2f, 0x01, 0x2c, 0x2f, 0xf6, 0xf4, 0xe6, 0xe2, 0xba, 0x09, 0xf4, 0xca, 0xfd, 0x0b, 0xd1,
+	0xe3, 0x1e, 0x1a, 0x0f, 0x8f, 0x47, 0x12, 0x38, 0x19, 0x49, 0xe0, 0xeb, 0x48, 0x02, 0x6f, 0xc7,
+	0x52, 0xe6, 0x64, 0x2c, 0x65, 0x3e, 0x8f, 0xa5, 0xcc, 0xf3, 0x9b, 0x67, 0xec, 0x8d, 0xbb, 0xfd,
+	0x5d, 0xf6, 0x63, 0xeb, 0x47, 0xf1, 0x17, 0x92, 0x3b, 0xbc, 0x5d, 0x60, 0xdf, 0xc3, 0x7b, 0xbf,
+	0x02, 0x00, 0x00, 0xff, 0xff, 0x7c, 0x8d, 0xb9, 0x6c, 0xc5, 0x07, 0x00, 0x00,
 }
 
 func (this *MsgCreateVestingAccount) Equal(that interface{}) bool {
@@ -494,6 +614,47 @@ func (this *MsgCreatePermanentLockedAccount) Equal(that interface{}) bool {
 	}
 	return true
 }
+func (this *MsgCreateCliffVestingAccount) Equal(that interface{}) bool {
+	if that == nil {
+		return this == nil
+	}
+
+	that1, ok := that.(*MsgCreateCliffVestingAccount)
+	if !ok {
+		that2, ok := that.(MsgCreateCliffVestingAccount)
+		if ok {
+			that1 = &that2
+		} else {
+			return false
+		}
+	}
+	if that1 == nil {
+		return this == nil
+	} else if this == nil {
+		return false
+	}
+	if this.FromAddress != that1.FromAddress {
+		return false
+	}
+	if this.ToAddress != that1.ToAddress {
+		return false
+	}
+	if len(this.Amount) != len(that1.Amount) {
+		return false
+	}
+	for i := range this.Amount {
+		if !this.Amount[i].Equal(&that1.Amount[i]) {
+			return false
+		}
+	}
+	if this.EndTime != that1.EndTime {
+		return false
+	}
+	if this.CliffTime != that1.CliffTime {
+		return false
+	}
+	return true
+}
 
 // Reference imports to suppress errors if they are not otherwise used.
 var _ context.Context
@@ -520,6 +681,9 @@ type MsgClient interface {
 	//
 	// Since: cosmos-sdk 0.46
 	CreatePeriodicVestingAccount(ctx context.Context, in *MsgCreatePeriodicVestingAccount, opts ...grpc.CallOption) (*MsgCreatePeriodicVestingAccountResponse, error)
+	// CreateCliffVestingAccount defines a method that enables creating a cliff vesting
+	// account.
+	CreateCliffVestingAccount(ctx context.Context, in *MsgCreateCliffVestingAccount, opts ...grpc.CallOption) (*MsgCreateCliffVestingAccountResponse, error)
 }
 
 type msgClient struct {
@@ -557,6 +721,15 @@ func (c *msgClient) CreatePeriodicVestingAccount(ctx context.Context, in *MsgCre
 	return out, nil
 }
 
+func (c *msgClient) CreateCliffVestingAccount(ctx context.Context, in *MsgCreateCliffVestingAccount, opts ...grpc.CallOption) (*MsgCreateCliffVestingAccountResponse, error) {
+	out := new(MsgCreateCliffVestingAccountResponse)
+	err := c.cc.Invoke(ctx, "/vesting.v1beta1.Msg/CreateCliffVestingAccount", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // MsgServer is the server API for Msg service.
 type MsgServer interface {
 	// CreateVestingAccount defines a method that enables creating a vesting
@@ -572,6 +745,9 @@ type MsgServer interface {
 	//
 	// Since: cosmos-sdk 0.46
 	CreatePeriodicVestingAccount(context.Context, *MsgCreatePeriodicVestingAccount) (*MsgCreatePeriodicVestingAccountResponse, error)
+	// CreateCliffVestingAccount defines a method that enables creating a cliff vesting
+	// account.
+	CreateCliffVestingAccount(context.Context, *MsgCreateCliffVestingAccount) (*MsgCreateCliffVestingAccountResponse, error)
 }
 
 // UnimplementedMsgServer can be embedded to have forward compatible implementations.
@@ -586,6 +762,9 @@ func (*UnimplementedMsgServer) CreatePermanentLockedAccount(ctx context.Context,
 }
 func (*UnimplementedMsgServer) CreatePeriodicVestingAccount(ctx context.Context, req *MsgCreatePeriodicVestingAccount) (*MsgCreatePeriodicVestingAccountResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method CreatePeriodicVestingAccount not implemented")
+}
+func (*UnimplementedMsgServer) CreateCliffVestingAccount(ctx context.Context, req *MsgCreateCliffVestingAccount) (*MsgCreateCliffVestingAccountResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method CreateCliffVestingAccount not implemented")
 }
 
 func RegisterMsgServer(s grpc1.Server, srv MsgServer) {
@@ -646,6 +825,24 @@ func _Msg_CreatePeriodicVestingAccount_Handler(srv interface{}, ctx context.Cont
 	return interceptor(ctx, in, info, handler)
 }
 
+func _Msg_CreateCliffVestingAccount_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MsgCreateCliffVestingAccount)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MsgServer).CreateCliffVestingAccount(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/vesting.v1beta1.Msg/CreateCliffVestingAccount",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MsgServer).CreateCliffVestingAccount(ctx, req.(*MsgCreateCliffVestingAccount))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 var _Msg_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "vesting.v1beta1.Msg",
 	HandlerType: (*MsgServer)(nil),
@@ -661,6 +858,10 @@ var _Msg_serviceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "CreatePeriodicVestingAccount",
 			Handler:    _Msg_CreatePeriodicVestingAccount_Handler,
+		},
+		{
+			MethodName: "CreateCliffVestingAccount",
+			Handler:    _Msg_CreateCliffVestingAccount_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
@@ -695,7 +896,7 @@ func (m *MsgCreateVestingAccount) MarshalToSizedBuffer(dAtA []byte) (int, error)
 			dAtA[i] = 0
 		}
 		i--
-		dAtA[i] = 0x28
+		dAtA[i] = 0x30
 	}
 	if m.EndTime != 0 {
 		i = encodeVarintTx(dAtA, i, uint64(m.EndTime))
@@ -909,6 +1110,90 @@ func (m *MsgCreatePeriodicVestingAccountResponse) MarshalToSizedBuffer(dAtA []by
 	return len(dAtA) - i, nil
 }
 
+func (m *MsgCreateCliffVestingAccount) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateCliffVestingAccount) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateCliffVestingAccount) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.CliffTime != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.CliffTime))
+		i--
+		dAtA[i] = 0x28
+	}
+	if m.EndTime != 0 {
+		i = encodeVarintTx(dAtA, i, uint64(m.EndTime))
+		i--
+		dAtA[i] = 0x20
+	}
+	if len(m.Amount) > 0 {
+		for iNdEx := len(m.Amount) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.Amount[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintTx(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if len(m.ToAddress) > 0 {
+		i -= len(m.ToAddress)
+		copy(dAtA[i:], m.ToAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.ToAddress)))
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.FromAddress) > 0 {
+		i -= len(m.FromAddress)
+		copy(dAtA[i:], m.FromAddress)
+		i = encodeVarintTx(dAtA, i, uint64(len(m.FromAddress)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *MsgCreateCliffVestingAccountResponse) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *MsgCreateCliffVestingAccountResponse) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *MsgCreateCliffVestingAccountResponse) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintTx(dAtA []byte, offset int, v uint64) int {
 	offset -= sovTx(v)
 	base := offset
@@ -1017,6 +1302,44 @@ func (m *MsgCreatePeriodicVestingAccount) Size() (n int) {
 }
 
 func (m *MsgCreatePeriodicVestingAccountResponse) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	return n
+}
+
+func (m *MsgCreateCliffVestingAccount) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.FromAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	l = len(m.ToAddress)
+	if l > 0 {
+		n += 1 + l + sovTx(uint64(l))
+	}
+	if len(m.Amount) > 0 {
+		for _, e := range m.Amount {
+			l = e.Size()
+			n += 1 + l + sovTx(uint64(l))
+		}
+	}
+	if m.EndTime != 0 {
+		n += 1 + sovTx(uint64(m.EndTime))
+	}
+	if m.CliffTime != 0 {
+		n += 1 + sovTx(uint64(m.CliffTime))
+	}
+	return n
+}
+
+func (m *MsgCreateCliffVestingAccountResponse) Size() (n int) {
 	if m == nil {
 		return 0
 	}
@@ -1177,7 +1500,7 @@ func (m *MsgCreateVestingAccount) Unmarshal(dAtA []byte) error {
 					break
 				}
 			}
-		case 5:
+		case 6:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field Delayed", wireType)
 			}
@@ -1660,6 +1983,242 @@ func (m *MsgCreatePeriodicVestingAccountResponse) Unmarshal(dAtA []byte) error {
 		}
 		if fieldNum <= 0 {
 			return fmt.Errorf("proto: MsgCreatePeriodicVestingAccountResponse: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateCliffVestingAccount) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateCliffVestingAccount: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateCliffVestingAccount: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field FromAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.FromAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field ToAddress", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.ToAddress = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Amount", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthTx
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthTx
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Amount = append(m.Amount, types.Coin{})
+			if err := m.Amount[len(m.Amount)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field EndTime", wireType)
+			}
+			m.EndTime = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.EndTime |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		case 5:
+			if wireType != 0 {
+				return fmt.Errorf("proto: wrong wireType = %d for field CliffTime", wireType)
+			}
+			m.CliffTime = 0
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowTx
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				m.CliffTime |= int64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+		default:
+			iNdEx = preIndex
+			skippy, err := skipTx(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthTx
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *MsgCreateCliffVestingAccountResponse) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowTx
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: MsgCreateCliffVestingAccountResponse: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: MsgCreateCliffVestingAccountResponse: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
 		default:

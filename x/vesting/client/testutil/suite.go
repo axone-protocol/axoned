@@ -10,7 +10,7 @@ import (
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	"github.com/cosmos/cosmos-sdk/testutil/network"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
+	"github.com/okp4/okp4d/x/vesting/client/cli"
 )
 
 type IntegrationTestSuite struct {

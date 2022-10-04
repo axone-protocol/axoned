@@ -13,8 +13,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
-	"github.com/cosmos/cosmos-sdk/x/auth/vesting/client/cli"
-	"github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
+	"github.com/okp4/okp4d/x/vesting/client/cli"
+	"github.com/okp4/okp4d/x/vesting/types"
 )
 
 var (

@@ -25,6 +25,9 @@ service Msg {
   //
   // Since: cosmos-sdk 0.46
   rpc CreatePeriodicVestingAccount(MsgCreatePeriodicVestingAccount) returns (MsgCreatePeriodicVestingAccountResponse);
+  // CreateCliffVestingAccount defines a method that enables creating a cliff vesting
+  // account.
+  rpc CreateCliffVestingAccount(MsgCreateCliffVestingAccount) returns (MsgCreateCliffVestingAccountResponse);
 }
 
 // MsgCreateVestingAccount defines a message that enables creating a vesting
@@ -40,7 +43,7 @@ message MsgCreateVestingAccount {
       [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
 
   int64 end_time = 4;
-  bool  delayed  = 5;
+  bool  delayed  = 6;
 }
 
 // MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount response type.
@@ -84,3 +87,22 @@ message MsgCreatePeriodicVestingAccount {
 //
 // Since: cosmos-sdk 0.46
 message MsgCreatePeriodicVestingAccountResponse {}
+
+// MsgCreateCliffVestingAccount defines a message that enables creating a cliff vesting
+// account.
+message MsgCreateCliffVestingAccount {
+  option (cosmos.msg.v1.signer) = "from_address";
+
+  option (gogoproto.equal) = true;
+
+  string   from_address                    = 1;
+  string   to_address                      = 2;
+  repeated cosmos.base.v1beta1.Coin amount = 3
+  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+
+  int64 end_time = 4;
+  int64 cliff_time = 5;
+}
+
+// MsgCreateCliffVestingAccountResponse defines the Msg/CreateVestingAccount response type.
+message MsgCreateCliffVestingAccountResponse {}
