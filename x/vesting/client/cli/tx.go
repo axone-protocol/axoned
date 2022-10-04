@@ -15,7 +15,7 @@ import (
 	"github.com/okp4/okp4d/x/vesting/types"
 )
 
-// Transaction command flags
+// FlagDelayed Transaction command flags.
 const (
 	FlagDelayed = "delayed"
 )
@@ -133,6 +133,8 @@ type InputPeriod struct {
 
 // NewMsgCreatePeriodicVestingAccountCmd returns a CLI command handler for creating a
 // MsgCreatePeriodicVestingAccountCmd transaction.
+//
+//nolint:funlen,lll
 func NewMsgCreatePeriodicVestingAccountCmd() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-periodic-vesting-account [to_address] [periods_json_file]",
@@ -181,7 +183,6 @@ func NewMsgCreatePeriodicVestingAccountCmd() *cobra.Command {
 			var periods []types.Period
 
 			for i, p := range vestingData.Periods {
-
 				amount, err := sdk.ParseCoinsNormalized(p.Coins)
 				if err != nil {
 					return err

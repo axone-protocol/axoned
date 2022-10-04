@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package logic.v1beta;
 
 import "gogoproto/gogo.proto";

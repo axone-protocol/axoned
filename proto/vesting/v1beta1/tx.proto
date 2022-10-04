@@ -1,12 +1,11 @@
 syntax = "proto3";
+
 package vesting.v1beta1;
 
-import "gogoproto/gogo.proto";
 import "cosmos/base/v1beta1/coin.proto";
-import "cosmos_proto/cosmos.proto";
-import "vesting/v1beta1/vesting.proto";
-
 import "cosmos/msg/v1/msg.proto";
+import "gogoproto/gogo.proto";
+import "vesting/v1beta1/vesting.proto";
 
 option go_package = "github.com/okp4/okp4d/x/vesting/types";
 
@@ -37,13 +36,15 @@ message MsgCreateVestingAccount {
 
   option (gogoproto.equal) = true;
 
-  string   from_address                    = 1;
-  string   to_address                      = 2;
-  repeated cosmos.base.v1beta1.Coin amount = 3
-      [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  string from_address = 1;
+  string to_address = 2;
+  repeated cosmos.base.v1beta1.Coin amount = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
 
   int64 end_time = 4;
-  bool  delayed  = 6;
+  bool delayed = 6;
 }
 
 // MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount response type.
@@ -56,10 +57,12 @@ message MsgCreateVestingAccountResponse {}
 message MsgCreatePermanentLockedAccount {
   option (gogoproto.equal) = true;
 
-  string   from_address                    = 1 [(gogoproto.moretags) = "yaml:\"from_address\""];
-  string   to_address                      = 2 [(gogoproto.moretags) = "yaml:\"to_address\""];
-  repeated cosmos.base.v1beta1.Coin amount = 3
-      [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  string from_address = 1 [(gogoproto.moretags) = "yaml:\"from_address\""];
+  string to_address = 2 [(gogoproto.moretags) = "yaml:\"to_address\""];
+  repeated cosmos.base.v1beta1.Coin amount = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
 }
 
 // MsgCreatePermanentLockedAccountResponse defines the Msg/CreatePermanentLockedAccount response type.
@@ -76,9 +79,9 @@ message MsgCreatePeriodicVestingAccount {
 
   option (gogoproto.equal) = false;
 
-  string          from_address    = 1;
-  string          to_address      = 2;
-  int64           start_time      = 3;
+  string from_address = 1;
+  string to_address = 2;
+  int64 start_time = 3;
   repeated Period vesting_periods = 4 [(gogoproto.nullable) = false];
 }
 
@@ -95,10 +98,12 @@ message MsgCreateCliffVestingAccount {
 
   option (gogoproto.equal) = true;
 
-  string   from_address                    = 1;
-  string   to_address                      = 2;
-  repeated cosmos.base.v1beta1.Coin amount = 3
-  [(gogoproto.nullable) = false, (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"];
+  string from_address = 1;
+  string to_address = 2;
+  repeated cosmos.base.v1beta1.Coin amount = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.castrepeated) = "github.com/cosmos/cosmos-sdk/types.Coins"
+  ];
 
   int64 end_time = 4;
   int64 cliff_time = 5;

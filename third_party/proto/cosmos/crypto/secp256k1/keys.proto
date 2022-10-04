@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package cosmos.crypto.secp256k1;
 
 import "gogoproto/gogo.proto";

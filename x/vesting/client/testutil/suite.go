@@ -40,6 +40,7 @@ func (s *IntegrationTestSuite) TearDownSuite() {
 	s.network.Cleanup()
 }
 
+//nolint:funlen
 func (s *IntegrationTestSuite) TestNewMsgCreateVestingAccountCmd() {
 	val := s.network.Validators[0]
 
@@ -147,6 +148,7 @@ func (s *IntegrationTestSuite) TestNewMsgCreateVestingAccountCmd() {
 	}
 }
 
+//nolint:funlen
 func (s *IntegrationTestSuite) TestNewMsgCreatePermanentLockedAccountCmd() {
 	val := s.network.Validators[0]
 

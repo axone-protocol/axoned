@@ -17,7 +17,7 @@ var (
 	addr2 = sdk.ValAddress(pk2.Address())
 )
 
-// require invalid vesting account fails validation
+// require invalid vesting account fails validation.
 func TestValidateGenesisInvalidAccounts(t *testing.T) {
 	acc1 := authtypes.NewBaseAccountWithAddress(sdk.AccAddress(addr1))
 	acc1Balance := sdk.NewCoins(sdk.NewInt64Coin(sdk.DefaultBondDenom, 150))

@@ -12,7 +12,7 @@ import (
 	vestexported "github.com/okp4/okp4d/x/vesting/exported"
 )
 
-// Compile-time type assertions
+// Compile-time type assertions.
 var (
 	_ authtypes.AccountI          = (*BaseVestingAccount)(nil)
 	_ vestexported.VestingAccount = (*ContinuousVestingAccount)(nil)
@@ -122,7 +122,7 @@ func (bva *BaseVestingAccount) TrackUndelegation(amount sdk.Coins) {
 	}
 }
 
-// GetOriginalVesting returns a vesting account's original vesting amount
+// GetOriginalVesting returns a vesting account's original vesting amount.
 func (bva BaseVestingAccount) GetOriginalVesting() sdk.Coins {
 	return bva.OriginalVesting
 }
@@ -139,12 +139,12 @@ func (bva BaseVestingAccount) GetDelegatedVesting() sdk.Coins {
 	return bva.DelegatedVesting
 }
 
-// GetEndTime returns a vesting account's end time
+// GetEndTime returns a vesting account's end time.
 func (bva BaseVestingAccount) GetEndTime() int64 {
 	return bva.EndTime
 }
 
-// Validate checks for errors on the account fields
+// Validate checks for errors on the account fields.
 func (bva BaseVestingAccount) Validate() error {
 	if !(bva.DelegatedVesting.IsAllLTE(bva.OriginalVesting)) {
 		return errors.New("delegated vesting amount cannot be greater than original vesting amount")
@@ -200,7 +200,7 @@ var (
 	_ authtypes.GenesisAccount    = (*ContinuousVestingAccount)(nil)
 )
 
-// NewContinuousVestingAccountRaw creates a new ContinuousVestingAccount object from BaseVestingAccount
+// NewContinuousVestingAccountRaw creates a new ContinuousVestingAccount object from BaseVestingAccount.
 func NewContinuousVestingAccountRaw(bva *BaseVestingAccount, startTime int64) *ContinuousVestingAccount {
 	return &ContinuousVestingAccount{
 		BaseVestingAccount: bva,
@@ -208,8 +208,10 @@ func NewContinuousVestingAccountRaw(bva *BaseVestingAccount, startTime int64) *C
 	}
 }
 
-// NewContinuousVestingAccount returns a new ContinuousVestingAccount
-func NewContinuousVestingAccount(baseAcc *authtypes.BaseAccount, originalVesting sdk.Coins, startTime, endTime int64) *ContinuousVestingAccount {
+// NewContinuousVestingAccount returns a new ContinuousVestingAccount.
+func NewContinuousVestingAccount(baseAcc *authtypes.BaseAccount,
+	originalVesting sdk.Coins,
+	startTime, endTime int64) *ContinuousVestingAccount {
 	baseVestingAcc := &BaseVestingAccount{
 		BaseAccount:     baseAcc,
 		OriginalVesting: originalVesting,
@@ -274,7 +276,7 @@ func (cva ContinuousVestingAccount) GetStartTime() int64 {
 	return cva.StartTime
 }
 
-// Validate checks for errors on the account fields
+// Validate checks for errors on the account fields.
 func (cva ContinuousVestingAccount) Validate() error {
 	if cva.GetStartTime() >= cva.GetEndTime() {
 		return errors.New("vesting start-time cannot be before end-time")
@@ -316,7 +318,7 @@ var (
 	_ authtypes.GenesisAccount    = (*PeriodicVestingAccount)(nil)
 )
 
-// NewPeriodicVestingAccountRaw creates a new PeriodicVestingAccount object from BaseVestingAccount
+// NewPeriodicVestingAccountRaw creates a new PeriodicVestingAccount object from BaseVestingAccount.
 func NewPeriodicVestingAccountRaw(bva *BaseVestingAccount, startTime int64, periods Periods) *PeriodicVestingAccount {
 	return &PeriodicVestingAccount{
 		BaseVestingAccount: bva,
@@ -325,8 +327,11 @@ func NewPeriodicVestingAccountRaw(bva *BaseVestingAccount, startTime int64, peri
 	}
 }
 
-// NewPeriodicVestingAccount returns a new PeriodicVestingAccount
-func NewPeriodicVestingAccount(baseAcc *authtypes.BaseAccount, originalVesting sdk.Coins, startTime int64, periods Periods) *PeriodicVestingAccount {
+// NewPeriodicVestingAccount returns a new PeriodicVestingAccount.
+func NewPeriodicVestingAccount(baseAcc *authtypes.BaseAccount,
+	originalVesting sdk.Coins,
+	startTime int64,
+	periods Periods) *PeriodicVestingAccount {
 	endTime := startTime
 	for _, p := range periods {
 		endTime += p.Length
@@ -407,7 +412,7 @@ func (pva PeriodicVestingAccount) GetVestingPeriods() Periods {
 	return pva.VestingPeriods
 }
 
-// Validate checks for errors on the account fields
+// Validate checks for errors on the account fields.
 func (pva PeriodicVestingAccount) Validate() error {
 	if pva.GetStartTime() >= pva.GetEndTime() {
 		return errors.New("vesting start-time cannot be before end-time")
@@ -462,14 +467,14 @@ var (
 	_ authtypes.GenesisAccount    = (*DelayedVestingAccount)(nil)
 )
 
-// NewDelayedVestingAccountRaw creates a new DelayedVestingAccount object from BaseVestingAccount
+// NewDelayedVestingAccountRaw creates a new DelayedVestingAccount object from BaseVestingAccount.
 func NewDelayedVestingAccountRaw(bva *BaseVestingAccount) *DelayedVestingAccount {
 	return &DelayedVestingAccount{
 		BaseVestingAccount: bva,
 	}
 }
 
-// NewDelayedVestingAccount returns a DelayedVestingAccount
+// NewDelayedVestingAccount returns a DelayedVestingAccount.
 func NewDelayedVestingAccount(baseAcc *authtypes.BaseAccount, originalVesting sdk.Coins, endTime int64) *DelayedVestingAccount {
 	baseVestingAcc := &BaseVestingAccount{
 		BaseAccount:     baseAcc,
@@ -514,7 +519,7 @@ func (dva DelayedVestingAccount) GetStartTime() int64 {
 	return 0
 }
 
-// Validate checks for errors on the account fields
+// Validate checks for errors on the account fields.
 func (dva DelayedVestingAccount) Validate() error {
 	return dva.BaseVestingAccount.Validate()
 }
@@ -532,7 +537,7 @@ var (
 	_ authtypes.GenesisAccount    = (*PermanentLockedAccount)(nil)
 )
 
-// NewPermanentLockedAccount returns a PermanentLockedAccount
+// NewPermanentLockedAccount returns a PermanentLockedAccount.
 func NewPermanentLockedAccount(baseAcc *authtypes.BaseAccount, coins sdk.Coins) *PermanentLockedAccount {
 	baseVestingAcc := &BaseVestingAccount{
 		BaseAccount:     baseAcc,
@@ -579,7 +584,7 @@ func (plva PermanentLockedAccount) GetEndTime() int64 {
 	return 0
 }
 
-// Validate checks for errors on the account fields
+// Validate checks for errors on the account fields.
 func (plva PermanentLockedAccount) Validate() error {
 	if plva.EndTime > 0 {
 		return errors.New("permanently vested accounts cannot have an end-time")
@@ -600,17 +605,19 @@ var (
 	_ authtypes.GenesisAccount    = (*CliffVestingAccount)(nil)
 )
 
-// NewCliffVestingAccountRaw creates a new CliffVestingAccount object from BaseVestingAccount
-func NewCliffVestingAccountRaw(bva *BaseVestingAccount, startTime int64, cliff_time int64) *CliffVestingAccount {
+// NewCliffVestingAccountRaw creates a new CliffVestingAccount object from BaseVestingAccount.
+func NewCliffVestingAccountRaw(bva *BaseVestingAccount, startTime int64, cliffTime int64) *CliffVestingAccount {
 	return &CliffVestingAccount{
 		BaseVestingAccount: bva,
 		StartTime:          startTime,
-		CliffTime:          cliff_time,
+		CliffTime:          cliffTime,
 	}
 }
 
-// NewCliffVestingAccount returns a new CliffVestingAccount
-func NewCliffVestingAccount(baseAcc *authtypes.BaseAccount, originalVesting sdk.Coins, startTime, cliff_time, endTime int64) *CliffVestingAccount {
+// NewCliffVestingAccount returns a new CliffVestingAccount.
+func NewCliffVestingAccount(baseAcc *authtypes.BaseAccount,
+	originalVesting sdk.Coins,
+	startTime, cliffTime, endTime int64) *CliffVestingAccount {
 	baseVestingAcc := &BaseVestingAccount{
 		BaseAccount:     baseAcc,
 		OriginalVesting: originalVesting,
@@ -619,7 +626,7 @@ func NewCliffVestingAccount(baseAcc *authtypes.BaseAccount, originalVesting sdk.
 
 	return &CliffVestingAccount{
 		StartTime:          startTime,
-		CliffTime:          cliff_time,
+		CliffTime:          cliffTime,
 		BaseVestingAccount: baseVestingAcc,
 	}
 }
@@ -682,7 +689,7 @@ func (cva CliffVestingAccount) GetCliffTime() int64 {
 	return cva.CliffTime
 }
 
-// Validate checks for errors on the account fields
+// Validate checks for errors on the account fields.
 func (cva CliffVestingAccount) Validate() error {
 	if cva.GetStartTime() >= cva.GetEndTime() {
 		return errors.New("vesting start-time cannot be before end-time")

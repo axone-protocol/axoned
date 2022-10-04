@@ -26,7 +26,9 @@ func NewMsgServerImpl(k keeper.AccountKeeper, bk types.BankKeeper) types.MsgServ
 
 var _ types.MsgServer = msgServer{}
 
-func (s msgServer) CreateVestingAccount(goCtx context.Context, msg *types.MsgCreateVestingAccount) (*types.MsgCreateVestingAccountResponse, error) {
+//nolint:funlen
+func (s msgServer) CreateVestingAccount(goCtx context.Context,
+	msg *types.MsgCreateVestingAccount) (*types.MsgCreateVestingAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	ak := s.AccountKeeper
 	bk := s.BankKeeper
@@ -94,7 +96,8 @@ func (s msgServer) CreateVestingAccount(goCtx context.Context, msg *types.MsgCre
 	return &types.MsgCreateVestingAccountResponse{}, nil
 }
 
-func (s msgServer) CreatePermanentLockedAccount(goCtx context.Context, msg *types.MsgCreatePermanentLockedAccount) (*types.MsgCreatePermanentLockedAccountResponse, error) {
+func (s msgServer) CreatePermanentLockedAccount(goCtx context.Context,
+	msg *types.MsgCreatePermanentLockedAccount) (*types.MsgCreatePermanentLockedAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	ak := s.AccountKeeper
 	bk := s.BankKeeper
@@ -155,7 +158,8 @@ func (s msgServer) CreatePermanentLockedAccount(goCtx context.Context, msg *type
 	return &types.MsgCreatePermanentLockedAccountResponse{}, nil
 }
 
-func (s msgServer) CreatePeriodicVestingAccount(goCtx context.Context, msg *types.MsgCreatePeriodicVestingAccount) (*types.MsgCreatePeriodicVestingAccountResponse, error) {
+func (s msgServer) CreatePeriodicVestingAccount(goCtx context.Context,
+	msg *types.MsgCreatePeriodicVestingAccount) (*types.MsgCreatePeriodicVestingAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	ak := s.AccountKeeper
@@ -214,7 +218,9 @@ func (s msgServer) CreatePeriodicVestingAccount(goCtx context.Context, msg *type
 	return &types.MsgCreatePeriodicVestingAccountResponse{}, nil
 }
 
-func (s msgServer) CreateCliffVestingAccount(goCtx context.Context, msg *types.MsgCreateCliffVestingAccount) (*types.MsgCreateCliffVestingAccountResponse, error) {
+//nolint:funlen
+func (s msgServer) CreateCliffVestingAccount(goCtx context.Context,
+	msg *types.MsgCreateCliffVestingAccount) (*types.MsgCreateCliffVestingAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	ak := s.AccountKeeper
 	bk := s.BankKeeper
