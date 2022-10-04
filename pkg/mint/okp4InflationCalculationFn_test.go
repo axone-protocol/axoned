@@ -13,8 +13,9 @@ import (
 func TestOkp4InflationCalculationFn(t *testing.T) {
 	Convey("Considering the Okp4InflationCalculationFn", t, func(c C) {
 		type args struct {
-			blockHeight   uint64
-			blocksPerYear uint64
+			blockHeight         uint64
+			blocksPerYear       uint64
+			inflationRateChange float64
 		}
 		tests := []struct {
 			name string
@@ -24,36 +25,41 @@ func TestOkp4InflationCalculationFn(t *testing.T) {
 			{
 				name: "Inflation for the first block of the first year",
 				args: args{
-					blockHeight:   0,
-					blocksPerYear: 10,
+					blockHeight:         0,
+					blocksPerYear:       10,
+					inflationRateChange: .8,
 				}, want: sdk.NewDecWithPrec(15, 3),
 			},
 			{
 				name: "Inflation for the last block of the first year",
 				args: args{
-					blockHeight:   9,
-					blocksPerYear: 10,
+					blockHeight:         9,
+					blocksPerYear:       10,
+					inflationRateChange: .8,
 				}, want: sdk.NewDecWithPrec(15, 3),
 			},
 			{
 				name: "Inflation for the first block of the second year",
 				args: args{
-					blockHeight:   10,
-					blocksPerYear: 10,
+					blockHeight:         10,
+					blocksPerYear:       10,
+					inflationRateChange: .8,
 				}, want: sdk.NewDecWithPrec(12, 3),
 			},
 			{
 				name: "Inflation for the second block of the third year",
 				args: args{
-					blockHeight:   21,
-					blocksPerYear: 10,
+					blockHeight:         21,
+					blocksPerYear:       10,
+					inflationRateChange: .8,
 				}, want: sdk.MustNewDecFromStr("0.0096"),
 			},
 			{
 				name: "Inflation for a block in the 16th year",
 				args: args{
-					blockHeight:   87899401,
-					blocksPerYear: 5256000,
+					blockHeight:         87899401,
+					blocksPerYear:       5256000,
+					inflationRateChange: .8,
 				}, want: sdk.MustNewDecFromStr("0.000000000803296166"),
 			},
 		}
@@ -67,6 +73,7 @@ func TestOkp4InflationCalculationFn(t *testing.T) {
 				params := minttypes.DefaultParams()
 				params.MintDenom = "uknow"
 				params.BlocksPerYear = tt.args.blocksPerYear
+				params.InflationRateChange = sdk.MustNewDecFromStr(fmt.Sprintf("%f", tt.args.inflationRateChange))
 
 				Convey("When calling testcase", func() {
 					got := Okp4InflationCalculationFn(ctx, minter, params, sdk.ZeroDec())
