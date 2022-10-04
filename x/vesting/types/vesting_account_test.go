@@ -731,6 +731,33 @@ func TestGetVestingCoinsCliffVestingAcc(t *testing.T) {
 	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 250), sdk.NewInt64Coin(stakeDenom, 25)}, vestingCoins)
 }
 
+func TestSpendableCoinsCliffVestingAcc(t *testing.T) {
+	now := tmtime.Now()
+	cliffTime := now.Add(12 * time.Hour)
+	endTime := now.Add(24 * time.Hour)
+
+	bacc, origCoins := initBaseAccount()
+	cva := types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+
+	// require that all original coins are locked at the end of the vesting
+	// schedule
+	lockedCoins := cva.LockedCoins(now)
+	require.Equal(t, origCoins, lockedCoins)
+
+	// require that all original coins are locked at the end of the cliff vesting
+	// schedule
+	lockedCoins = cva.LockedCoins(cliffTime)
+	require.Equal(t, origCoins, lockedCoins)
+
+	// require that there exist no locked coins in the beginning of the
+	lockedCoins = cva.LockedCoins(endTime)
+	require.Equal(t, sdk.NewCoins(), lockedCoins)
+
+	// require that all vested coins (25%) are spendable
+	lockedCoins = cva.LockedCoins(now.Add(18 * time.Hour))
+	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 250), sdk.NewInt64Coin(stakeDenom, 25)}, lockedCoins)
+}
+
 func TestGenesisAccountValidate(t *testing.T) {
 	pubkey := secp256k1.GenPrivKey().PubKey()
 	addr := sdk.AccAddress(pubkey.Address())
