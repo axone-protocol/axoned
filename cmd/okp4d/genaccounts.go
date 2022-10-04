@@ -23,10 +23,13 @@ import (
 const (
 	flagVestingStart = "vesting-start-time"
 	flagVestingEnd   = "vesting-end-time"
+	flagVestingCliff = "vesting-cliff-time"
 	flagVestingAmt   = "vesting-amount"
 )
 
 // AddGenesisAccountCmd returns add-genesis-account cobra Command.
+//
+//nolint:funlen,gocognit,cyclop
 func AddGenesisAccountCmd(defaultNodeHome string) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "add-genesis-account [address_or_key_name] [coin][,[coin]]",
@@ -80,6 +83,10 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 			if err != nil {
 				return err
 			}
+			vestingCliff, err := cmd.Flags().GetInt64(flagVestingCliff)
+			if err != nil {
+				return err
+			}
 			vestingEnd, err := cmd.Flags().GetInt64(flagVestingEnd)
 			if err != nil {
 				return err
@@ -109,14 +116,15 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 				}
 
 				switch {
+				case vestingStart != 0 && vestingCliff != 0:
+					genAccount = authvesting.NewCliffVestingAccountRaw(baseVestingAccount, vestingStart, vestingCliff)
 				case vestingStart != 0 && vestingEnd != 0:
 					genAccount = authvesting.NewContinuousVestingAccountRaw(baseVestingAccount, vestingStart)
-
 				case vestingEnd != 0:
 					genAccount = authvesting.NewDelayedVestingAccountRaw(baseVestingAccount)
 
 				default:
-					return errors.New("invalid vesting parameters; must supply start and end time or end time")
+					return errors.New("invalid vesting parameters; must supply start and end time, start and cliff time or end time")
 				}
 			} else {
 				genAccount = baseAccount
@@ -187,6 +195,7 @@ contain valid denominations. Accounts may optionally be supplied with vesting pa
 	cmd.Flags().String(flagVestingAmt, "", "amount of coins for vesting accounts")
 	cmd.Flags().Int64(flagVestingStart, 0, "schedule start time (unix epoch) for vesting accounts")
 	cmd.Flags().Int64(flagVestingEnd, 0, "schedule end time (unix epoch) for vesting accounts")
+	cmd.Flags().Int64(flagVestingCliff, 0, "schedule cliff time (unix epoch) for vesting accounts")
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd

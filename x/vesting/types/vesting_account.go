@@ -692,13 +692,13 @@ func (cva CliffVestingAccount) GetCliffTime() int64 {
 // Validate checks for errors on the account fields.
 func (cva CliffVestingAccount) Validate() error {
 	if cva.GetStartTime() >= cva.GetEndTime() {
-		return errors.New("vesting start-time cannot be before end-time")
+		return errors.New("vesting start-time cannot be after end-time")
 	}
 	if cva.GetStartTime() >= cva.GetCliffTime() {
-		return errors.New("vesting start-time cannot be before cliff-time")
+		return errors.New("vesting start-time cannot be after cliff-time")
 	}
 	if cva.GetCliffTime() >= cva.GetEndTime() {
-		return errors.New("vesting cliff-time cannot be before end-time")
+		return errors.New("vesting cliff-time cannot be after end-time")
 	}
 
 	return cva.BaseVestingAccount.Validate()
