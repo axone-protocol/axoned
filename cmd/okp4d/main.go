@@ -24,6 +24,13 @@ func main() {
 	rootCmd.Short = Resource.Short
 	rootCmd.Long = Resource.Long
 
+	for _, element := range rootCmd.Commands() {
+		if element.Name() == "add-genesis-account" {
+			rootCmd.RemoveCommand(element)
+		}
+	}
+	rootCmd.AddCommand(AddGenesisAccountCmd(app.DefaultNodeHome))
+
 	if err := svrcmd.Execute(rootCmd, "", app.DefaultNodeHome); err != nil {
 		os.Exit(1)
 	}
