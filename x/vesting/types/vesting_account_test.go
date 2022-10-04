@@ -677,6 +677,35 @@ func TestTrackUndelegationPermLockedVestingAcc(t *testing.T) {
 	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(stakeDenom, 25)}, plva.DelegatedVesting)
 }
 
+func TestGetVestedCoinsCliffVestingAcc(t *testing.T) {
+	now := tmtime.Now()
+	cliffTime := now.Add(12 * time.Hour)
+	endTime := now.Add(24 * time.Hour)
+
+	bacc, origCoins := initBaseAccount()
+	cva := types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+
+	// require no coins vested in the very beginning of the vesting schedule
+	vestedCoins := cva.GetVestedCoins(now)
+	require.Nil(t, vestedCoins)
+
+	// require no coins vested in the very beginning of the cliff schedule
+	vestedCoins = cva.GetVestedCoins(cliffTime)
+	require.Nil(t, vestedCoins)
+
+	// require all coins vested at the end of the vesting schedule
+	vestedCoins = cva.GetVestedCoins(endTime)
+	require.Equal(t, origCoins, vestedCoins)
+
+	// require 75% of coins vested
+	vestedCoins = cva.GetVestedCoins(now.Add(18 * time.Hour))
+	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 750), sdk.NewInt64Coin(stakeDenom, 75)}, vestedCoins)
+
+	// require 100% of coins vested
+	vestedCoins = cva.GetVestedCoins(now.Add(48 * time.Hour))
+	require.Equal(t, origCoins, vestedCoins)
+}
+
 func TestGenesisAccountValidate(t *testing.T) {
 	pubkey := secp256k1.GenPrivKey().PubKey()
 	addr := sdk.AccAddress(pubkey.Address())
@@ -823,6 +852,26 @@ func (s *VestingAccountTestSuite) TestPermanentLockedAccountMarshal() {
 	acc2, err := app.AccountKeeper.UnmarshalAccount(bz)
 	require.Nil(err)
 	require.IsType(&types.PermanentLockedAccount{}, acc2)
+	require.Equal(acc.String(), acc2.String())
+
+	// error on bad bytes
+	_, err = app.AccountKeeper.UnmarshalAccount(bz[:len(bz)/2])
+	require.NotNil(err)
+}
+
+func (s *VestingAccountTestSuite) TestCliffVestingAccountMarshal() {
+	app := s.app
+	require := s.Require()
+	baseAcc, coins := initBaseAccount()
+	baseVesting := types.NewBaseVestingAccount(baseAcc, coins, time.Now().Unix())
+	acc := types.NewCliffVestingAccountRaw(baseVesting, baseVesting.EndTime, time.Now().Add(24*time.Hour).Unix())
+
+	bz, err := app.AccountKeeper.MarshalAccount(acc)
+	require.Nil(err)
+
+	acc2, err := app.AccountKeeper.UnmarshalAccount(bz)
+	require.Nil(err)
+	require.IsType(&types.CliffVestingAccount{}, acc2)
 	require.Equal(acc.String(), acc2.String())
 
 	// error on bad bytes
