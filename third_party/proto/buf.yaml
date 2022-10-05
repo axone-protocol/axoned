@@ -1,5 +1,5 @@
 version: v1
-name: buf.build/evmos/evmos
+name: buf.build/okp4/okp4d
 build:
   excludes:
     - google/protobuf
