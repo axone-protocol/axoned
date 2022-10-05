@@ -92,7 +92,7 @@ func TestSpendableCoinsContVestingAcc(t *testing.T) {
 	lockedCoins := cva.LockedCoins(now)
 	require.Equal(t, origCoins, lockedCoins)
 
-	// require that there exist no locked coins in the beginning of the
+	// require that there exist no locked coins at the end of the vesting
 	lockedCoins = cva.LockedCoins(endTime)
 	require.Equal(t, sdk.NewCoins(), lockedCoins)
 
@@ -749,7 +749,7 @@ func TestSpendableCoinsCliffVestingAcc(t *testing.T) {
 	lockedCoins = cva.LockedCoins(cliffTime)
 	require.Equal(t, origCoins, lockedCoins)
 
-	// require that there exist no locked coins in the beginning of the
+	// require that there exist no locked coins at the end of the vesting
 	lockedCoins = cva.LockedCoins(endTime)
 	require.Equal(t, sdk.NewCoins(), lockedCoins)
 
