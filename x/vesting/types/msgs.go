@@ -222,7 +222,7 @@ func NewMsgCreateCliffVestingAccount(fromAddr,
 func (msg MsgCreateCliffVestingAccount) Route() string { return RouterKey }
 
 // Type returns the message type for a MsgCreateVestingAccount.
-func (msg MsgCreateCliffVestingAccount) Type() string { return TypeMsgCreateVestingAccount }
+func (msg MsgCreateCliffVestingAccount) Type() string { return TypeMsgCreateCliffVestingAccount }
 
 // ValidateBasic Implements Msg.
 func (msg MsgCreateCliffVestingAccount) ValidateBasic() error {
@@ -243,6 +243,14 @@ func (msg MsgCreateCliffVestingAccount) ValidateBasic() error {
 
 	if msg.EndTime <= 0 {
 		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid end time")
+	}
+
+	if msg.CliffTime <= 0 {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "invalid cliff time")
+	}
+
+	if msg.CliffTime > msg.EndTime {
+		return sdkerrors.Wrap(sdkerrors.ErrInvalidRequest, "cliff time should be before end time")
 	}
 
 	return nil
