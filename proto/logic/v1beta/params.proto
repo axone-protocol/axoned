@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package logic.v1beta;
 
 import "gogoproto/gogo.proto";
@@ -9,6 +10,6 @@ option go_package = "github.com/okp4/okp4d/x/logic/types";
 message Params {
   option (gogoproto.goproto_stringer) = false;
 
-  // foo represents a metasyntactic variable for testing purposes. 
+  // foo represents a metasyntactic variable for testing purposes.
   string foo = 1 [(gogoproto.moretags) = "yaml:\"foo\""];
 }

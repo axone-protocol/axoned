@@ -1,8 +1,8 @@
 version: v1
 name: buf.build/okp4/okp4d
-breaking:
-  use:
-    - FILE
+build:
+  excludes:
+    - google/protobuf
 lint:
   use:
     - DEFAULT
@@ -18,3 +18,20 @@ lint:
     - RPC_RESPONSE_STANDARD_NAME
     - RPC_REQUEST_RESPONSE_UNIQUE
     - COMMENT_MESSAGE
+  ignore:
+    - cosmos
+    - tendermint
+    - gogoproto
+    - cosmos_proto
+    - google
+    - confio
+    - ibc
+    - proofs.proto
+breaking:
+  use:
+    - FILE
+  ignore:
+    - tendermint
+    - gogoproto
+    - cosmos_proto
+    - google
