@@ -24,9 +24,11 @@ func main() {
 	rootCmd.Short = Resource.Short
 	rootCmd.Long = Resource.Long
 
-	for _, element := range rootCmd.Commands() {
-		if element.Name() == "add-genesis-account" {
-			rootCmd.RemoveCommand(element)
+	// To keep other default Ignite commands and add our custom `AddGenesisAccountCmd` (integrating the cliff),
+	// we need first to remove the Ignite `AddGenesisAccountCmd` then add ours.
+	for _, command := range rootCmd.Commands() {
+		if command.Name() == "add-genesis-account" {
+			rootCmd.RemoveCommand(command)
 		}
 	}
 	rootCmd.AddCommand(AddGenesisAccountCmd(app.DefaultNodeHome))
