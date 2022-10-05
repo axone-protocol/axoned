@@ -3,7 +3,6 @@ module github.com/okp4/okp4d
 go 1.19
 
 require (
-	cosmossdk.io/errors v1.0.0-beta.7
 	github.com/CosmWasm/wasmd v0.28.0
 	github.com/armon/go-metrics v0.4.0
 	github.com/cosmos/cosmos-sdk v0.46.2
@@ -15,7 +14,6 @@ require (
 	github.com/ignite/cli v0.24.0
 	github.com/prometheus/client_golang v1.13.0
 	github.com/smartystreets/goconvey v1.6.4
-	github.com/regen-network/cosmos-proto v0.3.1
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.5.0
 	github.com/stretchr/testify v1.8.0
@@ -33,6 +31,7 @@ require (
 	cloud.google.com/go/compute v1.7.0 // indirect
 	cloud.google.com/go/iam v0.4.0 // indirect
 	cloud.google.com/go/storage v1.22.1 // indirect
+	cosmossdk.io/errors v1.0.0-beta.7 // indirect
 	cosmossdk.io/math v1.0.0-beta.3 // indirect
 	filippo.io/edwards25519 v1.0.0-rc.1 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
@@ -168,6 +167,7 @@ require (
 	github.com/radovskyb/watcher v1.0.7 // indirect
 	github.com/rakyll/statik v0.1.7 // indirect
 	github.com/rcrowley/go-metrics v0.0.0-20200313005456-10cdbea86bc0 // indirect
+	github.com/regen-network/cosmos-proto v0.3.1 // indirect
 	github.com/rs/cors v1.8.2 // indirect
 	github.com/rs/zerolog v1.27.0 // indirect
 	github.com/sasha-s/go-deadlock v0.2.1-0.20190427202633-1595213edefa // indirect

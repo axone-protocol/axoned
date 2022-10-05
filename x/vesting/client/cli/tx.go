@@ -34,6 +34,7 @@ func GetTxCmd() *cobra.Command {
 		NewMsgCreateVestingAccountCmd(),
 		NewMsgCreatePermanentLockedAccountCmd(),
 		NewMsgCreatePeriodicVestingAccountCmd(),
+		NewMsgCreateCliffVestingAccountCmd(),
 	)
 
 	return txCmd
@@ -199,6 +200,54 @@ func NewMsgCreatePeriodicVestingAccountCmd() *cobra.Command {
 			if err := msg.ValidateBasic(); err != nil {
 				return err
 			}
+
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+// NewMsgCreateCliffVestingAccountCmd returns a CLI command handler for creating a
+// MsgCreateCliffVestingAccount transaction.
+func NewMsgCreateCliffVestingAccountCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "create-cliff-vesting-account [to_address] [amount] [cliff_time] [end_time]",
+		Short: "Create a new vesting account funded with an allocation of tokens with cliff.",
+		Long: `Create a new vesting account funded with an allocation of tokens. The
+tokens allowed will be start vested but the token will be released only after the cliff time.
+All vesting accounts created will have their start time
+set by the committed block's time. The end_time and cliff_time must be provided as a UNIX epoch
+timestamp.`,
+		Args: cobra.ExactArgs(4),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+			toAddr, err := sdk.AccAddressFromBech32(args[0])
+			if err != nil {
+				return err
+			}
+
+			amount, err := sdk.ParseCoinsNormalized(args[1])
+			if err != nil {
+				return err
+			}
+
+			cliffTime, err := strconv.ParseInt(args[2], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			endTime, err := strconv.ParseInt(args[3], 10, 64)
+			if err != nil {
+				return err
+			}
+
+			msg := types.NewMsgCreateCliffVestingAccount(clientCtx.GetFromAddress(), toAddr, amount, endTime, cliffTime)
 
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
