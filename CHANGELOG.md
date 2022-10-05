@@ -1,5 +1,26 @@
 # ØKP4 protocol changelog
 
+## [2.1.0](https://github.com/okp4/okp4d/compare/v2.0.0...v2.1.0) (2022-10-05)
+
+
+### Features
+
+* **cliff:** add cliff cmd on vesting transaction ([ccff37c](https://github.com/okp4/okp4d/commit/ccff37ce34941297fc924b277381d08c7a48a367))
+* **cliff:** add vesting-cliff-time flags on add-genesis account cmd ([ea3e2c5](https://github.com/okp4/okp4d/commit/ea3e2c5abb28ae24fa7f6633c3a3f5f95196f92f))
+* **cliff:** override add-genesis-account ([434d418](https://github.com/okp4/okp4d/commit/434d4181a114675cd3c894378d0179266ec1fd3b))
+* **cliff:** register cliff vesting account msg ([9106919](https://github.com/okp4/okp4d/commit/910691901185a32a2699c67fe5560f55e37fddba))
+* implment okp4 inflaction calculation function ([2e95801](https://github.com/okp4/okp4d/commit/2e958010bdbaa78af0f0a1958c9c0493c2fbfed7))
+* use okp4 inflation calculation fn (instead of default one) ([bdca893](https://github.com/okp4/okp4d/commit/bdca89319b5546fca1aabe2ff5bece1c05258558))
+* use okp4 vesting module ([7493de9](https://github.com/okp4/okp4d/commit/7493de90a0fb601b9ab7b10eb0526a59652d5eef))
+* use third party to generate proto ([cb4f5bb](https://github.com/okp4/okp4d/commit/cb4f5bb36fee1cc54d59bf902eae229fe2421bd6))
+
+
+### Bug Fixes
+
+* **cliff:** improve verification on cliff msg tx ([4dfaa5b](https://github.com/okp4/okp4d/commit/4dfaa5b2624fcd39b12459d83275027f8d09507d))
+* **ibc:** ensure ibc fees are managed ([c26b0db](https://github.com/okp4/okp4d/commit/c26b0db71dbd5b71788a7f333b673bc75ac80198))
+* make linter happy ([584851c](https://github.com/okp4/okp4d/commit/584851c5b248112fc10ea3ff0a3f3873a3878a06))
+
 ## [2.0.0](https://github.com/okp4/okp4d/compare/v1.3.0...v2.0.0) (2022-09-23)
 
 
