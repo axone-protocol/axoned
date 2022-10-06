@@ -12,6 +12,7 @@ require (
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/ignite/cli v0.24.0
+	github.com/iqlusioninc/liquidity-staking-module v1.0.1-0.20220923193544-9f2b692521b9
 	github.com/prometheus/client_golang v1.13.0
 	github.com/smartystreets/goconvey v1.6.4
 	github.com/spf13/cast v1.5.0
