@@ -211,7 +211,8 @@ func NewContinuousVestingAccountRaw(bva *BaseVestingAccount, startTime int64) *C
 // NewContinuousVestingAccount returns a new ContinuousVestingAccount.
 func NewContinuousVestingAccount(baseAcc *authtypes.BaseAccount,
 	originalVesting sdk.Coins,
-	startTime, endTime int64) *ContinuousVestingAccount {
+	startTime, endTime int64,
+) *ContinuousVestingAccount {
 	baseVestingAcc := &BaseVestingAccount{
 		BaseAccount:     baseAcc,
 		OriginalVesting: originalVesting,
@@ -331,7 +332,8 @@ func NewPeriodicVestingAccountRaw(bva *BaseVestingAccount, startTime int64, peri
 func NewPeriodicVestingAccount(baseAcc *authtypes.BaseAccount,
 	originalVesting sdk.Coins,
 	startTime int64,
-	periods Periods) *PeriodicVestingAccount {
+	periods Periods,
+) *PeriodicVestingAccount {
 	endTime := startTime
 	for _, p := range periods {
 		endTime += p.Length
@@ -617,7 +619,8 @@ func NewCliffVestingAccountRaw(bva *BaseVestingAccount, startTime int64, cliffTi
 // NewCliffVestingAccount returns a new CliffVestingAccount.
 func NewCliffVestingAccount(baseAcc *authtypes.BaseAccount,
 	originalVesting sdk.Coins,
-	startTime, cliffTime, endTime int64) *CliffVestingAccount {
+	startTime, cliffTime, endTime int64,
+) *CliffVestingAccount {
 	baseVestingAcc := &BaseVestingAccount{
 		BaseAccount:     baseAcc,
 		OriginalVesting: originalVesting,

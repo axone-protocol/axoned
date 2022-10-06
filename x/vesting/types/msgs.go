@@ -34,7 +34,8 @@ func NewMsgCreateVestingAccount(fromAddr,
 	toAddr sdk.AccAddress,
 	amount sdk.Coins,
 	endTime int64,
-	delayed bool) *MsgCreateVestingAccount {
+	delayed bool,
+) *MsgCreateVestingAccount {
 	return &MsgCreateVestingAccount{
 		FromAddress: fromAddr.String(),
 		ToAddress:   toAddr.String(),
@@ -141,7 +142,8 @@ func (msg MsgCreatePermanentLockedAccount) GetSigners() []sdk.AccAddress {
 func NewMsgCreatePeriodicVestingAccount(fromAddr,
 	toAddr sdk.AccAddress,
 	startTime int64,
-	periods []Period) *MsgCreatePeriodicVestingAccount {
+	periods []Period,
+) *MsgCreatePeriodicVestingAccount {
 	return &MsgCreatePeriodicVestingAccount{
 		FromAddress:    fromAddr.String(),
 		ToAddress:      toAddr.String(),
@@ -208,7 +210,8 @@ func (msg MsgCreatePeriodicVestingAccount) ValidateBasic() error {
 func NewMsgCreateCliffVestingAccount(fromAddr,
 	toAddr sdk.AccAddress,
 	amount sdk.Coins,
-	endTime, cliffTime int64) *MsgCreateCliffVestingAccount {
+	endTime, cliffTime int64,
+) *MsgCreateCliffVestingAccount {
 	return &MsgCreateCliffVestingAccount{
 		FromAddress: fromAddr.String(),
 		ToAddress:   toAddr.String(),
