@@ -5,9 +5,7 @@ import (
 	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
 )
 
-var (
-	initialInflation = sdk.NewDecWithPrec(75, 3)
-)
+var initialInflation = sdk.NewDecWithPrec(75, 3)
 
 // Okp4InflationCalculationFn is the function used to calculate the inflation for the OKP4 network.
 // Inflation is calculated in absolute terms, without taking into account previous inflation, on the basis of the current

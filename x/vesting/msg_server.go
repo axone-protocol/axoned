@@ -28,7 +28,8 @@ var _ types.MsgServer = msgServer{}
 
 //nolint:funlen
 func (s msgServer) CreateVestingAccount(goCtx context.Context,
-	msg *types.MsgCreateVestingAccount) (*types.MsgCreateVestingAccountResponse, error) {
+	msg *types.MsgCreateVestingAccount,
+) (*types.MsgCreateVestingAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	ak := s.AccountKeeper
 	bk := s.BankKeeper
@@ -97,7 +98,8 @@ func (s msgServer) CreateVestingAccount(goCtx context.Context,
 }
 
 func (s msgServer) CreatePermanentLockedAccount(goCtx context.Context,
-	msg *types.MsgCreatePermanentLockedAccount) (*types.MsgCreatePermanentLockedAccountResponse, error) {
+	msg *types.MsgCreatePermanentLockedAccount,
+) (*types.MsgCreatePermanentLockedAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	ak := s.AccountKeeper
 	bk := s.BankKeeper
@@ -159,7 +161,8 @@ func (s msgServer) CreatePermanentLockedAccount(goCtx context.Context,
 }
 
 func (s msgServer) CreatePeriodicVestingAccount(goCtx context.Context,
-	msg *types.MsgCreatePeriodicVestingAccount) (*types.MsgCreatePeriodicVestingAccountResponse, error) {
+	msg *types.MsgCreatePeriodicVestingAccount,
+) (*types.MsgCreatePeriodicVestingAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
 	ak := s.AccountKeeper
@@ -220,7 +223,8 @@ func (s msgServer) CreatePeriodicVestingAccount(goCtx context.Context,
 
 //nolint:funlen
 func (s msgServer) CreateCliffVestingAccount(goCtx context.Context,
-	msg *types.MsgCreateCliffVestingAccount) (*types.MsgCreateCliffVestingAccountResponse, error) {
+	msg *types.MsgCreateCliffVestingAccount,
+) (*types.MsgCreateCliffVestingAccountResponse, error) {
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	ak := s.AccountKeeper
 	bk := s.BankKeeper
