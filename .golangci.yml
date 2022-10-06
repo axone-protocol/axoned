@@ -44,14 +44,11 @@ linters:
     - predeclared
     - promlinter
     - revive
-    - rowserrcheck
-    - sqlclosecheck
     - stylecheck
     - tenv
     - tparallel
     - unconvert
     - unparam
-    - wastedassign
     - whitespace
 
 linters-settings:
