@@ -10,3 +10,9 @@ plugins:
     out: .
     opt:
       - logtostderr=true
+        
+  - name: doc
+    out: ./docs/proto
+    opt:
+      - ./docs/proto/protodoc-markdown.tmpl,docs.md
+    strategy: all
