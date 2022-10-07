@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	initialInflation = sdk.NewDecWithPrec(15, 2)
+	initialInflation = sdk.NewDecWithPrec(75, 3)
 )
 
 // Okp4InflationCalculationFn is the function used to calculate the inflation for the OKP4 network.

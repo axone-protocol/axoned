@@ -28,7 +28,7 @@ func TestOkp4InflationCalculationFn(t *testing.T) {
 					blockHeight:         0,
 					blocksPerYear:       10,
 					inflationRateChange: .8,
-				}, want: sdk.NewDecWithPrec(15, 2),
+				}, want: sdk.NewDecWithPrec(75, 3),
 			},
 			{
 				name: "Inflation for the last block of the first year",
@@ -36,7 +36,7 @@ func TestOkp4InflationCalculationFn(t *testing.T) {
 					blockHeight:         9,
 					blocksPerYear:       10,
 					inflationRateChange: .8,
-				}, want: sdk.NewDecWithPrec(15, 2),
+				}, want: sdk.NewDecWithPrec(75, 3),
 			},
 			{
 				name: "Inflation for the first block of the second year",
@@ -44,7 +44,7 @@ func TestOkp4InflationCalculationFn(t *testing.T) {
 					blockHeight:         10,
 					blocksPerYear:       10,
 					inflationRateChange: .8,
-				}, want: sdk.NewDecWithPrec(12, 2),
+				}, want: sdk.NewDecWithPrec(6, 2),
 			},
 			{
 				name: "Inflation for the second block of the third year",
@@ -52,7 +52,7 @@ func TestOkp4InflationCalculationFn(t *testing.T) {
 					blockHeight:         21,
 					blocksPerYear:       10,
 					inflationRateChange: .8,
-				}, want: sdk.MustNewDecFromStr("0.096"),
+				}, want: sdk.MustNewDecFromStr("0.048"),
 			},
 			{
 				name: "Inflation for a block in the 16th year",
@@ -60,7 +60,7 @@ func TestOkp4InflationCalculationFn(t *testing.T) {
 					blockHeight:         87899401,
 					blocksPerYear:       5256000,
 					inflationRateChange: .8,
-				}, want: sdk.MustNewDecFromStr("0.004222124650659840"),
+				}, want: sdk.MustNewDecFromStr("0.002111062325329920"),
 			},
 		}
 
