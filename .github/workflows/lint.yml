@@ -36,7 +36,7 @@ jobs:
         uses: avto-dev/markdown-lint@v1.5.0
         with:
           args: "**/*.md"
-          ignore: "CHANGELOG.md"
+          ignore: "CHANGELOG.md" "docs/proto/docs.md"
 
   lint-yaml:
     runs-on: ubuntu-20.04
