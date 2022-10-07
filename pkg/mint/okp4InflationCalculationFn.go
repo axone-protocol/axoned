@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	initialInflation = sdk.NewDecWithPrec(15, 2)
+	initialInflation = sdk.NewDecWithPrec(75, 3)
 )
 
 // Okp4InflationCalculationFn is the function used to calculate the inflation for the OKP4 network.
@@ -18,7 +18,6 @@ var (
 // See: https://docs.okp4.network/docs/whitepaper/tokenomics#staking-rewards
 func Okp4InflationCalculationFn(ctx sdk.Context, minter minttypes.Minter, params minttypes.Params, _ sdk.Dec) sdk.Dec {
 	year := uint64(ctx.BlockHeight()) / params.BlocksPerYear
-	inflationForYear := initialInflation.Mul(params.InflationRateChange.Power(year))
 
-	return inflationForYear.QuoInt64Mut(int64(params.BlocksPerYear))
+	return initialInflation.Mul(params.InflationRateChange.Power(year))
 }
