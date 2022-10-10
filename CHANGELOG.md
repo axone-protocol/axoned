@@ -1,5 +1,13 @@
 # ØKP4 protocol changelog
 
+## [2.1.1](https://github.com/okp4/okp4d/compare/v2.1.0...v2.1.1) (2022-10-10)
+
+
+### Bug Fixes
+
+* **mint:** provide annual inflation rate ([608af3f](https://github.com/okp4/okp4d/commit/608af3f20ccc0afedfd518b56ae84c679df21502))
+* **mint:** set initial inflation to 7.5% instead of 15% ([7bbd048](https://github.com/okp4/okp4d/commit/7bbd04802ce402967a56550f9c843c608fd91877))
+
 ## [2.1.0](https://github.com/okp4/okp4d/compare/v2.0.0...v2.1.0) (2022-10-05)
 
 
