@@ -7,7 +7,7 @@ require (
 	github.com/armon/go-metrics v0.4.1
 	github.com/cosmos/cosmos-sdk v0.46.2
 	github.com/cosmos/ibc-go/v5 v5.0.0
-	github.com/cosmos/interchain-accounts v0.3.4
+	github.com/cosmos/interchain-accounts v0.3.5
 	github.com/gogo/protobuf v1.3.3
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
