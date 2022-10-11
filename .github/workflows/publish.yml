@@ -78,3 +78,18 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_REGISTRY_TOKEN }}
           repository: okp4/okp4d
           readme-filepath: README.md
+
+  publish-buf-proto:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Setup buf
+        uses: bufbuild/buf-setup-action@v1.8.0
+
+      - name: Push okp4 proto on buf registry
+        uses: bufbuild/buf-push-action@v1
+        with:
+          input: 'proto'
+          buf_token: ${{ secrets.BUF_TOKEN }}
