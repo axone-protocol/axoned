@@ -5,6 +5,7 @@ BINARY_NAME             = okp4d
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 RELEASE_FOLDER          = $(TARGET_FOLDER)/release
+DOCKER_IMAGE_GOLANG		= golang:1.19-alpine3.16
 DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.49
 DOCKER_IMAGE_BUF  		= okp4/buf-cosmos:0.3.1
 DOCKER_BUILDX_BUILDER   = okp4-builder
@@ -83,6 +84,18 @@ lint-proto: ## Lint proto files
   		-w /proto \
   		${DOCKER_IMAGE_BUF} \
   		lint proto -v
+
+## Format:
+format: format-go ## Run all available formatters
+
+format-go: ## Format go files
+	@echo "${COLOR_CYAN}📐 Formatting go source code${COLOR_RESET}"
+	@docker run --rm \
+  		-v `pwd`:/app:rw \
+  		-w /app \
+  		${DOCKER_IMAGE_GOLANG} \
+  		sh -c \
+		"go install mvdan.cc/gofumpt@v0.4.0; gofumpt -w -l ."
 
 ## Build:
 build: build-go ## Build all available artefacts (executable, docker image, etc.)
