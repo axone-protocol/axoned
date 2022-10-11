@@ -38,3 +38,25 @@ jobs:
       - name: Build docker image
         run: |
           docker build .
+
+  build-proto:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Find changed proto files
+        id: changed-proto-files
+        uses: tj-actions/changed-files@v31.0.3
+        with:
+          files: |
+            proto/**/*.proto
+
+      - name: Setup buf
+        if: steps.changed-proto-files.outputs.any_changed == 'true'
+        uses: bufbuild/buf-setup-action@v1.8.0
+
+      - name: Build and generate proto
+        if: steps.changed-proto-files.outputs.any_changed == 'true'
+        run: |
+          make proto-gen
