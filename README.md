@@ -58,7 +58,7 @@ we also apply the philosophical principles of [release early - release often](ht
 
 ## Docker image
 
-A docker image is available on [Docker hub](https://hub.docker.com/r/okp4/okp4d):
+For a quick start, a docker image is officially available on [Docker hub](https://hub.docker.com/r/okp4/okp4d).
 
 ```bash
 docker pull okp4/okp4d:latest
@@ -120,7 +120,51 @@ OKP4 blockchain and hosted in the [okp4/contracts](https://github.com/okp4/contr
 - install [Go] `1.19+` following instructions from the [official Go documentation](https://golang.org/doc/install);
 - use [gofumpt](https://github.com/mvdan/gofumpt) as formatter. You can integrate it in your favorite IDE following these [instructions](https://github.com/mvdan/gofumpt#installation) or invoke the makefile `make format-go`;
 - verify that [Docker] is properly installed and if not, follow the [instructions](https://docs.docker.com) for your environment;
-- the project comes with a convenient `Makefile` so verify that [`make`](https://fr.wikipedia.org/wiki/Make) is properly installed.
+- verify that [`make`](https://fr.wikipedia.org/wiki/Make) is properly installed if you intend to use the provided `Makefile`.
+
+### Makefile
+
+The project comes with a convenient `Makefile` that helps you to build, install, lint and test the project.
+
+```text
+$ make help
+
+Usage:
+  make <target>
+
+Targets:
+  Lint:
+    lint                Lint all available linters
+    lint-go             Lint go source code
+    lint-proto          Lint proto files
+  Format:
+    format              Run all available formatters
+    format-go           Format go files
+  Build:
+    build               Build all available artefacts (executable, docker image, etc.)
+    build-go            Build node executable for the current environment (default build)
+    build-go-all        Build node executables for all available environments
+  Install:
+    install             Install node executable
+  Test:
+    test                Pass all the tests
+    test-go             Pass the test for the go source code
+  Clean:
+    clean               Remove all the files from the target folder
+  Proto:
+    proto-format        Format Protobuf files
+    proto-build         Build all Protobuf files
+    proto-gen           Generate all the code from the Protobuf files
+  Release:
+    release-assets      Generate release assets
+  Help:
+    help                Show this help.
+
+This Makefile depends on docker. To install it, please follow the instructions:
+- for macOS: https://docs.docker.com/docker-for-mac/install/
+- for Windows: https://docs.docker.com/docker-for-windows/install/
+- for Linux: https://docs.docker.com/engine/install/
+```
 
 ### Build
 
