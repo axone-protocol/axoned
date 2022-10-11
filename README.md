@@ -41,6 +41,7 @@ Looking for a network to join ? 👉 [Checkout the networks!](https://github.com
 ### Prerequisites
 
 - install [Go] `1.19+` following instructions from the [official Go documentation](https://golang.org/doc/install);
+- use [gofumpt](https://github.com/mvdan/gofumpt) as formatter, you can integrate it in your favorite IDE following these [instructions](https://github.com/mvdan/gofumpt#installation);
 - verify that [Docker] is properly installed and if not, follow the [instructions](https://docs.docker.com) for your environment;
 - the project comes with a convenient `Makefile` so verify that [`make`](https://fr.wikipedia.org/wiki/Make) is properly installed.
 
