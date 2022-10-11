@@ -10,9 +10,7 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
-var (
-	DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
-)
+var DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())
 
 //nolint:unused
 const (
