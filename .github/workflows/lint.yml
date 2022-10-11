@@ -101,6 +101,16 @@ jobs:
         with:
           version: v1.49
 
+      - name: Lint go code (gofumpt)
+        if: steps.changed-go-files.outputs.any_changed == 'true'
+        run: |
+          go install mvdan.cc/gofumpt@v0.4.0
+          if [ "$(gofumpt -l .)" != "" ]; then
+            echo "❌ Code is not gofumpt!"
+            exit 1
+          fi
+          echo "✅ Code is gofumpt!"
+
   lint-dockerfile:
     runs-on: ubuntu-20.04
     if: github.actor != 'dependabot[bot]'
