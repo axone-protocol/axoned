@@ -34,27 +34,6 @@ Want to become a validator? 👉 [Checkout the documentation!](https://docs.okp4
 
 Looking for a network to join ? 👉 [Checkout the networks!](https://github.com/okp4/networks)
 
-## Developing & contributing
-
-`okp4d` is written in [Go] and built using [Cosmos SDK].
-
-### Prerequisites
-
-- install [Go] `1.19+` following instructions from the [official Go documentation](https://golang.org/doc/install);
-- use [gofumpt](https://github.com/mvdan/gofumpt) as formatter, you can integrate it in your favorite IDE following these [instructions](https://github.com/mvdan/gofumpt#installation);
-- verify that [Docker] is properly installed and if not, follow the [instructions](https://docs.docker.com) for your environment;
-- the project comes with a convenient `Makefile` so verify that [`make`](https://fr.wikipedia.org/wiki/Make) is properly installed.
-
-### Build
-
-To build the `okp4d` node, invoke the goal `build` of the `Makefile`:
-
-```sh
-make build
-```
-
-The binary will be generated under the folder `target/dist`.
-
 ## Supported platforms
 
 The `okp4d` blockchain currently supports the following builds:
@@ -110,7 +89,7 @@ docker run -v $(pwd)/home:/home okp4/okp4d:latest keys add my-wallet --keyring-b
 
 ### Start a node
 
-Everything you need to start a node and even more is explained here : <https://docs.okp4.network/docs/nodes/run-node>
+Everything you need to start a node and more is explained here: <https://docs.okp4.network/docs/nodes/run-node>
 
 ```bash
 MONIKER=node-in-my-name
@@ -130,6 +109,28 @@ Set `persistent_peers` in `config/config.toml` file.
 ```bash
 docker run -v $(pwd)/home:/home okp4/okp4d:latest start --home /home
 ```
+
+## Developing & contributing
+
+`okp4d` is written in [Go] and built using [Cosmos SDK]. A number of smart contracts are also deployed on the
+OKP4 blockchain and hosted in the [okp4/contracts](https://github.com/okp4/contracts) project.
+
+### Prerequisites
+
+- install [Go] `1.19+` following instructions from the [official Go documentation](https://golang.org/doc/install);
+- use [gofumpt](https://github.com/mvdan/gofumpt) as formatter. You can integrate it in your favorite IDE following these [instructions](https://github.com/mvdan/gofumpt#installation) or invoke the makefile `make format-go`;
+- verify that [Docker] is properly installed and if not, follow the [instructions](https://docs.docker.com) for your environment;
+- the project comes with a convenient `Makefile` so verify that [`make`](https://fr.wikipedia.org/wiki/Make) is properly installed.
+
+### Build
+
+To build the `okp4d` node, invoke the goal `build` of the `Makefile`:
+
+```sh
+make build
+```
+
+The binary will be generated under the folder `target/dist`.
 
 ## Bug reports & feature requests
 
