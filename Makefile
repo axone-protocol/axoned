@@ -19,7 +19,7 @@ COLOR_CYAN   = $(shell tput -Txterm setaf 6)
 COLOR_RED    = $(shell tput -Txterm setaf 1)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
 
-BUILD_TAGS += netgo
+BUILD_TAGS += netgo ledger
 BUILD_TAGS := $(strip $(BUILD_TAGS))
 
 # Flags
