@@ -1,6 +1,12 @@
 #--- Build stage
 FROM golang:1.19-alpine3.16 AS go-builder
 
+# install Linux header and build-base for native C codes
+RUN apk add --no-cache \
+    ca-certificates \
+    build-base \
+    linux-headers
+
 WORKDIR /src
 
 # CosmWasm: see https://github.com/CosmWasm/wasmvm/releases

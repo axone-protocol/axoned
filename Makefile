@@ -10,6 +10,7 @@ DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.49
 DOCKER_IMAGE_BUF  		= okp4/buf-cosmos:0.3.1
 DOCKER_BUILDX_BUILDER   = okp4-builder
 CMD_ROOT               :=./cmd/${BINARY_NAME}
+LEDGER_ENABLED ?= true
 
 # Some colors
 COLOR_GREEN  = $(shell tput -Txterm setaf 2)
@@ -19,8 +20,30 @@ COLOR_CYAN   = $(shell tput -Txterm setaf 6)
 COLOR_RED    = $(shell tput -Txterm setaf 1)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
 
-BUILD_TAGS += netgo ledger
+BUILD_TAGS += netgo
 BUILD_TAGS := $(strip $(BUILD_TAGS))
+ifeq ($(LEDGER_ENABLED),true)
+  ifeq ($(OS),Windows_NT)
+    GCCEXE = $(shell where gcc.exe 2> NUL)
+    ifeq ($(GCCEXE),)
+      $(error gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
+    else
+      build_tags += ledger
+    endif
+  else
+    UNAME_S = $(shell uname -s)
+    ifeq ($(UNAME_S),OpenBSD)
+      $(warning OpenBSD detected, disabling ledger support (https://github.com/cosmos/cosmos-sdk/issues/1988))
+    else
+      GCC = $(shell command -v gcc 2> /dev/null)
+      ifeq ($(GCC),)
+        $(error gcc not installed for ledger support, please install or set LEDGER_ENABLED=false)
+      else
+        build_tags += ledger
+      endif
+    endif
+  endif
+endif
 
 # Flags
 WHITESPACE := $(subst ,, )
