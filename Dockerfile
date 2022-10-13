@@ -9,7 +9,7 @@ ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.1.1/libwasmvm_muslc.
 
 # hadolint ignore=DL4006
 RUN set -eux \
-    && apk add --no-cache ca-certificates=20220614-r0 build-base=0.5-r3 git=2.36.2-r0 \
+    && apk add --no-cache ca-certificates=20220614-r0 build-base=0.5-r3 git=2.36.2-r0 linux-headers=5.16.7-r1 \
     && sha256sum /lib/libwasmvm_muslc.aarch64.a | grep 9ecb037336bd56076573dc18c26631a9d2099a7f2b40dc04b6cae31ffb4c8f9a \
     && sha256sum /lib/libwasmvm_muslc.x86_64.a | grep 6e4de7ba9bad4ae9679c7f9ecf7e283dd0160e71567c6a7be6ae47c81ebe7f32 \
     && cp "/lib/libwasmvm_muslc.$(uname -m).a" /lib/libwasmvm_muslc.a
