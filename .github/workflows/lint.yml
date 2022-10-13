@@ -120,6 +120,8 @@ jobs:
 
       - name: Lint dockerfile (hadolint)
         uses: hadolint/hadolint-action@v2.1.0
+        with:
+          verbose: true
 
       - name: Lint dockerfile (docker-lint)
         uses: luke142367/Docker-Lint-Action@v1.1.1
