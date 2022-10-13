@@ -123,13 +123,6 @@ jobs:
         with:
           verbose: true
 
-      - name: Lint dockerfile (docker-lint)
-        uses: luke142367/Docker-Lint-Action@v1.1.1
-        with:
-          target: Dockerfile
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
   lint-proto:
     runs-on: ubuntu-20.04
     steps:
