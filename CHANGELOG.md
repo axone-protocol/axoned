@@ -1,5 +1,15 @@
 # ØKP4 protocol changelog
 
+## [2.2.0](https://github.com/okp4/okp4d/compare/v2.1.1...v2.2.0) (2022-10-13)
+
+
+### Features
+
+* **ledger:** add build dependancies and follow sdk standards ([dcd4135](https://github.com/okp4/okp4d/commit/dcd41350615132d983edf40ea0e8a490f0f5589f))
+* **ledger:** bump ledger to v0.9.3 ([bff91ba](https://github.com/okp4/okp4d/commit/bff91baf73aa839f2beb33d43e9568ad7122daf4))
+* **ledger:** fix install dependancies in dockerfile ([5f90752](https://github.com/okp4/okp4d/commit/5f9075231ff4e195dacd49b56a6402ee3acccd88))
+* **ledger:** update ledger-go to support Ledger Nano S Plus ([4dc7f4d](https://github.com/okp4/okp4d/commit/4dc7f4d08d09f1b864010ab89df286bf80cf3ee8))
+
 ## [2.1.1](https://github.com/okp4/okp4d/compare/v2.1.0...v2.1.1) (2022-10-10)
 
 
