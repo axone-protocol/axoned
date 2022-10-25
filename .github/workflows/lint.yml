@@ -36,7 +36,7 @@ jobs:
         uses: avto-dev/markdown-lint@v1.5.0
         with:
           args: "**/*.md"
-          ignore: "CHANGELOG.md" "docs/proto/*.md"
+          ignore: 'CHANGELOG.md docs/proto/*.md'
 
   lint-yaml:
     runs-on: ubuntu-20.04
@@ -132,3 +132,22 @@ jobs:
       - name: Lint proto files
         run: |
           make lint-proto
+
+  lint-generated:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Generate proto and documentation
+        run: |
+          make proto-gen
+          make proto-gen-doc
+
+      - name: Check Git diff in generated files (proto + docs)
+        run: |
+          if [[ $(git status -s) != "" ]]; then
+            >&2 echo "❌ There is a diff between generated files and source code"
+            >&2 git status
+            exit 1
+          fi
