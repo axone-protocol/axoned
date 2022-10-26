@@ -141,8 +141,7 @@ jobs:
 
       - name: Generate proto and documentation
         run: |
-          make proto-gen
-          make proto-gen-doc
+          sudo make proto-gen-doc
 
       - name: Check Git diff in generated files (proto + docs)
         run: |
