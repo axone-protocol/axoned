@@ -196,6 +196,18 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 	@cp -r github.com/okp4/okp4d/x/* x/
 	@rm -rf github.com
 
+proto-gen-doc: proto-gen ## Generate the documention from the Protobuf files
+	@for MODULE in $(shell find proto -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
+		echo "${COLOR_CYAN} 📖 Generate documentation for $${MODULE} module${COLOR_RESET}" ; \
+  		docker run --rm \
+        		-v ${HOME}/.cache:/root/.cache \
+        		-v `pwd`:/proto \
+        		-w /proto \
+        		${DOCKER_IMAGE_BUF} \
+        		generate --path $${MODULE} --template buf.gen.doc.yaml -v ; \
+        mv docs/proto/docs.md docs/$${MODULE}.md ; \
+	done
+
 ## Release:
 release-assets: release-binary-all release-checksums ## Generate release assets
 
