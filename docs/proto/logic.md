@@ -1,4 +1,4 @@
-<!-- This file is auto-generated. Please do not modify it yourself. -->
+[//]: # (This file is auto-generated. Please do not modify it yourself.)
 # Protobuf Documentation
 <a name="top"></a>
 
@@ -44,13 +44,13 @@ Params defines the parameters for the module.
 
 
 
- <!-- end messages -->
+ [//]: # (end messages)
 
- <!-- end enums -->
+ [//]: # (end enums)
 
- <!-- end HasExtensions -->
+ [//]: # (end HasExtensions)
 
- <!-- end services -->
+ [//]: # (end services)
 
 
 
@@ -75,13 +75,13 @@ GenesisState defines the logic module's genesis state.
 
 
 
- <!-- end messages -->
+ [//]: # (end messages)
 
- <!-- end enums -->
+ [//]: # (end enums)
 
- <!-- end HasExtensions -->
+ [//]: # (end HasExtensions)
 
- <!-- end services -->
+ [//]: # (end services)
 
 
 
@@ -116,11 +116,11 @@ QueryServiceParamsResponse is response type for the QueryService/Params RPC meth
 
 
 
- <!-- end messages -->
+ [//]: # (end messages)
 
- <!-- end enums -->
+ [//]: # (end enums)
 
- <!-- end HasExtensions -->
+ [//]: # (end HasExtensions)
 
 
 <a name="logic.v1beta.QueryService"></a>
@@ -132,7 +132,7 @@ QueryService defines the gRPC querier service.
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
 | `Params` | [QueryServiceParamsRequest](#logic.v1beta.QueryServiceParamsRequest) | [QueryServiceParamsResponse](#logic.v1beta.QueryServiceParamsResponse) | Parameters queries the parameters of the module. | GET|/okp4/okp4d/logic/params|
 
- <!-- end services -->
+ [//]: # (end services)
 
 
 
@@ -142,11 +142,11 @@ QueryService defines the gRPC querier service.
 ## logic/v1beta/tx.proto
 
 
- <!-- end messages -->
+ [//]: # (end messages)
 
- <!-- end enums -->
+ [//]: # (end enums)
 
- <!-- end HasExtensions -->
+ [//]: # (end HasExtensions)
 
 
 <a name="logic.v1beta.MsgService"></a>
@@ -157,7 +157,7 @@ Msg defines the Msg service.
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
 
- <!-- end services -->
+ [//]: # (end services)
 
 
 

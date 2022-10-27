@@ -1,4 +1,4 @@
-<!-- This file is auto-generated. Please do not modify it yourself. -->
+[//]: # (This file is auto-generated. Please do not modify it yourself.)
 # Protobuf Documentation
 <a name="top"></a>
 
@@ -160,13 +160,13 @@ Since: cosmos-sdk 0.43
 
 
 
- <!-- end messages -->
+ [//]: # (end messages)
 
- <!-- end enums -->
+ [//]: # (end enums)
 
- <!-- end HasExtensions -->
+ [//]: # (end HasExtensions)
 
- <!-- end services -->
+ [//]: # (end services)
 
 
 
@@ -302,11 +302,11 @@ MsgCreateVestingAccountResponse defines the Msg/CreateVestingAccount response ty
 
 
 
- <!-- end messages -->
+ [//]: # (end messages)
 
- <!-- end enums -->
+ [//]: # (end enums)
 
- <!-- end HasExtensions -->
+ [//]: # (end HasExtensions)
 
 
 <a name="vesting.v1beta1.Msg"></a>
@@ -325,7 +325,7 @@ Since: cosmos-sdk 0.46 | |
 Since: cosmos-sdk 0.46 | |
 | `CreateCliffVestingAccount` | [MsgCreateCliffVestingAccount](#vesting.v1beta1.MsgCreateCliffVestingAccount) | [MsgCreateCliffVestingAccountResponse](#vesting.v1beta1.MsgCreateCliffVestingAccountResponse) | CreateCliffVestingAccount defines a method that enables creating a cliff vesting account. | |
 
- <!-- end services -->
+ [//]: # (end services)
 
 
 
