@@ -1,4 +1,4 @@
-<!-- This file is auto-generated. Please do not modify it yourself. -->
+[//]: # (This file is auto-generated. Please do not modify it yourself.)
 # Protobuf Documentation
 <a name="top"></a>
 
@@ -54,7 +54,7 @@
 {{end}}
 {{end}}
 
-{{end}} <!-- end messages -->
+{{end}} [//]: # (end messages)
 
 {{range .Enums}}
 <a name="{{.FullName}}"></a>
@@ -68,7 +68,7 @@
   | {{.Name}} | {{.Number}} | {{nobr .Description}} |
 {{end}}
 
-{{end}} <!-- end enums -->
+{{end}} [//]: # (end enums)
 
 {{if .HasExtensions}}
 <a name="{{$file_name}}-extensions"></a>
@@ -79,7 +79,7 @@
 {{range .Extensions -}}
   | `{{.Name}}` | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: `{{.DefaultValue}}`{{end}} |
 {{end}}
-{{end}} <!-- end HasExtensions -->
+{{end}} [//]: # (end HasExtensions)
 
 {{range .Services}}
 <a name="{{.FullName}}"></a>
@@ -92,7 +92,7 @@
 {{range .Methods -}}
   | `{{.Name}}` | [{{.RequestLongType}}](#{{.RequestFullType}}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}](#{{.ResponseFullType}}){{if .ResponseStreaming}} stream{{end}} | {{nobr .Description}} | {{with (index .Options "google.api.http")}}{{range .Rules}}{{.Method}}|{{.Pattern}}{{end}}{{end}}|
 {{end}}
-{{end}} <!-- end services -->
+{{end}} [//]: # (end services)
 
 {{end}}
 
