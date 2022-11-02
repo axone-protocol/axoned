@@ -40,3 +40,20 @@ jobs:
                 "docs_directory": "docs/proto/*"
               }
             }
+
+  update-docs-version:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Update docs version
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://api.github.com/repos/okp4/docs/actions/workflows/bump-okp4d-version/dispatches'
+          method: 'POST'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          data: |-
+            {
+              "ref": "main",
+              "inputs": {
+                "okp4dVersion": "${{ github.event.release.tag_name }}"
+              }
+            }
