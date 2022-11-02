@@ -212,6 +212,7 @@ require (
 
 replace (
 	github.com/CosmWasm/wasmd => github.com/notional-labs/wasmd v0.25.1-0.20220918064224-459cefae5a9a
+	github.com/confio/ics23/go => github.com/cosmos/cosmos-sdk/ics23/go v0.8.0
 	github.com/cosmos/ledger-go => github.com/cosmos/ledger-go v0.9.3
 	github.com/gogo/protobuf => github.com/regen-network/protobuf v1.3.3-alpha.regen.1
 )
