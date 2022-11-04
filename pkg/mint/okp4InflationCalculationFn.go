@@ -2,7 +2,7 @@ package mint
 
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	minttypes "github.com/cosmos/cosmos-sdk/x/mint/types"
+	minttypes "github.com/okp4/okp4d/x/mint/types"
 )
 
 var initialInflation = sdk.NewDecWithPrec(75, 3)
