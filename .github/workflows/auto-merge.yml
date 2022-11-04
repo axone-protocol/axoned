@@ -5,7 +5,7 @@ on:
 
 jobs:
   auto-merge-dependabot:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.actor == 'dependabot[bot]'
     steps:
       - name: Auto merge PR
