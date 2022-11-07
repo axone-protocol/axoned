@@ -23,7 +23,7 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	// If we have reached the end of the year by reaching the targeted supply for the year
 	// We need to re-calculate the next inflation for the next year.
 	if totalSupply.GTE(targetSupply) {
-		minter.Inflation = minter.NextInflation()
+		minter.Inflation = minter.NextInflation(params)
 		minter.AnnualProvisions = minter.NextAnnualProvisions(params, totalSupply)
 		minter.TargetSupply = totalSupply.Add(minter.AnnualProvisions.TruncateInt())
 		k.SetMinter(ctx, minter)

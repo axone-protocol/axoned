@@ -9,21 +9,19 @@ import (
 
 // NewMinter returns a new Minter object with the given inflation, annual
 // provisions values and annual reduction factor.
-func NewMinter(inflation, annualProvisions, annualReductionFactor sdk.Dec, targetSupply math.Int) Minter {
+func NewMinter(inflation, annualProvisions sdk.Dec, targetSupply math.Int) Minter {
 	return Minter{
-		Inflation:             inflation,
-		AnnualProvisions:      annualProvisions,
-		AnnualReductionFactor: annualReductionFactor,
-		TargetSupply:          targetSupply,
+		Inflation:        inflation,
+		AnnualProvisions: annualProvisions,
+		TargetSupply:     targetSupply,
 	}
 }
 
 // InitialMinter returns an initial Minter object with a given inflation value and annual reduction factor.
-func InitialMinter(inflation, annualReductionFactor sdk.Dec, targetSupply math.Int) Minter {
+func InitialMinter(inflation sdk.Dec, targetSupply math.Int) Minter {
 	return NewMinter(
 		inflation,
 		sdk.NewDec(0),
-		annualReductionFactor,
 		targetSupply,
 	)
 }
@@ -33,7 +31,6 @@ func InitialMinter(inflation, annualReductionFactor sdk.Dec, targetSupply math.I
 func DefaultInitialMinter() Minter {
 	return InitialMinter(
 		sdk.NewDecWithPrec(15, 2),
-		sdk.NewDecWithPrec(20, 2),
 		math.NewInt(230000000000000),
 	)
 }
@@ -49,8 +46,8 @@ func ValidateMinter(minter Minter) error {
 
 // NextInflation return the new inflation rate for the next year
 // Get the current inflation and multiply by (1 - annual reduction factor).
-func (m Minter) NextInflation() sdk.Dec {
-	return m.Inflation.Mul(sdk.OneDec().Sub(m.AnnualReductionFactor))
+func (m Minter) NextInflation(params Params) sdk.Dec {
+	return m.Inflation.Mul(sdk.OneDec().Sub(params.AnnualReductionFactor))
 }
 
 // NextAnnualProvisions returns the annual provisions based on current total
