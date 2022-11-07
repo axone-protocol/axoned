@@ -20,3 +20,40 @@ jobs:
               "username": "Bot Anik",
               "content": "🚨 A new version of @${{github.repository}} ${{ github.event.release.tag_name }} has been released! 🎉\n\n👉 Changelog: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}\n👉 Official repo: https://github.com/${{ github.repository }}"
             }
+
+  update-docs:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Update docs repository
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://api.github.com/repos/okp4/docs/actions/workflows/update-versioned-docs/dispatches'
+          method: 'POST'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          data: |-
+            {
+              "ref": "main",
+              "inputs": {
+                "version": "${{ github.event.release.tag_name }}",
+                "repository": "${{github.repository}}",
+                "section": "modules",
+                "docs_directory": "docs/proto/*"
+              }
+            }
+
+  update-docs-version:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Update docs version
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://api.github.com/repos/okp4/docs/actions/workflows/bump-okp4d-version/dispatches'
+          method: 'POST'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          data: |-
+            {
+              "ref": "main",
+              "inputs": {
+                "okp4dVersion": "${{ github.event.release.tag_name }}"
+              }
+            }
