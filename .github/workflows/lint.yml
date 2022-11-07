@@ -15,7 +15,7 @@ concurrency:
 
 jobs:
   lint-commits:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.actor != 'dependabot[bot]'
     steps:
       - name: Check out repository
@@ -27,7 +27,7 @@ jobs:
         uses: wagoid/commitlint-github-action@v5
 
   lint-markdown:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -39,7 +39,7 @@ jobs:
           ignore: 'CHANGELOG.md docs/proto/*.md'
 
   lint-yaml:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -48,7 +48,7 @@ jobs:
         uses: ibiqlik/action-yamllint@v3.1.1
 
   lint-json:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -72,7 +72,7 @@ jobs:
           ' sh {} +
 
   lint-go:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     timeout-minutes: 10
     steps:
       - name: Check out repository
@@ -112,7 +112,7 @@ jobs:
           echo "✅ Code is gofumpt!"
 
   lint-dockerfile:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     if: github.actor != 'dependabot[bot]'
     steps:
       - name: Check out repository
@@ -124,7 +124,7 @@ jobs:
           verbose: true
 
   lint-proto:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -134,7 +134,7 @@ jobs:
           make lint-proto
 
   lint-generated:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
