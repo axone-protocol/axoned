@@ -7,8 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/okp4/okp4d/x/mint/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	"github.com/okp4/okp4d/x/mint/types"
 )
 
 // Keeper of the mint store
@@ -80,6 +80,12 @@ func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
 // SetParams sets the total set of minting parameters.
 func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
 	k.paramSpace.SetParamSet(ctx, &params)
+}
+
+// TokenSupply implements an alias call to the underlying bank keeper's
+// TokenSupply to be used in BeginBlocker.
+func (k Keeper) TokenSupply(ctx sdk.Context, denom string) math.Int {
+	return k.bankKeeper.GetSupply(ctx, denom).Amount
 }
 
 // StakingTokenSupply implements an alias call to the underlying staking keeper's

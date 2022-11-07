@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"math/rand"
 
+	"cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/okp4/okp4d/x/mint/types"
@@ -82,9 +83,9 @@ func RandomizedGenState(simState *module.SimulationState) {
 
 	mintDenom := sdk.DefaultBondDenom
 	blocksPerYear := uint64(60 * 60 * 8766 / 5)
-	params := types.NewParams(mintDenom, inflationRateChange, inflationMax, inflationMin, goalBonded, blocksPerYear)
+	params := types.NewParams(mintDenom, blocksPerYear)
 
-	mintGenesis := types.NewGenesisState(types.InitialMinter(inflation), params)
+	mintGenesis := types.NewGenesisState(types.InitialMinter(inflation, sdk.NewDecWithPrec(20, 2), math.NewInt(230)), params)
 
 	bz, err := json.MarshalIndent(&mintGenesis, "", " ")
 	if err != nil {
