@@ -35,7 +35,7 @@ func DefaultInitialMinter() Minter {
 	)
 }
 
-// validate minter
+// validate minter.
 func ValidateMinter(minter Minter) error {
 	if minter.Inflation.IsNegative() {
 		return fmt.Errorf("mint parameter Inflation should be positive, is %s",
@@ -64,7 +64,9 @@ func (m Minter) BlockProvision(params Params, totalSupply math.Int) sdk.Coin {
 	// Fixe rounding by limiting to the target supply at the end of the year block.
 	futureSupply := totalSupply.Add(provisionAmt.TruncateInt())
 	if futureSupply.GT(m.TargetSupply) {
-		return sdk.NewCoin(params.MintDenom, m.TargetSupply.Sub(totalSupply))
+		// In case of a rounding is not precise enough, truncating int of provisionAmt could return Zero
+		// To avoid negative coin if provisionAmt is equal to Zero, return minimum Zero or more coin.
+		return sdk.NewCoin(params.MintDenom, sdk.MaxInt(m.TargetSupply.Sub(totalSupply), sdk.ZeroInt()))
 	}
 
 	return sdk.NewCoin(params.MintDenom, provisionAmt.TruncateInt())
