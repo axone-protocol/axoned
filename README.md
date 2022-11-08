@@ -187,7 +187,7 @@ you're willing to give!
 
 ## Community
 
-The [**OKP4 Discord Server**](https://discord.gg/GHNZh4SaJ3) is our primary chat channel for the open-source community,
+The [**OKP4 Discord Server**](https://discord.gg/okp4) is our primary chat channel for the open-source community,
 software developers and node operators.
 
 Please reach out to us and say hi 👋, we're happy to help there.
