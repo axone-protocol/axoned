@@ -12,23 +12,23 @@ import (
 	"github.com/okp4/okp4d/x/mint/types"
 )
 
-// Simulation parameter constants
+// Simulation parameter constants.
 const (
 	Inflation             = "inflation"
 	AnnualReductionFactor = "annual_reduction_factor"
 )
 
-// GenInflation randomized Inflation
+// GenInflation randomized Inflation.
 func GenInflation(r *rand.Rand) sdk.Dec {
 	return sdk.NewDecWithPrec(int64(r.Intn(99)), 2)
 }
 
-// GenAnnualReductionFactor randomized AnnualReductionFactor
+// GenAnnualReductionFactor randomized AnnualReductionFactor.
 func GenAnnualReductionFactorMax(r *rand.Rand) sdk.Dec {
 	return sdk.NewDecWithPrec(20, 2)
 }
 
-// RandomizedGenState generates a random GenesisState for mint
+// RandomizedGenState generates a random GenesisState for mint.
 func RandomizedGenState(simState *module.SimulationState) {
 	// minter
 	var inflation sdk.Dec
@@ -48,9 +48,13 @@ func RandomizedGenState(simState *module.SimulationState) {
 	mintDenom := sdk.DefaultBondDenom
 	blocksPerYear := uint64(60 * 60 * 8766 / 5)
 	params := types.NewParams(mintDenom, annualReductionFactor, blocksPerYear)
-	targetSupply := inflation.MulInt(simState.InitialStake)
+	annualProvision := inflation.MulInt(simState.InitialStake)
+	targetSupply := simState.InitialStake.Add(annualProvision.TruncateInt())
 
-	mintGenesis := types.NewGenesisState(types.InitialMinter(inflation, targetSupply.TruncateInt()), params)
+	minter := types.InitialMinter(inflation, targetSupply)
+	minter.AnnualProvisions = annualProvision
+
+	mintGenesis := types.NewGenesisState(minter, params)
 
 	bz, err := json.MarshalIndent(&mintGenesis, "", " ")
 	if err != nil {

@@ -69,7 +69,7 @@ func TestBlockProvision(t *testing.T) {
 // BenchmarkBlockProvision-4 5000000 220 ns/op
 //
 // using sdk.Dec operations: (current implementation)
-// BenchmarkBlockProvision-4 3000000 429 ns/op
+// BenchmarkBlockProvision-4 3000000 429 ns/op.
 func BenchmarkBlockProvision(b *testing.B) {
 	b.ReportAllocs()
 	minter := InitialMinter(sdk.NewDecWithPrec(1, 1), math.NewInt(1))
@@ -86,7 +86,7 @@ func BenchmarkBlockProvision(b *testing.B) {
 }
 
 // Next inflation benchmarking
-// BenchmarkNextInflation-4 1000000 1828 ns/op
+// BenchmarkNextInflation-4 1000000 1828 ns/op.
 func BenchmarkNextInflation(b *testing.B) {
 	b.ReportAllocs()
 	minter := InitialMinter(sdk.NewDecWithPrec(1, 1), math.NewInt(1))
@@ -99,7 +99,7 @@ func BenchmarkNextInflation(b *testing.B) {
 }
 
 // // Next annual provisions benchmarking
-// // BenchmarkNextAnnualProvisions-4 5000000 251 ns/op
+// // BenchmarkNextAnnualProvisions-4 5000000 251 ns/op.
 func BenchmarkNextAnnualProvisions(b *testing.B) {
 	b.ReportAllocs()
 	minter := InitialMinter(sdk.NewDecWithPrec(1, 1), math.NewInt(1))

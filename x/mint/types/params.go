@@ -11,7 +11,7 @@ import (
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
-// Parameter store keys
+// Parameter store keys.
 var (
 	KeyMintDenom             = []byte("MintDenom")
 	KeyAnnualReductionFactor = []byte("AnnualReductionFactor")
@@ -33,7 +33,7 @@ func NewParams(
 	}
 }
 
-// default minting module parameters
+// default minting module parameters.
 func DefaultParams() Params {
 	return Params{
 		MintDenom:             sdk.DefaultBondDenom,
@@ -42,7 +42,7 @@ func DefaultParams() Params {
 	}
 }
 
-// validate params
+// validate params.
 func (p Params) Validate() error {
 	if err := validateMintDenom(p.MintDenom); err != nil {
 		return err
@@ -63,7 +63,7 @@ func (p Params) String() string {
 	return string(out)
 }
 
-// Implements params.ParamSet
+// Implements params.ParamSet.
 func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
 	return paramtypes.ParamSetPairs{
 		paramtypes.NewParamSetPair(KeyMintDenom, &p.MintDenom, validateMintDenom),

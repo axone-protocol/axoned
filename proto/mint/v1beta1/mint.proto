@@ -4,7 +4,6 @@ package mint.v1beta1;
 option go_package = "github.com/okp4/okp4d/x/mint/types";
 
 import "gogoproto/gogo.proto";
-import "cosmos_proto/cosmos.proto";
 
 // Minter represents the minting state.
 message Minter {

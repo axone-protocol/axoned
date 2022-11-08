@@ -6,7 +6,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
 )
 
-// StakingKeeper defines the expected staking keeper
+// StakingKeeper defines the expected staking keeper.
 type StakingKeeper interface {
 	StakingTokenSupply(ctx sdk.Context) math.Int
 	BondedRatio(ctx sdk.Context) sdk.Dec

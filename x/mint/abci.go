@@ -1,7 +1,6 @@
 package mint
 
 import (
-	"fmt"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
@@ -26,8 +25,6 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 		k.SetMinter(ctx, minter)
 	}
 
-	tt := minter.AnnualProvisions.String()
-	fmt.Printf("%v", tt)
 	// If we have reached the end of the year by reaching the targeted supply for the year
 	// We need to re-calculate the next inflation for the next year.
 	if totalSupply.GTE(minter.TargetSupply) {
