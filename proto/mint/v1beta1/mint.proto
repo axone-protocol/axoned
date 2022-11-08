@@ -6,6 +6,11 @@ option go_package = "github.com/okp4/okp4d/x/mint/types";
 import "gogoproto/gogo.proto";
 
 // Minter represents the minting state.
+//
+// At the beginning of the chain (first block) the mint module will recalculate the `annual_provisions` and
+// `target_supply` based on the genesis total token supply and the inflation configured.
+// By default inflation is set to 15%. If the genesis total token supply is 200M token, the `annual_provision` will be 30M
+// and `target_supply` 230M.
 message Minter {
   // current annual inflation rate
   string inflation = 1 [
@@ -25,6 +30,11 @@ message Minter {
 }
 
 // Params holds parameters for the mint module.
+//
+// Configure the annual reduction factor will update at the each end of year the new token distribution rate by reducing
+// the actual inflation by the `annual_reduction_factor` configured.
+// By default, `annual_reduction_factor` is 20%. For example, with an initial inflation of 15%, at the end of the year,
+// new inflation will be 12%.
 message Params {
   option (gogoproto.goproto_stringer) = false;
 
