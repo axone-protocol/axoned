@@ -1,3 +1,4 @@
+//nolint: gosec
 package simulation_test
 
 import (
@@ -46,8 +47,10 @@ func TestRandomizedGenState(t *testing.T) {
 	require.Equal(t, uint64(6311520), mintGenesis.Params.BlocksPerYear)
 	require.Equal(t, dec1, mintGenesis.Params.AnnualReductionFactor)
 	require.Equal(t, "stake", mintGenesis.Params.MintDenom)
-	require.Equal(t, "0stake", mintGenesis.Minter.BlockProvision(mintGenesis.Params, simState.InitialStake).String())
-	require.Equal(t, "170.000000000000000000", mintGenesis.Minter.NextAnnualProvisions(mintGenesis.Params, simState.InitialStake).String())
+	require.Equal(t, "0stake",
+		mintGenesis.Minter.BlockProvision(mintGenesis.Params, simState.InitialStake).String())
+	require.Equal(t, "170.000000000000000000",
+		mintGenesis.Minter.NextAnnualProvisions(mintGenesis.Params, simState.InitialStake).String())
 	require.Equal(t, "0.136000000000000000", mintGenesis.Minter.NextInflation(mintGenesis.Params).String())
 	require.Equal(t, "0.170000000000000000", mintGenesis.Minter.Inflation.String())
 	require.Equal(t, "170.000000000000000000", mintGenesis.Minter.AnnualProvisions.String())

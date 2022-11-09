@@ -26,7 +26,8 @@ func (k Keeper) Inflation(c context.Context, _ *types.QueryInflationRequest) (*t
 }
 
 // AnnualProvisions returns minter.AnnualProvisions of the mint module.
-func (k Keeper) AnnualProvisions(c context.Context, _ *types.QueryAnnualProvisionsRequest) (*types.QueryAnnualProvisionsResponse, error) {
+func (k Keeper) AnnualProvisions(c context.Context,
+	_ *types.QueryAnnualProvisionsRequest) (*types.QueryAnnualProvisionsResponse, error) {
 	ctx := sdk.UnwrapSDKContext(c)
 	minter := k.GetMinter(ctx)
 
