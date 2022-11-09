@@ -1,4 +1,4 @@
-// nolint: gosec
+//nolint:gosec
 package simulation_test
 
 import (

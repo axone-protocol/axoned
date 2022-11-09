@@ -1,4 +1,4 @@
-// nolint: gosec
+//nolint:gosec
 package types
 
 import (
@@ -20,7 +20,7 @@ func TestNextInflation(t *testing.T) {
 	}{
 		// With annual reduction factor of 20 % (defined in params), next infaltion should be 12%
 		{sdk.NewDecWithPrec(15, 2), sdk.NewDecWithPrec(12, 2)},
-		// With annual reduction factor of 20 % (defined in params), next infaltion should be 12%
+		// With annual reduction factor of 20 % (defined in params), next infaltion should be 9.6%
 		{sdk.NewDecWithPrec(12, 2), sdk.NewDecWithPrec(96, 3)},
 	}
 	for i, tc := range tests {
@@ -33,6 +33,7 @@ func TestNextInflation(t *testing.T) {
 	}
 }
 
+//nolint:lll
 func TestBlockProvision(t *testing.T) {
 	minter := InitialMinter(sdk.NewDecWithPrec(1, 1), math.NewInt(1))
 	params := DefaultParams()
@@ -41,19 +42,26 @@ func TestBlockProvision(t *testing.T) {
 	blockInterval := int64(5) // there is 1 block each 5 second approximately
 
 	tests := []struct {
-		annualProvisions int64
+		annualProvisions sdk.Dec
 		expProvisions    int64
+		targetSupply     math.Int
 		totalSupply      math.Int
 	}{
-		{secondsPerYear / blockInterval, 1, sdk.NewInt(1)},
-		{secondsPerYear/blockInterval + 1, 1, math.NewInt(1)},
-		{(secondsPerYear / 5) * 2, 2, math.NewInt(1)},
-		{(secondsPerYear / 5) / 2, 0, math.NewInt(1)},
+		{sdk.NewDec(secondsPerYear / blockInterval), 1, sdk.NewInt(secondsPerYear / blockInterval), sdk.NewInt(1)},
+		{sdk.NewDec(secondsPerYear/blockInterval + 1), 1, sdk.NewInt(secondsPerYear/blockInterval + 1), math.NewInt(1)},
+		{sdk.NewDec((secondsPerYear / blockInterval) * 2), 2, sdk.NewInt((secondsPerYear / 5) * 2), math.NewInt(1)},
+		{sdk.NewDec((secondsPerYear / blockInterval) / 2), 0, sdk.NewInt(1), math.NewInt(1)},
+		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 20, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), math.NewInt(1)},
+		// Only two token should be minted to reach the target supply
+		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 2, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), sdk.NewInt(((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)) - 2)},
+		// Zero token should be minted since the target supply is already reached, the new inflation should be calculated
+		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 0, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval))},
+		// Zero token should be minted since target supply are exceeded (avoid negative coin)
+		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 0, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), sdk.NewInt(((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)) + 2)},
 	}
 	for i, tc := range tests {
-		minter.AnnualProvisions = sdk.NewDec(tc.annualProvisions)
-		minter.TargetSupply = tc.totalSupply.Add(minter.AnnualProvisions.TruncateInt())
-
+		minter.AnnualProvisions = tc.annualProvisions
+		minter.TargetSupply = tc.targetSupply
 		provisions := minter.BlockProvision(params, tc.totalSupply)
 
 		expProvisions := sdk.NewCoin(params.MintDenom,

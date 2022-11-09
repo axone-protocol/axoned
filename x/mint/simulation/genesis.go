@@ -29,7 +29,8 @@ func GenAnnualReductionFactorMax(r *rand.Rand) sdk.Dec {
 }
 
 // RandomizedGenState generates a random GenesisState for mint.
-//nolint: forbidigo
+//
+//nolint:forbidigo
 func RandomizedGenState(simState *module.SimulationState) {
 	// minter
 	var inflation sdk.Dec
