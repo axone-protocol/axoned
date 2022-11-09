@@ -36,8 +36,6 @@ func (s *IntegrationTestSuite) SetupSuite() {
 
 	inflation := sdk.MustNewDecFromStr("1.0")
 	mintData.Minter.Inflation = inflation
-	mintData.Params.InflationMin = inflation
-	mintData.Params.InflationMax = inflation
 
 	mintDataBz, err := s.cfg.Codec.MarshalJSON(&mintData)
 	s.Require().NoError(err)
@@ -67,16 +65,13 @@ func (s *IntegrationTestSuite) TestGetCmdQueryParams() {
 		{
 			"json output",
 			[]string{fmt.Sprintf("--%s=1", flags.FlagHeight), fmt.Sprintf("--%s=json", tmcli.OutputFlag)},
-			`{"mint_denom":"stake","inflation_rate_change":"0.130000000000000000","inflation_max":"1.000000000000000000","inflation_min":"1.000000000000000000","goal_bonded":"0.670000000000000000","blocks_per_year":"6311520"}`,
+			`{"mint_denom":"stake","annual_reduction_factor":"0.200000000000000000","blocks_per_year":"6311520"}`,
 		},
 		{
 			"text output",
 			[]string{fmt.Sprintf("--%s=1", flags.FlagHeight), fmt.Sprintf("--%s=text", tmcli.OutputFlag)},
 			`blocks_per_year: "6311520"
-goal_bonded: "0.670000000000000000"
-inflation_max: "1.000000000000000000"
-inflation_min: "1.000000000000000000"
-inflation_rate_change: "0.130000000000000000"
+annual_reduction_factor: "0.200000000000000000"
 mint_denom: stake`,
 		},
 	}
