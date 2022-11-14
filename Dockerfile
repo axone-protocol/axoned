@@ -19,7 +19,7 @@ COPY . /src/
 RUN BUILD_TAGS=muslc LINK_STATICALLY=true make build
 
 #--- Image stage
-FROM alpine:3.16.2
+FROM alpine:3.16.3
 
 COPY --from=go-builder /src/target/dist/okp4d /usr/bin/okp4d
 
