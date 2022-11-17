@@ -1,4 +1,4 @@
-[![okp4 github banner](https://raw.githubusercontent.com/okp4/okp4d/main/etc/okp4-banner.png)](https://okp4.network)
+[![okp4 github banner](etc/okp4-banner.webp)](https://okp4.network)
 
 <p align="center">
   <a href="https://discord.gg/okp4"><img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" /></a> &nbsp;
