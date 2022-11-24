@@ -3,13 +3,79 @@ syntax = "proto3";
 package logic.v1beta;
 
 import "gogoproto/gogo.proto";
+import "google/protobuf/duration.proto";
+import "logic/v1beta/types.proto";
 
 option go_package = "github.com/okp4/okp4d/x/logic/types";
 
-// Params defines the parameters for the module.
+// Params defines all the configuration parameters of the "logic" module.
 message Params {
   option (gogoproto.goproto_stringer) = false;
 
-  // foo represents a metasyntactic variable for testing purposes.
-  string foo = 1 [(gogoproto.moretags) = "yaml:\"foo\""];
+  // Specify the parameter for the logic interpreter.
+  Interpreter interpreter = 1
+  [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"interpreter\""];
+
+  // Specify the limits for query executions.
+  QueryExecutionLimits query_execution_limits = 2
+  [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"query_execution_limits\""];
+
+  // Specify the limits for programs.
+  ProgramLimits program_limits = 3
+  [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"program_limits\""];
+
+  // Specify the access control list that applies to the module.
+  //
+  // ACLs are expressed as a combination set of tag, qualifier and permission, where:
+  //
+  // - `tag` denotes the authorization scheme to use. Possible values are:
+  //    - `address`: authorization is evaluated according to the address wallet of the transaction.
+  // - `qualifier` denotes the identifier in the tag scope.
+  // - `permission` denotes a permission, i.e. the operation allowed on the considered domain object. Possible values are:
+  //    - `store`: if authorization is granted to store a program in the module.
+  //    - `remove`: if authorization is granted to remove a program from the module.
+  //
+  // It is important to note that if no ACL is configured, all requests are allowed. If an empty ACL set is configured,
+  // all requests are denied and explicit permissions must be defined.
+  repeated ACL acls = 4
+  [(gogoproto.nullable) = false, (gogoproto.moretags) = "yaml:\"acls\""];
+}
+
+// QueryExecutionLimits defines the limits for query executions.
+message QueryExecutionLimits {
+  option (gogoproto.goproto_stringer) = true;
+
+  // Specify the maximum amount of computing power allowed to be consumed to execute the request by the interpreter,
+  // in "gas", the unit of this quantity.
+  uint32 max_gas = 1
+  [(gogoproto.moretags) = "yaml:\"max_execution_time\",omitempty"];
+
+  // Specify the maximum number of results that can be asked for a query.
+  uint32 max_result_count = 2
+  [(gogoproto.moretags) = "yaml:\"max_result_count\""];
+}
+
+// ProgramLimits defines the limits for a program.
+message ProgramLimits {
+  option (gogoproto.goproto_stringer) = true;
+
+  // Specify the maximum accepted size (in bytes) of a program.
+  uint32 max_size = 1
+  [(gogoproto.moretags) = "yaml:\"max_size\""];
+}
+
+// Interpreter defines the various parameters for the interpreter.
+message Interpreter {
+  option (gogoproto.goproto_stringer) = true;
+
+  // Specify the list of registered predicates/operators, in the form of: "<predicate_name>/<arity>".
+  // For instance: "findall/3".
+  // If not specified, the default set of predicates/operators will be registered.
+  repeated string registered_predicates = 1
+  [(gogoproto.nullable) = true, (gogoproto.moretags) = "yaml:\"registered_predicates\""];
+
+  // Specify the initial program to run when booting the logic interpreter.
+  // If not specified, the default boot sequence will be executed.
+  string bootstrap = 2
+  [(gogoproto.nullable) = true, (gogoproto.moretags) = "yaml:\"bootstrap\""];
 }
