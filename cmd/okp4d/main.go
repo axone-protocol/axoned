@@ -1,39 +1,25 @@
 package main
 
 import (
-	_ "embed"
+	"errors"
 	"os"
 
+	"github.com/cosmos/cosmos-sdk/server"
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
-	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
-	"github.com/ignite/cli/ignite/pkg/xstrings"
+	"github.com/okp4/okp4d/cmd/okp4d/cmd"
+
 	"github.com/okp4/okp4d/app"
 )
 
 func main() {
-	rootCmd, _ := cosmoscmd.NewRootCmd(
-		app.Name,
-		app.AccountAddressPrefix,
-		app.DefaultNodeHome,
-		xstrings.NoDash(app.Name),
-		app.ModuleBasics,
-		app.New,
-	)
-
-	rootCmd.Use = app.Name
-	rootCmd.Short = Resource.Short
-	rootCmd.Long = Resource.Long
-
-	// To keep other default Ignite commands and add our custom `AddGenesisAccountCmd` (integrating the cliff),
-	// we need first to remove the Ignite `AddGenesisAccountCmd` then add ours.
-	for _, command := range rootCmd.Commands() {
-		if command.Name() == "add-genesis-account" {
-			rootCmd.RemoveCommand(command)
-		}
-	}
-	rootCmd.AddCommand(AddGenesisAccountCmd(app.DefaultNodeHome))
-
+	rootCmd, _ := cmd.NewRootCmd()
 	if err := svrcmd.Execute(rootCmd, "", app.DefaultNodeHome); err != nil {
-		os.Exit(1)
+		var codeErr *server.ErrorCode
+		switch {
+		case errors.As(err, &codeErr):
+			os.Exit(codeErr.Code)
+		default:
+			os.Exit(1)
+		}
 	}
 }
