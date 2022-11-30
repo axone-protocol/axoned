@@ -1,5 +1,35 @@
 # ØKP4 protocol changelog
 
+## [3.0.0](https://github.com/okp4/okp4d/compare/v2.2.0...v3.0.0) (2022-11-30)
+
+
+### ⚠ BREAKING CHANGES
+
+* **mint:** configure annual provision and target supply on first block
+
+### Features
+
+* **docs:** trigger docs version update workflow on docs repo ([a224a10](https://github.com/okp4/okp4d/commit/a224a106a75188b00a62d8c936cca67da2629890))
+* **docs:** trigger the docs workflow to update documentation ([e0558aa](https://github.com/okp4/okp4d/commit/e0558aa62ecd58ef46dccc0677b8ec91e026a1a8))
+* **mint:** add target_supply on proto ([3c198f7](https://github.com/okp4/okp4d/commit/3c198f7fd1b7794c6eeb197934f677bb6bde339b))
+* **mint:** configure annual provision and target supply on first block ([31d5884](https://github.com/okp4/okp4d/commit/31d5884fc0a7ebbbdf23ce6921726f0489775359))
+* **mint:** implement inflation calculation ([42bfa4c](https://github.com/okp4/okp4d/commit/42bfa4c8fb5de4bb269970bf852a18708d96aeff))
+* **mint:** move annual reduction factor from minter to minter params ([f731e66](https://github.com/okp4/okp4d/commit/f731e6699fcae0c9c48977d5641a25182c976c2f))
+* **mint:** remove okp4 old inflation calc func ([9956d1b](https://github.com/okp4/okp4d/commit/9956d1b5c8fe8e0f06ed4aacf8abc799ba322d5a))
+* **mint:** set mint param on proto ([ade514e](https://github.com/okp4/okp4d/commit/ade514ecf383430dd0dfeaf283b4882659d3afcc))
+* **mint:** use local proto ([cbf22f6](https://github.com/okp4/okp4d/commit/cbf22f60eff9e2bfed4ca1945a9ee24e56c0bb0d))
+* **mint:** use own mint module ([af1386e](https://github.com/okp4/okp4d/commit/af1386e01a9750d0807c0291507de6751345344d))
+
+
+### Bug Fixes
+
+* **docs:** change comments syntax in markdown template ([9e8496b](https://github.com/okp4/okp4d/commit/9e8496b6279bd5361587027cd0f36d0230980e1e))
+* **docs:** fix linting issue ([13709c4](https://github.com/okp4/okp4d/commit/13709c4011473e8e11f1040ca4b688da4b45a463))
+* **docs:** ignore linting of generated protobuf docs ([84aaab2](https://github.com/okp4/okp4d/commit/84aaab20bc0870f71efbb3095cce10fd44078e20))
+* **mint:** avoid return negative coin ([b25b1f3](https://github.com/okp4/okp4d/commit/b25b1f3b1054c4bb53a940c2eb672a594c47e384))
+* **mint:** make linter more happy ([35bed9f](https://github.com/okp4/okp4d/commit/35bed9f864c19229736bf4b71e37cd3f04a2f7fe))
+* **mint:** spelling mistake ([d043d1b](https://github.com/okp4/okp4d/commit/d043d1b49b83028602c10c586500065bb34b34c3))
+
 ## [2.2.0](https://github.com/okp4/okp4d/compare/v2.1.1...v2.2.0) (2022-10-13)
 
 
