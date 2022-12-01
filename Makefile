@@ -209,6 +209,13 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
         mv docs/proto/docs.md docs/$${MODULE}.md ; \
 	done
 
+doc-command: ## Generate markdown documentation for the command
+	@echo "${COLOR_CYAN} 📖 Generate markdown documentation for the command${COLOR_RESET}"
+	@cd docs; \
+	rm -rf commands; \
+	go get ../scripts; \
+	go run ../scripts/generate_command_doc.go
+
 ## Release:
 release-assets: release-binary-all release-checksums ## Generate release assets
 
