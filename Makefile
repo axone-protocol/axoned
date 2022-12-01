@@ -196,7 +196,8 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 	@cp -r github.com/okp4/okp4d/x/* x/
 	@rm -rf github.com
 
-proto-gen-doc: proto-gen ## Generate the documention from the Protobuf files
+## Documentation:
+doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 	@for MODULE in $(shell find proto -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
 		echo "${COLOR_CYAN} 📖 Generate documentation for $${MODULE} module${COLOR_RESET}" ; \
   		docker run --rm \
