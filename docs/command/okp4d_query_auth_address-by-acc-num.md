@@ -1,0 +1,33 @@
+## okp4d query auth address-by-acc-num
+
+Query for an address by account number
+
+```
+okp4d query auth address-by-acc-num [acc-num] [flags]
+```
+
+### Examples
+
+```
+<appd> q auth address-by-acc-num 1
+```
+
+### Options
+
+```
+      --height int      Use a specific height to query state at (this can error if the node is pruning state)
+  -h, --help            help for address-by-acc-num
+      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+  -o, --output string   Output format (text|json) (default "text")
+```
+
+### Options inherited from parent commands
+
+```
+      --chain-id string   The network chain ID (default "okp4d")
+```
+
+### SEE ALSO
+
+* [okp4d query auth](okp4d_query_auth.md)	 - Querying commands for the auth module
+
