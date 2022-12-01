@@ -141,11 +141,15 @@ jobs:
 
       - name: Generate proto and documentation
         run: |
-          sudo make proto-gen-doc
+          sudo make doc-proto
+
+      - name: Generate command documentation
+        run: |
+          sudo make doc-command
 
       - name: Check Git diff in generated files (proto + docs)
         run: |
-          if [[ $(git status -s) != "" ]]; then
+          if [[ $(git status -s | grep --fixed-strings -v "go.mod" | grep --fixed-strings -v "go.sum") != "" ]]; then
             >&2 echo "❌ There is a diff between generated files and source code"
             >&2 git status
             exit 1
