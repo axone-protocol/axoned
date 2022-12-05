@@ -2,7 +2,7 @@ package main
 
 import (
 	"errors"
-	"fmt"
+	"log"
 	"os"
 
 	"github.com/cosmos/cosmos-sdk/server"
@@ -12,9 +12,9 @@ import (
 )
 
 func main() {
-	err := generateDocumentaton("command")
+	err := generateDocumentation("command")
 	if err != nil {
-		fmt.Printf("failed to generate documentation: %e", err)
+		log.Printf("failed to generate documentation: %s\n", err)
 
 		var codeErr *server.ErrorCode
 		switch {
@@ -26,11 +26,11 @@ func main() {
 	}
 }
 
-func generateDocumentaton(folder string) error {
+func generateDocumentation(folder string) error {
 	rootCmd, _ := cmd.NewRootCmd()
 	rootCmd.DisableAutoGenTag = true
 
-	err := os.Mkdir(folder, 0750)
+	err := os.Mkdir(folder, 0o750)
 	if err != nil && !os.IsExist(err) {
 		return err
 	}
