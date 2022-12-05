@@ -84,6 +84,13 @@ RELEASE_BINARIES = \
 	linux-arm64
 RELEASE_TARGETS = $(addprefix release-binary-, $(RELEASE_BINARIES))
 
+# Handle sed -i on Darwin
+SED_FLAG=
+SHELL_NAME := $(shell uname -s)
+ifeq ($(SHELL_NAME),Darwin)
+    SED_FLAG := ""
+endif
+
 .PHONY: all lint lint-go build build-go help
 
 all: help
@@ -214,7 +221,10 @@ doc-command: ## Generate markdown documentation for the command
 	@cd docs; \
 	rm -rf commands; \
 	go get ../scripts; \
-	go run ../scripts/generate_command_doc.go
+	go run ../scripts/generate_command_doc.go; \
+	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.okp4d\")/(default \"\/home\/john\/\.okp4d\")/g' command/*.md; \
+	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' command/*.md; \
+	sed -i $(SED_FLAG) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' command/*.md
 
 ## Release:
 release-assets: release-binary-all release-checksums ## Generate release assets
