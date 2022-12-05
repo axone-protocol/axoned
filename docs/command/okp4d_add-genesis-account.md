@@ -19,7 +19,7 @@ okp4d add-genesis-account [address_or_key_name] [coin][,[coin]] [flags]
 ```
       --height int               Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help                     help for add-genesis-account
-      --home string              The application home directory (default "/Users/chris/.okp4d")
+      --home string              The application home directory (default "/home/john/.okp4d")
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test) (default "test")
       --node string              <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string            Output format (text|json) (default "text")

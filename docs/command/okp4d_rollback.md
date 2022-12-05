@@ -21,7 +21,7 @@ okp4d rollback [flags]
 
 ```
   -h, --help          help for rollback
-      --home string   The application home directory (default "/Users/chris/.okp4d")
+      --home string   The application home directory (default "/home/john/.okp4d")
 ```
 
 ### SEE ALSO

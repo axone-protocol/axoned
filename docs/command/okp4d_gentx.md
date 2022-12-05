@@ -53,9 +53,9 @@ okp4d gentx [key_name] [amount] [flags]
       --gas-prices string                   Gas prices in decimal format to determine the transaction fee (e.g. 0.1uatom)
       --generate-only                       Build an unsigned transaction and write it to STDOUT (when enabled, the local Keybase only accessed when providing a key name)
   -h, --help                                help for gentx
-      --home string                         The application home directory (default "/Users/chris/.okp4d")
+      --home string                         The application home directory (default "/home/john/.okp4d")
       --identity string                     The (optional) identity signature (ex. UPort or Keybase)
-      --ip string                           The node's public IP (default "192.168.1.91")
+      --ip string                           The node's public IP (default "127.0.0.1")
       --keyring-backend string              Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string                  The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                              Use a connected Ledger device

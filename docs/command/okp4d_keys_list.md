@@ -21,7 +21,7 @@ okp4d keys list [flags]
 ### Options inherited from parent commands
 
 ```
-      --home string              The application home directory (default "/Users/chris/.okp4d")
+      --home string              The application home directory (default "/home/john/.okp4d")
       --keyring-backend string   Select keyring's backend (os|file|test) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --output string            Output format (text|json) (default "text")

@@ -15,7 +15,7 @@ okp4d init [moniker] [flags]
 ```
       --chain-id string             genesis file chain-id, if left blank will be randomly created (default "okp4d")
   -h, --help                        help for init
-      --home string                 node's home directory (default "/Users/chris/.okp4d")
+      --home string                 node's home directory (default "/home/john/.okp4d")
   -o, --overwrite                   overwrite the genesis.json file
       --recover                     provide seed phrase to recover existing key instead of creating
       --staking-bond-denom string   genesis file staking bond denomination, if left blank default value is 'stake'
