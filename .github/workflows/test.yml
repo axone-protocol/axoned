@@ -14,8 +14,28 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  check-tests:
+    runs-on: ubuntu-22.04
+    outputs:
+      status: ${{ steps.changed-files.outputs.any_changed == 'true' }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+
+      - name: Search for all modified files that involve the execution of tests
+        id: changed-files
+        uses: tj-actions/changed-files@v34.5.0
+        with:
+          files: |
+            **/*.go
+            go.mod
+            go.sum
+            Makefile
+
   test-go:
     runs-on: ubuntu-22.04
+    needs: check-tests
+    if: needs.check-tests.status
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
@@ -32,6 +52,8 @@ jobs:
   test-blockchain:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
+    needs: check-tests
+    if: needs.check-tests.status
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
