@@ -84,6 +84,13 @@ RELEASE_BINARIES = \
 	linux-arm64
 RELEASE_TARGETS = $(addprefix release-binary-, $(RELEASE_BINARIES))
 
+# Handle sed -i on Darwin
+SED_FLAG=
+SHELL_NAME := $(shell uname -s)
+ifeq ($(SHELL_NAME),Darwin)
+    SED_FLAG := ""
+endif
+
 .PHONY: all lint lint-go build build-go help
 
 all: help
@@ -196,7 +203,8 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 	@cp -r github.com/okp4/okp4d/x/* x/
 	@rm -rf github.com
 
-proto-gen-doc: proto-gen ## Generate the documention from the Protobuf files
+## Documentation:
+doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 	@for MODULE in $(shell find proto -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
 		echo "${COLOR_CYAN} 📖 Generate documentation for $${MODULE} module${COLOR_RESET}" ; \
   		docker run --rm \
@@ -207,6 +215,16 @@ proto-gen-doc: proto-gen ## Generate the documention from the Protobuf files
         		generate --path $${MODULE} --template buf.gen.doc.yaml -v ; \
         mv docs/proto/docs.md docs/$${MODULE}.md ; \
 	done
+
+doc-command: ## Generate markdown documentation for the command
+	@echo "${COLOR_CYAN} 📖 Generate markdown documentation for the command${COLOR_RESET}"
+	@cd docs; \
+	rm -rf commands; \
+	go get ../scripts; \
+	go run ../scripts/generate_command_doc.go; \
+	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.okp4d\")/(default \"\/home\/john\/\.okp4d\")/g' command/*.md; \
+	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' command/*.md; \
+	sed -i $(SED_FLAG) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' command/*.md
 
 ## Release:
 release-assets: release-binary-all release-checksums ## Generate release assets

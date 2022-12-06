@@ -155,6 +155,9 @@ Targets:
     proto-format        Format Protobuf files
     proto-build         Build all Protobuf files
     proto-gen           Generate all the code from the Protobuf files
+  Documentation:
+    doc-proto           Generate the documentation from the Protobuf files
+    doc-command         Generate markdown documentation for the command
   Release:
     release-assets      Generate release assets
   Help:
