@@ -7,7 +7,7 @@ Import private keys into the local keybase
 Import a ASCII armored private key into the local keybase.
 
 ```
-okp4d keys import <name> <keyfile> [flags]
+okp4d keys import &lt;name&gt; &lt;keyfile&gt; [flags]
 ```
 
 ### Options

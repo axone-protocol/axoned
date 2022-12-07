@@ -8,9 +8,9 @@ Grant authorization to pay fees from your address. Note, the'--from' flag is
 				ignored as it is implied from [granter].
 
 Examples:
-<appd> tx feegrant grant cosmos1skjw... cosmos1skjw... --spend-limit 100stake --expiration 2022-01-30T15:04:05Z or
-<appd> tx feegrant grant cosmos1skjw... cosmos1skjw... --spend-limit 100stake --period 3600 --period-limit 10stake --expiration 2022-01-30T15:04:05Z or
-<appd> tx feegrant grant cosmos1skjw... cosmos1skjw... --spend-limit 100stake --expiration 2022-01-30T15:04:05Z 
+okp4d tx feegrant grant cosmos1skjw... cosmos1skjw... --spend-limit 100stake --expiration 2022-01-30T15:04:05Z or
+okp4d tx feegrant grant cosmos1skjw... cosmos1skjw... --spend-limit 100stake --period 3600 --period-limit 10stake --expiration 2022-01-30T15:04:05Z or
+okp4d tx feegrant grant cosmos1skjw... cosmos1skjw... --spend-limit 100stake --expiration 2022-01-30T15:04:05Z 
 	--allowed-messages "/cosmos.gov.v1beta1.MsgSubmitProposal,/cosmos.gov.v1beta1.MsgVote"
 
 ```
@@ -38,7 +38,7 @@ okp4d tx feegrant grant [granter_key_or_address] [grantee] [flags]
       --keyring-backend string     Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string         The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                     Use a connected Ledger device
-      --node string                <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string                &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string                Note to add a description to the transaction (previously --memo)
       --offline                    Offline mode (does not allow any online functionality)
   -o, --output string              Output format (text|json) (default "json")

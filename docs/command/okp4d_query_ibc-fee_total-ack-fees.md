@@ -13,7 +13,7 @@ okp4d query ibc-fee total-ack-fees [port-id] [channel-id] [sequence] [flags]
 ### Examples
 
 ```
-<appd> query ibc-fee total-ack-fees transfer channel-5 100
+okp4d query ibc-fee total-ack-fees transfer channel-5 100
 ```
 
 ### Options
@@ -21,7 +21,7 @@ okp4d query ibc-fee total-ack-fees [port-id] [channel-id] [sequence] [flags]
 ```
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for total-ack-fees
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
 ```
 

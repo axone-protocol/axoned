@@ -10,7 +10,7 @@ to each module's documentation for the full set of events to query for. Each mod
 documents its respective events under 'xx_events.md'.
 
 Example:
-$ <appd> query txs --events 'message.sender=cosmos1...&message.action=withdraw_delegator_reward' --page 1 --limit 30
+$ okp4d query txs --events 'message.sender=cosmos1...&message.action=withdraw_delegator_reward' --page 1 --limit 30
 
 ```
 okp4d query txs [flags]
@@ -23,7 +23,7 @@ okp4d query txs [flags]
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for txs
       --limit int       Query number of transactions results per page returned (default 100)
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
       --page int        Query a specific page of paginated results (default 1)
 ```

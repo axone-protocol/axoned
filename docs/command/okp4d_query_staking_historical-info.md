@@ -7,7 +7,7 @@ Query historical info at given height
 Query historical info at given height.
 
 Example:
-$ <appd> query staking historical-info 5
+$ okp4d query staking historical-info 5
 
 ```
 okp4d query staking historical-info [height] [flags]
@@ -18,7 +18,7 @@ okp4d query staking historical-info [height] [flags]
 ```
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for historical-info
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
 ```
 

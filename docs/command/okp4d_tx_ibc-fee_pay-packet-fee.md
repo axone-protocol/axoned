@@ -13,7 +13,7 @@ okp4d tx ibc-fee pay-packet-fee [src-port] [src-channel] [sequence] [flags]
 ### Examples
 
 ```
-<appd> tx ibc-fee pay-packet-fee transfer channel-0 1 --recv-fee 10stake --ack-fee 10stake --timeout-fee 10stake
+okp4d tx ibc-fee pay-packet-fee transfer channel-0 1 --recv-fee 10stake --ack-fee 10stake --timeout-fee 10stake
 ```
 
 ### Options
@@ -36,7 +36,7 @@ okp4d tx ibc-fee pay-packet-fee [src-port] [src-channel] [sequence] [flags]
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

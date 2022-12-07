@@ -12,7 +12,7 @@ private keys stored in a ledger device cannot be deleted with the CLI.
 
 
 ```
-okp4d keys delete <name>... [flags]
+okp4d keys delete &lt;name&gt;... [flags]
 ```
 
 ### Options

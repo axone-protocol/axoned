@@ -224,7 +224,9 @@ doc-command: ## Generate markdown documentation for the command
 	go run ../scripts/generate_command_doc.go; \
 	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.okp4d\")/(default \"\/home\/john\/\.okp4d\")/g' command/*.md; \
 	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' command/*.md; \
-	sed -i $(SED_FLAG) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' command/*.md
+	sed -i $(SED_FLAG) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' command/*.md; \
+	sed -i $(SED_FLAG) 's/<appd>/okp4d/g' command/*.md; \
+	sed -i $(SED_FLAG) 's/<\([a-zA-Z-]*\)>/\&lt;\1\&gt;/g' command/*.md
 
 ## Release:
 release-assets: release-binary-all release-checksums ## Generate release assets

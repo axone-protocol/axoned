@@ -6,8 +6,8 @@ Decode a ED25519 or secp256k1 pubkey from hex, base64, or bech32
 
 Decode a pubkey from hex, base64, or bech32.
 Example:
-$ <appd> debug pubkey-raw TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz
-$ <appd> debug pubkey-raw cosmos1e0jnq2sun3dzjh8p2xq95kk0expwmd7shwjpfg
+$ okp4d debug pubkey-raw TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz
+$ okp4d debug pubkey-raw cosmos1e0jnq2sun3dzjh8p2xq95kk0expwmd7shwjpfg
 			
 
 ```

@@ -7,7 +7,7 @@ Redelegate illiquid tokens from one validator to another
 Redelegate an amount of illiquid staking tokens from one validator to another.
 
 Example:
-$ <appd> tx staking redelegate okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj okp4valoper1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 100stake --from mykey
+$ okp4d tx staking redelegate okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj okp4valoper1l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm 100stake --from mykey
 
 ```
 okp4d tx staking redelegate [src-validator-addr] [dst-validator-addr] [amount] [flags]
@@ -32,7 +32,7 @@ okp4d tx staking redelegate [src-validator-addr] [dst-validator-addr] [amount] [
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

@@ -17,7 +17,7 @@ Proper vetting of a parameter change proposal should prevent this from happening
 regardless.
 
 Example:
-$ <appd> tx gov submit-proposal param-change <path/to/proposal.json> --from=<key_or_address>
+$ okp4d tx gov submit-proposal param-change <path/to/proposal.json> --from=<key_or_address>
 
 Where proposal.json contains:
 
@@ -57,7 +57,7 @@ okp4d tx gov submit-legacy-proposal param-change [proposal-file] [flags]
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

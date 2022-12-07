@@ -10,7 +10,7 @@ Read one or more signatures from one or more [signature] file, generate a multis
 multisig key [name], and attach the key name to the transaction read from [file].
 
 Example:
-$ <appd> tx multisign transaction.json k1k2k3 k1sig.json k2sig.json k3sig.json
+$ okp4d tx multisign transaction.json k1k2k3 k1sig.json k2sig.json k3sig.json
 
 If --signature-only flag is on, output a JSON representation
 of only the generated signature.
@@ -47,7 +47,7 @@ okp4d tx multi-sign [file] [name] [[signature]...] [flags]
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

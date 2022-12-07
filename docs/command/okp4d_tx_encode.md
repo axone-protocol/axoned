@@ -5,7 +5,7 @@ Encode transactions generated offline
 ### Synopsis
 
 Encode transactions created with the --generate-only flag and signed with the sign command.
-Read a transaction from <file>, serialize it to the Protobuf wire protocol, and output it as base64.
+Read a transaction from &lt;file&gt;, serialize it to the Protobuf wire protocol, and output it as base64.
 If you supply a dash (-) argument in place of an input filename, the command reads from standard input.
 
 ```
@@ -31,7 +31,7 @@ okp4d tx encode [file] [flags]
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

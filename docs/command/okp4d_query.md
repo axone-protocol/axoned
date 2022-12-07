@@ -37,7 +37,7 @@ okp4d query [flags]
 * [okp4d query slashing](okp4d_query_slashing.md)	 - Querying commands for the slashing module
 * [okp4d query staking](okp4d_query_staking.md)	 - Querying commands for the staking module
 * [okp4d query tendermint-validator-set](okp4d_query_tendermint-validator-set.md)	 - Get the full tendermint validator set at given height
-* [okp4d query tx](okp4d_query_tx.md)	 - Query for a transaction by hash, "<addr>/<seq>" combination or comma-separated signatures in a committed block
+* [okp4d query tx](okp4d_query_tx.md)	 - Query for a transaction by hash, "&lt;addr&gt;/&lt;seq&gt;" combination or comma-separated signatures in a committed block
 * [okp4d query txs](okp4d_query_txs.md)	 - Query for paginated transactions that match a set of events
 * [okp4d query upgrade](okp4d_query_upgrade.md)	 - Querying commands for the upgrade module
 * [okp4d query wasm](okp4d_query_wasm.md)	 - Querying commands for the wasm module

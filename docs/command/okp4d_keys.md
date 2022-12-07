@@ -40,7 +40,7 @@ The pass backend requires GnuPG: https://gnupg.org/
 ### SEE ALSO
 
 * [okp4d](okp4d.md)	 - OKP4 Daemon 👹
-* [okp4d keys add](okp4d_keys_add.md)	 - Add an encrypted private key (either newly generated or recovered), encrypt it, and save to <name> file
+* [okp4d keys add](okp4d_keys_add.md)	 - Add an encrypted private key (either newly generated or recovered), encrypt it, and save to &lt;name&gt; file
 * [okp4d keys delete](okp4d_keys_delete.md)	 - Delete the given keys
 * [okp4d keys export](okp4d_keys_export.md)	 - Export private keys
 * [okp4d keys import](okp4d_keys_import.md)	 - Import private keys into the local keybase

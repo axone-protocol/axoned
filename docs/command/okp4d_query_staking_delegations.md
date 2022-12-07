@@ -7,7 +7,7 @@ Query all delegations made by one delegator
 Query delegations for an individual delegator on all validators.
 
 Example:
-$ <appd> query staking delegations okp41gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p
+$ okp4d query staking delegations okp41gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p
 
 ```
 okp4d query staking delegations [delegator-addr] [flags]
@@ -20,7 +20,7 @@ okp4d query staking delegations [delegator-addr] [flags]
       --height int        Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help              help for delegations
       --limit uint        pagination limit of delegations to query for (default 100)
-      --node string       <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string       &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
       --offset uint       pagination offset of delegations to query for
   -o, --output string     Output format (text|json) (default "text")
       --page uint         pagination page of delegations to query for. This sets offset to a multiple of limit (default 1)

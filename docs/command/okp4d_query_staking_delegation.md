@@ -7,7 +7,7 @@ Query a delegation based on address and validator address
 Query delegations for an individual delegator on an individual validator.
 
 Example:
-$ <appd> query staking delegation okp41gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
+$ okp4d query staking delegation okp41gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
 
 ```
 okp4d query staking delegation [delegator-addr] [validator-addr] [flags]
@@ -18,7 +18,7 @@ okp4d query staking delegation [delegator-addr] [validator-addr] [flags]
 ```
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for delegation
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
 ```
 

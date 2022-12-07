@@ -7,7 +7,7 @@ Query all unbonding-delegations records for one delegator
 Query unbonding delegations for an individual delegator.
 
 Example:
-$ <appd> query staking unbonding-delegations okp41gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p
+$ okp4d query staking unbonding-delegations okp41gghjut3ccd8ay0zduzj64hwre2fxs9ld75ru9p
 
 ```
 okp4d query staking unbonding-delegations [delegator-addr] [flags]
@@ -20,7 +20,7 @@ okp4d query staking unbonding-delegations [delegator-addr] [flags]
       --height int        Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help              help for unbonding-delegations
       --limit uint        pagination limit of unbonding delegations to query for (default 100)
-      --node string       <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string       &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
       --offset uint       pagination offset of unbonding delegations to query for
   -o, --output string     Output format (text|json) (default "text")
       --page uint         pagination page of unbonding delegations to query for. This sets offset to a multiple of limit (default 1)

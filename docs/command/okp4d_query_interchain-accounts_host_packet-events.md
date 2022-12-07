@@ -13,7 +13,7 @@ okp4d query interchain-accounts host packet-events [channel-id] [sequence] [flag
 ### Examples
 
 ```
-<appd> query interchain-accounts host packet-events channel-0 100
+okp4d query interchain-accounts host packet-events channel-0 100
 ```
 
 ### Options
@@ -21,7 +21,7 @@ okp4d query interchain-accounts host packet-events [channel-id] [sequence] [flag
 ```
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for packet-events
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
 ```
 

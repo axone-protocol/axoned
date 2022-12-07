@@ -7,8 +7,8 @@ Query for evidence by hash or for all (paginated) submitted evidence
 Query for specific submitted evidence by hash or query for all (paginated) evidence:
 
 Example:
-$ <appd> query evidence DF0C23E8634E480F84B9D5674A7CDC9816466DEC28A3358F73260F68D28D7660
-$ <appd> query evidence --page=2 --limit=50
+$ okp4d query evidence DF0C23E8634E480F84B9D5674A7CDC9816466DEC28A3358F73260F68D28D7660
+$ okp4d query evidence --page=2 --limit=50
 
 ```
 okp4d query evidence [flags]
@@ -21,7 +21,7 @@ okp4d query evidence [flags]
       --height int        Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help              help for evidence
       --limit uint        pagination limit of evidence to query for (default 100)
-      --node string       <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string       &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
       --offset uint       pagination offset of evidence to query for
   -o, --output string     Output format (text|json) (default "text")
       --page uint         pagination page of evidence to query for. This sets offset to a multiple of limit (default 1)

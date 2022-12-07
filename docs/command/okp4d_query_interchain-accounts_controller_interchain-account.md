@@ -13,7 +13,7 @@ okp4d query interchain-accounts controller interchain-account [owner] [connectio
 ### Examples
 
 ```
-<appd> query interchain-accounts controller interchain-account cosmos1layxcsmyye0dc0har9sdfzwckaz8sjwlfsj8zs connection-0
+okp4d query interchain-accounts controller interchain-account cosmos1layxcsmyye0dc0har9sdfzwckaz8sjwlfsj8zs connection-0
 ```
 
 ### Options
@@ -21,7 +21,7 @@ okp4d query interchain-accounts controller interchain-account [owner] [connectio
 ```
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for interchain-account
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
 ```
 

@@ -7,10 +7,10 @@ Query proposals with optional filters
 Query for a all paginated proposals that match optional filters:
 
 Example:
-$ <appd> query gov proposals --depositor cosmos1skjwj5whet0lpe65qaq4rpq03hjxlwd9nf39lk
-$ <appd> query gov proposals --voter cosmos1skjwj5whet0lpe65qaq4rpq03hjxlwd9nf39lk
-$ <appd> query gov proposals --status (DepositPeriod|VotingPeriod|Passed|Rejected)
-$ <appd> query gov proposals --page=2 --limit=100
+$ okp4d query gov proposals --depositor cosmos1skjwj5whet0lpe65qaq4rpq03hjxlwd9nf39lk
+$ okp4d query gov proposals --voter cosmos1skjwj5whet0lpe65qaq4rpq03hjxlwd9nf39lk
+$ okp4d query gov proposals --status (DepositPeriod|VotingPeriod|Passed|Rejected)
+$ okp4d query gov proposals --page=2 --limit=100
 
 ```
 okp4d query gov proposals [flags]
@@ -24,7 +24,7 @@ okp4d query gov proposals [flags]
       --height int         Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help               help for proposals
       --limit uint         pagination limit of proposals to query for (default 100)
-      --node string        <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string        &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
       --offset uint        pagination offset of proposals to query for
   -o, --output string      Output format (text|json) (default "text")
       --page uint          pagination page of proposals to query for. This sets offset to a multiple of limit (default 1)

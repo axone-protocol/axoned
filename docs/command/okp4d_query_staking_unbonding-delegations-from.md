@@ -7,7 +7,7 @@ Query all unbonding delegatations from a validator
 Query delegations that are unbonding _from_ a validator.
 
 Example:
-$ <appd> query staking unbonding-delegations-from okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
+$ okp4d query staking unbonding-delegations-from okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj
 
 ```
 okp4d query staking unbonding-delegations-from [validator-addr] [flags]
@@ -20,7 +20,7 @@ okp4d query staking unbonding-delegations-from [validator-addr] [flags]
       --height int        Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help              help for unbonding-delegations-from
       --limit uint        pagination limit of unbonding delegations to query for (default 100)
-      --node string       <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string       &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
       --offset uint       pagination offset of unbonding delegations to query for
   -o, --output string     Output format (text|json) (default "text")
       --page uint         pagination page of unbonding delegations to query for. This sets offset to a multiple of limit (default 1)

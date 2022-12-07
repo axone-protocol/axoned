@@ -34,7 +34,7 @@ okp4d tx staking create-validator [flags]
       --ledger                              Use a connected Ledger device
       --min-self-delegation string          The minimum self delegation required on the validator
       --moniker string                      The validator's name
-      --node string                         <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string                         &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --node-id string                      The node's ID
       --note string                         Note to add a description to the transaction (previously --memo)
       --offline                             Offline mode (does not allow any online functionality)

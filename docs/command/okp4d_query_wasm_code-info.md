@@ -15,7 +15,7 @@ okp4d query wasm code-info [code_id] [flags]
 ```
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for code-info
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
 ```
 
