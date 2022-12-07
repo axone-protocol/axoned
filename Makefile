@@ -20,6 +20,10 @@ COLOR_CYAN   = $(shell tput -Txterm setaf 6)
 COLOR_RED    = $(shell tput -Txterm setaf 1)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
 
+# Blockchain constants
+CHAIN      := localnet
+CHAIN_HOME := ./target/deployment/${CHAIN}
+
 BUILD_TAGS += netgo
 BUILD_TAGS := $(strip $(BUILD_TAGS))
 ifeq ($(LEDGER_ENABLED),true)
@@ -167,6 +171,38 @@ test: test-go ## Pass all the tests
 test-go: build ## Pass the test for the go source code
 	@echo "${COLOR_CYAN} 🧪 Passing go tests${COLOR_RESET}"
 	@go test -v -covermode=count -coverprofile ./target/coverage.out ./...
+
+## Chain:
+chain-init: build ## Initialize the blockchain with default settings.
+	@echo "${COLOR_CYAN} 🛠️ Initializing chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} under ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"; \
+	rm -rf "${CHAIN_HOME}"; \
+	okp4d init okp4-node \
+	  --chain-id=okp4-${CHAIN} \
+	  --home "${CHAIN_HOME}"; \
+	\
+	sed -i $(SED_FLAG) "s/\"stake\"/\"uknow\"/g" "${CHAIN_HOME}/config/genesis.json"; \
+	\
+	MNEMONIC_VALIDATOR="island position immense mom cross enemy grab little deputy tray hungry detect state helmet \
+	  tomorrow trap expect admit inhale present vault reveal scene atom"; \
+	echo $$MNEMONIC_VALIDATOR \
+	  | okp4d keys add validator \
+	      --recover \
+	      --keyring-backend test \
+	      --home "${CHAIN_HOME}"; \
+	\
+	okp4d add-genesis-account validator 1000000000uknow \
+	  --keyring-backend test \
+	  --home "${CHAIN_HOME}"; \
+	\
+	NODE_ID=`okp4d tendermint show-node-id --home ${CHAIN_HOME}`; \
+	okp4d gentx validator 1000000uknow \
+	  --node-id $$NODE_ID \
+	  --chain-id=okp4-${CHAIN} \
+	  --keyring-backend test \
+      --home "${CHAIN_HOME}"; \
+	\
+	okp4d collect-gentxs \
+	  --home "${CHAIN_HOME}"
 
 ## Clean:
 clean: ## Remove all the files from the target folder
