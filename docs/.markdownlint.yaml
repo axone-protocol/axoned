@@ -1,0 +1,7 @@
+line-length: false
+no-hard-tabs: false
+first-line-h1: false
+no-inline-html: false
+fenced-code-language: false
+code-block-style: false
+link-fragments: false
