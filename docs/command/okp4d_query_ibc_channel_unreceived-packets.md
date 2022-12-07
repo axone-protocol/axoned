@@ -17,7 +17,7 @@ okp4d query ibc channel unreceived-packets [port-id] [channel-id] [flags]
 ### Examples
 
 ```
-<appd> query ibc channel unreceived-packets [port-id] [channel-id] --sequences=1,2,3
+okp4d query ibc channel unreceived-packets [port-id] [channel-id] --sequences=1,2,3
 ```
 
 ### Options
@@ -25,7 +25,7 @@ okp4d query ibc channel unreceived-packets [port-id] [channel-id] [flags]
 ```
       --height int             Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help                   help for unreceived-packets
-      --node string            <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string            &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string          Output format (text|json) (default "text")
       --sequences int64Slice   comma separated list of packet sequence numbers (default [])
 ```

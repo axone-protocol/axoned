@@ -5,10 +5,10 @@ Deposit tokens for an active proposal
 ### Synopsis
 
 Submit a deposit for an active proposal. You can
-find the proposal-id by running "<appd> query gov proposals".
+find the proposal-id by running "okp4d query gov proposals".
 
 Example:
-$ <appd> tx gov deposit 1 10stake --from mykey
+$ okp4d tx gov deposit 1 10stake --from mykey
 
 ```
 okp4d tx gov deposit [proposal-id] [deposit] [flags]
@@ -33,7 +33,7 @@ okp4d tx gov deposit [proposal-id] [deposit] [flags]
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

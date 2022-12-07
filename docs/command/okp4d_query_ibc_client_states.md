@@ -13,7 +13,7 @@ okp4d query ibc client states [flags]
 ### Examples
 
 ```
-<appd> query ibc client states
+okp4d query ibc client states
 ```
 
 ### Options
@@ -23,7 +23,7 @@ okp4d query ibc client states [flags]
       --height int        Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help              help for states
       --limit uint        pagination limit of client states to query for (default 100)
-      --node string       <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string       &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
       --offset uint       pagination offset of client states to query for
   -o, --output string     Output format (text|json) (default "text")
       --page uint         pagination page of client states to query for. This sets offset to a multiple of limit (default 1)

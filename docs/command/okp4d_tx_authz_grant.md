@@ -7,11 +7,11 @@ Grant authorization to an address
 create a new grant authorization to an address to execute a transaction on your behalf:
 
 Examples:
- $ <appd> tx authz grant cosmos1skjw.. send /cosmos.bank.v1beta1.MsgSend --spend-limit=1000stake --from=cosmos1skl..
- $ <appd> tx authz grant cosmos1skjw.. generic --msg-type=/cosmos.gov.v1.MsgVote --from=cosmos1sk..
+ $ okp4d tx authz grant cosmos1skjw.. send /cosmos.bank.v1beta1.MsgSend --spend-limit=1000stake --from=cosmos1skl..
+ $ okp4d tx authz grant cosmos1skjw.. generic --msg-type=/cosmos.gov.v1.MsgVote --from=cosmos1sk..
 
 ```
-okp4d tx authz grant <grantee> <authorization_type="send"|"generic"|"delegate"|"unbond"|"redelegate"> --from <granter> [flags]
+okp4d tx authz grant &lt;grantee&gt; <authorization_type="send"|"generic"|"delegate"|"unbond"|"redelegate"> --from &lt;granter&gt; [flags]
 ```
 
 ### Options
@@ -37,7 +37,7 @@ okp4d tx authz grant <grantee> <authorization_type="send"|"generic"|"delegate"|"
       --keyring-dir string           The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                       Use a connected Ledger device
       --msg-type string              The Msg method name for which we are creating a GenericAuthorization
-      --node string                  <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string                  &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string                  Note to add a description to the transaction (previously --memo)
       --offline                      Offline mode (does not allow any online functionality)
   -o, --output string                Output format (text|json) (default "json")

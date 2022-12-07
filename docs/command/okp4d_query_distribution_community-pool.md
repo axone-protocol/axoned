@@ -7,7 +7,7 @@ Query the amount of coins in the community pool
 Query all coins in the community pool which is under Governance control.
 
 Example:
-$ <appd> query distribution community-pool
+$ okp4d query distribution community-pool
 
 ```
 okp4d query distribution community-pool [flags]
@@ -18,7 +18,7 @@ okp4d query distribution community-pool [flags]
 ```
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for community-pool
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
 ```
 

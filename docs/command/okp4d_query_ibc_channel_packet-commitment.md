@@ -13,7 +13,7 @@ okp4d query ibc channel packet-commitment [port-id] [channel-id] [sequence] [fla
 ### Examples
 
 ```
-<appd> query ibc channel packet-commitment [port-id] [channel-id] [sequence]
+okp4d query ibc channel packet-commitment [port-id] [channel-id] [sequence]
 ```
 
 ### Options
@@ -21,7 +21,7 @@ okp4d query ibc channel packet-commitment [port-id] [channel-id] [sequence] [fla
 ```
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for packet-commitment
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
       --prove           show proofs for the query results (default true)
 ```

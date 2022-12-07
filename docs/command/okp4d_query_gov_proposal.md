@@ -5,10 +5,10 @@ Query details of a single proposal
 ### Synopsis
 
 Query details for a proposal. You can find the
-proposal-id by running "<appd> query gov proposals".
+proposal-id by running "okp4d query gov proposals".
 
 Example:
-$ <appd> query gov proposal 1
+$ okp4d query gov proposal 1
 
 ```
 okp4d query gov proposal [proposal-id] [flags]
@@ -19,7 +19,7 @@ okp4d query gov proposal [proposal-id] [flags]
 ```
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for proposal
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
 ```
 

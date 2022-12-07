@@ -6,7 +6,7 @@ revoke authorization
 
 revoke authorization from a granter to a grantee:
 Example:
- $ <appd> tx authz revoke cosmos1skj.. /cosmos.bank.v1beta1.MsgSend --from=cosmos1skj..
+ $ okp4d tx authz revoke cosmos1skj.. /cosmos.bank.v1beta1.MsgSend --from=cosmos1skj..
 
 ```
 okp4d tx authz revoke [grantee] [msg-type-url] --from=[granter] [flags]
@@ -31,7 +31,7 @@ okp4d tx authz revoke [grantee] [msg-type-url] --from=[granter] [flags]
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

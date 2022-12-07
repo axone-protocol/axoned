@@ -17,7 +17,7 @@ file. The following default parameters are included:
 
 
 Example:
-$ <appd> gentx my-key-name 1000000stake --home=/path/to/home/dir --keyring-backend=os --chain-id=test-chain-1 \
+$ okp4d gentx my-key-name 1000000stake --home=/path/to/home/dir --keyring-backend=os --chain-id=test-chain-1 \
     --moniker="myvalidator" \
     --commission-max-change-rate=0.01 \
     --commission-max-rate=1.0 \
@@ -61,7 +61,7 @@ okp4d gentx [key_name] [amount] [flags]
       --ledger                              Use a connected Ledger device
       --min-self-delegation string          The minimum self delegation required on the validator
       --moniker string                      The validator's (optional) moniker
-      --node string                         <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string                         &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --node-id string                      The node's NodeID
       --note string                         Note to add a description to the transaction (previously --memo)
       --offline                             Offline mode (does not allow any online functionality)

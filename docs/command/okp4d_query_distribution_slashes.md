@@ -7,7 +7,7 @@ Query distribution validator slashes
 Query all slashes of a validator for a given block range.
 
 Example:
-$ <appd> query distribution slashes okp4valopervaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 0 100
+$ okp4d query distribution slashes okp4valopervaloper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 0 100
 
 ```
 okp4d query distribution slashes [validator] [start-height] [end-height] [flags]
@@ -20,7 +20,7 @@ okp4d query distribution slashes [validator] [start-height] [end-height] [flags]
       --height int        Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help              help for slashes
       --limit uint        pagination limit of validator slashes to query for (default 100)
-      --node string       <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string       &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
       --offset uint       pagination offset of validator slashes to query for
   -o, --output string     Output format (text|json) (default "text")
       --page uint         pagination page of validator slashes to query for. This sets offset to a multiple of limit (default 1)

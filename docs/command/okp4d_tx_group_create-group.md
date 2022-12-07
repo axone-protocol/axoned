@@ -15,7 +15,7 @@ okp4d tx group create-group [admin] [metadata] [members-json-file] [flags]
 
 ```
 
-<appd> tx group create-group [admin] [metadata] [members-json-file]
+okp4d tx group create-group [admin] [metadata] [members-json-file]
 
 Where members.json contains:
 
@@ -54,7 +54,7 @@ Where members.json contains:
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

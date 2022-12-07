@@ -14,7 +14,7 @@ okp4d query ibc client consensus-state [client-id] [height] [flags]
 ### Examples
 
 ```
-<appd> query ibc client  consensus-state [client-id] [height]
+okp4d query ibc client  consensus-state [client-id] [height]
 ```
 
 ### Options
@@ -23,7 +23,7 @@ okp4d query ibc client consensus-state [client-id] [height] [flags]
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for consensus-state
       --latest-height   return latest stored consensus state
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
       --prove           show proofs for the query results (default true)
 ```

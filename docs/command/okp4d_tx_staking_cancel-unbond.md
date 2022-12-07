@@ -7,7 +7,7 @@ Cancel unbonding delegation and delegate back to the validator
 Cancel Unbonding Delegation and delegate back to the validator.
 
 Example:
-$ <appd> tx staking cancel-unbond okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 100stake 2 --from mykey
+$ okp4d tx staking cancel-unbond okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 100stake 2 --from mykey
 
 ```
 okp4d tx staking cancel-unbond [validator-addr] [amount] [creation-height] [flags]
@@ -16,7 +16,7 @@ okp4d tx staking cancel-unbond [validator-addr] [amount] [creation-height] [flag
 ### Examples
 
 ```
-$ <appd> tx staking cancel-unbond okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 100stake 2 --from mykey
+$ okp4d tx staking cancel-unbond okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 100stake 2 --from mykey
 ```
 
 ### Options
@@ -38,7 +38,7 @@ $ <appd> tx staking cancel-unbond okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmq
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

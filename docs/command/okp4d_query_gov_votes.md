@@ -7,8 +7,8 @@ Query votes on a proposal
 Query vote details for a single proposal by its identifier.
 
 Example:
-$ <appd> query gov votes 1
-$ <appd> query gov votes 1 --page=2 --limit=100
+$ okp4d query gov votes 1
+$ okp4d query gov votes 1 --page=2 --limit=100
 
 ```
 okp4d query gov votes [proposal-id] [flags]
@@ -21,7 +21,7 @@ okp4d query gov votes [proposal-id] [flags]
       --height int        Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help              help for votes
       --limit uint        pagination limit of votes to query for (default 100)
-      --node string       <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string       &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
       --offset uint       pagination offset of votes to query for
   -o, --output string     Output format (text|json) (default "text")
       --page uint         pagination page of votes to query for. This sets offset to a multiple of limit (default 1)

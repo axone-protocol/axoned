@@ -5,10 +5,10 @@ Vote for an active proposal, options: yes/no/no_with_veto/abstain
 ### Synopsis
 
 Submit a vote for an active proposal. You can
-find the proposal-id by running "<appd> query gov proposals".
+find the proposal-id by running "okp4d query gov proposals".
 
 Example:
-$ <appd> tx gov vote 1 yes --from mykey
+$ okp4d tx gov vote 1 yes --from mykey
 
 ```
 okp4d tx gov vote [proposal-id] [option] [flags]
@@ -34,7 +34,7 @@ okp4d tx gov vote [proposal-id] [option] [flags]
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
       --metadata string          Specify metadata of the vote
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

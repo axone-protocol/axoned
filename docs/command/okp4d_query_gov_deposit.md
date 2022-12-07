@@ -7,7 +7,7 @@ Query details of a deposit
 Query details for a single proposal deposit on a proposal by its identifier.
 
 Example:
-$ <appd> query gov deposit 1 cosmos1skjwj5whet0lpe65qaq4rpq03hjxlwd9nf39lk
+$ okp4d query gov deposit 1 cosmos1skjwj5whet0lpe65qaq4rpq03hjxlwd9nf39lk
 
 ```
 okp4d query gov deposit [proposal-id] [depositer-addr] [flags]
@@ -18,7 +18,7 @@ okp4d query gov deposit [proposal-id] [depositer-addr] [flags]
 ```
       --height int      Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help            help for deposit
-      --node string     <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string     &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string   Output format (text|json) (default "text")
 ```
 
