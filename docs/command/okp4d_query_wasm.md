@@ -32,4 +32,3 @@ okp4d query wasm [flags]
 * [okp4d query wasm list-contract-by-code](okp4d_query_wasm_list-contract-by-code.md)	 - List wasm all bytecode on the chain for given code id
 * [okp4d query wasm params](okp4d_query_wasm_params.md)	 - Query the current wasm parameters
 * [okp4d query wasm pinned](okp4d_query_wasm_pinned.md)	 - List all pinned code ids
-

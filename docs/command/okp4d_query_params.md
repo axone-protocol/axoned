@@ -22,4 +22,3 @@ okp4d query params [flags]
 
 * [okp4d query](okp4d_query.md)	 - Querying subcommands
 * [okp4d query params subspace](okp4d_query_params_subspace.md)	 - Query for raw parameters by subspace and key
-

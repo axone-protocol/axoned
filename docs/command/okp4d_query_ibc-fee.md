@@ -27,4 +27,3 @@ IBC relayer incentivization query subcommands
 * [okp4d query ibc-fee total-ack-fees](okp4d_query_ibc-fee_total-ack-fees.md)	 - Query the total acknowledgement fees for a packet
 * [okp4d query ibc-fee total-recv-fees](okp4d_query_ibc-fee_total-recv-fees.md)	 - Query the total receive fees for a packet
 * [okp4d query ibc-fee total-timeout-fees](okp4d_query_ibc-fee_total-timeout-fees.md)	 - Query the total timeout fees for a packet
-

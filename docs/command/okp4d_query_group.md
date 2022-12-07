@@ -34,4 +34,3 @@ okp4d query group [flags]
 * [okp4d query group vote](okp4d_query_group_vote.md)	 - Query for vote by proposal id and voter account address
 * [okp4d query group votes-by-proposal](okp4d_query_group_votes-by-proposal.md)	 - Query for votes by proposal id with pagination flags
 * [okp4d query group votes-by-voter](okp4d_query_group_votes-by-voter.md)	 - Query for votes by voter account address with pagination flags
-

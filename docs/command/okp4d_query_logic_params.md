@@ -24,4 +24,3 @@ okp4d query logic params [flags]
 ### SEE ALSO
 
 * [okp4d query logic](okp4d_query_logic.md)	 - Querying commands for the logic module
-

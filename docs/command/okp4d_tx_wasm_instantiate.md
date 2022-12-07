@@ -49,4 +49,3 @@ okp4d tx wasm instantiate [code_id_int64] [json_encoded_init_args] --label [text
 ### SEE ALSO
 
 * [okp4d tx wasm](okp4d_tx_wasm.md)	 - Wasm transaction subcommands
-

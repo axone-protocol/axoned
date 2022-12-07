@@ -37,4 +37,3 @@ okp4d query feegrant grants-by-grantee [grantee] [flags]
 ### SEE ALSO
 
 * [okp4d query feegrant](okp4d_query_feegrant.md)	 - Querying commands for the feegrant module
-

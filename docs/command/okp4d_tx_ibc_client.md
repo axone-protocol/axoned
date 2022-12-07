@@ -25,4 +25,3 @@ okp4d tx ibc client [flags]
 * [okp4d tx ibc client misbehaviour](okp4d_tx_ibc_client_misbehaviour.md)	 - submit a client misbehaviour
 * [okp4d tx ibc client update](okp4d_tx_ibc_client_update.md)	 - update existing client with a header
 * [okp4d tx ibc client upgrade](okp4d_tx_ibc_client_upgrade.md)	 - upgrade an IBC client
-

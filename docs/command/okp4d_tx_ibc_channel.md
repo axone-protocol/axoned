@@ -21,4 +21,3 @@ okp4d tx ibc channel [flags]
 ### SEE ALSO
 
 * [okp4d tx ibc](okp4d_tx_ibc.md)	 - IBC transaction subcommands
-

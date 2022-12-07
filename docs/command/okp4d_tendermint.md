@@ -17,4 +17,3 @@ Tendermint subcommands
 * [okp4d tendermint show-validator](okp4d_tendermint_show-validator.md)	 - Show this node's tendermint validator info
 * [okp4d tendermint unsafe-reset-all](okp4d_tendermint_unsafe-reset-all.md)	 - (unsafe) Remove all the data and WAL, reset this node's validator to genesis state
 * [okp4d tendermint version](okp4d_tendermint_version.md)	 - Print tendermint libraries' version
-

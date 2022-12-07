@@ -87,4 +87,3 @@ okp4d tx gov submit-legacy-proposal [flags]
 * [okp4d tx gov submit-legacy-proposal update-client](okp4d_tx_gov_submit-legacy-proposal_update-client.md)	 - Submit an update IBC client proposal
 * [okp4d tx gov submit-legacy-proposal update-instantiate-config](okp4d_tx_gov_submit-legacy-proposal_update-instantiate-config.md)	 - Submit an update instantiate config proposal.
 * [okp4d tx gov submit-legacy-proposal wasm-store](okp4d_tx_gov_submit-legacy-proposal_wasm-store.md)	 - Submit a wasm binary proposal
-

@@ -21,4 +21,3 @@ okp4d query wasm build-address [code-hash] [creator-address] [label] [flags]
 ### SEE ALSO
 
 * [okp4d query wasm](okp4d_query_wasm.md)	 - Querying commands for the wasm module
-

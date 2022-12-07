@@ -74,4 +74,3 @@ Where members.json contains:
 ### SEE ALSO
 
 * [okp4d tx group](okp4d_tx_group.md)	 - Group transaction subcommands
-

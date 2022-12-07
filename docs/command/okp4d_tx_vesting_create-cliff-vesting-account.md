@@ -53,4 +53,3 @@ okp4d tx vesting create-cliff-vesting-account [to_address] [amount] [cliff_time]
 ### SEE ALSO
 
 * [okp4d tx vesting](okp4d_tx_vesting.md)	 - Vesting transaction subcommands
-

@@ -15,4 +15,3 @@ okp4d tendermint show-validator [flags]
 ### SEE ALSO
 
 * [okp4d tendermint](okp4d_tendermint.md)	 - Tendermint subcommands
-

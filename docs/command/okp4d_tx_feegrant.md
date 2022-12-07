@@ -27,4 +27,3 @@ okp4d tx feegrant [flags]
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
 * [okp4d tx feegrant grant](okp4d_tx_feegrant_grant.md)	 - Grant Fee allowance to an address
 * [okp4d tx feegrant revoke](okp4d_tx_feegrant_revoke.md)	 - revoke fee-grant
-

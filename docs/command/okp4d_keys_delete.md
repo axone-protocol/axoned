@@ -10,7 +10,6 @@ Note that removing offline or ledger keys will remove
 only the public key references stored locally, i.e.
 private keys stored in a ledger device cannot be deleted with the CLI.
 
-
 ```
 okp4d keys delete &lt;name&gt;... [flags]
 ```
@@ -35,4 +34,3 @@ okp4d keys delete &lt;name&gt;... [flags]
 ### SEE ALSO
 
 * [okp4d keys](okp4d_keys.md)	 - Manage your application's keys
-

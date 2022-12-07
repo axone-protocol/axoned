@@ -35,4 +35,3 @@ okp4d query staking [flags]
 * [okp4d query staking unbonding-delegations-from](okp4d_query_staking_unbonding-delegations-from.md)	 - Query all unbonding delegatations from a validator
 * [okp4d query staking validator](okp4d_query_staking_validator.md)	 - Query a validator
 * [okp4d query staking validators](okp4d_query_staking_validators.md)	 - Query for all validators
-

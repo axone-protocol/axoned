@@ -29,4 +29,3 @@ okp4d query upgrade applied [upgrade-name] [flags]
 ### SEE ALSO
 
 * [okp4d query upgrade](okp4d_query_upgrade.md)	 - Querying commands for the upgrade module
-

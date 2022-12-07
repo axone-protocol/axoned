@@ -40,4 +40,3 @@ okp4d query ibc client consensus-states [client-id]
 ### SEE ALSO
 
 * [okp4d query ibc client](okp4d_query_ibc_client.md)	 - IBC client query subcommands
-

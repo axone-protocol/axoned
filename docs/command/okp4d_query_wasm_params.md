@@ -24,4 +24,3 @@ okp4d query wasm params [flags]
 ### SEE ALSO
 
 * [okp4d query wasm](okp4d_query_wasm.md)	 - Querying commands for the wasm module
-

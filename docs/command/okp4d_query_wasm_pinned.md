@@ -6,7 +6,6 @@ List all pinned code ids
 
 		Long:    List all pinned code ids,
 
-
 ```
 okp4d query wasm pinned [flags]
 ```
@@ -35,4 +34,3 @@ okp4d query wasm pinned [flags]
 ### SEE ALSO
 
 * [okp4d query wasm](okp4d_query_wasm.md)	 - Querying commands for the wasm module
-

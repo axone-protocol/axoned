@@ -31,7 +31,6 @@ API services are enabled via the 'grpc-only' flag. In this mode, Tendermint is
 bypassed and can be used when legacy queries are needed after an on-chain upgrade
 is performed. Note, when enabled, gRPC will also be automatically enabled.
 
-
 ```
 okp4d start-with-http-tunneling [flags]
 ```
@@ -102,4 +101,3 @@ okp4d start-with-http-tunneling [flags]
 ### SEE ALSO
 
 * [okp4d](okp4d.md)	 - OKP4 Daemon 👹
-

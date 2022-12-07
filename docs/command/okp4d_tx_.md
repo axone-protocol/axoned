@@ -1,6 +1,4 @@
-## okp4d tx 
-
-
+## okp4d tx
 
 ```
 okp4d tx  [flags]
@@ -21,4 +19,3 @@ okp4d tx  [flags]
 ### SEE ALSO
 
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
-

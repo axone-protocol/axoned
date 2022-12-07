@@ -74,4 +74,3 @@ Here, we can use percentage decision policy when needed, where 0 < percentage <=
 ### SEE ALSO
 
 * [okp4d tx group](okp4d_tx_group.md)	 - Group transaction subcommands
-

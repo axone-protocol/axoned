@@ -23,7 +23,6 @@ Example:
 
     keys add mymultisig --multisig "keyname1,keyname2,keyname3" --multisig-threshold 2
 
-
 ```
 okp4d keys add &lt;name&gt; [flags]
 ```
@@ -60,4 +59,3 @@ okp4d keys add &lt;name&gt; [flags]
 ### SEE ALSO
 
 * [okp4d keys](okp4d_keys.md)	 - Manage your application's keys
-

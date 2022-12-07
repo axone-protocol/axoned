@@ -12,7 +12,6 @@ the signatures were collected in the right order, and if the signature is valid 
 given transaction. If the --offline flag is also set, signature validation over the
 transaction will be not be performed as that will require RPC communication with a full node.
 
-
 ```
 okp4d tx validate-signatures [file] [flags]
 ```
@@ -51,4 +50,3 @@ okp4d tx validate-signatures [file] [flags]
 ### SEE ALSO
 
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
-

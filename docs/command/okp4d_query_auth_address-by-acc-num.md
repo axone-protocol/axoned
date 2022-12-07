@@ -30,4 +30,3 @@ okp4d q auth address-by-acc-num 1
 ### SEE ALSO
 
 * [okp4d query auth](okp4d_query_auth.md)	 - Querying commands for the auth module
-

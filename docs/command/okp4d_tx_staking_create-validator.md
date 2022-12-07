@@ -58,4 +58,3 @@ okp4d tx staking create-validator [flags]
 ### SEE ALSO
 
 * [okp4d tx staking](okp4d_tx_staking.md)	 - Staking transaction subcommands
-

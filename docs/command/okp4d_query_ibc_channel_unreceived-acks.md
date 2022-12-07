@@ -7,8 +7,8 @@ Query all the unreceived acks associated with a channel
 Given a list of acknowledgement sequences from counterparty, determine if an ack on the counterparty chain has been received on the executing chain.
 
 The return value represents:
-- Unreceived packet acknowledgement: packet commitment exists on original sending (executing) chain and ack exists on receiving chain.
 
+- Unreceived packet acknowledgement: packet commitment exists on original sending (executing) chain and ack exists on receiving chain.
 
 ```
 okp4d query ibc channel unreceived-acks [port-id] [channel-id] [flags]
@@ -38,5 +38,4 @@ okp4d query ibc channel unreceived-acks [port-id] [channel-id] --sequences=1,2,3
 
 ### SEE ALSO
 
-* [okp4d query ibc channel](okp4d_query_ibc_channel.md)	 - IBC channel query subcommands
-
+- [okp4d query ibc channel](okp4d_query_ibc_channel.md)	 - IBC channel query subcommands

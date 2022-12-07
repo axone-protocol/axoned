@@ -35,4 +35,3 @@ okp4d query ibc channel packet-ack [port-id] [channel-id] [sequence]
 ### SEE ALSO
 
 * [okp4d query ibc channel](okp4d_query_ibc_channel.md)	 - IBC channel query subcommands
-

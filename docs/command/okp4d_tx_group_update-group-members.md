@@ -72,4 +72,3 @@ Set a member's weight to "0" to delete it.
 ### SEE ALSO
 
 * [okp4d tx group](okp4d_tx_group.md)	 - Group transaction subcommands
-

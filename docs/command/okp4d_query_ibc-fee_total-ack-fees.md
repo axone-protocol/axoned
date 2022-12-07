@@ -34,4 +34,3 @@ okp4d query ibc-fee total-ack-fees transfer channel-5 100
 ### SEE ALSO
 
 * [okp4d query ibc-fee](okp4d_query_ibc-fee.md)	 - IBC relayer incentivization query subcommands
-

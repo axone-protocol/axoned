@@ -55,4 +55,3 @@ okp4d tx ibc client update [client-id] [path/to/header.json] --from node0 --home
 ### SEE ALSO
 
 * [okp4d tx ibc client](okp4d_tx_ibc_client.md)	 - IBC client transaction subcommands
-

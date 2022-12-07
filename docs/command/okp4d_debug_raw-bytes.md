@@ -8,7 +8,6 @@ Convert raw-bytes to hex.
 
 Example:
 $ okp4d debug raw-bytes [72 101 108 108 111 44 32 112 108 97 121 103 114 111 117 110 100]
-			
 
 ```
 okp4d debug raw-bytes [raw-bytes] [flags]
@@ -23,4 +22,3 @@ okp4d debug raw-bytes [raw-bytes] [flags]
 ### SEE ALSO
 
 * [okp4d debug](okp4d_debug.md)	 - Tool for helping with debugging your application
-

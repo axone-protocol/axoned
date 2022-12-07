@@ -53,4 +53,3 @@ okp4d tx gov deposit [proposal-id] [deposit] [flags]
 ### SEE ALSO
 
 * [okp4d tx gov](okp4d_tx_gov.md)	 - Governance transactions subcommands
-

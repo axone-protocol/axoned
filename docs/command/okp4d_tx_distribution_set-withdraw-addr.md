@@ -52,4 +52,3 @@ okp4d tx distribution set-withdraw-addr [withdraw-addr] [flags]
 ### SEE ALSO
 
 * [okp4d tx distribution](okp4d_tx_distribution.md)	 - Distribution transactions subcommands
-

@@ -58,4 +58,3 @@ okp4d tx ibc-fee pay-packet-fee transfer channel-0 1 --recv-fee 10stake --ack-fe
 ### SEE ALSO
 
 * [okp4d tx ibc-fee](okp4d_tx_ibc-fee.md)	 - IBC relayer incentivization transaction subcommands
-

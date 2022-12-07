@@ -1,7 +1,5 @@
 ## okp4d tx intertx submit
 
-
-
 ```
 okp4d tx intertx submit [path/to/sdk_msg.json] [flags]
 ```
@@ -46,4 +44,3 @@ okp4d tx intertx submit [path/to/sdk_msg.json] [flags]
 ### SEE ALSO
 
 * [okp4d tx intertx](okp4d_tx_intertx.md)	 - intertx transactions subcommands
-

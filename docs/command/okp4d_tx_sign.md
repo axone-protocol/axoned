@@ -18,7 +18,6 @@ The --multisig=<multisig_key> flag generates a signature on behalf of a multisig
 key. It implies --signature-only. Full multisig signed transactions may eventually
 be generated via the 'multisign' command.
 
-
 ```
 okp4d tx sign [file] [flags]
 ```
@@ -62,4 +61,3 @@ okp4d tx sign [file] [flags]
 ### SEE ALSO
 
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
-

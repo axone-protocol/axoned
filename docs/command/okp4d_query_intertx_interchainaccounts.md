@@ -1,7 +1,5 @@
 ## okp4d query intertx interchainaccounts
 
-
-
 ```
 okp4d query intertx interchainaccounts [connection-id] [owner-account] [flags]
 ```
@@ -24,4 +22,3 @@ okp4d query intertx interchainaccounts [connection-id] [owner-account] [flags]
 ### SEE ALSO
 
 * [okp4d query intertx](okp4d_query_intertx.md)	 - Querying commands for the inter-tx module
-

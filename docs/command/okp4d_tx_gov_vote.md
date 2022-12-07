@@ -54,4 +54,3 @@ okp4d tx gov vote [proposal-id] [option] [flags]
 ### SEE ALSO
 
 * [okp4d tx gov](okp4d_tx_gov.md)	 - Governance transactions subcommands
-

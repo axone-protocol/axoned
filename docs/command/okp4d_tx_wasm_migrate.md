@@ -45,4 +45,3 @@ okp4d tx wasm migrate [contract_addr_bech32] [new_code_id_int64] [json_encoded_m
 ### SEE ALSO
 
 * [okp4d tx wasm](okp4d_tx_wasm.md)	 - Wasm transaction subcommands
-

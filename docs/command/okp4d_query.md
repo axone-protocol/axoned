@@ -41,4 +41,3 @@ okp4d query [flags]
 * [okp4d query txs](okp4d_query_txs.md)	 - Query for paginated transactions that match a set of events
 * [okp4d query upgrade](okp4d_query_upgrade.md)	 - Querying commands for the upgrade module
 * [okp4d query wasm](okp4d_query_wasm.md)	 - Querying commands for the wasm module
-

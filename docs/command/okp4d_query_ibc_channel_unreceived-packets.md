@@ -7,8 +7,8 @@ Query all the unreceived packets associated with a channel
 Determine if a packet, given a list of packet commitment sequences, is unreceived.
 
 The return value represents:
-- Unreceived packet commitments: no acknowledgement exists on receiving chain for the given packet commitment sequence on sending chain.
 
+- Unreceived packet commitments: no acknowledgement exists on receiving chain for the given packet commitment sequence on sending chain.
 
 ```
 okp4d query ibc channel unreceived-packets [port-id] [channel-id] [flags]
@@ -38,5 +38,4 @@ okp4d query ibc channel unreceived-packets [port-id] [channel-id] --sequences=1,
 
 ### SEE ALSO
 
-* [okp4d query ibc channel](okp4d_query_ibc_channel.md)	 - IBC channel query subcommands
-
+- [okp4d query ibc channel](okp4d_query_ibc_channel.md)	 - IBC channel query subcommands

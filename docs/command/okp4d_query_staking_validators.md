@@ -37,4 +37,3 @@ okp4d query staking validators [flags]
 ### SEE ALSO
 
 * [okp4d query staking](okp4d_query_staking.md)	 - Querying commands for the staking module
-

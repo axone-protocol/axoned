@@ -34,4 +34,3 @@ okp4d query wasm contract-state all [bech32_address] [flags]
 ### SEE ALSO
 
 * [okp4d query wasm contract-state](okp4d_query_wasm_contract-state.md)	 - Querying commands for the wasm module
-

@@ -51,4 +51,3 @@ okp4d tx encode [file] [flags]
 ### SEE ALSO
 
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
-

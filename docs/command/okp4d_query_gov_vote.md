@@ -31,4 +31,3 @@ okp4d query gov vote [proposal-id] [voter-addr] [flags]
 ### SEE ALSO
 
 * [okp4d query gov](okp4d_query_gov.md)	 - Querying commands for the governance module
-

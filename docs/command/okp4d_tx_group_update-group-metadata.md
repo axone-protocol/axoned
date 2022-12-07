@@ -45,4 +45,3 @@ okp4d tx group update-group-metadata [admin] [group-id] [metadata] [flags]
 ### SEE ALSO
 
 * [okp4d tx group](okp4d_tx_group.md)	 - Group transaction subcommands
-

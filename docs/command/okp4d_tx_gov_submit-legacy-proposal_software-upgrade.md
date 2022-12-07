@@ -6,7 +6,7 @@ Submit a software upgrade proposal
 
 Submit a software upgrade along with an initial deposit.
 Please specify a unique name and height for the upgrade to take effect.
-You may include info to reference a binary download link, in a format compatible with: https://github.com/cosmos/cosmos-sdk/tree/main/cosmovisor
+You may include info to reference a binary download link, in a format compatible with: <https://github.com/cosmos/cosmos-sdk/tree/main/cosmovisor>
 
 ```
 okp4d tx gov submit-legacy-proposal software-upgrade [name] (--upgrade-height [height]) (--upgrade-info [info]) [flags]
@@ -58,4 +58,3 @@ okp4d tx gov submit-legacy-proposal software-upgrade [name] (--upgrade-height [h
 ### SEE ALSO
 
 * [okp4d tx gov submit-legacy-proposal](okp4d_tx_gov_submit-legacy-proposal.md)	 - Submit a legacy proposal along with an initial deposit
-

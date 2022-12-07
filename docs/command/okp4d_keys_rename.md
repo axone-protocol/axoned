@@ -10,7 +10,6 @@ Note that renaming offline or ledger keys will rename
 only the public key references stored locally, i.e.
 private keys stored in a ledger device cannot be renamed with the CLI.
 
-
 ```
 okp4d keys rename <old_name> <new_name> [flags]
 ```
@@ -34,4 +33,3 @@ okp4d keys rename <old_name> <new_name> [flags]
 ### SEE ALSO
 
 * [okp4d keys](okp4d_keys.md)	 - Manage your application's keys
-

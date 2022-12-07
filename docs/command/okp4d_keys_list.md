@@ -30,4 +30,3 @@ okp4d keys list [flags]
 ### SEE ALSO
 
 * [okp4d keys](okp4d_keys.md)	 - Manage your application's keys
-

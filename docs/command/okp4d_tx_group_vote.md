@@ -17,7 +17,6 @@ Parameters:
 				VOTE_OPTION_NO_WITH_VETO: no-with-veto
 			Metadata: metadata for the vote
 
-
 ```
 okp4d tx group vote [proposal-id] [voter] [vote-option] [metadata] [flags]
 ```
@@ -62,4 +61,3 @@ okp4d tx group vote [proposal-id] [voter] [vote-option] [metadata] [flags]
 ### SEE ALSO
 
 * [okp4d tx group](okp4d_tx_group.md)	 - Group transaction subcommands
-

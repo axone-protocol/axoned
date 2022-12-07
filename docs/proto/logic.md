@@ -1,48 +1,42 @@
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
+
 # Protobuf Documentation
+
 <a name="top"></a>
 
 ## Table of Contents
 
 - [logic/v1beta/params.proto](#logic/v1beta/params.proto)
-    - [Params](#logic.v1beta.Params)
+  - [Params](#logic.v1beta.Params)
   
 - [logic/v1beta/genesis.proto](#logic/v1beta/genesis.proto)
-    - [GenesisState](#logic.v1beta.GenesisState)
+  - [GenesisState](#logic.v1beta.GenesisState)
   
 - [logic/v1beta/query.proto](#logic/v1beta/query.proto)
-    - [QueryServiceParamsRequest](#logic.v1beta.QueryServiceParamsRequest)
-    - [QueryServiceParamsResponse](#logic.v1beta.QueryServiceParamsResponse)
+  - [QueryServiceParamsRequest](#logic.v1beta.QueryServiceParamsRequest)
+  - [QueryServiceParamsResponse](#logic.v1beta.QueryServiceParamsResponse)
   
-    - [QueryService](#logic.v1beta.QueryService)
+  - [QueryService](#logic.v1beta.QueryService)
   
 - [logic/v1beta/tx.proto](#logic/v1beta/tx.proto)
-    - [MsgService](#logic.v1beta.MsgService)
+  - [MsgService](#logic.v1beta.MsgService)
   
 - [Scalar Value Types](#scalar-value-types)
-
-
 
 <a name="logic/v1beta/params.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## logic/v1beta/params.proto
 
-
-
 <a name="logic.v1beta.Params"></a>
 
 ### Params
-Params defines the parameters for the module.
 
+Params defines the parameters for the module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `foo` | [string](#string) |  | foo represents a metasyntactic variable for testing purposes. |
-
-
-
-
 
  [//]: # (end messages)
 
@@ -51,29 +45,21 @@ Params defines the parameters for the module.
  [//]: # (end HasExtensions)
 
  [//]: # (end services)
-
-
 
 <a name="logic/v1beta/genesis.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## logic/v1beta/genesis.proto
 
-
-
 <a name="logic.v1beta.GenesisState"></a>
 
 ### GenesisState
-GenesisState defines the logic module's genesis state.
 
+GenesisState defines the logic module's genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `params` | [Params](#logic.v1beta.Params) |  | The state parameters for the logic module. |
-
-
-
-
 
  [//]: # (end messages)
 
@@ -83,38 +69,26 @@ GenesisState defines the logic module's genesis state.
 
  [//]: # (end services)
 
-
-
 <a name="logic/v1beta/query.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## logic/v1beta/query.proto
 
-
-
 <a name="logic.v1beta.QueryServiceParamsRequest"></a>
 
 ### QueryServiceParamsRequest
+
 QueryServiceParamsRequest is request type for the QueryService/Params RPC method.
-
-
-
-
-
 
 <a name="logic.v1beta.QueryServiceParamsResponse"></a>
 
 ### QueryServiceParamsResponse
-QueryServiceParamsResponse is response type for the QueryService/Params RPC method.
 
+QueryServiceParamsResponse is response type for the QueryService/Params RPC method.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `params` | [Params](#logic.v1beta.Params) |  | params holds all the parameters of this module. |
-
-
-
-
 
  [//]: # (end messages)
 
@@ -122,10 +96,10 @@ QueryServiceParamsResponse is response type for the QueryService/Params RPC meth
 
  [//]: # (end HasExtensions)
 
-
 <a name="logic.v1beta.QueryService"></a>
 
 ### QueryService
+
 QueryService defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
@@ -134,13 +108,10 @@ QueryService defines the gRPC querier service.
 
  [//]: # (end services)
 
-
-
 <a name="logic/v1beta/tx.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
 ## logic/v1beta/tx.proto
-
 
  [//]: # (end messages)
 
@@ -148,18 +119,16 @@ QueryService defines the gRPC querier service.
 
  [//]: # (end HasExtensions)
 
-
 <a name="logic.v1beta.MsgService"></a>
 
 ### MsgService
+
 Msg defines the Msg service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
 
  [//]: # (end services)
-
-
 
 ## Scalar Value Types
 
@@ -180,4 +149,3 @@ Msg defines the Msg service.
 | <a name="bool" /> bool |  | bool | boolean | boolean | bool | bool | boolean | TrueClass/FalseClass |
 | <a name="string" /> string | A string must always contain UTF-8 encoded or 7-bit ASCII text. | string | String | str/unicode | string | string | string | String (UTF-8) |
 | <a name="bytes" /> bytes | May contain any arbitrary sequence of bytes. | string | ByteString | str | []byte | ByteString | string | String (ASCII-8BIT) |
-

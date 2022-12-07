@@ -16,7 +16,7 @@ okp4d tx staking cancel-unbond [validator-addr] [amount] [creation-height] [flag
 ### Examples
 
 ```
-$ okp4d tx staking cancel-unbond okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 100stake 2 --from mykey
+okp4d tx staking cancel-unbond okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqhffj 100stake 2 --from mykey
 ```
 
 ### Options
@@ -58,4 +58,3 @@ $ okp4d tx staking cancel-unbond okp4valoper1gghjut3ccd8ay0zduzj64hwre2fxs9ldmqh
 ### SEE ALSO
 
 * [okp4d tx staking](okp4d_tx_staking.md)	 - Staking transaction subcommands
-

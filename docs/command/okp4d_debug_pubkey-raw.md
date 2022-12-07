@@ -8,7 +8,6 @@ Decode a pubkey from hex, base64, or bech32.
 Example:
 $ okp4d debug pubkey-raw TWFuIGlzIGRpc3Rpbmd1aXNoZWQsIG5vdCBvbmx5IGJ5IGhpcyByZWFzb24sIGJ1dCBieSB0aGlz
 $ okp4d debug pubkey-raw cosmos1e0jnq2sun3dzjh8p2xq95kk0expwmd7shwjpfg
-			
 
 ```
 okp4d debug pubkey-raw [pubkey] -t [{ed25519, secp256k1}] [flags]
@@ -24,4 +23,3 @@ okp4d debug pubkey-raw [pubkey] -t [{ed25519, secp256k1}] [flags]
 ### SEE ALSO
 
 * [okp4d debug](okp4d_debug.md)	 - Tool for helping with debugging your application
-

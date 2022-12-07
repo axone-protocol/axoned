@@ -34,4 +34,3 @@ okp4d query ibc-fee counterparty-payee channel-5 cosmos1layxcsmyye0dc0har9sdfzwc
 ### SEE ALSO
 
 * [okp4d query ibc-fee](okp4d_query_ibc-fee.md)	 - IBC relayer incentivization query subcommands
-

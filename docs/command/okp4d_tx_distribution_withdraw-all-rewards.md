@@ -54,4 +54,3 @@ okp4d tx distribution withdraw-all-rewards [flags]
 ### SEE ALSO
 
 * [okp4d tx distribution](okp4d_tx_distribution.md)	 - Distribution transactions subcommands
-

@@ -53,4 +53,3 @@ okp4d tx feegrant revoke [granter] [grantee] [flags]
 ### SEE ALSO
 
 * [okp4d tx feegrant](okp4d_tx_feegrant.md)	 - Feegrant transactions subcommands
-

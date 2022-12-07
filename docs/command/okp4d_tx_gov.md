@@ -27,4 +27,3 @@ okp4d tx gov [flags]
 * [okp4d tx gov submit-proposal](okp4d_tx_gov_submit-proposal.md)	 - Submit a proposal along with some messages, metadata and deposit
 * [okp4d tx gov vote](okp4d_tx_gov_vote.md)	 - Vote for an active proposal, options: yes/no/no_with_veto/abstain
 * [okp4d tx gov weighted-vote](okp4d_tx_gov_weighted-vote.md)	 - Vote for an active proposal, options: yes/no/no_with_veto/abstain
-

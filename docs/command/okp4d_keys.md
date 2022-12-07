@@ -21,11 +21,10 @@ The keyring supports the following backends:
 
 kwallet and pass backends depend on external tools. Refer to their respective documentation for more
 information:
-    KWallet     https://github.com/KDE/kwallet
-    pass        https://www.passwordstore.org/
+    KWallet     <https://github.com/KDE/kwallet>
+    pass        <https://www.passwordstore.org/>
 
-The pass backend requires GnuPG: https://gnupg.org/
-
+The pass backend requires GnuPG: <https://gnupg.org/>
 
 ### Options
 
@@ -50,4 +49,3 @@ The pass backend requires GnuPG: https://gnupg.org/
 * [okp4d keys parse](okp4d_keys_parse.md)	 - Parse address from hex to bech32 and vice versa
 * [okp4d keys rename](okp4d_keys_rename.md)	 - Rename an existing key
 * [okp4d keys show](okp4d_keys_show.md)	 - Retrieve key information by name or address
-

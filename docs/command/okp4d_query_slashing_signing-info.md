@@ -30,4 +30,3 @@ okp4d query slashing signing-info [validator-conspub] [flags]
 ### SEE ALSO
 
 * [okp4d query slashing](okp4d_query_slashing.md)	 - Querying commands for the slashing module
-

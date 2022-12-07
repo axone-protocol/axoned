@@ -8,7 +8,6 @@ unjail a jailed validator:
 
 $ okp4d tx slashing unjail --from mykey
 
-
 ```
 okp4d tx slashing unjail [flags]
 ```
@@ -52,4 +51,3 @@ okp4d tx slashing unjail [flags]
 ### SEE ALSO
 
 * [okp4d tx slashing](okp4d_tx_slashing.md)	 - Slashing transaction subcommands
-

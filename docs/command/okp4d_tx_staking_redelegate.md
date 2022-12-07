@@ -52,4 +52,3 @@ okp4d tx staking redelegate [src-validator-addr] [dst-validator-addr] [amount] [
 ### SEE ALSO
 
 * [okp4d tx staking](okp4d_tx_staking.md)	 - Staking transaction subcommands
-

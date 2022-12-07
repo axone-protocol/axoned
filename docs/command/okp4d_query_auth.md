@@ -27,4 +27,3 @@ okp4d query auth [flags]
 * [okp4d query auth module-account](okp4d_query_auth_module-account.md)	 - Query module account info by module name
 * [okp4d query auth module-accounts](okp4d_query_auth_module-accounts.md)	 - Query all module accounts
 * [okp4d query auth params](okp4d_query_auth_params.md)	 - Query the current auth parameters
-

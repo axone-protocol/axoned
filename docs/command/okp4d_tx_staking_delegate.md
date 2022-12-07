@@ -52,4 +52,3 @@ okp4d tx staking delegate [validator-addr] [amount] [flags]
 ### SEE ALSO
 
 * [okp4d tx staking](okp4d_tx_staking.md)	 - Staking transaction subcommands
-

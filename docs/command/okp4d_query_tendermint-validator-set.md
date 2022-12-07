@@ -25,4 +25,3 @@ okp4d query tendermint-validator-set [height] [flags]
 ### SEE ALSO
 
 * [okp4d query](okp4d_query.md)	 - Querying subcommands
-

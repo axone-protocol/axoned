@@ -21,6 +21,5 @@ okp4d tx intertx [flags]
 ### SEE ALSO
 
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
-* [okp4d tx intertx register](okp4d_tx_intertx_register.md)	 - 
-* [okp4d tx intertx submit](okp4d_tx_intertx_submit.md)	 - 
-
+* [okp4d tx intertx register](okp4d_tx_intertx_register.md)	 -
+* [okp4d tx intertx submit](okp4d_tx_intertx_submit.md)	 -
