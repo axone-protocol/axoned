@@ -21,8 +21,9 @@ COLOR_RED    = $(shell tput -Txterm setaf 1)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
 
 # Blockchain constants
-CHAIN      := localnet
-CHAIN_HOME := ./target/deployment/${CHAIN}
+CHAIN         := localnet
+CHAIN_HOME    := ./target/deployment/${CHAIN}
+CHAIN_MONIKER := local-node
 
 BUILD_TAGS += netgo
 BUILD_TAGS := $(strip $(BUILD_TAGS))
@@ -174,8 +175,8 @@ test-go: build ## Pass the test for the go source code
 
 ## Chain:
 chain-init: build ## Initialize the blockchain with default settings.
-	@echo "${COLOR_CYAN} 🛠️ Initializing chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} under ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"; \
-	rm -rf "${CHAIN_HOME}"; \
+	@echo "${COLOR_CYAN} 🛠️ Initializing chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} under ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
+	@rm -rf "${CHAIN_HOME}"; \
 	okp4d init okp4-node \
 	  --chain-id=okp4-${CHAIN} \
 	  --home "${CHAIN_HOME}"; \
@@ -203,6 +204,11 @@ chain-init: build ## Initialize the blockchain with default settings.
 	\
 	okp4d collect-gentxs \
 	  --home "${CHAIN_HOME}"
+
+chain-start: build ## Start the blockchain with existing configuration (see chain-init)
+	@echo "${COLOR_CYAN} 🛠️ Starting chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
+	@okp4d start --moniker ${CHAIN_MONIKER} \
+	  --home ${CHAIN_HOME}
 
 ## Clean:
 clean: ## Remove all the files from the target folder
