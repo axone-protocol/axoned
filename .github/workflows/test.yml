@@ -72,32 +72,11 @@ jobs:
 
       - name: Initialize blockchain
         run: |
-          okp4d init okp4-node \
-            --chain-id=okp4-devnet-1 \
-            --home ./target/deployment/devnet
-
-          sed -ie "s/\"stake\"/\"uknow\"/g" target/deployment/devnet/config/genesis.json
-
-          okp4d keys add validator \
-              --home ./target/deployment/devnet \
-              --keyring-backend test
-
-          okp4d add-genesis-account validator 1000000000uknow \
-              --home ./target/deployment/devnet \
-              --keyring-backend test
-
-          okp4d gentx validator 1000000uknow --node-id $(okp4d tendermint show-node-id --home ./target/deployment/devnet) \
-              --chain-id okp4-devnet-1 \
-              --home ./target/deployment/devnet \
-              --keyring-backend test
-
-          okp4d collect-gentxs \
-              --home ./target/deployment/devnet
+          make chain-init
 
       - name: Start the blockchain
         run: |
-          okp4d start --moniker okp4-node \
-            --home ./target/deployment/devnet &
+          make chain-start&
 
       - name: Wait for blockchain to start
         uses: ifaxity/wait-on-action@v1
