@@ -57,4 +57,3 @@ okp4d tx ibc client upgrade [client-identifier] [path/to/client_state.json] [pat
 ### SEE ALSO
 
 * [okp4d tx ibc client](okp4d_tx_ibc_client.md)	 - IBC client transaction subcommands
-

@@ -8,13 +8,12 @@ Generate a genesis transaction that creates a validator with a self-delegation,
 that is signed by the key in the Keyring referenced by a given name. A node ID and Bech32 consensus
 pubkey may optionally be provided. If they are omitted, they will be retrieved from the priv_validator.json
 file. The following default parameters are included:
-    
+
 	delegation amount:           100000000stake
 	commission rate:             0.1
 	commission max rate:         0.2
 	commission max change rate:  0.01
 	minimum self delegation:     1
-
 
 Example:
 $ okp4d gentx my-key-name 1000000stake --home=/path/to/home/dir --keyring-backend=os --chain-id=test-chain-1 \
@@ -25,7 +24,6 @@ $ okp4d gentx my-key-name 1000000stake --home=/path/to/home/dir --keyring-backen
     --details="..." \
     --security-contact="..." \
     --website="..."
-
 
 ```
 okp4d gentx [key_name] [amount] [flags]
@@ -80,4 +78,3 @@ okp4d gentx [key_name] [amount] [flags]
 ### SEE ALSO
 
 * [okp4d](okp4d.md)	 - OKP4 Daemon 👹
-

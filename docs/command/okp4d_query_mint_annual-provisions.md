@@ -24,4 +24,3 @@ okp4d query mint annual-provisions [flags]
 ### SEE ALSO
 
 * [okp4d query mint](okp4d_query_mint.md)	 - Querying commands for the minting module
-

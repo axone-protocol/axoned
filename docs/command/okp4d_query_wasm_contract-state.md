@@ -24,4 +24,3 @@ okp4d query wasm contract-state [flags]
 * [okp4d query wasm contract-state all](okp4d_query_wasm_contract-state_all.md)	 - Prints out all internal state of a contract given its address
 * [okp4d query wasm contract-state raw](okp4d_query_wasm_contract-state_raw.md)	 - Prints out internal state for key of a contract given its address
 * [okp4d query wasm contract-state smart](okp4d_query_wasm_contract-state_smart.md)	 - Calls contract with given address with query data and prints the returned result
-

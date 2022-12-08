@@ -41,4 +41,3 @@ okp4d query bank total [flags]
 ### SEE ALSO
 
 * [okp4d query bank](okp4d_query_bank.md)	 - Querying commands for the bank module
-

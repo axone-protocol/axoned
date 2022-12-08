@@ -76,4 +76,3 @@ okp4d tx group submit-proposal path/to/proposal.json
 ### SEE ALSO
 
 * [okp4d tx group](okp4d_tx_group.md)	 - Group transaction subcommands
-

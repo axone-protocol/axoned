@@ -45,4 +45,3 @@ okp4d tx crisis invariant-broken [module-name] [invariant-route] [flags]
 ### SEE ALSO
 
 * [okp4d tx crisis](okp4d_tx_crisis.md)	 - Crisis transactions subcommands
-

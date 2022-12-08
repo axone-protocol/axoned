@@ -27,4 +27,3 @@ okp4d tx wasm [flags]
 * [okp4d tx wasm migrate](okp4d_tx_wasm_migrate.md)	 - Migrate a wasm contract to a new code version
 * [okp4d tx wasm set-contract-admin](okp4d_tx_wasm_set-contract-admin.md)	 - Set new admin for a contract
 * [okp4d tx wasm store](okp4d_tx_wasm_store.md)	 - Upload a wasm binary
-

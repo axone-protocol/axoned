@@ -32,4 +32,3 @@ okp4d query ibc channel [flags]
 * [okp4d query ibc channel packet-receipt](okp4d_query_ibc_channel_packet-receipt.md)	 - Query a packet receipt
 * [okp4d query ibc channel unreceived-acks](okp4d_query_ibc_channel_unreceived-acks.md)	 - Query all the unreceived acks associated with a channel
 * [okp4d query ibc channel unreceived-packets](okp4d_query_ibc_channel_unreceived-packets.md)	 - Query all the unreceived packets associated with a channel
-

@@ -55,4 +55,3 @@ okp4d tx gov submit-legacy-proposal wasm-store [wasm file] --title [text] --desc
 ### SEE ALSO
 
 * [okp4d tx gov submit-legacy-proposal](okp4d_tx_gov_submit-legacy-proposal.md)	 - Submit a legacy proposal along with an initial deposit
-

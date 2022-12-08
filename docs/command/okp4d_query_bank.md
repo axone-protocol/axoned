@@ -24,4 +24,3 @@ okp4d query bank [flags]
 * [okp4d query bank balances](okp4d_query_bank_balances.md)	 - Query for account balances by address
 * [okp4d query bank denom-metadata](okp4d_query_bank_denom-metadata.md)	 - Query the client metadata for coin denominations
 * [okp4d query bank total](okp4d_query_bank_total.md)	 - Query the total supply of coins of the chain
-

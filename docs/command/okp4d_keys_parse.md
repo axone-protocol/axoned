@@ -7,7 +7,6 @@ Parse address from hex to bech32 and vice versa
 Convert and print to stdout key addresses and fingerprints from
 hexadecimal into bech32 cosmos prefixed format and vice versa.
 
-
 ```
 okp4d keys parse <hex-or-bech32-address> [flags]
 ```
@@ -30,4 +29,3 @@ okp4d keys parse <hex-or-bech32-address> [flags]
 ### SEE ALSO
 
 * [okp4d keys](okp4d_keys.md)	 - Manage your application's keys
-

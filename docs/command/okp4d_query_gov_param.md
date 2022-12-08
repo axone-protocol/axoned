@@ -33,4 +33,3 @@ okp4d query gov param [param-type] [flags]
 ### SEE ALSO
 
 * [okp4d query gov](okp4d_query_gov.md)	 - Querying commands for the governance module
-

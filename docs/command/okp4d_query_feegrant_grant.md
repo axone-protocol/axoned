@@ -4,7 +4,7 @@ Query details of a single grant
 
 ### Synopsis
 
-Query details for a grant. 
+Query details for a grant.
 You can find the fee-grant of a granter and grantee.
 
 Example:
@@ -32,4 +32,3 @@ okp4d query feegrant grant [granter] [grantee] [flags]
 ### SEE ALSO
 
 * [okp4d query feegrant](okp4d_query_feegrant.md)	 - Querying commands for the feegrant module
-

@@ -54,4 +54,3 @@ okp4d tx gov weighted-vote [proposal-id] [weighted-options] [flags]
 ### SEE ALSO
 
 * [okp4d tx gov](okp4d_tx_gov.md)	 - Governance transactions subcommands
-

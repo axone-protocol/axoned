@@ -40,4 +40,3 @@ okp4d query ibc channel channels
 ### SEE ALSO
 
 * [okp4d query ibc channel](okp4d_query_ibc_channel.md)	 - IBC channel query subcommands
-

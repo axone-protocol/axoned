@@ -52,4 +52,3 @@ okp4d tx authz exec [tx-json-file] --from [grantee] [flags]
 ### SEE ALSO
 
 * [okp4d tx authz](okp4d_tx_authz.md)	 - Authorization transactions subcommands
-

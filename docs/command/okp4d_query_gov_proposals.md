@@ -43,4 +43,3 @@ okp4d query gov proposals [flags]
 ### SEE ALSO
 
 * [okp4d query gov](okp4d_query_gov.md)	 - Querying commands for the governance module
-

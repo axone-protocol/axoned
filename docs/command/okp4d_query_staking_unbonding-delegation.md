@@ -31,4 +31,3 @@ okp4d query staking unbonding-delegation [delegator-addr] [validator-addr] [flag
 ### SEE ALSO
 
 * [okp4d query staking](okp4d_query_staking.md)	 - Querying commands for the staking module
-

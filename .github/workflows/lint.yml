@@ -32,11 +32,17 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
-      - name: Lint markdown files
+      - name: Lint regular markdown files
         uses: avto-dev/markdown-lint@v1.5.0
         with:
           args: "**/*.md"
-          ignore: 'CHANGELOG.md docs/proto/*.md docs/command/*.md'
+          ignore: "CHANGELOG.md docs/**/*.md"
+
+      - name: Lint generated markdown files
+        uses: avto-dev/markdown-lint@v1.5.0
+        with:
+          args: "docs/**/*.md"
+          config: "docs/.markdownlint.yaml"
 
   lint-yaml:
     runs-on: ubuntu-22.04

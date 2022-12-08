@@ -45,4 +45,3 @@ okp4d tx wasm clear-contract-admin [contract_addr_bech32] [flags]
 ### SEE ALSO
 
 * [okp4d tx wasm](okp4d_tx_wasm.md)	 - Wasm transaction subcommands
-

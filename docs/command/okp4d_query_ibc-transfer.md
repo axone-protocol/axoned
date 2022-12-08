@@ -22,4 +22,3 @@ IBC fungible token transfer query subcommands
 * [okp4d query ibc-transfer denom-traces](okp4d_query_ibc-transfer_denom-traces.md)	 - Query the trace info for all token denominations
 * [okp4d query ibc-transfer escrow-address](okp4d_query_ibc-transfer_escrow-address.md)	 - Get the escrow address for a channel
 * [okp4d query ibc-transfer params](okp4d_query_ibc-transfer_params.md)	 - Query the current ibc-transfer parameters
-

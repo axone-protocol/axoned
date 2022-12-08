@@ -54,4 +54,3 @@ okp4d tx vesting create-vesting-account [to_address] [amount] [end_time] [flags]
 ### SEE ALSO
 
 * [okp4d tx vesting](okp4d_tx_vesting.md)	 - Vesting transaction subcommands
-

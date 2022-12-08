@@ -17,12 +17,11 @@ it is required to set such parameters manually. Note, invalid values will cause
 the transaction to fail. The sequence will be incremented automatically for each
 transaction that is signed.
 
-If --account-number or --sequence flag is used when offline=false, they are ignored and 
+If --account-number or --sequence flag is used when offline=false, they are ignored and
 overwritten by the default flag values.
 
 The --multisig=<multisig_key> flag generates a signature on behalf of a multisig
 account key. It implies --signature-only.
-
 
 ```
 okp4d tx sign-batch [file] ([file2]...) [flags]
@@ -66,4 +65,3 @@ okp4d tx sign-batch [file] ([file2]...) [flags]
 ### SEE ALSO
 
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
-

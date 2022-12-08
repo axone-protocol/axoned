@@ -31,4 +31,3 @@ okp4d query gov [flags]
 * [okp4d query gov tally](okp4d_query_gov_tally.md)	 - Get the tally of a proposal vote
 * [okp4d query gov vote](okp4d_query_gov_vote.md)	 - Query details of a single vote
 * [okp4d query gov votes](okp4d_query_gov_votes.md)	 - Query votes on a proposal
-

@@ -24,4 +24,3 @@ okp4d query distribution params [flags]
 ### SEE ALSO
 
 * [okp4d query distribution](okp4d_query_distribution.md)	 - Querying commands for the distribution module
-

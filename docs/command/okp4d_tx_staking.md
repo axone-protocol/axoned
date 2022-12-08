@@ -27,4 +27,3 @@ okp4d tx staking [flags]
 * [okp4d tx staking edit-validator](okp4d_tx_staking_edit-validator.md)	 - edit an existing validator account
 * [okp4d tx staking redelegate](okp4d_tx_staking_redelegate.md)	 - Redelegate illiquid tokens from one validator to another
 * [okp4d tx staking unbond](okp4d_tx_staking_unbond.md)	 - Unbond shares from a validator
-

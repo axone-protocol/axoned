@@ -38,4 +38,3 @@ okp4d query evidence [flags]
 ### SEE ALSO
 
 * [okp4d query](okp4d_query.md)	 - Querying subcommands
-

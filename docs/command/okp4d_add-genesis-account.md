@@ -9,7 +9,6 @@ the account address or key name and a list of initial coins. If a key name is gi
 the address will be looked up in the local Keybase. The list of initial tokens must
 contain valid denominations. Accounts may optionally be supplied with vesting parameters.
 
-
 ```
 okp4d add-genesis-account [address_or_key_name] [coin][,[coin]] [flags]
 ```
@@ -32,4 +31,3 @@ okp4d add-genesis-account [address_or_key_name] [coin][,[coin]] [flags]
 ### SEE ALSO
 
 * [okp4d](okp4d.md)	 - OKP4 Daemon 👹
-

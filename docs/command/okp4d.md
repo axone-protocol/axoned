@@ -4,12 +4,10 @@ OKP4 Daemon 👹
 
 ### Synopsis
 
-
 OKP4 Daemon 👹 - a revolutionary public PoS layer 1 specifically designed to enable communities to trustlessly share data,
 algorithms and resources to build the Dataverse!
 
-Want to lean more about OKP4 network? Complete documentation is available at https://docs.okp4.network 👀
-
+Want to lean more about OKP4 network? Complete documentation is available at <https://docs.okp4.network> 👀
 
 ### Options
 
@@ -37,4 +35,3 @@ Want to lean more about OKP4 network? Complete documentation is available at htt
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
 * [okp4d validate-genesis](okp4d_validate-genesis.md)	 - validates the genesis file at the default location or at the location passed as an arg
 * [okp4d version](okp4d_version.md)	 - Print the application binary version information
-

@@ -22,4 +22,3 @@ okp4d query block [height] [flags]
 ### SEE ALSO
 
 * [okp4d query](okp4d_query.md)	 - Querying subcommands
-

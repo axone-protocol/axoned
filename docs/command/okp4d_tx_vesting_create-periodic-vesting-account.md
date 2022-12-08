@@ -21,7 +21,6 @@ A sequence of coins and period length in seconds. Periods are sequential, in tha
 ]
 	}
 		
-
 ```
 okp4d tx vesting create-periodic-vesting-account [to_address] [periods_json_file] [flags]
 ```
@@ -65,4 +64,3 @@ okp4d tx vesting create-periodic-vesting-account [to_address] [periods_json_file
 ### SEE ALSO
 
 * [okp4d tx vesting](okp4d_tx_vesting.md)	 - Vesting transaction subcommands
-

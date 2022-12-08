@@ -28,4 +28,3 @@ okp4d keys import &lt;name&gt; &lt;keyfile&gt; [flags]
 ### SEE ALSO
 
 * [okp4d keys](okp4d_keys.md)	 - Manage your application's keys
-

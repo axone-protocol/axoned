@@ -11,7 +11,6 @@ Parameters:
 			group-policy-admin-or-proposer: either admin of the group policy or one the proposer of the proposal.
 			Note: --from flag will be ignored here.
 
-
 ```
 okp4d tx group withdraw-proposal [proposal-id] [group-policy-admin-or-proposer] [flags]
 ```
@@ -55,4 +54,3 @@ okp4d tx group withdraw-proposal [proposal-id] [group-policy-admin-or-proposer] 
 ### SEE ALSO
 
 * [okp4d tx group](okp4d_tx_group.md)	 - Group transaction subcommands
-

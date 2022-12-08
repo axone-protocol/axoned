@@ -24,4 +24,3 @@ okp4d init [moniker] [flags]
 ### SEE ALSO
 
 * [okp4d](okp4d.md)	 - OKP4 Daemon 👹
-

@@ -57,4 +57,3 @@ okp4d tx ibc client create [path/to/client_state.json] [path/to/consensus_state.
 ### SEE ALSO
 
 * [okp4d tx ibc client](okp4d_tx_ibc_client.md)	 - IBC client transaction subcommands
-

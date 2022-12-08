@@ -52,4 +52,3 @@ okp4d tx gov submit-legacy-proposal execute-contract [contract_addr_bech32] [jso
 ### SEE ALSO
 
 * [okp4d tx gov submit-legacy-proposal](okp4d_tx_gov_submit-legacy-proposal.md)	 - Submit a legacy proposal along with an initial deposit
-

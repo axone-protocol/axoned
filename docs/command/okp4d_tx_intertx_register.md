@@ -1,7 +1,5 @@
 ## okp4d tx intertx register
 
-
-
 ```
 okp4d tx intertx register [flags]
 ```
@@ -47,4 +45,3 @@ okp4d tx intertx register [flags]
 ### SEE ALSO
 
 * [okp4d tx intertx](okp4d_tx_intertx.md)	 - intertx transactions subcommands
-

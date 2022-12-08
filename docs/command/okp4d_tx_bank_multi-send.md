@@ -10,7 +10,6 @@ Using the '--split' flag, the [amount] is split equally between the addresses.
 Note, the '--from' flag is ignored as it is implied from [from_key_or_address].
 When using '--dry-run' a key name cannot be used, only a bech32 address.
 
-
 ```
 okp4d tx bank multi-send [from_key_or_address] [to_address_1, to_address_2, ...] [amount] [flags]
 ```
@@ -55,4 +54,3 @@ okp4d tx bank multi-send [from_key_or_address] [to_address_1, to_address_2, ...]
 ### SEE ALSO
 
 * [okp4d tx bank](okp4d_tx_bank.md)	 - Bank transaction subcommands
-

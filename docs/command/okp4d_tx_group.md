@@ -36,4 +36,3 @@ okp4d tx group [flags]
 * [okp4d tx group update-group-policy-metadata](okp4d_tx_group_update-group-policy-metadata.md)	 - Update a group policy metadata
 * [okp4d tx group vote](okp4d_tx_group_vote.md)	 - Vote on a proposal
 * [okp4d tx group withdraw-proposal](okp4d_tx_group_withdraw-proposal.md)	 - Withdraw a submitted proposal
-

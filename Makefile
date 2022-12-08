@@ -5,12 +5,15 @@ BINARY_NAME             = okp4d
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 RELEASE_FOLDER          = $(TARGET_FOLDER)/release
-DOCKER_IMAGE_GOLANG		= golang:1.19-alpine3.16
-DOCKER_IMAGE_GOLANG_CI  = golangci/golangci-lint:v1.49
-DOCKER_IMAGE_BUF  		= okp4/buf-cosmos:0.3.1
-DOCKER_BUILDX_BUILDER   = okp4-builder
 CMD_ROOT               :=./cmd/${BINARY_NAME}
-LEDGER_ENABLED ?= true
+LEDGER_ENABLED         ?= true
+
+# Docker images
+DOCKER_IMAGE_GOLANG		  = golang:1.19-alpine3.16
+DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v1.49
+DOCKER_IMAGE_BUF  		  = okp4/buf-cosmos:0.3.1
+DOCKER_BUILDX_BUILDER     = okp4-builder
+DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
 
 # Some colors
 COLOR_GREEN  = $(shell tput -Txterm setaf 2)
@@ -257,18 +260,27 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
         		generate --path $${MODULE} --template buf.gen.doc.yaml -v ; \
         mv docs/proto/docs.md docs/$${MODULE}.md ; \
 	done
+	@docker run --rm \
+	  -v `pwd`:/usr/src/okp4d \
+	  -w /usr/src/okp4d/docs \
+	  ${DOCKER_IMAGE_MARKDOWNLINT} -f proto
 
 doc-command: ## Generate markdown documentation for the command
 	@echo "${COLOR_CYAN} 📖 Generate markdown documentation for the command${COLOR_RESET}"
 	@cd docs; \
-	rm -rf commands; \
+	OUT_FOLDER="command"; \
+	rm -rf $$OUT_FOLDER; \
 	go get ../scripts; \
 	go run ../scripts/generate_command_doc.go; \
-	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.okp4d\")/(default \"\/home\/john\/\.okp4d\")/g' command/*.md; \
-	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' command/*.md; \
-	sed -i $(SED_FLAG) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' command/*.md; \
-	sed -i $(SED_FLAG) 's/<appd>/okp4d/g' command/*.md; \
-	sed -i $(SED_FLAG) 's/<\([a-zA-Z-]*\)>/\&lt;\1\&gt;/g' command/*.md
+	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.okp4d\")/(default \"\/home\/john\/\.okp4d\")/g' $$OUT_FOLDER/*.md; \
+	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' $$OUT_FOLDER/*.md; \
+	sed -i $(SED_FLAG) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' $$OUT_FOLDER/*.md; \
+	sed -i $(SED_FLAG) 's/<appd>/okp4d/g' $$OUT_FOLDER/*.md; \
+    sed -i $(SED_FLAG) 's/<\([a-zA-Z-]*\)>/\&lt;\1\&gt;/g' $$OUT_FOLDER/*.md; \
+	docker run --rm \
+	  -v `pwd`:/usr/src/docs \
+	  -w /usr/src/docs \
+	  ${DOCKER_IMAGE_MARKDOWNLINT} -f $$OUT_FOLDER
 
 ## Release:
 release-assets: release-binary-all release-checksums ## Generate release assets

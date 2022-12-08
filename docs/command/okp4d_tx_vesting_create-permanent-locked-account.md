@@ -51,4 +51,3 @@ okp4d tx vesting create-permanent-locked-account [to_address] [amount] [flags]
 ### SEE ALSO
 
 * [okp4d tx vesting](okp4d_tx_vesting.md)	 - Vesting transaction subcommands
-

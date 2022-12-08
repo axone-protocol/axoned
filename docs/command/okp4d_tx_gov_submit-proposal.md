@@ -69,4 +69,3 @@ okp4d tx gov submit-proposal [path/to/proposal.json] [flags]
 ### SEE ALSO
 
 * [okp4d tx gov](okp4d_tx_gov.md)	 - Governance transactions subcommands
-

@@ -46,4 +46,3 @@ okp4d tx wasm execute [contract_addr_bech32] [json_encoded_send_args] --amount [
 ### SEE ALSO
 
 * [okp4d tx wasm](okp4d_tx_wasm.md)	 - Wasm transaction subcommands
-

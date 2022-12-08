@@ -24,4 +24,3 @@ okp4d query params subspace [subspace] [key] [flags]
 ### SEE ALSO
 
 * [okp4d query params](okp4d_query_params.md)	 - Querying commands for the params module
-

@@ -21,4 +21,3 @@ okp4d tx logic [flags]
 ### SEE ALSO
 
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
-

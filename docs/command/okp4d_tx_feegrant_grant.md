@@ -10,7 +10,7 @@ Grant authorization to pay fees from your address. Note, the'--from' flag is
 Examples:
 okp4d tx feegrant grant cosmos1skjw... cosmos1skjw... --spend-limit 100stake --expiration 2022-01-30T15:04:05Z or
 okp4d tx feegrant grant cosmos1skjw... cosmos1skjw... --spend-limit 100stake --period 3600 --period-limit 10stake --expiration 2022-01-30T15:04:05Z or
-okp4d tx feegrant grant cosmos1skjw... cosmos1skjw... --spend-limit 100stake --expiration 2022-01-30T15:04:05Z 
+okp4d tx feegrant grant cosmos1skjw... cosmos1skjw... --spend-limit 100stake --expiration 2022-01-30T15:04:05Z
 	--allowed-messages "/cosmos.gov.v1beta1.MsgSubmitProposal,/cosmos.gov.v1beta1.MsgVote"
 
 ```
@@ -61,4 +61,3 @@ okp4d tx feegrant grant [granter_key_or_address] [grantee] [flags]
 ### SEE ALSO
 
 * [okp4d tx feegrant](okp4d_tx_feegrant.md)	 - Feegrant transactions subcommands
-

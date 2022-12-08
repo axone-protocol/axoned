@@ -30,4 +30,3 @@ okp4d query ibc client [flags]
 * [okp4d query ibc client state](okp4d_query_ibc_client_state.md)	 - Query a client state
 * [okp4d query ibc client states](okp4d_query_ibc_client_states.md)	 - Query all available light clients
 * [okp4d query ibc client status](okp4d_query_ibc_client_status.md)	 - Query client status
-

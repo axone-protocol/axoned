@@ -28,4 +28,3 @@ okp4d tx authz [flags]
 * [okp4d tx authz exec](okp4d_tx_authz_exec.md)	 - execute tx on behalf of granter account
 * [okp4d tx authz grant](okp4d_tx_authz_grant.md)	 - Grant authorization to an address
 * [okp4d tx authz revoke](okp4d_tx_authz_revoke.md)	 - revoke authorization
-

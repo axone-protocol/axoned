@@ -24,4 +24,3 @@ okp4d tx ibc-fee [flags]
 * [okp4d tx ibc-fee pay-packet-fee](okp4d_tx_ibc-fee_pay-packet-fee.md)	 - Pay a fee to incentivize an existing IBC packet
 * [okp4d tx ibc-fee register-counterparty-payee](okp4d_tx_ibc-fee_register-counterparty-payee.md)	 - Register a counterparty payee address on a given channel.
 * [okp4d tx ibc-fee register-payee](okp4d_tx_ibc-fee_register-payee.md)	 - Register a payee on a given channel.
-

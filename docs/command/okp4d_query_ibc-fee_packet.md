@@ -34,4 +34,3 @@ okp4d query ibc-fee packet
 ### SEE ALSO
 
 * [okp4d query ibc-fee](okp4d_query_ibc-fee.md)	 - IBC relayer incentivization query subcommands
-

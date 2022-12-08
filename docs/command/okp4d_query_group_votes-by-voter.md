@@ -24,4 +24,3 @@ okp4d query group votes-by-voter [voter] [flags]
 ### SEE ALSO
 
 * [okp4d query group](okp4d_query_group.md)	 - Querying commands for the group module
-

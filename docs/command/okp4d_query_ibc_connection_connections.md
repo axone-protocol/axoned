@@ -40,4 +40,3 @@ okp4d query ibc connection connections
 ### SEE ALSO
 
 * [okp4d query ibc connection](okp4d_query_ibc_connection.md)	 - IBC connection query subcommands
-

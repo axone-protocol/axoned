@@ -32,4 +32,3 @@ okp4d query tx --type=[hash|acc_seq|signature] [hash|acc_seq|signature] [flags]
 ### SEE ALSO
 
 * [okp4d query](okp4d_query.md)	 - Querying subcommands
-

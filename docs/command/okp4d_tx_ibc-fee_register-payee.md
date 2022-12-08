@@ -55,4 +55,3 @@ okp4d tx ibc-fee register-payee transfer channel-0 cosmos1rsp837a4kvtgp2m4uqzdge
 ### SEE ALSO
 
 * [okp4d tx ibc-fee](okp4d_tx_ibc-fee.md)	 - IBC relayer incentivization transaction subcommands
-

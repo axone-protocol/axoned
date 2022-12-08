@@ -58,4 +58,3 @@ okp4d tx authz grant &lt;grantee&gt; <authorization_type="send"|"generic"|"deleg
 ### SEE ALSO
 
 * [okp4d tx authz](okp4d_tx_authz.md)	 - Authorization transactions subcommands
-

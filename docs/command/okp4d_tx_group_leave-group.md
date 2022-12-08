@@ -11,7 +11,6 @@ Parameters:
 		   member-address: account address of the group member
 		   Note, the '--from' flag is ignored as it is implied from [member-address]
 		
-
 ```
 okp4d tx group leave-group [member-address] [group-id] [flags]
 ```
@@ -55,4 +54,3 @@ okp4d tx group leave-group [member-address] [group-id] [flags]
 ### SEE ALSO
 
 * [okp4d tx group](okp4d_tx_group.md)	 - Group transaction subcommands
-

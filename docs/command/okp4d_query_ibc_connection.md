@@ -20,4 +20,3 @@ IBC connection query subcommands
 * [okp4d query ibc connection connections](okp4d_query_ibc_connection_connections.md)	 - Query all connections
 * [okp4d query ibc connection end](okp4d_query_ibc_connection_end.md)	 - Query stored connection end
 * [okp4d query ibc connection path](okp4d_query_ibc_connection_path.md)	 - Query stored client connection paths
-

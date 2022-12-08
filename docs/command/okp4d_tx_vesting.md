@@ -25,4 +25,3 @@ okp4d tx vesting [flags]
 * [okp4d tx vesting create-periodic-vesting-account](okp4d_tx_vesting_create-periodic-vesting-account.md)	 - Create a new vesting account funded with an allocation of tokens.
 * [okp4d tx vesting create-permanent-locked-account](okp4d_tx_vesting_create-permanent-locked-account.md)	 - Create a new permanently locked account funded with an allocation of tokens.
 * [okp4d tx vesting create-vesting-account](okp4d_tx_vesting_create-vesting-account.md)	 - Create a new vesting account funded with an allocation of tokens.
-

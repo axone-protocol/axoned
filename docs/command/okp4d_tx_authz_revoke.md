@@ -51,4 +51,3 @@ okp4d tx authz revoke [grantee] [msg-type-url] --from=[granter] [flags]
 ### SEE ALSO
 
 * [okp4d tx authz](okp4d_tx_authz.md)	 - Authorization transactions subcommands
-

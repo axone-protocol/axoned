@@ -36,4 +36,3 @@ okp4d query authz grants-by-granter [granter-addr] [flags]
 ### SEE ALSO
 
 * [okp4d query authz](okp4d_query_authz.md)	 - Querying commands for the authz module
-

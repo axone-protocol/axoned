@@ -21,5 +21,4 @@ okp4d query intertx [flags]
 ### SEE ALSO
 
 * [okp4d query](okp4d_query.md)	 - Querying subcommands
-* [okp4d query intertx interchainaccounts](okp4d_query_intertx_interchainaccounts.md)	 - 
-
+* [okp4d query intertx interchainaccounts](okp4d_query_intertx_interchainaccounts.md)	 -

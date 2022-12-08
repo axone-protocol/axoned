@@ -6,7 +6,7 @@ Submit an IBC upgrade proposal
 
 Submit an IBC client breaking upgrade proposal along with an initial deposit.
 The client state specified is the upgraded client state representing the upgraded chain
-Example Upgraded Client State JSON: 
+Example Upgraded Client State JSON:
 {
 	"@type":"/ibc.lightclients.tendermint.v1.ClientState",
  	"chain_id":"testchain1",
@@ -15,7 +15,6 @@ Example Upgraded Client State JSON:
 	"proof_specs":[{"leaf_spec":{"hash":"SHA256","prehash_key":"NO_HASH","prehash_value":"SHA256","length":"VAR_PROTO","prefix":"AA=="},"inner_spec":{"child_order":[0,1],"child_size":33,"min_prefix_length":4,"max_prefix_length":12,"empty_child":null,"hash":"SHA256"},"max_depth":0,"min_depth":0},{"leaf_spec":{"hash":"SHA256","prehash_key":"NO_HASH","prehash_value":"SHA256","length":"VAR_PROTO","prefix":"AA=="},"inner_spec":{"child_order":[0,1],"child_size":32,"min_prefix_length":1,"max_prefix_length":1,"empty_child":null,"hash":"SHA256"},"max_depth":0,"min_depth":0}],
 	"upgrade_path":["upgrade","upgradedIBCState"],
 }
-			
 
 ```
 okp4d tx gov submit-legacy-proposal ibc-upgrade [name] [height] [path/to/upgraded_client_state.json] [flags]
@@ -63,4 +62,3 @@ okp4d tx gov submit-legacy-proposal ibc-upgrade [name] [height] [path/to/upgrade
 ### SEE ALSO
 
 * [okp4d tx gov submit-legacy-proposal](okp4d_tx_gov_submit-legacy-proposal.md)	 - Submit a legacy proposal along with an initial deposit
-

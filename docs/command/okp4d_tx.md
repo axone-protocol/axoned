@@ -16,7 +16,7 @@ okp4d tx [flags]
 ### SEE ALSO
 
 * [okp4d](okp4d.md)	 - OKP4 Daemon 👹
-* [okp4d tx ](okp4d_tx_.md)	 - 
+* [okp4d tx](okp4d_tx_.md)	 -
 * [okp4d tx authz](okp4d_tx_authz.md)	 - Authorization transactions subcommands
 * [okp4d tx bank](okp4d_tx_bank.md)	 - Bank transaction subcommands
 * [okp4d tx broadcast](okp4d_tx_broadcast.md)	 - Broadcast transactions generated offline
@@ -41,4 +41,3 @@ okp4d tx [flags]
 * [okp4d tx validate-signatures](okp4d_tx_validate-signatures.md)	 - validate transactions signatures
 * [okp4d tx vesting](okp4d_tx_vesting.md)	 - Vesting transaction subcommands
 * [okp4d tx wasm](okp4d_tx_wasm.md)	 - Wasm transaction subcommands
-

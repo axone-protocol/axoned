@@ -40,4 +40,3 @@ okp4d query ibc-transfer denom-traces
 ### SEE ALSO
 
 * [okp4d query ibc-transfer](okp4d_query_ibc-transfer.md)	 - IBC fungible token transfer query subcommands
-

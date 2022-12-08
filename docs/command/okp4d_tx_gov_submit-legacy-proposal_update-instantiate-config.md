@@ -6,7 +6,7 @@ Submit an update instantiate config proposal.
 
 Submit an update instantiate config  proposal for multiple code ids.
 
-Example: 
+Example:
 $ okp4d tx gov submit-proposal update-instantiate-config 1:nobody 2:everybody 3:okp41l2rsakp388kuv9k8qzq6lrm9taddae7fpx59wm,okp41vx8knpllrj7n963p9ttd80w47kpacrhuts497x
 
 ```
@@ -57,4 +57,3 @@ okp4d tx gov submit-legacy-proposal update-instantiate-config [code-id:permissio
 ### SEE ALSO
 
 * [okp4d tx gov submit-legacy-proposal](okp4d_tx_gov_submit-legacy-proposal.md)	 - Submit a legacy proposal along with an initial deposit
-

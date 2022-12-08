@@ -45,4 +45,3 @@ okp4d tx group update-group-admin [admin] [group-id] [new-admin] [flags]
 ### SEE ALSO
 
 * [okp4d tx group](okp4d_tx_group.md)	 - Group transaction subcommands
-

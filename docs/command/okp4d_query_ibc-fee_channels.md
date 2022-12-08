@@ -40,4 +40,3 @@ okp4d query ibc-fee channels
 ### SEE ALSO
 
 * [okp4d query ibc-fee](okp4d_query_ibc-fee.md)	 - IBC relayer incentivization query subcommands
-

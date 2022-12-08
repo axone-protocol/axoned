@@ -35,4 +35,3 @@ okp4d keys show [name_or_address [name_or_address...]] [flags]
 ### SEE ALSO
 
 * [okp4d keys](okp4d_keys.md)	 - Manage your application's keys
-

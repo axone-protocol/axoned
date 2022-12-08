@@ -46,4 +46,3 @@ okp4d tx decode [protobuf-byte-string] [flags]
 ### SEE ALSO
 
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
-

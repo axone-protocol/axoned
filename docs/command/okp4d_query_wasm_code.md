@@ -28,4 +28,3 @@ okp4d query wasm code [code_id] [output filename] [flags]
 ### SEE ALSO
 
 * [okp4d query wasm](okp4d_query_wasm.md)	 - Querying commands for the wasm module
-

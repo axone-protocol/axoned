@@ -37,4 +37,3 @@ okp4d query txs [flags]
 ### SEE ALSO
 
 * [okp4d query](okp4d_query.md)	 - Querying subcommands
-
