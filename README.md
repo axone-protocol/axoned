@@ -149,6 +149,9 @@ Targets:
   Test:
     test                Pass all the tests
     test-go             Pass the test for the go source code
+  Chain:
+    chain-init          Initialize the blockchain with default settings.
+    chain-start         Start the blockchain with existing configuration (see chain-init)
   Clean:
     clean               Remove all the files from the target folder
   Proto:
