@@ -124,6 +124,12 @@ lint-proto: ## Lint proto files
   		-w /proto \
   		${DOCKER_IMAGE_BUF} \
   		lint proto -v
+	@docker run --rm \
+ 		-v ${HOME}/.cache:/root/.cache \
+   		-v `pwd`:/proto \
+   		-w /proto \
+   		${DOCKER_IMAGE_BUF} \
+   		format -d --exit-code
 
 ## Format:
 .PHONY: format
