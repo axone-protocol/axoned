@@ -99,13 +99,14 @@ ifeq ($(SHELL_NAME),Darwin)
     SED_FLAG := ""
 endif
 
-.PHONY: all lint lint-go build build-go help
-
+.PHONY: all
 all: help
 
 ## Lint:
+.PHONY: lint
 lint: lint-go lint-proto ## Lint all available linters
 
+.PHONY: lint-go
 lint-go: ## Lint go source code
 	@echo "${COLOR_CYAN}🔍 Inspecting go source code${COLOR_RESET}"
 	@docker run --rm \
@@ -114,6 +115,7 @@ lint-go: ## Lint go source code
   		${DOCKER_IMAGE_GOLANG_CI} \
   		golangci-lint run -v
 
+.PHONY: lint-proto
 lint-proto: ## Lint proto files
 	@echo "${COLOR_CYAN}🔍️ lint proto${COLOR_RESET}"
 	@docker run --rm \
@@ -124,8 +126,10 @@ lint-proto: ## Lint proto files
   		lint proto -v
 
 ## Format:
+.PHONY: format
 format: format-go ## Run all available formatters
 
+.PHONY: format-go
 format-go: ## Format go files
 	@echo "${COLOR_CYAN}📐 Formatting go source code${COLOR_RESET}"
 	@docker run --rm \
@@ -136,8 +140,10 @@ format-go: ## Format go files
 		"go install mvdan.cc/gofumpt@v0.4.0; gofumpt -w -l ."
 
 ## Build:
+.PHONY: build
 build: build-go ## Build all available artefacts (executable, docker image, etc.)
 
+.PHONY: build-go
 build-go: ## Build node executable for the current environment (default build)
 	@echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN}${COLOR_RESET} into ${COLOR_YELLOW}${DIST_FOLDER}${COLOR_RESET}"
 	@$(call build-go,"","",${DIST_FOLDER}/${BINARY_NAME})
@@ -165,13 +171,16 @@ $(ENVIRONMENTS_TARGETS):
 
 
 ## Install:
+.PHONY: install
 install: ## Install node executable
 	@echo "${COLOR_CYAN} 🚚 Installing project ${BINARY_NAME}${COLOR_RESET}"
 	@go install ${BUILD_FLAGS} ${CMD_ROOT}
 
 ## Test:
+.PHONY: test
 test: test-go ## Pass all the tests
 
+.PHONY: test-go
 test-go: build ## Pass the test for the go source code
 	@echo "${COLOR_CYAN} 🧪 Passing go tests${COLOR_RESET}"
 	@go test -v -covermode=count -coverprofile ./target/coverage.out ./...
@@ -214,11 +223,13 @@ chain-start: build ## Start the blockchain with existing configuration (see chai
 	  --home ${CHAIN_HOME}
 
 ## Clean:
+.PHONY: clean
 clean: ## Remove all the files from the target folder
 	@echo "${COLOR_CYAN} 🗑 Cleaning folder $(TARGET_FOLDER)${COLOR_RESET}"
 	@rm -rf $(TARGET_FOLDER)/
 
 ## Proto:
+.PHONY: proto-format
 proto-format: ## Format Protobuf files
 	@echo "${COLOR_CYAN} 📐 Formatting Protobuf files${COLOR_RESET}"
 	@docker run --rm \
@@ -228,6 +239,7 @@ proto-format: ## Format Protobuf files
     		${DOCKER_IMAGE_BUF} \
     		format -w -v
 
+.PHONY: proto-build
 proto-build: ## Build all Protobuf files
 	@echo "${COLOR_CYAN} 🔨️Build Protobuf files${COLOR_RESET}"
 	@docker run --rm \
@@ -237,6 +249,7 @@ proto-build: ## Build all Protobuf files
 		${DOCKER_IMAGE_BUF} \
 		build proto -v
 
+.PHONY: proto-gen
 proto-gen: proto-build ## Generate all the code from the Protobuf files
 	@echo "${COLOR_CYAN} 📝 Generating code from Protobuf files${COLOR_RESET}"
 	@docker run --rm \
@@ -283,6 +296,7 @@ doc-command: ## Generate markdown documentation for the command
 	  ${DOCKER_IMAGE_MARKDOWNLINT} -f $$OUT_FOLDER
 
 ## Release:
+.PHONY: release-assets
 release-assets: release-binary-all release-checksums ## Generate release assets
 
 release-binary-all: $(RELEASE_TARGETS)
@@ -318,6 +332,7 @@ ensure-buildx-builder:
 	docker buildx create --name ${DOCKER_BUILDX_BUILDER}
 
 ## Help:
+.PHONY: help
 help: ## Show this help.
 	@echo ''
 	@echo 'Usage:'
