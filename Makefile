@@ -139,6 +139,16 @@ format-go: ## Format go files
   		sh -c \
 		"go install mvdan.cc/gofumpt@v0.4.0; gofumpt -w -l ."
 
+.PHONY: format-proto
+format-proto: ## Format proto files
+	@echo "${COLOR_CYAN}📐 Formatting proto files${COLOR_RESET}"
+	@docker run --rm \
+		-v ${HOME}/.cache:/root/.cache \
+  		-v `pwd`:/proto \
+  		-w /proto \
+  		${DOCKER_IMAGE_BUF} \
+  		format -w
+
 ## Build:
 .PHONY: build
 build: build-go ## Build all available artefacts (executable, docker image, etc.)
