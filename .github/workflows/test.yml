@@ -97,4 +97,4 @@ jobs:
 
       - name: Stop the blockchain
         run: |
-          ps -ef | grep 'okp4d' | grep -v grep | awk '{print $2}' | xargs -r kill -9
+          make chain-stop
