@@ -245,6 +245,9 @@ clean: ## Remove all the files from the target folder
 	@rm -rf $(TARGET_FOLDER)/
 
 ## Proto:
+.PHONY: proto
+proto: proto-format lint-proto proto-build proto-gen doc-proto ## Generate all resources for proto files (go, doc, etc.)
+
 .PHONY: proto-format
 proto-format: ## Format Protobuf files
 	@echo "${COLOR_CYAN} 📐 Formatting Protobuf files${COLOR_RESET}"
