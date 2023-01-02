@@ -2,9 +2,8 @@ syntax = "proto3";
 
 package logic.v1beta;
 
-import "gogoproto/gogo.proto";
-
 option go_package = "github.com/okp4/okp4d/x/logic/types";
 
-service MsgService {
-}
+// MsgService defines the service for the logic module.
+// Do nothing for now as the service is without any side effects.
+service MsgService {}

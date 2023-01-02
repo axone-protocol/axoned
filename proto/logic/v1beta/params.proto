@@ -10,7 +10,7 @@ option go_package = "github.com/okp4/okp4d/x/logic/types";
 message Params {
   option (gogoproto.goproto_stringer) = false;
 
-  // Specify the parameter for the logic interpreter.
+  // Interpreter specifies the parameter for the logic interpreter.
   Interpreter interpreter = 1 [
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"interpreter\""
@@ -23,31 +23,29 @@ message Params {
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"limits\""
   ];
-
 }
 
 // Limits defines the limits of the logic module.
 message Limits {
   option (gogoproto.goproto_stringer) = true;
 
-  // The maximum amount of computing power, measured in "gas," that is allowed to be consumed when executing a request
-  // by the interpreter is specified here. The interpreter calculates the gas consumption based on the number and type
+  // max_gas specifies the maximum amount of computing power, measured in "gas," that is allowed to be consumed when
+  // executing a request by the interpreter. The interpreter calculates the gas consumption based on the number and type
   // of operations that are executed, as well as, in some cases, the complexity of the processed data.
   uint64 max_gas = 1 [(gogoproto.moretags) = "yaml:\"max_gas\",omitempty"];
 
-  // Specify the maximum size, in bytes, that is accepted for a program.
+  // max_size specifies the maximum size, in bytes, that is accepted for a program.
   uint32 max_size = 3 [(gogoproto.moretags) = "yaml:\"max_size\""];
 
-  // Specify the maximum number of results that can be requested for a query.
+  // max_result_count specifies the maximum number of results that can be requested for a query.
   uint32 max_result_count = 2 [(gogoproto.moretags) = "yaml:\"max_result_count\""];
-
 }
 
 // Interpreter defines the various parameters for the interpreter.
 message Interpreter {
   option (gogoproto.goproto_stringer) = true;
 
-  // Specify the list of registered predicates/operators, in the form of: `<predicate_name>/<arity>`.
+  // registered_predicates specifies the list of registered predicates/operators, in the form of: `<predicate_name>/<arity>`.
   // For instance: `findall/3`.
   // If not specified, the default set of predicates/operators will be registered.
   repeated string registered_predicates = 1 [
@@ -55,7 +53,7 @@ message Interpreter {
     (gogoproto.moretags) = "yaml:\"registered_predicates\""
   ];
 
-  // Specify the initial program to run when booting the logic interpreter.
+  // bootstrap specifies the initial program to run when booting the logic interpreter.
   // If not specified, the default boot sequence will be executed.
   string bootstrap = 2 [
     (gogoproto.nullable) = true,

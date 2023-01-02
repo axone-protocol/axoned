@@ -5,14 +5,22 @@ package logic.v1beta;
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "logic/v1beta/params.proto";
+import "logic/v1beta/types.proto";
 
 option go_package = "github.com/okp4/okp4d/x/logic/types";
 
 // QueryService defines the gRPC querier service.
 service QueryService {
-  // Parameters queries the parameters of the module.
+  // Params queries all parameters for the logic module.
   rpc Params(QueryServiceParamsRequest) returns (QueryServiceParamsResponse) {
     option (google.api.http).get = "/okp4/okp4d/logic/params";
+  }
+
+  // Query executes a logic query and returns the solutions found.
+  // Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee
+  // is charged for this, but the execution is constrained by the current limits configured in the module.
+  rpc Query(QueryServiceQueryRequest) returns (QueryServiceQueryResponse) {
+    option (google.api.http).get = "/okp4/okp4d/logic/query";
   }
 }
 
@@ -22,5 +30,30 @@ message QueryServiceParamsRequest {}
 // QueryServiceParamsResponse is response type for the QueryService/Params RPC method.
 message QueryServiceParamsResponse {
   // params holds all the parameters of this module.
-  Params params = 1 [(gogoproto.nullable) = false];
+  Params params = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"params\",omitempty"
+  ];
+}
+
+// QueryServiceQueryRequest is request type for the QueryService/Query RPC method.
+message QueryServiceQueryRequest {
+  option (gogoproto.goproto_stringer) = true;
+
+  // program is the logic program to be queried.
+  string program = 1 [(gogoproto.moretags) = "yaml:\"program\",omitempty"];
+  // query is the query string to be executed.
+  string query = 2 [(gogoproto.moretags) = "yaml:\"query\",omitempty"];
+}
+
+// QueryServiceQueryResponse is response type for the QueryService/Query RPC method.
+message QueryServiceQueryResponse {
+  option (gogoproto.goproto_stringer) = true;
+
+  // height is the block height at which the query was executed.
+  uint64 height = 1 [(gogoproto.moretags) = "yaml:\"height\",omitempty"];
+  // gas_used is the amount of gas used to execute the query.
+  uint64 gas_used = 2 [(gogoproto.moretags) = "yaml:\"gas_used\",omitempty"];
+  // answer is the answer to the query.
+  Answer answer = 3 [(gogoproto.moretags) = "yaml:\"answer\",omitempty"];
 }
