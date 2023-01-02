@@ -1,9 +1,10 @@
 syntax = "proto3";
+
 package mint.v1beta1;
 
-option go_package = "github.com/okp4/okp4d/x/mint/types";
-
 import "gogoproto/gogo.proto";
+
+option go_package = "github.com/okp4/okp4d/x/mint/types";
 
 // Minter represents the minting state.
 //
@@ -15,17 +16,17 @@ message Minter {
   // current annual inflation rate
   string inflation = 1 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.nullable)   = false
+    (gogoproto.nullable) = false
   ];
   // current annual expected provisions
   string annual_provisions = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.nullable)   = false
+    (gogoproto.nullable) = false
   ];
   // target supply at end of period
   string target_supply = 3 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable)   = false
+    (gogoproto.nullable) = false
   ];
 }
 
@@ -43,7 +44,7 @@ message Params {
   // annual reduction factor inflation rate change
   string annual_reduction_factor = 2 [
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
-    (gogoproto.nullable)   = false
+    (gogoproto.nullable) = false
   ];
   // expected blocks per year
   uint64 blocks_per_year = 3;
