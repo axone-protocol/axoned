@@ -1,0 +1,64 @@
+syntax = "proto3";
+
+package logic.v1beta;
+
+import "gogoproto/gogo.proto";
+
+option go_package = "github.com/okp4/okp4d/x/logic/types";
+
+// Term is the representation of a piece of data and can be a constant, a variable, or an atom.
+message Term {
+  option (gogoproto.goproto_stringer) = true;
+
+  // name is the name of the term.
+  string name = 1 [(gogoproto.moretags) = "yaml:\"name\",omitempty"];
+  // arguments are the arguments of the term, which can be constants, variables, or atoms.
+  repeated Term arguments = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"arguments\",omitempty"
+  ];
+}
+
+// Substitution represents a substitution made to the variables in the query to obtain the answer.
+message Substitution {
+  option (gogoproto.goproto_stringer) = true;
+
+  // variable is the name of the variable.
+  string variable = 1 [(gogoproto.moretags) = "yaml:\"variable\",omitempty"];
+  // term is the term that the variable is substituted with.
+  Term term = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"term\",omitempty"
+  ];
+}
+
+// Result represents the result of a query.
+message Result {
+  option (gogoproto.goproto_stringer) = true;
+
+  // substitutions represent all the substitutions made to the variables in the query to obtain the answer.
+  repeated Substitution substitutions = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"substitutions\",omitempty"
+  ];
+}
+
+// Answer represents the answer to a logic query.
+message Answer {
+  option (gogoproto.goproto_stringer) = true;
+
+  // result is the result of the query.
+  bool success = 1 [(gogoproto.moretags) = "yaml:\"success\",omitempty"];
+  // has_more specifies if there are more solutions than the ones returned.
+  bool has_more = 2 [(gogoproto.moretags) = "yaml:\"has_next\",omitempty"];
+  // variables represent all the variables in the query.
+  repeated string variables = 3 [
+    (gogoproto.nullable) = true,
+    (gogoproto.moretags) = "yaml:\"variables\",omitempty"
+  ];
+  // results represent all the results of the query.
+  repeated Result results = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"results\",omitempty"
+  ];
+}

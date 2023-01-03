@@ -140,6 +140,7 @@ Targets:
   Format:
     format              Run all available formatters
     format-go           Format go files
+    format-proto        Format proto files
   Build:
     build               Build all available artefacts (executable, docker image, etc.)
     build-go            Build node executable for the current environment (default build)
@@ -155,6 +156,7 @@ Targets:
   Clean:
     clean               Remove all the files from the target folder
   Proto:
+    proto               Generate all resources for proto files (go, doc, etc.)
     proto-format        Format Protobuf files
     proto-build         Build all Protobuf files
     proto-gen           Generate all the code from the Protobuf files

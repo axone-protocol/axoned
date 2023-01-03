@@ -1,4 +1,5 @@
 syntax = "proto3";
+
 package mint.v1beta1;
 
 import "gogoproto/gogo.proto";
@@ -41,7 +42,10 @@ message QueryInflationRequest {}
 // method.
 message QueryInflationResponse {
   // inflation is the current minting inflation value.
-  bytes inflation = 1 [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  bytes inflation = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
 }
 
 // QueryAnnualProvisionsRequest is the request type for the
@@ -52,6 +56,8 @@ message QueryAnnualProvisionsRequest {}
 // Query/AnnualProvisions RPC method.
 message QueryAnnualProvisionsResponse {
   // annual_provisions is the current minting annual provisions value.
-  bytes annual_provisions = 1
-      [(gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec", (gogoproto.nullable) = false];
+  bytes annual_provisions = 1 [
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
 }
