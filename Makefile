@@ -213,6 +213,10 @@ chain-start: build ## Start the blockchain with existing configuration (see chai
 	@okp4d start --moniker ${CHAIN_MONIKER} \
 	  --home ${CHAIN_HOME}
 
+chain-stop: ## Stop the blockchain
+	@echo "${COLOR_CYAN} ✋️ Stopping chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
+	@killall okp4d
+
 ## Clean:
 clean: ## Remove all the files from the target folder
 	@echo "${COLOR_CYAN} 🗑 Cleaning folder $(TARGET_FOLDER)${COLOR_RESET}"
