@@ -1,7 +1,6 @@
 package keeper
 
 import (
-	"context"
 	"fmt"
 
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -20,11 +19,6 @@ type (
 		paramstore paramtypes.Subspace
 	}
 )
-
-func (k Keeper) Query(ctx context.Context, request *types.QueryServiceQueryRequest) (*types.QueryServiceQueryResponse, error) {
-	// TODO implement me
-	panic("implement me")
-}
 
 func NewKeeper(
 	cdc codec.BinaryCodec,
