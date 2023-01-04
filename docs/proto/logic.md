@@ -21,10 +21,10 @@
   - [Term](#logic.v1beta.Term)
   
 - [logic/v1beta/query.proto](#logic/v1beta/query.proto)
+  - [QueryServiceAskRequest](#logic.v1beta.QueryServiceAskRequest)
+  - [QueryServiceAskResponse](#logic.v1beta.QueryServiceAskResponse)
   - [QueryServiceParamsRequest](#logic.v1beta.QueryServiceParamsRequest)
   - [QueryServiceParamsResponse](#logic.v1beta.QueryServiceParamsResponse)
-  - [QueryServiceQueryRequest](#logic.v1beta.QueryServiceQueryRequest)
-  - [QueryServiceQueryResponse](#logic.v1beta.QueryServiceQueryResponse)
   
   - [QueryService](#logic.v1beta.QueryService)
   
@@ -166,6 +166,29 @@ Term is the representation of a piece of data and can be a constant, a variable,
 
 ## logic/v1beta/query.proto
 
+<a name="logic.v1beta.QueryServiceAskRequest"></a>
+
+### QueryServiceAskRequest
+
+QueryServiceAskRequest is request type for the QueryService/Ask RPC method.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `program` | [string](#string) |  | program is the logic program to be queried. |
+| `query` | [string](#string) |  | query is the query string to be executed. |
+
+<a name="logic.v1beta.QueryServiceAskResponse"></a>
+
+### QueryServiceAskResponse
+
+QueryServiceAskResponse is response type for the QueryService/Ask RPC method.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `height` | [uint64](#uint64) |  | height is the block height at which the query was executed. |
+| `gas_used` | [uint64](#uint64) |  | gas_used is the amount of gas used to execute the query. |
+| `answer` | [Answer](#logic.v1beta.Answer) |  | answer is the answer to the query. |
+
 <a name="logic.v1beta.QueryServiceParamsRequest"></a>
 
 ### QueryServiceParamsRequest
@@ -182,29 +205,6 @@ QueryServiceParamsResponse is response type for the QueryService/Params RPC meth
 | ----- | ---- | ----- | ----------- |
 | `params` | [Params](#logic.v1beta.Params) |  | params holds all the parameters of this module. |
 
-<a name="logic.v1beta.QueryServiceQueryRequest"></a>
-
-### QueryServiceQueryRequest
-
-QueryServiceQueryRequest is request type for the QueryService/Query RPC method.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `program` | [string](#string) |  | program is the logic program to be queried. |
-| `query` | [string](#string) |  | query is the query string to be executed. |
-
-<a name="logic.v1beta.QueryServiceQueryResponse"></a>
-
-### QueryServiceQueryResponse
-
-QueryServiceQueryResponse is response type for the QueryService/Query RPC method.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `height` | [uint64](#uint64) |  | height is the block height at which the query was executed. |
-| `gas_used` | [uint64](#uint64) |  | gas_used is the amount of gas used to execute the query. |
-| `answer` | [Answer](#logic.v1beta.Answer) |  | answer is the answer to the query. |
-
  [//]: # (end messages)
 
  [//]: # (end enums)
@@ -220,7 +220,7 @@ QueryService defines the gRPC querier service.
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
 | `Params` | [QueryServiceParamsRequest](#logic.v1beta.QueryServiceParamsRequest) | [QueryServiceParamsResponse](#logic.v1beta.QueryServiceParamsResponse) | Params queries all parameters for the logic module. | GET|/okp4/okp4d/logic/params|
-| `Query` | [QueryServiceQueryRequest](#logic.v1beta.QueryServiceQueryRequest) | [QueryServiceQueryResponse](#logic.v1beta.QueryServiceQueryResponse) | Query executes a logic query and returns the solutions found. Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee is charged for this, but the execution is constrained by the current limits configured in the module. | GET|/okp4/okp4d/logic/query|
+| `Ask` | [QueryServiceAskRequest](#logic.v1beta.QueryServiceAskRequest) | [QueryServiceAskResponse](#logic.v1beta.QueryServiceAskResponse) | Ask executes a logic query and returns the solutions found. Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee is charged for this, but the execution is constrained by the current limits configured in the module. | GET|/okp4/okp4d/logic/ask|
 
  [//]: # (end services)
 
