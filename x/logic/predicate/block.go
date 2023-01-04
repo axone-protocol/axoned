@@ -23,3 +23,19 @@ func BlockHeight(ctx context.Context) engine.Predicate1 {
 	}
 }
 
+// BlockTime is higher order function that given a context returns the following predicate:
+//
+//	block_time(?Time)
+//
+// where Time represents the current chain time at the time of the query.
+// The predicate is non-deterministic, producing a different time each time it is called.
+func BlockTime(ctx context.Context) engine.Predicate1 {
+	return func(vm *engine.VM, time engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+		sdkContext, err := UnwrapSDKContext(ctx)
+		if err != nil {
+			return engine.Error(err)
+		}
+
+		return engine.Unify(vm, time, engine.Integer(sdkContext.BlockTime().Unix()), cont, env)
+	}
+}
