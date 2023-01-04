@@ -26,6 +26,10 @@ func TestBlock(t *testing.T) {
 		{header: tmproto.Header{Height: 905}, implication: `block_height(102)`, ok: false},
 		{header: tmproto.Header{Height: 102}, implication: `block_height(X), X == 102`, ok: true},
 		{header: tmproto.Header{Height: 102}, implication: `block_height(X), X == 905`, ok: true},
+		{header: tmproto.Header{Time: time.Unix(1494505756, 0)}, implication: `block_time(102)`, ok: true},
+		{header: tmproto.Header{Time: time.Unix(1494505757, 0)}, implication: `block_time(102)`, ok: false},
+		{header: tmproto.Header{Time: time.Unix(1494505756, 0)}, implication: `block_time(X), X == 1494505756`, ok: true},
+		{header: tmproto.Header{Time: time.Unix(1494505756, 0)}, implication: `block_time(X), X == 1494505757`, ok: true},
 	}
 	for _, tc := range cases {
 		convey.Convey(fmt.Sprintf("Given the clause body: %s", tc.implication), t, func() {
