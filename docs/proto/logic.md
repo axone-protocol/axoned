@@ -57,9 +57,9 @@ Limits defines the limits of the logic module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `max_gas` | [uint64](#uint64) |  | max_gas specifies the maximum amount of computing power, measured in "gas," that is allowed to be consumed when executing a request by the interpreter. The interpreter calculates the gas consumption based on the number and type of operations that are executed, as well as, in some cases, the complexity of the processed data. |
-| `max_size` | [uint32](#uint32) |  | max_size specifies the maximum size, in bytes, that is accepted for a program. |
-| `max_result_count` | [uint32](#uint32) |  | max_result_count specifies the maximum number of results that can be requested for a query. |
+| `max_gas` | [string](#string) |  | max_gas specifies the maximum amount of computing power, measured in "gas," that is allowed to be consumed when executing a request by the interpreter. The interpreter calculates the gas consumption based on the number and type of operations that are executed, as well as, in some cases, the complexity of the processed data. nil value remove max gas limitation. |
+| `max_size` | [string](#string) |  | max_size specifies the maximum size, in bytes, that is accepted for a program. nil value remove size limitation. |
+| `max_result_count` | [string](#string) |  | max_result_count specifies the maximum number of results that can be requested for a query. nil value remove max result count limitation. |
 
 <a name="logic.v1beta.Params"></a>
 
