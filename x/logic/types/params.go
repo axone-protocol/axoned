@@ -17,9 +17,9 @@ var (
 var (
 	DefaultRegisteredPredicates = make([]string, 0)
 	DefaultBootstrap            = ""
-	DefaultMaxGas               = uint64(200000)
-	DefaultMaxSize              = uint32(0)
-	DefaultMaxResultCount       = uint32(50)
+	DefaultMaxGas               = uint64(100)
+	DefaultMaxSize              = uint32(5000)
+	DefaultMaxResultCount       = uint32(1)
 )
 
 // ParamKeyTable the param key table for launch module.
