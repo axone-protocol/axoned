@@ -3,6 +3,7 @@ package types
 import (
 	"fmt"
 
+	"cosmossdk.io/math"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
 
@@ -17,9 +18,9 @@ var (
 var (
 	DefaultRegisteredPredicates = make([]string, 0)
 	DefaultBootstrap            = ""
-	DefaultMaxGas               = uint64(100)
-	DefaultMaxSize              = uint32(5000)
-	DefaultMaxResultCount       = uint32(1)
+	DefaultMaxGas               = math.NewUint(uint64(100))
+	DefaultMaxSize              = math.NewUint(uint64(5000))
+	DefaultMaxResultCount       = math.NewUint(uint64(1))
 )
 
 // ParamKeyTable the param key table for launch module.
@@ -90,7 +91,7 @@ func validateInterpreter(i interface{}) error {
 }
 
 // NewLimits creates a new Limits object.
-func NewLimits(maxGas uint64, maxSize, maxResultCount uint32) Limits {
+func NewLimits(maxGas, maxSize, maxResultCount *math.Uint) Limits {
 	return Limits{
 		MaxGas:         maxGas,
 		MaxSize:        maxSize,
@@ -100,7 +101,7 @@ func NewLimits(maxGas uint64, maxSize, maxResultCount uint32) Limits {
 
 // DefaultLimits return a Limits object with default params.
 func DefaultLimits() Limits {
-	return NewLimits(DefaultMaxGas, DefaultMaxSize, DefaultMaxResultCount)
+	return NewLimits(&DefaultMaxGas, &DefaultMaxSize, &DefaultMaxResultCount)
 }
 
 func validateLimits(i interface{}) error {
