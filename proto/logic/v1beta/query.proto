@@ -16,11 +16,11 @@ service QueryService {
     option (google.api.http).get = "/okp4/okp4d/logic/params";
   }
 
-  // Query executes a logic query and returns the solutions found.
+  // Ask executes a logic query and returns the solutions found.
   // Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee
   // is charged for this, but the execution is constrained by the current limits configured in the module.
-  rpc Query(QueryServiceQueryRequest) returns (QueryServiceQueryResponse) {
-    option (google.api.http).get = "/okp4/okp4d/logic/query";
+  rpc Ask(QueryServiceAskRequest) returns (QueryServiceAskResponse) {
+    option (google.api.http).get = "/okp4/okp4d/logic/ask";
   }
 }
 
@@ -36,8 +36,8 @@ message QueryServiceParamsResponse {
   ];
 }
 
-// QueryServiceQueryRequest is request type for the QueryService/Query RPC method.
-message QueryServiceQueryRequest {
+// QueryServiceAskRequest is request type for the QueryService/Ask RPC method.
+message QueryServiceAskRequest {
   option (gogoproto.goproto_stringer) = true;
 
   // program is the logic program to be queried.
@@ -46,8 +46,8 @@ message QueryServiceQueryRequest {
   string query = 2 [(gogoproto.moretags) = "yaml:\"query\",omitempty"];
 }
 
-// QueryServiceQueryResponse is response type for the QueryService/Query RPC method.
-message QueryServiceQueryResponse {
+// QueryServiceAskResponse is response type for the QueryService/Ask RPC method.
+message QueryServiceAskResponse {
   option (gogoproto.goproto_stringer) = true;
 
   // height is the block height at which the query was executed.
