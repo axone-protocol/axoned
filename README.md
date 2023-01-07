@@ -153,6 +153,7 @@ Targets:
   Chain:
     chain-init          Initialize the blockchain with default settings.
     chain-start         Start the blockchain with existing configuration (see chain-init)
+    chain-stop          Stop the blockchain
   Clean:
     clean               Remove all the files from the target folder
   Proto:
@@ -163,6 +164,8 @@ Targets:
   Documentation:
     doc-proto           Generate the documentation from the Protobuf files
     doc-command         Generate markdown documentation for the command
+  Mock:
+    mock                Generate all the mocks (for tests)
   Release:
     release-assets      Generate release assets
   Help:
