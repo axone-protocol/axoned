@@ -285,6 +285,7 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 	@rm -rf github.com
 
 ## Documentation:
+.PHONY: doc-proto
 doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 	@for MODULE in $(shell find proto -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
 		echo "${COLOR_CYAN} 📖 Generate documentation for $${MODULE} module${COLOR_RESET}" ; \
@@ -301,6 +302,7 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 	  -w /usr/src/okp4d/docs \
 	  ${DOCKER_IMAGE_MARKDOWNLINT} -f proto
 
+.PHONY: doc-command
 doc-command: ## Generate markdown documentation for the command
 	@echo "${COLOR_CYAN} 📖 Generate markdown documentation for the command${COLOR_RESET}"
 	@cd docs; \
