@@ -1,12 +1,14 @@
 package types
 
-// DONTCOVER
-
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	sdkerrors "cosmossdk.io/errors"
+	"google.golang.org/grpc/codes"
 )
 
-// x/logic module sentinel errors.
 var (
-	ErrSample = sdkerrors.Register(ModuleName, 1100, "sample error")
+	InvalidArgument = sdkerrors.RegisterWithGRPCCode(ModuleName, 1, codes.InvalidArgument, "limit exceeded")
+	// LimitExceeded is returned when a limit is exceeded.
+	LimitExceeded = sdkerrors.RegisterWithGRPCCode(ModuleName, 2, codes.InvalidArgument, "limit exceeded")
+	// Internal is returned when an internal error occurs.
+	Internal = sdkerrors.RegisterWithGRPCCode(ModuleName, 3, codes.Internal, "internal error")
 )
