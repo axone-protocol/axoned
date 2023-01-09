@@ -1,4 +1,4 @@
-package predicate
+package util
 
 import (
 	"context"
@@ -8,8 +8,7 @@ import (
 )
 
 // UnwrapSDKContext retrieves a Context from a context.Context instance
-// attached with WrapSDKContext. It panics if a Context was not properly
-// attached.
+// attached with WrapSDKContext.
 func UnwrapSDKContext(ctx context.Context) (sdk.Context, error) {
 	if sdkCtx, ok := ctx.(sdk.Context); ok {
 		return sdkCtx, nil
