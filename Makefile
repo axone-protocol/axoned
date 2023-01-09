@@ -308,7 +308,7 @@ doc-command: ## Generate markdown documentation for the command
 	@cd docs; \
 	OUT_FOLDER="command"; \
 	rm -rf $$OUT_FOLDER; \
-	go get ../scripts; \
+	go get ./scripts; \
 	go run ../scripts/generate_command_doc.go; \
 	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.okp4d\")/(default \"\/home\/john\/\.okp4d\")/g' $$OUT_FOLDER/*.md; \
 	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' $$OUT_FOLDER/*.md; \

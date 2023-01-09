@@ -145,6 +145,11 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v3
 
+      - name: Setup Go environment
+        uses: actions/setup-go@v3.5.0
+        with:
+          go-version: "1.19"
+
       - name: Generate proto and documentation
         run: |
           sudo make doc-proto
