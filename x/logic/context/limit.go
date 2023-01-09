@@ -25,10 +25,10 @@ func WithLimit(parent context.Context, limit uint64) (context.Context, Increment
 	ctx, cancel := context.WithCancel(parent)
 
 	return ctx, func(delta uint64) uint64 {
-		new := atomic.AddUint64(&counter, delta)
-		if new > limit {
+		newValue := atomic.AddUint64(&counter, delta)
+		if newValue > limit {
 			cancel()
 		}
-		return new
+		return newValue
 	}
 }

@@ -2,7 +2,6 @@ package interpreter
 
 import (
 	goctx "context"
-	_ "embed"
 	"fmt"
 
 	"github.com/ichiban/prolog"
@@ -17,7 +16,12 @@ import (
 // The predicates names must be present in the registry, otherwise the function will return an error.
 // The bootstrap script can be an empty string if no bootstrap script is needed. If compilation of the bootstrap script
 // fails, the function will return an error.
-func NewInstrumentedInterpreter(ctx goctx.Context, predicates []string, bootstrap string, inc context.IncrementCountByFunc) (*prolog.Interpreter, error) {
+func NewInstrumentedInterpreter(
+	ctx goctx.Context,
+	predicates []string,
+	bootstrap string,
+	inc context.IncrementCountByFunc,
+) (*prolog.Interpreter, error) {
 	var i prolog.Interpreter
 
 	for _, o := range predicates {

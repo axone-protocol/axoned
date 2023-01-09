@@ -16,14 +16,14 @@ import (
 
 // withLimitContext returns a context with the limits configured for the module.
 func (k Keeper) withLimitContext(ctx goctx.Context) (goctx.Context, context.IncrementCountByFunc) {
-	limits := k.getLimits(ctx)
+	limits := k.limits(ctx)
 
 	maxGas := util.DerefOrDefault(limits.MaxGas, sdkmath.NewUint(math.MaxInt64))
 
 	return context.WithLimit(ctx, maxGas.Uint64())
 }
 
-func (k Keeper) getLimits(ctx goctx.Context) types.Limits {
+func (k Keeper) limits(ctx goctx.Context) types.Limits {
 	params := k.GetParams(sdk.UnwrapSDKContext(ctx))
 	return params.GetLimits()
 }
@@ -49,7 +49,7 @@ func (k Keeper) execute(goctx goctx.Context, program, query string) (*types.Quer
 	}()
 
 	success := false
-	limits := k.getLimits(sdkCtx)
+	limits := k.limits(goctx)
 	var variables []string
 	results := make([]types.Result, 0)
 	for nb := sdkmath.ZeroUint(); nb.LT(*limits.MaxResultCount) && sols.Next(); nb = nb.Incr() {

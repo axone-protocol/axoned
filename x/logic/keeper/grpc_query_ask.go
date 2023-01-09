@@ -12,7 +12,7 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (*type
 		return nil, sdkerrors.Wrap(types.InvalidArgument, "request is nil")
 	}
 
-	limits := k.getLimits(ctx)
+	limits := k.limits(ctx)
 	if err := checkLimits(req, limits); err != nil {
 		return nil, err
 	}

@@ -15,7 +15,6 @@ import (
 	tmdb "github.com/tendermint/tm-db"
 )
 
-//nolint:dupl
 func TestBlock(t *testing.T) {
 	cases := []struct {
 		header      tmproto.Header
@@ -42,7 +41,7 @@ func TestBlock(t *testing.T) {
 					vm := testutil.NewVMMust(ctx)
 					vm.Register1(engine.NewAtom("block_height"), BlockHeight(ctx))
 					vm.Register1(engine.NewAtom("block_time"), BlockTime(ctx))
-					testutil.CompileMust(vm, ctx, fmt.Sprintf("test :- %s.", tc.implication))
+					testutil.CompileMust(ctx, vm, fmt.Sprintf("test :- %s.", tc.implication))
 
 					convey.Convey("When the predicate is called", func() {
 						ok, err := vm.Arrive(engine.NewAtom("test"), []engine.Term{}, engine.Success, nil).Force(ctx)

@@ -27,7 +27,7 @@ func NewVMMust(ctx context.Context) (vm *engine.VM) {
 
 // CompileMust compiles the given source code and panics if it fails.
 // This is a convenience function for testing.
-func CompileMust(vm *engine.VM, ctx context.Context, s string, args ...interface{}) {
+func CompileMust(ctx context.Context, vm *engine.VM, s string, args ...interface{}) {
 	err := vm.Compile(ctx, s, args...)
 	if err != nil {
 		panic(err)

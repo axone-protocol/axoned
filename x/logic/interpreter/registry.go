@@ -141,6 +141,8 @@ var RegistryNames = func() []string {
 // name is the name of the predicate in the form of "atom/arity".
 // inc is the increment function that is called when the predicate is called and which allows to count the cost of
 // executing the predicate(ctx).
+//
+//nolint:lll
 func Register(ctx goctx.Context, i *prolog.Interpreter, name string, inc context.IncrementCountByFunc) error {
 	if entry, ok := Registry[name]; ok {
 		parts := strings.Split(name, "/")
