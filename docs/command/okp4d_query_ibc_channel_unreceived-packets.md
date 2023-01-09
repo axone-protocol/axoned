@@ -23,6 +23,8 @@ okp4d query ibc channel unreceived-packets [port-id] [channel-id] --sequences=1,
 ### Options
 
 ```
+      --grpc-addr string       the gRPC endpoint to use for this chain
+      --grpc-insecure          allow gRPC over insecure channels, if not TLS the server must use TLS
       --height int             Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help                   help for unreceived-packets
       --node string            &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
