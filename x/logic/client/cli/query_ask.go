@@ -3,8 +3,6 @@ package cli
 import (
 	"context"
 	"fmt"
-	"io"
-	"os"
 	"strings"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -36,11 +34,7 @@ $ %s %s query ask "immortal(X)." program.txt
 			clientCtx := client.GetClientContextFromCmd(cmd)
 
 			query := args[0]
-			program, err := ReadProgramFromFile(args[1])
-
-			if err != nil {
-				return err
-			}
+			program := args[1]
 
 			queryClient := types.NewQueryServiceClient(clientCtx)
 
@@ -59,22 +53,4 @@ $ %s %s query ask "immortal(X)." program.txt
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
-}
-
-// ReadProgramFromFile read text from the given filename. Can pass "-" to read from stdin.
-func ReadProgramFromFile(filename string) (v string, err error) {
-	var bytes []byte
-
-	if filename == "-" {
-		bytes, err = io.ReadAll(os.Stdin)
-	} else {
-		bytes, err = os.ReadFile(filename)
-	}
-
-	if err != nil {
-		return
-	}
-
-	v = string(bytes)
-	return
 }
