@@ -2,6 +2,8 @@
 # Protobuf Documentation
 <a name="top"></a>
 
+{{ `{{ if (datasource "docs").description }}{{ (datasource "docs").description }}{{ end }}` }}
+
 ## Table of Contents
 {{range .Files}}
 {{$file_name := .Name}}- [{{.Name}}](#{{.Name}})

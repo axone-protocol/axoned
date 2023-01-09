@@ -4,6 +4,10 @@
 
 <a name="top"></a>
 
+## 📝 Description
+
+Lorem impsus dolor sit amet
+
 ## Table of Contents
 
 - [logic/v1beta/params.proto](#logic/v1beta/params.proto)

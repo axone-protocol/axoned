@@ -294,7 +294,16 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
         		-w /proto \
         		${DOCKER_IMAGE_BUF} \
         		generate --path $${MODULE} --template buf.gen.doc.yaml -v ; \
-        mv docs/proto/docs.md docs/$${MODULE}.md ; \
+        DEFAULT_DATASOURCE="./docs/proto/templates/default.yaml" ; \
+        MODULE_DATASOURCE="merge:./$${MODULE}/docs.yaml|$${DEFAULT_DATASOURCE}" ; \
+        DATASOURCE="docs=`[ -f $${MODULE}/docs.yaml ] && echo $$MODULE_DATASOURCE || echo $${DEFAULT_DATASOURCE}`" ; \
+		docker run --rm \
+				-v ${HOME}/.cache:/root/.cache \
+				-v `pwd`:/usr/src/okp4d \
+				-w /usr/src/okp4d \
+				hairyhenderson/gomplate \
+				-d $$DATASOURCE -f docs/proto/docs.md -o docs/$${MODULE}.md ; \
+		rm -f docs/proto/docs.md ; \
 	done
 	@docker run --rm \
 	  -v `pwd`:/usr/src/okp4d \
