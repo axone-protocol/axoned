@@ -14,6 +14,7 @@ DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v1.49
 DOCKER_IMAGE_BUF  		  = okp4/buf-cosmos:0.3.1
 DOCKER_BUILDX_BUILDER     = okp4-builder
 DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
+DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate
 
 # Some colors
 COLOR_GREEN  = $(shell tput -Txterm setaf 2)
@@ -301,7 +302,7 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 				-v ${HOME}/.cache:/root/.cache \
 				-v `pwd`:/usr/src/okp4d \
 				-w /usr/src/okp4d \
-				hairyhenderson/gomplate \
+				${DOCKER_IMAGE_GOTEMPLATE} \
 				-d $$DATASOURCE -f docs/proto/docs.md -o docs/$${MODULE}.md ; \
 		rm -f docs/proto/docs.md ; \
 	done
