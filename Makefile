@@ -283,7 +283,7 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 		${DOCKER_IMAGE_BUF} \
 		generate proto --template buf.gen.proto.yaml -v
 	@cp -r github.com/okp4/okp4d/x/* x/
-	@rm -rf github.com
+	@sudo rm -rf github.com
 
 ## Documentation:
 .PHONY: doc-proto
