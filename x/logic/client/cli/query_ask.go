@@ -22,12 +22,14 @@ func CmdQueryAsk() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "ask [query]",
 		Short: "executes a logic query and returns the solutions found.",
-		Long: `Executes the [query] for the given [program] file and return the solution(s) found.
+		Long: `Executes the [query] and return the solution(s) found.
+
+Optionally, a program can be transmitted, which will be interpreted before the query is processed.
 
 Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee
 is charged for this, but the execution is constrained by the current limits configured in the module (that you can
 query).`,
-		Example: fmt.Sprintf(`$ %s %s query ask "chain_id(X)." # returns the chain-id`,
+		Example: fmt.Sprintf(`$ %s query %s ask "chain_id(X)." # returns the chain-id`,
 			version.AppName,
 			types.ModuleName),
 		Args: cobra.MinimumNArgs(1),

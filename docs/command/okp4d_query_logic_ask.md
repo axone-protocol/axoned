@@ -4,7 +4,9 @@ executes a logic query and returns the solutions found.
 
 ### Synopsis
 
-Executes the [query] for the given [program] file and return the solution(s) found.
+Executes the [query] and return the solution(s) found.
+
+Optionally, a program can be transmitted, which will be interpreted before the query is processed.
 
 Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee
 is charged for this, but the execution is constrained by the current limits configured in the module (that you can
@@ -17,7 +19,7 @@ okp4d query logic ask [query] [flags]
 ### Examples
 
 ```
-okp4d logic query ask "chain_id(X)." # returns the chain-id
+okp4d query logic ask "chain_id(X)." # returns the chain-id
 ```
 
 ### Options
