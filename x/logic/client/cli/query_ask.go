@@ -27,7 +27,7 @@ func CmdQueryAsk() *cobra.Command {
 Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee
 is charged for this, but the execution is constrained by the current limits configured in the module (that you can
 query).`,
-		Example: fmt.Sprintf(`$ %s %s query ask "immortal(X)." program.txt`,
+		Example: fmt.Sprintf(`$ %s %s query ask "chain_id(X)." # returns the chain-id`,
 			version.AppName,
 			types.ModuleName),
 		Args: cobra.MinimumNArgs(1),
