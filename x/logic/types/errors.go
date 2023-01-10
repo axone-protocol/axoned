@@ -6,7 +6,7 @@ import (
 )
 
 var (
-	InvalidArgument = sdkerrors.RegisterWithGRPCCode(ModuleName, 1, codes.InvalidArgument, "limit exceeded")
+	InvalidArgument = sdkerrors.RegisterWithGRPCCode(ModuleName, 1, codes.InvalidArgument, "invalid argument")
 	// LimitExceeded is returned when a limit is exceeded.
 	LimitExceeded = sdkerrors.RegisterWithGRPCCode(ModuleName, 2, codes.InvalidArgument, "limit exceeded")
 	// Internal is returned when an internal error occurs.

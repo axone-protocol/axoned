@@ -3,7 +3,8 @@ package cli
 import (
 	"context"
 	"fmt"
-	"strings"
+	"io"
+	"os"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -12,30 +13,34 @@ import (
 	"github.com/spf13/cobra"
 )
 
+var (
+	program     string
+	programFile string
+)
+
 func CmdQueryAsk() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ask [query] [program]",
+		Use:   "ask [query]",
 		Short: "executes a logic query and returns the solutions found.",
-		Long: strings.TrimSpace(
-			fmt.Sprintf(`Executes the [query] for the given [program] file and return the solution(s) found.
+		Long: `Executes the [query] for the given [program] file and return the solution(s) found.
 
 Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee
-is charged for this, but the execution is constrained by the current limits configured in the module.
+is charged for this, but the execution is constrained by the current limits configured in the module (that you can
+query).`,
+		Example: fmt.Sprintf(`$ %s %s query ask "immortal(X)." program.txt`,
+			version.AppName,
+			types.ModuleName),
+		Args: cobra.MinimumNArgs(1),
+		RunE: func(cmd *cobra.Command, args []string) (err error) {
+			if programFile != "" {
+				program, err = ReadProgramFromFile(programFile)
+				if err != nil {
+					return
+				}
+			}
 
-Example:
-$ %s %s query ask "immortal(X)." program.txt
-`,
-				version.AppName,
-				types.ModuleName,
-			),
-		),
-		Args: cobra.MinimumNArgs(2),
-		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx := client.GetClientContextFromCmd(cmd)
-
 			query := args[0]
-			program := args[1]
-
 			queryClient := types.NewQueryServiceClient(clientCtx)
 
 			res, err := queryClient.Ask(context.Background(), &types.QueryServiceAskRequest{
@@ -43,14 +48,53 @@ $ %s %s query ask "immortal(X)." program.txt
 				Query:   query,
 			})
 			if err != nil {
-				return err
+				return
 			}
 
 			return clientCtx.PrintProto(res)
 		},
 	}
 
+	cmd.Flags().StringVar(
+		&program,
+		"program",
+		"",
+		`reads the program from the given filename or from stdin if "-" is passed as the filename.`)
+	cmd.Flags().StringVar(
+		&programFile,
+		"program-file",
+		"",
+		`reads the program from the given string.`)
+	cmd.MarkFlagsMutuallyExclusive("program", "program-file")
+
 	flags.AddQueryFlagsToCmd(cmd)
 
 	return cmd
+}
+
+// ReadProgramFromFile reads text from the given filename or from stdin if "-" is passed as the filename.
+// It returns the text as a string and an error value.
+func ReadProgramFromFile(filename string) (string, error) {
+	var r io.Reader
+
+	if filename == "-" {
+		r = os.Stdin
+	} else {
+		file, err := os.Open(filename)
+		if err != nil {
+			return "", err
+		}
+		defer func() {
+			_ = file.Close()
+		}()
+
+		r = file
+	}
+
+	bytes, err := io.ReadAll(r)
+	if err != nil {
+		return "", err
+	}
+
+	return string(bytes), nil
 }
