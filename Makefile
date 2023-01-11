@@ -60,11 +60,12 @@ BUILD_TAGS_COMMA_SEP := $(subst $(WHITESPACE),$(COMMA),$(BUILD_TAGS))
 VERSION  := $(shell cat version)
 COMMIT   := $(shell git log -1 --format='%H')
 LD_FLAGS  = \
+    -X github.com/cosmos/cosmos-sdk/version.AppName=okp4d      \
 	-X github.com/cosmos/cosmos-sdk/version.Name=okp4d         \
 	-X github.com/cosmos/cosmos-sdk/version.ServerName=okp4d   \
 	-X github.com/cosmos/cosmos-sdk/version.ClientName=okp4d   \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT) \
+	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)   \
     -X github.com/cosmos/cosmos-sdk/version.BuildTags=$(BUILD_TAGS_COMMA_SEP)
 
 ifeq ($(LINK_STATICALLY),true)
@@ -282,9 +283,10 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 		${DOCKER_IMAGE_BUF} \
 		generate proto --template buf.gen.proto.yaml -v
 	@cp -r github.com/okp4/okp4d/x/* x/
-	@rm -rf github.com
+	@sudo rm -rf github.com
 
 ## Documentation:
+.PHONY: doc-proto
 doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 	@for MODULE in $(shell find proto -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
 		echo "${COLOR_CYAN} 📖 Generate documentation for $${MODULE} module${COLOR_RESET}" ; \
@@ -301,12 +303,14 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 	  -w /usr/src/okp4d/docs \
 	  ${DOCKER_IMAGE_MARKDOWNLINT} -f proto
 
+.PHONY: doc-command
 doc-command: ## Generate markdown documentation for the command
 	@echo "${COLOR_CYAN} 📖 Generate markdown documentation for the command${COLOR_RESET}"
 	@cd docs; \
 	OUT_FOLDER="command"; \
 	rm -rf $$OUT_FOLDER; \
-	go get ../scripts; \
+	go version; \
+	go get ./scripts; \
 	go run ../scripts/generate_command_doc.go; \
 	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.okp4d\")/(default \"\/home\/john\/\.okp4d\")/g' $$OUT_FOLDER/*.md; \
 	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' $$OUT_FOLDER/*.md; \
@@ -317,6 +321,13 @@ doc-command: ## Generate markdown documentation for the command
 	  -v `pwd`:/usr/src/docs \
 	  -w /usr/src/docs \
 	  ${DOCKER_IMAGE_MARKDOWNLINT} -f $$OUT_FOLDER
+
+## Mock:
+.PHONY: mock
+mock: ## Generate all the mocks (for tests)
+	@echo "${COLOR_CYAN} 🧱 Generating all the mocks${COLOR_RESET}"
+	@go install github.com/golang/mock/mockgen@v1.6.0
+	@mockgen -source=x/logic/testutil/expected_keepers.go -package testutil -destination x/logic/testutil/expected_keepers_mocks.go
 
 ## Release:
 .PHONY: release-assets

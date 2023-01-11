@@ -1,12 +1,21 @@
 package keeper
 
 import (
-	"context"
+	goctx "context"
 
+	sdkerrors "cosmossdk.io/errors"
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
-func (k Keeper) Ask(ctx context.Context, request *types.QueryServiceAskRequest) (*types.QueryServiceAskResponse, error) {
-	// TODO implement me
-	panic("implement me")
+func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (*types.QueryServiceAskResponse, error) {
+	if req == nil {
+		return nil, sdkerrors.Wrap(types.InvalidArgument, "request is nil")
+	}
+
+	limits := k.limits(ctx)
+	if err := checkLimits(req, limits); err != nil {
+		return nil, err
+	}
+
+	return k.execute(ctx, req.Program, req.Query)
 }
