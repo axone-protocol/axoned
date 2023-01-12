@@ -14,7 +14,7 @@ DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v1.49
 DOCKER_IMAGE_BUF  		  = okp4/buf-cosmos:0.3.1
 DOCKER_BUILDX_BUILDER     = okp4-builder
 DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
-DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate
+DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
 
 # Some colors
 COLOR_GREEN  = $(shell tput -Txterm setaf 2)
