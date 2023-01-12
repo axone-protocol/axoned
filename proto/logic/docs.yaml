@@ -33,29 +33,29 @@ description: |
   A rule has the following format:
 
   ```prolog
-  head :- body.  
-  ```  
+  head :- body.
+  ```
 
   The symbol `:-` is called the "if-then" operator, and it means that the relationship described in the head of the rule
   holds only if the conditions in the body are true.
 
   For example:
 
-  ```prolog  
+  ```prolog
   grandfather(X,Y) :- father(X,Z), father(Z,Y). # X is the grandfather of Y if X is the father of Z and Z is the father of Y.
-  ```  
+  ```
 
   A fact is a special type of rule that has no body (with no `:-` and no conditions). A fact has the following format:
 
   ```prolog
-  head.  
-  ```  
+  head.
+  ```
 
   For instance:
 
-  ```prolog  
+  ```prolog
   father(john, mary). # john is the father of mary.
-  ```  
+  ```
 
   #### Variable
 
@@ -140,7 +140,7 @@ description: |
   chain_id(X). # ask for the chain ID.
   ```
 
-  #### Result
+  #### Response
 
   The response is an object that contains the following fields:
 
@@ -155,7 +155,7 @@ description: |
     - `results`: an array of objects that contains the results of the query. Each result is an object that contains the
       following fields:
       - `substitutions`: an array of objects that contains the substitutions that were made to satisfy the query. A
-        substitution is a set of variable-value pairs that is used to replace variables with constants. A substitution 
+        substitution is a set of variable-value pairs that is used to replace variables with constants. A substitution
         is the result of unification. A substitution is used to replace variables with constants when evaluating a rule.
 
   ## Performance
@@ -165,7 +165,7 @@ description: |
   program.
   Keep in mind that he module uses [backtracking](https://en.wikipedia.org/wiki/Backtracking) to search for solutions,
   making it most effective when used for queries that are satisfiable. Indeed, if the query is not satisfiable, the module will
-  attempt to find a solution by [backtracking](https://en.wikipedia.org/wiki/Backtracking) and searching through possible 
+  attempt to find a solution by [backtracking](https://en.wikipedia.org/wiki/Backtracking) and searching through possible
   solutions for an extended period before ultimately being canceled.
 
   ## Gas
