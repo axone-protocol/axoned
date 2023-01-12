@@ -25,7 +25,7 @@ func NewInstrumentedInterpreter(
 	var i prolog.Interpreter
 
 	for _, o := range predicates {
-		if err := Register(ctx, &i, o, inc); err != nil {
+		if err := Register(&i, o, inc); err != nil {
 			return nil, fmt.Errorf("error registering predicate '%s': %w", o, err)
 		}
 	}
