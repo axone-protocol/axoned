@@ -39,8 +39,8 @@ func TestBlock(t *testing.T) {
 
 				convey.Convey("and a vm", func() {
 					vm := testutil.NewVMMust(ctx)
-					vm.Register1(engine.NewAtom("block_height"), BlockHeight(ctx))
-					vm.Register1(engine.NewAtom("block_time"), BlockTime(ctx))
+					vm.Register1(engine.NewAtom("block_height"), BlockHeight)
+					vm.Register1(engine.NewAtom("block_time"), BlockTime)
 					testutil.CompileMust(ctx, vm, fmt.Sprintf("test :- %s.", tc.implication))
 
 					convey.Convey("When the predicate is called", func() {
