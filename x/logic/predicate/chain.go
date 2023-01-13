@@ -2,6 +2,7 @@ package predicate
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ichiban/prolog/engine"
 	"github.com/okp4/okp4d/x/logic/util"
@@ -16,7 +17,7 @@ func ChainID(vm *engine.VM, chainID engine.Term, cont engine.Cont, env *engine.E
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		sdkContext, err := util.UnwrapSDKContext(ctx)
 		if err != nil {
-			return engine.Error(err)
+			return engine.Error(fmt.Errorf("chain_id/1: %w", err))
 		}
 
 		return engine.Unify(vm, chainID, engine.CharList(sdkContext.ChainID()), cont, env)
