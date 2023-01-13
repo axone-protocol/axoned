@@ -1,7 +1,6 @@
 package interpreter
 
 import (
-	goctx "context"
 	"fmt"
 	"strconv"
 	"strings"
@@ -12,119 +11,106 @@ import (
 	"github.com/okp4/okp4d/x/logic/predicate"
 )
 
-// wrapContext wraps a context.Context around a predicate(ctx).
-func wrapCtx(p any) func(goctx.Context) any {
-	return func(ctx goctx.Context) any {
-		return p
-	}
-}
-
-func relax[T any](f func(goctx.Context) T) func(goctx.Context) any {
-	return func(ctx goctx.Context) any {
-		return f(ctx)
-	}
-}
-
 // RegistryEntry is the type of registry entry.
 type RegistryEntry struct {
 	// predicate is the registered predicate(ctx).
-	predicate func(goctx.Context) any
+	predicate any
 	// cost is the cost of the predicate when it is called.
 	cost uint64
 }
 
 // Registry is a map from predicate names (in the form of "atom/arity") to predicates and their costs.
 var Registry = map[string]RegistryEntry{
-	"call/1":                    {wrapCtx(engine.Call), 1},
-	"catch/3":                   {wrapCtx(engine.Catch), 1},
-	"throw/1":                   {wrapCtx(engine.Throw), 1},
-	"=/2":                       {wrapCtx(engine.Unify), 1},
-	"unify_with_occurs_check/2": {wrapCtx(engine.UnifyWithOccursCheck), 1},
-	"subsumes_term/2":           {wrapCtx(engine.SubsumesTerm), 1},
-	"var/1":                     {wrapCtx(engine.TypeVar), 1},
-	"atom/1":                    {wrapCtx(engine.TypeAtom), 1},
-	"integer/1":                 {wrapCtx(engine.TypeInteger), 1},
-	"float/1":                   {wrapCtx(engine.TypeFloat), 1},
-	"compound/1":                {wrapCtx(engine.TypeCompound), 1},
-	"acyclic_term/1":            {wrapCtx(engine.AcyclicTerm), 1},
-	"compare/3":                 {wrapCtx(engine.Compare), 1},
-	"sort/2":                    {wrapCtx(engine.Sort), 1},
-	"keysort/2":                 {wrapCtx(engine.KeySort), 1},
-	"functor/3":                 {wrapCtx(engine.Functor), 1},
-	"arg/3":                     {wrapCtx(engine.Arg), 1},
-	"=../2":                     {wrapCtx(engine.Univ), 1},
-	"copy_term/2":               {wrapCtx(engine.CopyTerm), 1},
-	"term_variables/2":          {wrapCtx(engine.TermVariables), 1},
-	"is/2":                      {wrapCtx(engine.Is), 1},
-	"=:=/2":                     {wrapCtx(engine.Equal), 1},
-	"=\\=/2":                    {wrapCtx(engine.NotEqual), 1},
-	"</2":                       {wrapCtx(engine.LessThan), 1},
-	"=</2":                      {wrapCtx(engine.LessThanOrEqual), 1},
-	">/2":                       {wrapCtx(engine.GreaterThan), 1},
-	">=/2":                      {wrapCtx(engine.GreaterThanOrEqual), 1},
-	"clause/2":                  {wrapCtx(engine.Clause), 1},
-	"current_predicate/1":       {wrapCtx(engine.CurrentPredicate), 1},
-	"asserta/1":                 {wrapCtx(engine.Asserta), 1},
-	"assertz/1":                 {wrapCtx(engine.Assertz), 1},
-	"retract/1":                 {wrapCtx(engine.Retract), 1},
-	"abolish/1":                 {wrapCtx(engine.Abolish), 1},
-	"findall/3":                 {wrapCtx(engine.FindAll), 1},
-	"bagof/3":                   {wrapCtx(engine.BagOf), 1},
-	"setof/3":                   {wrapCtx(engine.SetOf), 1},
-	"current_input/1":           {wrapCtx(engine.CurrentInput), 1},
-	"current_output/1":          {wrapCtx(engine.CurrentOutput), 1},
-	"set_input/1":               {wrapCtx(engine.SetInput), 1},
-	"set_output/1":              {wrapCtx(engine.SetOutput), 1},
-	"open/4":                    {wrapCtx(engine.Open), 1},
-	"close/2":                   {wrapCtx(engine.Close), 1},
-	"flush_output/1":            {wrapCtx(engine.FlushOutput), 1},
-	"stream_property/2":         {wrapCtx(engine.StreamProperty), 1},
-	"set_stream_position/2":     {wrapCtx(engine.SetStreamPosition), 1},
-	"get_char/2":                {wrapCtx(engine.GetChar), 1},
-	"peek_char/2":               {wrapCtx(engine.PeekChar), 1},
-	"put_char/2":                {wrapCtx(engine.PutChar), 1},
-	"get_byte/2":                {wrapCtx(engine.GetByte), 1},
-	"peek_byte/2":               {wrapCtx(engine.PeekByte), 1},
-	"put_byte/2":                {wrapCtx(engine.PutByte), 1},
-	"read_term/3":               {wrapCtx(engine.ReadTerm), 1},
-	"write_term/3":              {wrapCtx(engine.WriteTerm), 1},
-	"op/3":                      {wrapCtx(engine.Op), 1},
-	"current_op/3":              {wrapCtx(engine.CurrentOp), 1},
-	"char_conversion/2":         {wrapCtx(engine.CharConversion), 1},
-	"current_char_conversion/2": {wrapCtx(engine.CurrentCharConversion), 1},
-	`\+/1`:                      {wrapCtx(engine.Negate), 1},
-	"repeat/0":                  {wrapCtx(engine.Repeat), 1},
-	"call/2":                    {wrapCtx(engine.Call1), 1},
-	"call/3":                    {wrapCtx(engine.Call2), 1},
-	"call/4":                    {wrapCtx(engine.Call3), 1},
-	"call/5":                    {wrapCtx(engine.Call4), 1},
-	"call/6":                    {wrapCtx(engine.Call5), 1},
-	"call/7":                    {wrapCtx(engine.Call6), 1},
-	"call/8":                    {wrapCtx(engine.Call7), 1},
-	"atom_length/2":             {wrapCtx(engine.AtomLength), 1},
-	"atom_concat/3":             {wrapCtx(engine.AtomConcat), 1},
-	"sub_atom/5":                {wrapCtx(engine.SubAtom), 1},
-	"atom_chars/2":              {wrapCtx(engine.AtomChars), 1},
-	"atom_codes/2":              {wrapCtx(engine.AtomCodes), 1},
-	"char_code/2":               {wrapCtx(engine.CharCode), 1},
-	"number_chars/2":            {wrapCtx(engine.NumberChars), 1},
-	"number_codes/2":            {wrapCtx(engine.NumberCodes), 1},
-	"set_prolog_flag/2":         {wrapCtx(engine.SetPrologFlag), 1},
-	"current_prolog_flag/2":     {wrapCtx(engine.CurrentPrologFlag), 1},
-	"halt/1":                    {wrapCtx(engine.Halt), 1},
-	"consult/1":                 {wrapCtx(engine.Consult), 1},
-	"phrase/3":                  {wrapCtx(engine.Phrase), 1},
-	"expand_term/2":             {wrapCtx(engine.ExpandTerm), 1},
-	"append/3":                  {wrapCtx(engine.Append), 1},
-	"length/2":                  {wrapCtx(engine.Length), 1},
-	"between/3":                 {wrapCtx(engine.Between), 1},
-	"succ/2":                    {wrapCtx(engine.Succ), 1},
-	"nth0/3":                    {wrapCtx(engine.Nth0), 1},
-	"nth1/3":                    {wrapCtx(engine.Nth1), 1},
-	"call_nth/2":                {wrapCtx(engine.CallNth), 1},
-	"chain_id/1":                {relax(predicate.ChainID), 1},
-	"block_height/1":            {relax(predicate.BlockHeight), 1},
-	"block_time/1":              {relax(predicate.BlockTime), 1},
+	"call/1":                    {engine.Call, 1},
+	"catch/3":                   {engine.Catch, 1},
+	"throw/1":                   {engine.Throw, 1},
+	"=/2":                       {engine.Unify, 1},
+	"unify_with_occurs_check/2": {engine.UnifyWithOccursCheck, 1},
+	"subsumes_term/2":           {engine.SubsumesTerm, 1},
+	"var/1":                     {engine.TypeVar, 1},
+	"atom/1":                    {engine.TypeAtom, 1},
+	"integer/1":                 {engine.TypeInteger, 1},
+	"float/1":                   {engine.TypeFloat, 1},
+	"compound/1":                {engine.TypeCompound, 1},
+	"acyclic_term/1":            {engine.AcyclicTerm, 1},
+	"compare/3":                 {engine.Compare, 1},
+	"sort/2":                    {engine.Sort, 1},
+	"keysort/2":                 {engine.KeySort, 1},
+	"functor/3":                 {engine.Functor, 1},
+	"arg/3":                     {engine.Arg, 1},
+	"=../2":                     {engine.Univ, 1},
+	"copy_term/2":               {engine.CopyTerm, 1},
+	"term_variables/2":          {engine.TermVariables, 1},
+	"is/2":                      {engine.Is, 1},
+	"=:=/2":                     {engine.Equal, 1},
+	"=\\=/2":                    {engine.NotEqual, 1},
+	"</2":                       {engine.LessThan, 1},
+	"=</2":                      {engine.LessThanOrEqual, 1},
+	">/2":                       {engine.GreaterThan, 1},
+	">=/2":                      {engine.GreaterThanOrEqual, 1},
+	"clause/2":                  {engine.Clause, 1},
+	"current_predicate/1":       {engine.CurrentPredicate, 1},
+	"asserta/1":                 {engine.Asserta, 1},
+	"assertz/1":                 {engine.Assertz, 1},
+	"retract/1":                 {engine.Retract, 1},
+	"abolish/1":                 {engine.Abolish, 1},
+	"findall/3":                 {engine.FindAll, 1},
+	"bagof/3":                   {engine.BagOf, 1},
+	"setof/3":                   {engine.SetOf, 1},
+	"current_input/1":           {engine.CurrentInput, 1},
+	"current_output/1":          {engine.CurrentOutput, 1},
+	"set_input/1":               {engine.SetInput, 1},
+	"set_output/1":              {engine.SetOutput, 1},
+	"open/4":                    {engine.Open, 1},
+	"close/2":                   {engine.Close, 1},
+	"flush_output/1":            {engine.FlushOutput, 1},
+	"stream_property/2":         {engine.StreamProperty, 1},
+	"set_stream_position/2":     {engine.SetStreamPosition, 1},
+	"get_char/2":                {engine.GetChar, 1},
+	"peek_char/2":               {engine.PeekChar, 1},
+	"put_char/2":                {engine.PutChar, 1},
+	"get_byte/2":                {engine.GetByte, 1},
+	"peek_byte/2":               {engine.PeekByte, 1},
+	"put_byte/2":                {engine.PutByte, 1},
+	"read_term/3":               {engine.ReadTerm, 1},
+	"write_term/3":              {engine.WriteTerm, 1},
+	"op/3":                      {engine.Op, 1},
+	"current_op/3":              {engine.CurrentOp, 1},
+	"char_conversion/2":         {engine.CharConversion, 1},
+	"current_char_conversion/2": {engine.CurrentCharConversion, 1},
+	`\+/1`:                      {engine.Negate, 1},
+	"repeat/0":                  {engine.Repeat, 1},
+	"call/2":                    {engine.Call1, 1},
+	"call/3":                    {engine.Call2, 1},
+	"call/4":                    {engine.Call3, 1},
+	"call/5":                    {engine.Call4, 1},
+	"call/6":                    {engine.Call5, 1},
+	"call/7":                    {engine.Call6, 1},
+	"call/8":                    {engine.Call7, 1},
+	"atom_length/2":             {engine.AtomLength, 1},
+	"atom_concat/3":             {engine.AtomConcat, 1},
+	"sub_atom/5":                {engine.SubAtom, 1},
+	"atom_chars/2":              {engine.AtomChars, 1},
+	"atom_codes/2":              {engine.AtomCodes, 1},
+	"char_code/2":               {engine.CharCode, 1},
+	"number_chars/2":            {engine.NumberChars, 1},
+	"number_codes/2":            {engine.NumberCodes, 1},
+	"set_prolog_flag/2":         {engine.SetPrologFlag, 1},
+	"current_prolog_flag/2":     {engine.CurrentPrologFlag, 1},
+	"halt/1":                    {engine.Halt, 1},
+	"consult/1":                 {engine.Consult, 1},
+	"phrase/3":                  {engine.Phrase, 1},
+	"expand_term/2":             {engine.ExpandTerm, 1},
+	"append/3":                  {engine.Append, 1},
+	"length/2":                  {engine.Length, 1},
+	"between/3":                 {engine.Between, 1},
+	"succ/2":                    {engine.Succ, 1},
+	"nth0/3":                    {engine.Nth0, 1},
+	"nth1/3":                    {engine.Nth1, 1},
+	"call_nth/2":                {engine.CallNth, 1},
+	"chain_id/1":                {predicate.ChainID, 1},
+	"block_height/1":            {predicate.BlockHeight, 1},
+	"block_time/1":              {predicate.BlockTime, 1},
 }
 
 // RegistryNames is the list of the predicate names in the Registry.
@@ -143,7 +129,7 @@ var RegistryNames = func() []string {
 // executing the predicate(ctx).
 //
 //nolint:lll
-func Register(ctx goctx.Context, i *prolog.Interpreter, name string, inc context.IncrementCountByFunc) error {
+func Register(i *prolog.Interpreter, name string, inc context.IncrementCountByFunc) error {
 	if entry, ok := Registry[name]; ok {
 		parts := strings.Split(name, "/")
 		if len(parts) == 2 {
@@ -154,7 +140,7 @@ func Register(ctx goctx.Context, i *prolog.Interpreter, name string, inc context
 			}
 
 			hook := inc.By(entry.cost)
-			p := entry.predicate(ctx)
+			p := entry.predicate
 
 			switch arity {
 			case 0:

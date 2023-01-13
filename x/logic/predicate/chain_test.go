@@ -34,7 +34,7 @@ func TestChainID(t *testing.T) {
 
 				convey.Convey("and a vm", func() {
 					vm := testutil.NewVMMust(ctx)
-					vm.Register1(engine.NewAtom("chain_id"), ChainID(ctx))
+					vm.Register1(engine.NewAtom("chain_id"), ChainID)
 					testutil.CompileMust(ctx, vm, fmt.Sprintf("test :- %s.", tc.implication))
 
 					convey.Convey("When the predicate is called", func() {
