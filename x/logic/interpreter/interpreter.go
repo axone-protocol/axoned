@@ -8,7 +8,7 @@ import (
 	"github.com/okp4/okp4d/x/logic/context"
 )
 
-// NewInstrumentedInterpreter creates a new prolog.Interpreter with:
+// New creates a new prolog.Interpreter with:
 // - a list of predefined predicates
 // - a compiled bootstrap script, that can be used to perform setup tasks.
 // - a function that can be used to increment the gas meter.
@@ -16,7 +16,7 @@ import (
 // The predicates names must be present in the registry, otherwise the function will return an error.
 // The bootstrap script can be an empty string if no bootstrap script is needed. If compilation of the bootstrap script
 // fails, the function will return an error.
-func NewInstrumentedInterpreter(
+func New(
 	ctx goctx.Context,
 	predicates []string,
 	bootstrap string,

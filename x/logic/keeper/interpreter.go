@@ -98,7 +98,7 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, goctx.Co
 	interpreterParams := params.GetInterpreter()
 	limitContext, inc := k.withLimitContext(ctx)
 
-	interpreted, err := interpreter.NewInstrumentedInterpreter(
+	interpreted, err := interpreter.New(
 		limitContext,
 		util.NonZeroOrDefault(interpreterParams.GetRegisteredPredicates(), interpreter.RegistryNames),
 		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), interpreter.Bootstrap()),
