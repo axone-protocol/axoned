@@ -4,6 +4,196 @@
 
 <a name="top"></a>
 
+## 📝 Description
+
+This module implements a [Prolog](https://en.wikipedia.org/wiki/Prolog) logic interpreter (go-native) and
+its [unification](https://en.wikipedia.org/wiki/Unification_(computer_science))
+algorithm to evaluate logical expressions against the current state of the blockchain.
+
+This distinctive module allows for the creation of advanced, goal-oriented queries and logical systems that can be
+applied
+to a wide range of use cases, while still maintaining the determinism and predictability of blockchain technology. It
+also features a collection of predefined, blockchain-specific predicates that can be used to access information about
+the state of the blockchain.
+
+## Concepts
+
+### Program
+
+A program is a text that is parsed and compiled by the interpreter. A program is composed of a set of predicates, which
+are defined by the user and can be used to express the desired query logic.
+
+#### Predicate
+
+A predicate is a statement that describes a relationship between one or more variables or constants. A predicate
+consists of a name followed by zero or more arguments.
+
+#### Rule & Fact
+
+A rule is a statement that describes a relationship between one or more variables or constants, similar to a predicate.
+However, unlike a predicate, a rule also specifies one or more conditions that must be true in order for the
+relationship described by the rule to hold.
+
+A rule has the following format:
+
+```prolog
+head :- body.
+```
+
+The symbol `:-` is called the "if-then" operator, and it means that the relationship described in the head of the rule
+holds only if the conditions in the body are true.
+
+For example:
+
+```prolog
+grandfather(X,Y) :- father(X,Z), father(Z,Y). # X is the grandfather of Y if X is the father of Z and Z is the father of Y.
+```
+
+A fact is a special type of rule that has no body (with no `:-` and no conditions). A fact has the following format:
+
+```prolog
+head.
+```
+
+For instance:
+
+```prolog
+father(john, mary). # john is the father of mary.
+```
+
+#### Variable
+
+A variable is a predicate argument that is used as a placeholder for a value. It can represent any type of data, such as
+numbers, strings, or lists.
+
+Variables are denoted by a name that starts with an uppercase letter, for example `X` or `Foo`.
+
+For instance:
+
+```prolog
+father(X, mary). # ask for all X that are the father of mary.
+```
+
+### Query
+
+A query is a statement used to retrieve information from the blockchain. It can be sent against a program, but this
+is optional. The interpreter evaluates the query and returns the result to the caller. Queries can be submitted to a
+module using the `Ask` message.
+
+#### `Ask`
+
+The `Ask` message is used to submit a query to the module. It has the following format:
+
+```text
+{
+  string Program
+  string Query
+}
+```
+
+The `Program` field is optional. If it is not specified, the query is just evaluated against the current state of the
+blockchain.
+If it is specified, the query is evaluated against the program that is passed as an argument.
+
+For instance:
+
+```text
+{
+  Program: "father(john, mary)."
+  Query: "father(X, mary)."
+}
+```
+
+Gives:
+
+```json
+{
+  "height": "7235",
+  "gas_used": "9085",
+  "answer": {
+    "success": true,
+    "has_more": false,
+    "variables": [
+      "X"
+    ],
+    "results": [
+      {
+        "substitutions": [
+          {
+            "variable": "X",
+            "term": {
+              "name": "john",
+              "arguments": []
+            }
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+The logic module supports chain-specific predicates that can be used to query the state of the blockchain. For example,
+the `chain_id` predicate can be used to retrieve the chain ID of the current blockchain. Several other predicates are
+available, such as `block_height`, `block_time`... Please refer to the go documentation for the full list of available
+predicates.
+
+For instance:
+
+```prolog
+chain_id(X). # ask for the chain ID.
+```
+
+#### Response
+
+The response is an object that contains the following fields:
+
+- `height`: the height of the block at which the query was evaluated.
+- `gas_used`: the amount of gas used to evaluate the query.
+- `answer`: the result of the query. It is an object that contains the following fields:
+  - `success`: a boolean that indicates whether the query was successful or not. Successful means that solutions were
+    found, i.e. the query was satisfiable.
+  - `has_more`: a boolean that indicates whether there are more results to be retrieved. It's just informative since no
+    more results can be retrieved.
+  - `variables`: an array of strings that contains the names of the variables that were used in the query.
+  - `results`: an array of objects that contains the results of the query. Each result is an object that contains the
+    following fields:
+    - `substitutions`: an array of objects that contains the substitutions that were made to satisfy the query. A
+      substitution is a set of variable-value pairs that is used to replace variables with constants. A substitution
+      is the result of unification. A substitution is used to replace variables with constants when evaluating a rule.
+
+## Performance
+
+The performance of the logic module is closely tied to the complexity of the query and the size of the program. To
+optimize performance, especially in a constrained environment like the blockchain, it is important to minimize the size of the
+program.
+Keep in mind that he module uses [backtracking](https://en.wikipedia.org/wiki/Backtracking) to search for solutions,
+making it most effective when used for queries that are satisfiable. Indeed, if the query is not satisfiable, the module will
+attempt to find a solution by [backtracking](https://en.wikipedia.org/wiki/Backtracking) and searching through possible
+solutions for an extended period before ultimately being canceled.
+
+## Gas
+
+The `Ask` message incurs gas consumption, which is calculated as the sum of the gas used to evaluate each predicate during
+the query evaluation process. Each predicate has a fixed gas cost that is based on its complexity.
+
+While querying the module does not require any fees, the use of gas serves as a mechanism to limit the size and
+complexity of the query, ensuring optimal performance and fairness.
+
+## Security
+
+The logic module is a deterministic program that is executed in a sandboxed environment and does not have the ability
+to submit transactions or make changes to the blockchain's state. It is therefore safe to use.
+
+To control the cpu and memory usage of the module, the module is limited by several different mechanisms:
+
+- `max_gas`: the maximum amount of gas that can be used to evaluate a query.
+- `max_size`: the maximum size of the program that can be evaluated.
+- `max_result_count`: the maximum number of results that can be returned by a query.
+
+Additional limitations are being considered for the future, such as restricting the number of variables that can be
+utilized within a query, or limiting the depth of the backtracking algorithm.
+
 ## Table of Contents
 
 - [logic/v1beta/params.proto](#logic/v1beta/params.proto)
