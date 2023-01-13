@@ -1,4 +1,4 @@
-name: notify-release
+name: update-draft-docs
 
 on:
   push:
@@ -22,7 +22,7 @@ jobs:
                 "repository": "${{github.repository}}",
                 "section": "modules",
                 "docs_directory": "docs/proto/*",
-                "draft": true
+                "draft": "true"
               }
             }
 
@@ -40,6 +40,6 @@ jobs:
                 "repository": "${{github.repository}}",
                 "section": "commands",
                 "docs_directory": "docs/command/*",
-                "draft": true
+                "draft": "true"
               }
             }
