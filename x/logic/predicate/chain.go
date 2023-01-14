@@ -20,6 +20,6 @@ func ChainID(vm *engine.VM, chainID engine.Term, cont engine.Cont, env *engine.E
 			return engine.Error(fmt.Errorf("chain_id/1: %w", err))
 		}
 
-		return engine.Unify(vm, chainID, engine.CharList(sdkContext.ChainID()), cont, env)
+		return engine.Unify(vm, chainID, engine.NewAtom(sdkContext.ChainID()), cont, env)
 	})
 }
