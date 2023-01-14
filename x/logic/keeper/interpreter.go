@@ -98,6 +98,9 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, goctx.Co
 	interpreterParams := params.GetInterpreter()
 	limitContext, inc := k.withLimitContext(ctx)
 
+	limitContext = goctx.WithValue(limitContext, types.AuthKeeperContextKey, k.authKeeper)
+	limitContext = goctx.WithValue(limitContext, types.BankKeeperContextKey, k.bankKeeper)
+
 	interpreted, err := interpreter.New(
 		limitContext,
 		util.NonZeroOrDefault(interpreterParams.GetRegisteredPredicates(), interpreter.RegistryNames),
