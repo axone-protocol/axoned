@@ -12,11 +12,13 @@ func NewVMMust(ctx context.Context) (vm *engine.VM) {
 	vm = &engine.VM{}
 	vm.Register3(engine.NewAtom("op"), engine.Op)
 	vm.Register3(engine.NewAtom("compare"), engine.Compare)
+	vm.Register2(engine.NewAtom("="), engine.Unify)
 
 	err := vm.Compile(ctx, `
 						:-(op(1200, xfx, ':-')).
 						:-(op(1000, xfy, ',')).
 						:-(op(700, xfx, '==')).
+						:-(op(700, xfx, '=')).
 						X == Y :- compare(=, X, Y).`)
 	if err != nil {
 		panic(err)
