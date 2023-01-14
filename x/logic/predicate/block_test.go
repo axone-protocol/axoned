@@ -38,13 +38,13 @@ func TestBlock(t *testing.T) {
 				ctx := sdk.NewContext(stateStore, tc.header, false, log.NewNopLogger())
 
 				Convey("and a vm", func() {
-					vm := testutil.NewVMMust(ctx)
-					vm.Register1(engine.NewAtom("block_height"), BlockHeight)
-					vm.Register1(engine.NewAtom("block_time"), BlockTime)
-					testutil.CompileMust(ctx, vm, fmt.Sprintf("test :- %s.", tc.implication))
+					interpreter := testutil.NewInterpreterMust(ctx)
+					interpreter.Register1(engine.NewAtom("block_height"), BlockHeight)
+					interpreter.Register1(engine.NewAtom("block_time"), BlockTime)
+					testutil.CompileMust(ctx, interpreter, fmt.Sprintf("test :- %s.", tc.implication))
 
 					Convey("When the predicate is called", func() {
-						ok, err := vm.Arrive(engine.NewAtom("test"), []engine.Term{}, engine.Success, nil).Force(ctx)
+						ok, err := interpreter.Arrive(engine.NewAtom("test"), []engine.Term{}, engine.Success, nil).Force(ctx)
 
 						Convey("Then the result should be true and there should be no error", func() {
 							So(err, ShouldBeNil)
