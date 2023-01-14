@@ -19,6 +19,7 @@ func NewVMMust(ctx context.Context) (vm *engine.VM) {
 						:-(op(1000, xfy, ',')).
 						:-(op(700, xfx, '==')).
 						:-(op(700, xfx, '=')).
+						:-(op(500, yfx, [+, -, /\, \/])).
 						X == Y :- compare(=, X, Y).`)
 	if err != nil {
 		panic(err)
