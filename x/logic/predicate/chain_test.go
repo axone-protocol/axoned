@@ -18,12 +18,12 @@ func TestChainID(t *testing.T) {
 	cases := []struct {
 		header      tmproto.Header
 		implication string
-		ok          bool
+		wantOk      bool
 	}{
-		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id("okp4-nemeton-1")`, ok: true},
-		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id("akashnet-2")`, ok: false},
-		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id(X), X == "okp4-nemeton-1"`, ok: true},
-		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id(X), X == "akashnet-2"`, ok: false},
+		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id("okp4-nemeton-1")`, wantOk: true},
+		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id("akashnet-2")`, wantOk: false},
+		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id(X), X == "okp4-nemeton-1"`, wantOk: true},
+		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id(X), X == "akashnet-2"`, wantOk: false},
 	}
 	for _, tc := range cases {
 		Convey(fmt.Sprintf("Given the clause body: %s", tc.implication), t, func() {
@@ -42,7 +42,7 @@ func TestChainID(t *testing.T) {
 
 						Convey("Then the result should be true and there should be no error", func() {
 							So(err, ShouldBeNil)
-							So(ok, ShouldEqual, tc.ok)
+							So(ok, ShouldEqual, tc.wantOk)
 						})
 					})
 				})
