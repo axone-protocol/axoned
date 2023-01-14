@@ -337,7 +337,7 @@ doc-command: ## Generate markdown documentation for the command
 mock: ## Generate all the mocks (for tests)
 	@echo "${COLOR_CYAN} 🧱 Generating all the mocks${COLOR_RESET}"
 	@go install github.com/golang/mock/mockgen@v1.6.0
-	@mockgen -source=x/logic/testutil/expected_keepers.go -package testutil -destination x/logic/testutil/expected_keepers_mocks.go
+	@mockgen -source=x/logic/types/expected_keepers.go -package testutil -destination x/logic/testutil/expected_keepers_mocks.go
 
 ## Release:
 .PHONY: release-assets
