@@ -1,34 +1,22 @@
 package types
 
 import (
-	"bytes"
-	"fmt"
-	"reflect"
 	"sort"
+
+	"github.com/ichiban/prolog"
 )
 
 // TermResults is a map from variable strings to prolog term values.
-type TermResults map[string]interface{}
+type TermResults map[string]prolog.TermString
 
 // ToSubstitutions converts a TermResults value to a slice of Substitution values.
 func (t TermResults) ToSubstitutions() []Substitution {
 	substitutions := make([]Substitution, 0, len(t))
 	for v, ts := range t {
-		var term string
-		if reflect.TypeOf(ts).Kind() == reflect.Slice {
-			var buf bytes.Buffer
-			for _, t := range ts.([]interface{}) {
-				buf.WriteString(fmt.Sprintf("%v", t))
-			}
-			term = buf.String()
-		} else {
-			term = fmt.Sprintf("%v", ts)
-		}
-
 		substitution := Substitution{
 			Variable: v,
 			Term: Term{
-				Name: term,
+				Name: string(ts),
 			},
 		}
 		substitutions = append(substitutions, substitution)
