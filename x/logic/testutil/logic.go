@@ -18,7 +18,7 @@ func NewInterpreterMust(ctx context.Context) (interpreter *prolog.Interpreter) {
 	err := interpreter.Compile(ctx, `
 						:-(op(1200, xfx, ':-')).
 						:-(op(1000, xfy, ',')).
-						:-(op(700, xfx, '==')).
+						:-(op(700, xfx, [==, \==, @<, @=<, @>, @>=])).
 						:-(op(700, xfx, '=')).
 						:-(op(500, yfx, [+, -, /\, \/])).
 
