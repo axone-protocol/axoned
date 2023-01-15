@@ -21,6 +21,9 @@ func NewInterpreterMust(ctx context.Context) (interpreter *prolog.Interpreter) {
 						:-(op(700, xfx, '==')).
 						:-(op(700, xfx, '=')).
 						:-(op(500, yfx, [+, -, /\, \/])).
+
+						member(X, [X|_]).
+						member(X, [_|Xs]) :- member(X, Xs).
 						X == Y :- compare(=, X, Y).`)
 	if err != nil {
 		panic(err)
