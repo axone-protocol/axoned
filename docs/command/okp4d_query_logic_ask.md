@@ -31,8 +31,8 @@ okp4d query logic ask "chain_id(X)." # returns the chain-id
   -h, --help                  help for ask
       --node string           &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string         Output format (text|json) (default "text")
-      --program string        reads the program from the given filename or from stdin if "-" is passed as the filename.
-      --program-file string   reads the program from the given string.
+      --program string        reads the program from the given string.
+      --program-file string   reads the program from the given filename or from stdin if "-" is passed as the filename.
 ```
 
 ### Options inherited from parent commands
