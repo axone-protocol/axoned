@@ -134,8 +134,18 @@ jobs:
     steps:
       - name: Check out repository
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Find changed proto files
+        id: changed-proto-files
+        uses: tj-actions/changed-files@v34.5.4
+        with:
+          files: |
+            proto/**/*.proto
 
       - name: Lint proto files
+        if: steps.changed-proto-files.outputs.any_changed == 'true'
         run: |
           make lint-proto
 
