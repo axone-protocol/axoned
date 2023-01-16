@@ -94,12 +94,14 @@ func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) err
 // newInterpreter creates a new interpreter with the limits configured for the module, and initialized with the
 // interpreter's module settings.
 func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, goctx.Context, context.IncrementCountByFunc, error) {
-	params := k.GetParams(sdk.UnwrapSDKContext(ctx))
-	interpreterParams := params.GetInterpreter()
-	limitContext, inc := k.withLimitContext(ctx)
+	sdkctx := sdk.UnwrapSDKContext(ctx)
+	sdkctx = sdkctx.WithValue(types.AuthKeeperContextKey, k.authKeeper)
+	sdkctx = sdkctx.WithValue(types.BankKeeperContextKey, k.bankKeeper)
 
-	limitContext = goctx.WithValue(limitContext, types.AuthKeeperContextKey, k.authKeeper)
-	limitContext = goctx.WithValue(limitContext, types.BankKeeperContextKey, k.bankKeeper)
+	params := k.GetParams(sdkctx)
+
+	interpreterParams := params.GetInterpreter()
+	limitContext, inc := k.withLimitContext(sdkctx)
 
 	interpreted, err := interpreter.New(
 		limitContext,
