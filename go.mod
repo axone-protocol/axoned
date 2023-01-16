@@ -8,6 +8,7 @@ require (
 	github.com/CosmWasm/wasmd v0.28.0
 	github.com/armon/go-metrics v0.4.1
 	github.com/cosmos/cosmos-sdk v0.46.7
+	github.com/cosmos/gogoproto v1.4.3
 	github.com/cosmos/ibc-go/v5 v5.1.0
 	github.com/cosmos/interchain-accounts v0.3.5
 	github.com/gogo/protobuf v1.3.3
@@ -16,6 +17,7 @@ require (
 	github.com/ichiban/prolog v0.15.1
 	github.com/ignite/cli v0.25.2
 	github.com/prometheus/client_golang v1.13.0
+	github.com/smartystreets/goconvey v1.7.2
 	github.com/spf13/cast v1.5.0
 	github.com/spf13/cobra v1.6.0
 	github.com/spf13/pflag v1.0.5
@@ -175,7 +177,6 @@ require (
 	github.com/sergi/go-diff v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.0 // indirect
 	github.com/smartystreets/assertions v1.2.0 // indirect
-	github.com/smartystreets/goconvey v1.7.2 // indirect
 	github.com/spf13/afero v1.9.2 // indirect
 	github.com/spf13/jwalterweatherman v1.1.0 // indirect
 	github.com/spf13/viper v1.13.0 // indirect

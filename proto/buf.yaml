@@ -1,5 +1,10 @@
 version: v1
 name: buf.build/okp4/okp4d
+deps:
+  - buf.build/cosmos/cosmos-sdk
+  - buf.build/cosmos/cosmos-proto
+  - buf.build/cosmos/gogo-proto
+  - buf.build/googleapis/googleapis
 breaking:
   use:
     - FILE
