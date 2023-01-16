@@ -224,9 +224,9 @@ func RegisterQueryServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 }
 
 var (
-	pattern_QueryService_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"okp4", "okp4d", "logic", "params"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_QueryService_Params_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"okp4", "okp4d", "logic", "params"}, "", runtime.AssumeColonVerbOpt(false)))
 
-	pattern_QueryService_Ask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"okp4", "okp4d", "logic", "ask"}, "", runtime.AssumeColonVerbOpt(true)))
+	pattern_QueryService_Ask_0 = runtime.MustPattern(runtime.NewPattern(1, []int{2, 0, 2, 1, 2, 2, 2, 3}, []string{"okp4", "okp4d", "logic", "ask"}, "", runtime.AssumeColonVerbOpt(false)))
 )
 
 var (
