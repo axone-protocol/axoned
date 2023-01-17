@@ -287,6 +287,9 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 	@sudo rm -rf github.com
 
 ## Documentation:
+.PHONY: doc
+doc: doc-proto doc-command ## Generate all the documentation
+
 .PHONY: doc-proto
 doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 	@for MODULE in $(shell find proto -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
