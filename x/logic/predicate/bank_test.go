@@ -137,7 +137,7 @@ func TestBank(t *testing.T) {
 				balances:   []bank.Balance{},
 				query:      `bank_balances('foo', X).`,
 				wantResult: []types.TermResults{{"X": "[uknow-100]"}},
-				wantError:  fmt.Errorf("bank_spendable_coins/2: decoding bech32 failed: invalid bech32 string length 3"),
+				wantError:  fmt.Errorf("bank_balances/2: decoding bech32 failed: invalid bech32 string length 3"),
 			},
 		}
 		for nc, tc := range cases {

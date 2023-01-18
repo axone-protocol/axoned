@@ -42,10 +42,10 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 		case engine.Atom:
 			bech32Addr, err = sdk.AccAddressFromBech32(acc.String())
 			if err != nil {
-				return engine.Error(fmt.Errorf("bank_spendable_coins/2: %w", err))
+				return engine.Error(fmt.Errorf("bank_balances/2: %w", err))
 			}
 		default:
-			return engine.Error(fmt.Errorf("bank_spendable_coins/2: cannot unify account address with %T", acc))
+			return engine.Error(fmt.Errorf("bank_balances/2: cannot unify account address with %T", acc))
 		}
 
 		if bech32Addr != nil {
