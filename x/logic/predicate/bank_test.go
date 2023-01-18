@@ -401,10 +401,10 @@ func TestBank(t *testing.T) {
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(7411))),
 					},
 				},
-				query: `bank_locked_coins(Accounts, SpendableCoins).`,
+				query: `bank_locked_coins(Accounts, LockedCoins).`,
 				wantResult: []types.TermResults{
-					{"Accounts": "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm", "SpendableCoins": "[uknow-420]"},
-					{"Accounts": "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38", "SpendableCoins": "[uatom-589]"},
+					{"Accounts": "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm", "LockedCoins": "[uknow-800]"},
+					{"Accounts": "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38", "LockedCoins": "[uatom-7411]"},
 				},
 			},
 			{
@@ -457,6 +457,7 @@ func TestBank(t *testing.T) {
 							interpreter := testutil.NewInterpreterMust(ctx)
 							interpreter.Register2(engine.NewAtom("bank_balances"), BankBalances)
 							interpreter.Register2(engine.NewAtom("bank_spendable_coins"), BankSpendableCoins)
+							interpreter.Register2(engine.NewAtom("bank_locked_coins"), BankLockedCoins)
 
 							err := interpreter.Compile(ctx, tc.program)
 							So(err, ShouldBeNil)

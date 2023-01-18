@@ -132,7 +132,7 @@ func (mr *MockBankKeeperMockRecorder) SpendableCoins(ctx, addr interface{}) *gom
 // LockedCoins mocks base method.
 func (m *MockBankKeeper) LockedCoins(ctx types.Context, addr types.AccAddress) types.Coins {
 	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "SpendableCoins", ctx, addr)
+	ret := m.ctrl.Call(m, "LockedCoins", ctx, addr)
 	ret0, _ := ret[0].(types.Coins)
 	return ret0
 }
