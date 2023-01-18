@@ -12,6 +12,7 @@ require (
 	github.com/cosmos/ibc-go/v5 v5.1.0
 	github.com/cosmos/interchain-accounts v0.3.5
 	github.com/gogo/protobuf v1.3.3
+	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/ichiban/prolog v0.15.1

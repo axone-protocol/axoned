@@ -162,6 +162,7 @@ Targets:
     proto-build         Build all Protobuf files
     proto-gen           Generate all the code from the Protobuf files
   Documentation:
+    doc                 Generate all the documentation
     doc-proto           Generate the documentation from the Protobuf files
     doc-command         Generate markdown documentation for the command
   Mock:
@@ -170,6 +171,7 @@ Targets:
     release-assets      Generate release assets
   Help:
     help                Show this help.
+
 
 This Makefile depends on docker. To install it, please follow the instructions:
 - for macOS: https://docs.docker.com/docker-for-mac/install/

@@ -61,12 +61,12 @@ query).`,
 		&program,
 		"program",
 		"",
-		`reads the program from the given filename or from stdin if "-" is passed as the filename.`)
+		`reads the program from the given string.`)
 	cmd.Flags().StringVar(
 		&programFile,
 		"program-file",
 		"",
-		`reads the program from the given string.`)
+		`reads the program from the given filename or from stdin if "-" is passed as the filename.`)
 	cmd.MarkFlagsMutuallyExclusive("program", "program-file")
 
 	flags.AddQueryFlagsToCmd(cmd)

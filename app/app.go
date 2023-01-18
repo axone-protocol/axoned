@@ -611,6 +611,8 @@ func New(
 		keys[logicmoduletypes.StoreKey],
 		keys[logicmoduletypes.MemStoreKey],
 		app.GetSubspace(logicmoduletypes.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
 	)
 	logicModule := logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper)
 

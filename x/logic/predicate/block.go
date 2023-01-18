@@ -2,6 +2,7 @@ package predicate
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/ichiban/prolog/engine"
 	"github.com/okp4/okp4d/x/logic/util"
@@ -16,7 +17,7 @@ func BlockHeight(vm *engine.VM, height engine.Term, cont engine.Cont, env *engin
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		sdkContext, err := util.UnwrapSDKContext(ctx)
 		if err != nil {
-			return engine.Error(err)
+			return engine.Error(fmt.Errorf("block_height/1: %w", err))
 		}
 
 		return engine.Unify(vm, height, engine.Integer(sdkContext.BlockHeight()), cont, env)
@@ -32,7 +33,7 @@ func BlockTime(vm *engine.VM, time engine.Term, cont engine.Cont, env *engine.En
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		sdkContext, err := util.UnwrapSDKContext(ctx)
 		if err != nil {
-			return engine.Error(err)
+			return engine.Error(fmt.Errorf("block_time/1: %w", err))
 		}
 
 		return engine.Unify(vm, time, engine.Integer(sdkContext.BlockTime().Unix()), cont, env)
