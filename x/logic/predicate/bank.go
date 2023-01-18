@@ -102,7 +102,8 @@ func BankSpendableCoins(vm *engine.VM, account, balances engine.Term, cont engin
 		allBalances := bankKeeper.GetAccountsBalances(sdkContext)
 		promises := make([]func(ctx context.Context) *engine.Promise, 0, len(allBalances))
 		for _, balance := range allBalances {
-			bech32Addr, err = sdk.AccAddressFromBech32(balance.Address)
+			address := balance.Address
+			bech32Addr, err = sdk.AccAddressFromBech32(address)
 			if err != nil {
 				return engine.Error(fmt.Errorf("bank_spendable_coins/2: %w", err))
 			}
@@ -113,7 +114,7 @@ func BankSpendableCoins(vm *engine.VM, account, balances engine.Term, cont engin
 				func(ctx context.Context) *engine.Promise {
 					return engine.Unify(
 						vm,
-						Tuple(engine.NewAtom(bech32Addr.String()), CoinsToTerm(coins)),
+						Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
 						Tuple(account, balances),
 						cont,
 						env,
