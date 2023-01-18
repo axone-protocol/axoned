@@ -17,17 +17,18 @@ import (
 	tmdb "github.com/tendermint/tm-db"
 )
 
-func TestBankBalances(t *testing.T) {
+func TestBank(t *testing.T) {
 	Convey("Under a mocked environment", t, func() {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
 
 		cases := []struct {
-			balances   []bank.Balance
-			program    string
-			query      string
-			wantResult []types.TermResults
-			wantError  error
+			balances       []bank.Balance
+			spendableCoins []bank.Balance
+			program        string
+			query          string
+			wantResult     []types.TermResults
+			wantError      error
 		}{
 			{
 				balances: []bank.Balance{
@@ -139,87 +140,14 @@ func TestBankBalances(t *testing.T) {
 				wantResult: []types.TermResults{{"X": "[uknow-100]"}},
 				wantError:  fmt.Errorf("bank_balances/2: decoding bech32 failed: invalid bech32 string length 3"),
 			},
-		}
-		for nc, tc := range cases {
-			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
-				Convey("and a context", func() {
-					db := tmdb.NewMemDB()
-					stateStore := store.NewCommitMultiStore(db)
-					bankKeeper := testutil.NewMockBankKeeper(ctrl)
-					ctx := sdk.
-						NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger()).
-						WithValue(types.BankKeeperContextKey, bankKeeper)
-					sdk.GetConfig().SetBech32PrefixForAccount("okp4", "okp4pub")
-
-					Convey("and a bank keeper initialized with the preconfigured balances", func() {
-						for _, balance := range tc.balances {
-							bankKeeper.
-								EXPECT().
-								GetAllBalances(ctx, sdk.MustAccAddressFromBech32(balance.Address)).
-								AnyTimes().
-								Return(balance.Coins)
-						}
-						bankKeeper.
-							EXPECT().
-							GetAccountsBalances(ctx).
-							AnyTimes().
-							Return(tc.balances)
-
-						Convey("and a vm", func() {
-							interpreter := testutil.NewInterpreterMust(ctx)
-							interpreter.Register2(engine.NewAtom("bank_balances"), BankBalances)
-
-							err := interpreter.Compile(ctx, tc.program)
-							So(err, ShouldBeNil)
-
-							Convey("When the predicate is called", func() {
-								sols, err := interpreter.QueryContext(ctx, tc.query)
-
-								Convey("Then the error should be nil", func() {
-									So(err, ShouldBeNil)
-									So(sols, ShouldNotBeNil)
-
-									Convey("and the bindings should be as expected", func() {
-										var got []types.TermResults
-										for sols.Next() {
-											m := types.TermResults{}
-											err := sols.Scan(m)
-											So(err, ShouldBeNil)
-
-											got = append(got, m)
-										}
-										if tc.wantError != nil {
-											So(sols.Err(), ShouldNotBeNil)
-											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
-										} else {
-											So(sols.Err(), ShouldBeNil)
-											So(got, ShouldResemble, tc.wantResult)
-										}
-									})
-								})
-							})
-						})
-					})
-				})
-			})
-		}
-	})
-}
-
-func TestBankSpendableCoins(t *testing.T) {
-	Convey("Under a mocked environment", t, func() {
-		ctrl := gomock.NewController(t)
-		defer ctrl.Finish()
-
-		cases := []struct {
-			balances   []bank.Balance
-			program    string
-			query      string
-			wantResult []types.TermResults
-			wantError  error
-		}{
 			{
 				balances: []bank.Balance{
+					{
+						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(1000))),
+					},
+				},
+				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(100))),
@@ -229,7 +157,7 @@ func TestBankSpendableCoins(t *testing.T) {
 				wantResult: []types.TermResults{{"X": "[uknow-100]"}},
 			},
 			{
-				balances: []bank.Balance{
+				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(100))),
@@ -239,7 +167,7 @@ func TestBankSpendableCoins(t *testing.T) {
 				wantResult: []types.TermResults{{"X": "uatom-100"}},
 			},
 			{
-				balances: []bank.Balance{
+				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(589))),
@@ -249,7 +177,7 @@ func TestBankSpendableCoins(t *testing.T) {
 				wantResult: []types.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
 			},
 			{
-				balances: []bank.Balance{
+				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(589))),
@@ -259,7 +187,7 @@ func TestBankSpendableCoins(t *testing.T) {
 				wantResult: []types.TermResults{{"D": "uatom", "A": "589"}},
 			},
 			{
-				balances: []bank.Balance{
+				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(493))),
@@ -273,7 +201,7 @@ func TestBankSpendableCoins(t *testing.T) {
 				wantResult: []types.TermResults{{"X": "uknow-589"}},
 			},
 			{
-				balances: []bank.Balance{
+				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(493))),
@@ -288,7 +216,7 @@ func TestBankSpendableCoins(t *testing.T) {
 				wantResult: []types.TermResults{{"V": "589"}},
 			},
 			{
-				balances: []bank.Balance{
+				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
 						Coins: sdk.NewCoins(
@@ -309,6 +237,16 @@ func TestBankSpendableCoins(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(1220))),
+					},
+					{
+						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(8000))),
+					},
+				},
+				spendableCoins: []bank.Balance{
+					{
+						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420))),
 					},
 					{
@@ -323,10 +261,10 @@ func TestBankSpendableCoins(t *testing.T) {
 				},
 			},
 			{
-				balances:   []bank.Balance{},
-				query:      `bank_spendable_coins('foo', X).`,
-				wantResult: []types.TermResults{{"X": "[uknow-100]"}},
-				wantError:  fmt.Errorf("bank_spendable_coins/2: decoding bech32 failed: invalid bech32 string length 3"),
+				spendableCoins: []bank.Balance{},
+				query:          `bank_spendable_coins('foo', X).`,
+				wantResult:     []types.TermResults{{"X": "[uknow-100]"}},
+				wantError:      fmt.Errorf("bank_spendable_coins/2: decoding bech32 failed: invalid bech32 string length 3"),
 			},
 		}
 		for nc, tc := range cases {
@@ -344,6 +282,13 @@ func TestBankSpendableCoins(t *testing.T) {
 						for _, balance := range tc.balances {
 							bankKeeper.
 								EXPECT().
+								GetAllBalances(ctx, sdk.MustAccAddressFromBech32(balance.Address)).
+								AnyTimes().
+								Return(balance.Coins)
+						}
+						for _, balance := range tc.spendableCoins {
+							bankKeeper.
+								EXPECT().
 								SpendableCoins(ctx, sdk.MustAccAddressFromBech32(balance.Address)).
 								AnyTimes().
 								Return(balance.Coins)
@@ -356,6 +301,7 @@ func TestBankSpendableCoins(t *testing.T) {
 
 						Convey("and a vm", func() {
 							interpreter := testutil.NewInterpreterMust(ctx)
+							interpreter.Register2(engine.NewAtom("bank_balances"), BankBalances)
 							interpreter.Register2(engine.NewAtom("bank_spendable_coins"), BankSpendableCoins)
 
 							err := interpreter.Compile(ctx, tc.program)
