@@ -32,7 +32,8 @@ func SpendableCoinsSorted(sdkContext sdk.Context, bankKeeper types.BankKeeper, b
 // LockedCoinsSorted returns the list of spendable coins for the given address, sorted by coin denomination.
 func LockedCoinsSorted(sdkContext sdk.Context, bankKeeper types.BankKeeper, bech32Addr sdk.AccAddress) sdk.Coins {
 	fetchedBalances := bankKeeper.LockedCoins(sdkContext, bech32Addr)
-	return BalancesSorted(fetchedBalances)
+	SortBalances(fetchedBalances)
+	return fetchedBalances
 }
 
 // CoinsToTerm converts the given coins to a term of the form:
