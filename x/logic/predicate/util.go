@@ -8,14 +8,24 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
-// BalancesSorted returns the list of balances for the given address, sorted by coin denomination.
-func BalancesSorted(sdkContext sdk.Context, bankKeeper types.BankKeeper, bech32Addr sdk.AccAddress) sdk.Coins {
-	fetchedBalances := bankKeeper.GetAllBalances(sdkContext, bech32Addr)
-	sort.SliceStable(fetchedBalances, func(i, j int) bool {
-		return fetchedBalances[i].Denom < fetchedBalances[j].Denom
+// BalancesSorted returns given balances sorted by coin denomination.
+func BalancesSorted(balances sdk.Coins) sdk.Coins {
+	sort.SliceStable(balances, func(i, j int) bool {
+		return balances[i].Denom < balances[j].Denom
 	})
+	return balances
+}
 
-	return fetchedBalances
+// AllBalancesSorted returns the list of balances for the given address, sorted by coin denomination.
+func AllBalancesSorted(sdkContext sdk.Context, bankKeeper types.BankKeeper, bech32Addr sdk.AccAddress) sdk.Coins {
+	fetchedBalances := bankKeeper.GetAllBalances(sdkContext, bech32Addr)
+	return BalancesSorted(fetchedBalances)
+}
+
+// SpendableCoinsSorted returns the list of spendable coins for the given address, sorted by coin denomination.
+func SpendableCoinsSorted(sdkContext sdk.Context, bankKeeper types.BankKeeper, bech32Addr sdk.AccAddress) sdk.Coins {
+	fetchedBalances := bankKeeper.SpendableCoins(sdkContext, bech32Addr)
+	return BalancesSorted(fetchedBalances)
 }
 
 // CoinsToTerm converts the given coins to a term of the form:
