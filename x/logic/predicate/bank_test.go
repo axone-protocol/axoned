@@ -1,3 +1,4 @@
+//nolint:gocognit
 package predicate
 
 import (
@@ -229,7 +230,8 @@ func TestBank(t *testing.T) {
 						),
 					},
 				},
-				program:    `bank_spendable_has_sufficient_coin(A, C, S) :- bank_spendable_coins(A, R), member(C, R), -(_, V) = C, compare(>, V, S).`,
+				program: `bank_spendable_has_sufficient_coin(A, C, S) :- bank_spendable_coins(A, R), member(C, R),
+-(_, V) = C, compare(>, V, S).`,
 				query:      `bank_spendable_has_sufficient_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', C, 600).`,
 				wantResult: []types.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
 			},
