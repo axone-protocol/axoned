@@ -74,6 +74,24 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 	})
 }
 
+// BankSpendableCoins is a predicate which unifies the given terms with the list of spendable coins of the given account.
+//
+//	bank_spendable_coins(?Account, ?Balances)
+//
+// where:
+//   - Account represents the account address (in Bech32 format).
+//   - Coins represents the spendable coins of the account as a list of pairs of coin denomination and amount.
+//
+// Example:
+//
+//	# Query the spendable coins of the account.
+//	- bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
+//
+// # Query the spendable coins of all accounts. The result is a list of pairs of account address and balances.
+// - bank_spendable_coins(X, Y).
+//
+// # Query the first spendable coin of the given account by unifying the denomination and amount with the given terms.
+// - bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
 func BankSpendableCoins(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		sdkContext, err := util.UnwrapSDKContext(ctx)
