@@ -29,48 +29,8 @@ import (
 // # Query the first balance of the given account by unifying the denomination and amount with the given terms.
 // - bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
 func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		sdkContext, err := util.UnwrapSDKContext(ctx)
-		if err != nil {
-			return engine.Error(err)
-		}
-		bankKeeper := sdkContext.Value(types.BankKeeperContextKey).(types.BankKeeper)
-
-		bech32Addr := sdk.AccAddress(nil)
-		switch acc := env.Resolve(account).(type) {
-		case engine.Variable:
-		case engine.Atom:
-			bech32Addr, err = sdk.AccAddressFromBech32(acc.String())
-			if err != nil {
-				return engine.Error(fmt.Errorf("bank_balances/2: %w", err))
-			}
-		default:
-			return engine.Error(fmt.Errorf("bank_balances/2: cannot unify account address with %T", acc))
-		}
-
-		if bech32Addr != nil {
-			fetchedBalances := AllBalancesSorted(sdkContext, bankKeeper, bech32Addr)
-
-			return engine.Unify(vm, CoinsToTerm(fetchedBalances), balances, cont, env)
-		}
-
-		allBalances := bankKeeper.GetAccountsBalances(sdkContext)
-		promises := make([]func(ctx context.Context) *engine.Promise, 0, len(allBalances))
-		for _, balance := range allBalances {
-			address, coins := balance.Address, balance.Coins
-			promises = append(
-				promises,
-				func(ctx context.Context) *engine.Promise {
-					return engine.Unify(
-						vm,
-						Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
-						Tuple(account, balances),
-						cont,
-						env,
-					)
-				})
-		}
-		return engine.Delay(promises...)
+	return fetchBalances("bank_balances/2", account, balances, vm, env, cont, func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
+		return AllBalancesSorted(ctx, bankKeeper, address)
 	})
 }
 
@@ -93,57 +53,36 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 // # Query the first spendable coin of the given account by unifying the denomination and amount with the given terms.
 // - bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
 func BankSpendableCoins(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		sdkContext, err := util.UnwrapSDKContext(ctx)
-		if err != nil {
-			return engine.Error(err)
-		}
-		bankKeeper := sdkContext.Value(types.BankKeeperContextKey).(types.BankKeeper)
-
-		bech32Addr := sdk.AccAddress(nil)
-		switch acc := env.Resolve(account).(type) {
-		case engine.Variable:
-		case engine.Atom:
-			bech32Addr, err = sdk.AccAddressFromBech32(acc.String())
-			if err != nil {
-				return engine.Error(fmt.Errorf("bank_spendable_coins/2: %w", err))
-			}
-		default:
-			return engine.Error(fmt.Errorf("bank_spendable_coins/2: cannot unify account address with %T", acc))
-		}
-
-		if bech32Addr != nil {
-			fetchedBalances := SpendableCoinsSorted(sdkContext, bankKeeper, bech32Addr)
-			return engine.Unify(vm, CoinsToTerm(fetchedBalances), balances, cont, env)
-		}
-
-		allBalances := bankKeeper.GetAccountsBalances(sdkContext)
-		promises := make([]func(ctx context.Context) *engine.Promise, 0, len(allBalances))
-		for _, balance := range allBalances {
-			address := balance.Address
-			bech32Addr, err = sdk.AccAddressFromBech32(address)
-			if err != nil {
-				return engine.Error(fmt.Errorf("bank_spendable_coins/2: %w", err))
-			}
-			coins := SpendableCoinsSorted(sdkContext, bankKeeper, bech32Addr)
-
-			promises = append(
-				promises,
-				func(ctx context.Context) *engine.Promise {
-					return engine.Unify(
-						vm,
-						Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
-						Tuple(account, balances),
-						cont,
-						env,
-					)
-				})
-		}
-		return engine.Delay(promises...)
+	return fetchBalances("bank_spendable_coins/2", account, balances, vm, env, cont, func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
+		return SpendableCoinsSorted(ctx, bankKeeper, address)
 	})
 }
 
 func BankLockedCoins(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return fetchBalances("bank_locked_coins/2", account, balances, vm, env, cont, func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
+		return LockedCoinsSorted(ctx, bankKeeper, address)
+	})
+}
+
+func getBech32(env *engine.Env, account engine.Term) (sdk.AccAddress, error) {
+	switch acc := env.Resolve(account).(type) {
+	case engine.Variable:
+	case engine.Atom:
+		return sdk.AccAddressFromBech32(acc.String())
+	default:
+		return nil, fmt.Errorf("cannot unify account address with %T", acc)
+	}
+	return sdk.AccAddress(nil), nil
+}
+
+func fetchBalances(
+	predicate string,
+	account, balances engine.Term,
+	vm *engine.VM,
+	env *engine.Env,
+	cont engine.Cont,
+	coinsFn func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins) *engine.Promise {
+
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		sdkContext, err := util.UnwrapSDKContext(ctx)
 		if err != nil {
@@ -151,20 +90,13 @@ func BankLockedCoins(vm *engine.VM, account, balances engine.Term, cont engine.C
 		}
 		bankKeeper := sdkContext.Value(types.BankKeeperContextKey).(types.BankKeeper)
 
-		bech32Addr := sdk.AccAddress(nil)
-		switch acc := env.Resolve(account).(type) {
-		case engine.Variable:
-		case engine.Atom:
-			bech32Addr, err = sdk.AccAddressFromBech32(acc.String())
-			if err != nil {
-				return engine.Error(fmt.Errorf("bank_locked_coins/2: %w", err))
-			}
-		default:
-			return engine.Error(fmt.Errorf("bank_locked_coins/2: cannot unify account address with %T", acc))
+		bech32Addr, err := getBech32(env, account)
+		if err != nil {
+			return engine.Error(fmt.Errorf("%s: %w", predicate, err))
 		}
 
 		if bech32Addr != nil {
-			fetchedBalances := LockedCoinsSorted(sdkContext, bankKeeper, bech32Addr)
+			fetchedBalances := coinsFn(sdkContext, bankKeeper, bech32Addr)
 			return engine.Unify(vm, CoinsToTerm(fetchedBalances), balances, cont, env)
 		}
 
@@ -174,9 +106,9 @@ func BankLockedCoins(vm *engine.VM, account, balances engine.Term, cont engine.C
 			address := balance.Address
 			bech32Addr, err = sdk.AccAddressFromBech32(address)
 			if err != nil {
-				return engine.Error(fmt.Errorf("bank_locked_coins/2: %w", err))
+				return engine.Error(fmt.Errorf("%s: %w", predicate, err))
 			}
-			coins := LockedCoinsSorted(sdkContext, bankKeeper, bech32Addr)
+			coins := coinsFn(sdkContext, bankKeeper, bech32Addr)
 
 			promises = append(
 				promises,
