@@ -16,7 +16,7 @@ import (
 //
 // where:
 //   - Account represents the account address (in Bech32 format).
-//   - Coins represents the balances of the account as a list of pairs of coin denomination and amount.
+//   - Balances represents the balances of the account as a list of pairs of coin denomination and amount.
 //
 // Example:
 //
@@ -49,7 +49,7 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 		}
 
 		if bech32Addr != nil {
-			fetchedBalances := BalancesSorted(sdkContext, bankKeeper, bech32Addr)
+			fetchedBalances := AllBalancesSorted(sdkContext, bankKeeper, bech32Addr)
 
 			return engine.Unify(vm, CoinsToTerm(fetchedBalances), balances, cont, env)
 		}
@@ -58,6 +58,75 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 		promises := make([]func(ctx context.Context) *engine.Promise, 0, len(allBalances))
 		for _, balance := range allBalances {
 			address, coins := balance.Address, balance.Coins
+			promises = append(
+				promises,
+				func(ctx context.Context) *engine.Promise {
+					return engine.Unify(
+						vm,
+						Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
+						Tuple(account, balances),
+						cont,
+						env,
+					)
+				})
+		}
+		return engine.Delay(promises...)
+	})
+}
+
+// BankSpendableCoins is a predicate which unifies the given terms with the list of spendable coins of the given account.
+//
+//	bank_spendable_coins(?Account, ?Balances)
+//
+// where:
+//   - Account represents the account address (in Bech32 format).
+//   - Balances represents the spendable coins of the account as a list of pairs of coin denomination and amount.
+//
+// Example:
+//
+//	# Query the spendable coins of the account.
+//	- bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
+//
+// # Query the spendable coins of all accounts. The result is a list of pairs of account address and balances.
+// - bank_spendable_coins(X, Y).
+//
+// # Query the first spendable coin of the given account by unifying the denomination and amount with the given terms.
+// - bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
+func BankSpendableCoins(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return engine.Delay(func(ctx context.Context) *engine.Promise {
+		sdkContext, err := util.UnwrapSDKContext(ctx)
+		if err != nil {
+			return engine.Error(err)
+		}
+		bankKeeper := sdkContext.Value(types.BankKeeperContextKey).(types.BankKeeper)
+
+		bech32Addr := sdk.AccAddress(nil)
+		switch acc := env.Resolve(account).(type) {
+		case engine.Variable:
+		case engine.Atom:
+			bech32Addr, err = sdk.AccAddressFromBech32(acc.String())
+			if err != nil {
+				return engine.Error(fmt.Errorf("bank_spendable_coins/2: %w", err))
+			}
+		default:
+			return engine.Error(fmt.Errorf("bank_spendable_coins/2: cannot unify account address with %T", acc))
+		}
+
+		if bech32Addr != nil {
+			fetchedBalances := SpendableCoinsSorted(sdkContext, bankKeeper, bech32Addr)
+			return engine.Unify(vm, CoinsToTerm(fetchedBalances), balances, cont, env)
+		}
+
+		allBalances := bankKeeper.GetAccountsBalances(sdkContext)
+		promises := make([]func(ctx context.Context) *engine.Promise, 0, len(allBalances))
+		for _, balance := range allBalances {
+			address := balance.Address
+			bech32Addr, err = sdk.AccAddressFromBech32(address)
+			if err != nil {
+				return engine.Error(fmt.Errorf("bank_spendable_coins/2: %w", err))
+			}
+			coins := SpendableCoinsSorted(sdkContext, bankKeeper, bech32Addr)
+
 			promises = append(
 				promises,
 				func(ctx context.Context) *engine.Promise {
