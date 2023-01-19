@@ -16,7 +16,7 @@ import (
 //
 // where:
 //   - Account represents the account address (in Bech32 format).
-//   - Coins represents the balances of the account as a list of pairs of coin denomination and amount.
+//   - Balances represents the balances of the account as a list of pairs of coin denomination and amount.
 //
 // Example:
 //
@@ -80,7 +80,7 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 //
 // where:
 //   - Account represents the account address (in Bech32 format).
-//   - Coins represents the spendable coins of the account as a list of pairs of coin denomination and amount.
+//   - Balances represents the spendable coins of the account as a list of pairs of coin denomination and amount.
 //
 // Example:
 //
