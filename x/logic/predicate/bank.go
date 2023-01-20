@@ -29,9 +29,15 @@ import (
 // # Query the first balance of the given account by unifying the denomination and amount with the given terms.
 // - bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
 func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances("bank_balances/2", account, balances, vm, env, cont, func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
-		return AllBalancesSorted(ctx, bankKeeper, address)
-	})
+	return fetchBalances("bank_balances/2",
+		account,
+		balances,
+		vm,
+		env,
+		cont,
+		func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
+			return AllBalancesSorted(ctx, bankKeeper, address)
+		})
 }
 
 // BankSpendableCoins is a predicate which unifies the given terms with the list of spendable coins of the given account.
@@ -53,15 +59,45 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 // # Query the first spendable coin of the given account by unifying the denomination and amount with the given terms.
 // - bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
 func BankSpendableCoins(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances("bank_spendable_coins/2", account, balances, vm, env, cont, func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
-		return SpendableCoinsSorted(ctx, bankKeeper, address)
-	})
+	return fetchBalances("bank_spendable_coins/2",
+		account,
+		balances,
+		vm,
+		env,
+		cont,
+		func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
+			return SpendableCoinsSorted(ctx, bankKeeper, address)
+		})
 }
 
+// BankLockedCoins is a predicate which unifies the given terms with the list of locked coins of the given account.
+//
+//	bank_locked_coins(?Account, ?Balances)
+//
+// where:
+//   - Account represents the account address (in Bech32 format).
+//   - Balances represents the locked coins of the account as a list of pairs of coin denomination and amount.
+//
+// Example:
+//
+//	# Query the locked coins of the account.
+//	- bank_locked_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
+//
+// # Query the locked coins of all accounts. The result is a list of pairs of account address and balances.
+// - bank_locked_coins(X, Y).
+//
+// # Query the first locked coin of the given account by unifying the denomination and amount with the given terms.
+// - bank_locked_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
 func BankLockedCoins(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances("bank_locked_coins/2", account, balances, vm, env, cont, func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
-		return LockedCoinsSorted(ctx, bankKeeper, address)
-	})
+	return fetchBalances("bank_locked_coins/2",
+		account,
+		balances,
+		vm,
+		env,
+		cont,
+		func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
+			return LockedCoinsSorted(ctx, bankKeeper, address)
+		})
 }
 
 func getBech32(env *engine.Env, account engine.Term) (sdk.AccAddress, error) {
