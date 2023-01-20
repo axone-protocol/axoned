@@ -35,7 +35,10 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 		vm,
 		env,
 		cont,
-		func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
+		func(ctx sdk.Context, bankKeeper types.BankKeeper, coins sdk.Coins, address sdk.AccAddress) sdk.Coins {
+			if coins != nil {
+				return coins
+			}
 			return AllBalancesSorted(ctx, bankKeeper, address)
 		})
 }
@@ -65,7 +68,7 @@ func BankSpendableCoins(vm *engine.VM, account, balances engine.Term, cont engin
 		vm,
 		env,
 		cont,
-		func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
+		func(ctx sdk.Context, bankKeeper types.BankKeeper, coins sdk.Coins, address sdk.AccAddress) sdk.Coins {
 			return SpendableCoinsSorted(ctx, bankKeeper, address)
 		})
 }
@@ -95,7 +98,7 @@ func BankLockedCoins(vm *engine.VM, account, balances engine.Term, cont engine.C
 		vm,
 		env,
 		cont,
-		func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins {
+		func(ctx sdk.Context, bankKeeper types.BankKeeper, coins sdk.Coins, address sdk.AccAddress) sdk.Coins {
 			return LockedCoinsSorted(ctx, bankKeeper, address)
 		})
 }
@@ -117,8 +120,8 @@ func fetchBalances(
 	vm *engine.VM,
 	env *engine.Env,
 	cont engine.Cont,
-	coinsFn func(ctx sdk.Context, bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins) *engine.Promise {
-
+	coinsFn func(ctx sdk.Context, bankKeeper types.BankKeeper, coins sdk.Coins, address sdk.AccAddress) sdk.Coins,
+) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		sdkContext, err := util.UnwrapSDKContext(ctx)
 		if err != nil {
@@ -132,7 +135,7 @@ func fetchBalances(
 		}
 
 		if bech32Addr != nil {
-			fetchedBalances := coinsFn(sdkContext, bankKeeper, bech32Addr)
+			fetchedBalances := coinsFn(sdkContext, bankKeeper, nil, bech32Addr)
 			return engine.Unify(vm, CoinsToTerm(fetchedBalances), balances, cont, env)
 		}
 
@@ -144,7 +147,7 @@ func fetchBalances(
 			if err != nil {
 				return engine.Error(fmt.Errorf("%s: %w", predicate, err))
 			}
-			coins := coinsFn(sdkContext, bankKeeper, bech32Addr)
+			coins := coinsFn(sdkContext, bankKeeper, balance.Coins, bech32Addr)
 
 			promises = append(
 				promises,
