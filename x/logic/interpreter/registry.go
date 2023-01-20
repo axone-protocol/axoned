@@ -112,7 +112,7 @@ var Registry = map[string]RegistryEntry{
 	"block_height/1":            {predicate.BlockHeight, 1},
 	"block_time/1":              {predicate.BlockTime, 1},
 	"bank_balances/2":           {predicate.BankBalances, 1},
-	"bank_spendable_coins/2":    {predicate.BankSpendableCoins, 1},
+	"bank_spendable_balances/2": {predicate.BankSpendableBalances, 1},
 	"bank_locked_coins/2":       {predicate.BankLockedCoins, 1},
 }
 

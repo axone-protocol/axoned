@@ -155,7 +155,7 @@ func TestBank(t *testing.T) {
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(100))),
 					},
 				},
-				query:      `bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
+				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
 				wantResult: []types.TermResults{{"X": "[uknow-100]"}},
 			},
 			{
@@ -165,7 +165,7 @@ func TestBank(t *testing.T) {
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(100))),
 					},
 				},
-				query:      `bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
+				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
 				wantResult: []types.TermResults{{"X": "uatom-100"}},
 			},
 			{
@@ -175,7 +175,7 @@ func TestBank(t *testing.T) {
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(589))),
 					},
 				},
-				query:      `bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
+				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
 				wantResult: []types.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
 			},
 			{
@@ -185,7 +185,7 @@ func TestBank(t *testing.T) {
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(589))),
 					},
 				},
-				query:      `bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
+				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
 				wantResult: []types.TermResults{{"D": "uatom", "A": "589"}},
 			},
 			{
@@ -199,7 +199,7 @@ func TestBank(t *testing.T) {
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(589)), sdk.NewCoin("uatom", sdk.NewInt(693))),
 					},
 				},
-				query:      `bank_spendable_coins('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
+				query:      `bank_spendable_balances('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
 				wantResult: []types.TermResults{{"X": "uknow-589"}},
 			},
 			{
@@ -213,7 +213,7 @@ func TestBank(t *testing.T) {
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(589)), sdk.NewCoin("uatom", sdk.NewInt(693))),
 					},
 				},
-				program:    `bank_spendable_has_coin(A, D, V) :- bank_spendable_coins(A, R), member(D-V, R).`,
+				program:    `bank_spendable_has_coin(A, D, V) :- bank_spendable_balances(A, R), member(D-V, R).`,
 				query:      `bank_spendable_has_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', 'uknow', V).`,
 				wantResult: []types.TermResults{{"V": "589"}},
 			},
@@ -231,7 +231,7 @@ func TestBank(t *testing.T) {
 						),
 					},
 				},
-				program: `bank_spendable_has_sufficient_coin(A, C, S) :- bank_spendable_coins(A, R), member(C, R),
+				program: `bank_spendable_has_sufficient_coin(A, C, S) :- bank_spendable_balances(A, R), member(C, R),
 -(_, V) = C, compare(>, V, S).`,
 				query:      `bank_spendable_has_sufficient_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', C, 600).`,
 				wantResult: []types.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
@@ -257,7 +257,7 @@ func TestBank(t *testing.T) {
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(589))),
 					},
 				},
-				query: `bank_spendable_coins(Accounts, SpendableCoins).`,
+				query: `bank_spendable_balances(Accounts, SpendableCoins).`,
 				wantResult: []types.TermResults{
 					{"Accounts": "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm", "SpendableCoins": "[uknow-420]"},
 					{"Accounts": "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38", "SpendableCoins": "[uatom-589]"},
@@ -265,9 +265,9 @@ func TestBank(t *testing.T) {
 			},
 			{
 				spendableCoins: []bank.Balance{},
-				query:          `bank_spendable_coins('foo', X).`,
+				query:          `bank_spendable_balances('foo', X).`,
 				wantResult:     []types.TermResults{{"X": "[uknow-100]"}},
-				wantError:      fmt.Errorf("bank_spendable_coins/2: decoding bech32 failed: invalid bech32 string length 3"),
+				wantError:      fmt.Errorf("bank_spendable_balances/2: decoding bech32 failed: invalid bech32 string length 3"),
 			},
 
 			{
@@ -456,7 +456,7 @@ func TestBank(t *testing.T) {
 						Convey("and a vm", func() {
 							interpreter := testutil.NewInterpreterMust(ctx)
 							interpreter.Register2(engine.NewAtom("bank_balances"), BankBalances)
-							interpreter.Register2(engine.NewAtom("bank_spendable_coins"), BankSpendableCoins)
+							interpreter.Register2(engine.NewAtom("bank_spendable_balances"), BankSpendableBalances)
 							interpreter.Register2(engine.NewAtom("bank_locked_coins"), BankLockedCoins)
 
 							err := interpreter.Compile(ctx, tc.program)
