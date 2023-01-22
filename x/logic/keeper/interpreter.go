@@ -8,20 +8,10 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
-	"github.com/okp4/okp4d/x/logic/context"
 	"github.com/okp4/okp4d/x/logic/interpreter"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
 )
-
-// withLimitContext returns a context with the limits configured for the module.
-func (k Keeper) withLimitContext(ctx goctx.Context) (goctx.Context, context.IncrementCountByFunc) {
-	limits := k.limits(ctx)
-
-	maxGas := util.DerefOrDefault(limits.MaxGas, sdkmath.NewUint(math.MaxInt64))
-
-	return context.WithLimit(ctx, maxGas.Uint64())
-}
 
 func (k Keeper) limits(ctx goctx.Context) types.Limits {
 	params := k.GetParams(sdk.UnwrapSDKContext(ctx))
@@ -30,17 +20,16 @@ func (k Keeper) limits(ctx goctx.Context) types.Limits {
 
 func (k Keeper) execute(goctx goctx.Context, program, query string) (*types.QueryServiceAskResponse, error) {
 	sdkCtx := sdk.UnwrapSDKContext(goctx)
-
-	i, limitContext, inc, err := k.newInterpreter(goctx)
+	i, err := k.newInterpreter(goctx)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.Internal, "error creating interpreter: %v", err.Error())
 	}
 
-	if err := i.ExecContext(limitContext, program); err != nil {
+	if err := i.ExecContext(goctx, program); err != nil {
 		return nil, sdkerrors.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
 	}
 
-	sols, err := i.QueryContext(limitContext, query)
+	sols, err := i.QueryContext(goctx, query)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
 	}
@@ -67,8 +56,6 @@ func (k Keeper) execute(goctx goctx.Context, program, query string) (*types.Quer
 		results = append(results, types.Result{Substitutions: m.ToSubstitutions()})
 	}
 
-	sdkCtx.GasMeter().ConsumeGas(inc(0), "interpreter")
-
 	return &types.QueryServiceAskResponse{
 		Height:  uint64(sdkCtx.BlockHeight()),
 		GasUsed: sdkCtx.GasMeter().GasConsumed(),
@@ -91,9 +78,8 @@ func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) err
 	return nil
 }
 
-// newInterpreter creates a new interpreter with the limits configured for the module, and initialized with the
-// interpreter's module settings.
-func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, goctx.Context, context.IncrementCountByFunc, error) {
+// newInterpreter creates a new interpreter properly configured.
+func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 	sdkctx := sdk.UnwrapSDKContext(ctx)
 	sdkctx = sdkctx.WithValue(types.AuthKeeperContextKey, k.authKeeper)
 	sdkctx = sdkctx.WithValue(types.BankKeeperContextKey, k.bankKeeper)
@@ -101,13 +87,13 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, goctx.Co
 	params := k.GetParams(sdkctx)
 
 	interpreterParams := params.GetInterpreter()
-	limitContext, inc := k.withLimitContext(sdkctx)
 
 	interpreted, err := interpreter.New(
-		limitContext,
+		ctx,
 		util.NonZeroOrDefault(interpreterParams.GetRegisteredPredicates(), interpreter.RegistryNames),
 		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), interpreter.Bootstrap()),
-		inc)
+		sdkctx.GasMeter(),
+	)
 
-	return interpreted, limitContext, inc, err
+	return interpreted, err
 }

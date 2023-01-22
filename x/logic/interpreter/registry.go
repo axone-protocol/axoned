@@ -5,9 +5,9 @@ import (
 	"strconv"
 	"strings"
 
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
-	"github.com/okp4/okp4d/x/logic/context"
 	"github.com/okp4/okp4d/x/logic/predicate"
 )
 
@@ -125,13 +125,13 @@ var RegistryNames = func() []string {
 	return names
 }()
 
-// Register registers a well-known predicate in the interpreter with support for "instrumentation".
+// Register registers a well-known predicate in the interpreter with support for consumption measurement.
 // name is the name of the predicate in the form of "atom/arity".
-// inc is the increment function that is called when the predicate is called and which allows to count the cost of
+// meter is the gas meter object that is called when the predicate is called and which allows to count the cost of
 // executing the predicate(ctx).
 //
 //nolint:lll
-func Register(i *prolog.Interpreter, name string, inc context.IncrementCountByFunc) error {
+func Register(i *prolog.Interpreter, name string, meter sdk.GasMeter) error {
 	if entry, ok := Registry[name]; ok {
 		parts := strings.Split(name, "/")
 		if len(parts) == 2 {
@@ -141,7 +141,11 @@ func Register(i *prolog.Interpreter, name string, inc context.IncrementCountByFu
 				return err
 			}
 
-			hook := inc.By(entry.cost)
+			hook := func() sdk.Gas {
+				meter.ConsumeGas(entry.cost, fmt.Sprintf("predicate %s", name))
+
+				return meter.GasRemaining()
+			}
 			p := entry.predicate
 
 			switch arity {
