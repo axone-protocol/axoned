@@ -4,10 +4,14 @@ import (
 	goctx "context"
 
 	sdkerrors "cosmossdk.io/errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/okp4/okp4d/x/logic/types"
+	"golang.org/x/net/context"
 )
 
-func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (*types.QueryServiceAskResponse, error) {
+func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 	if req == nil {
 		return nil, sdkerrors.Wrap(types.InvalidArgument, "request is nil")
 	}
@@ -17,5 +21,33 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (*type
 		return nil, err
 	}
 
-	return k.execute(ctx, req.Program, req.Query)
+	sdkCtx = withGasMeter(sdkCtx, limits)
+	defer func() {
+		if r := recover(); r != nil {
+			if gasError, ok := r.(sdk.ErrorOutOfGas); ok {
+				response, err = nil, sdkerrors.Wrapf(
+					types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
+					types.ModuleName, gasError.Descriptor, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
+
+				return
+			}
+
+			panic(r)
+		}
+	}()
+	sdkCtx.GasMeter().ConsumeGas(sdkCtx.GasMeter().GasConsumed(), types.ModuleName)
+
+	//nolint:contextcheck
+	return k.execute(
+		context.WithValue(sdkCtx, sdk.SdkContextKey, sdkCtx),
+		req.Program,
+		req.Query)
+}
+
+// withGasMeter returns a new context with a gas meter that has the given limit.
+// The gas meter is go-router-safe.
+func withGasMeter(sdkCtx sdk.Context, limits types.Limits) sdk.Context {
+	gasMeter := types.NewSafeGasMeter(sdk.NewGasMeter(limits.MaxGas.Uint64()))
+
+	return sdkCtx.WithGasMeter(gasMeter)
 }
