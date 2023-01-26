@@ -25,9 +25,13 @@ COLOR_RED    = $(shell tput -Txterm setaf 1)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
 
 # Blockchain constants
-CHAIN         := localnet
-CHAIN_HOME    := ./target/deployment/${CHAIN}
-CHAIN_MONIKER := local-node
+CHAIN     		:= localnet
+CHAIN_HOME    	:= ./target/deployment/${CHAIN}
+CHAIN_MONIKER 	:= local-node
+CHAIN_BINARY 	:= ./${DIST_FOLDER}/${BINARY_NAME}
+
+DAEMON_NAME 	:= okp4d
+DAEMON_HOME 	:= `pwd`/${CHAIN_HOME}/.okp4app
 
 BUILD_TAGS += netgo
 BUILD_TAGS := $(strip $(BUILD_TAGS))
@@ -206,8 +210,9 @@ test-go: build ## Pass the test for the go source code
 ## Chain:
 chain-init: build ## Initialize the blockchain with default settings.
 	@echo "${COLOR_CYAN} 🛠️ Initializing chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} under ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
+
 	@rm -rf "${CHAIN_HOME}"; \
-	okp4d init okp4-node \
+	${CHAIN_BINARY} init okp4-node \
 	  --chain-id=okp4-${CHAIN} \
 	  --home "${CHAIN_HOME}"; \
 	\
@@ -216,28 +221,28 @@ chain-init: build ## Initialize the blockchain with default settings.
 	MNEMONIC_VALIDATOR="island position immense mom cross enemy grab little deputy tray hungry detect state helmet \
 	  tomorrow trap expect admit inhale present vault reveal scene atom"; \
 	echo $$MNEMONIC_VALIDATOR \
-	  | okp4d keys add validator \
+	  | ${CHAIN_BINARY} keys add validator \
 	      --recover \
 	      --keyring-backend test \
 	      --home "${CHAIN_HOME}"; \
 	\
-	okp4d add-genesis-account validator 1000000000uknow \
+	${CHAIN_BINARY} add-genesis-account validator 1000000000uknow \
 	  --keyring-backend test \
 	  --home "${CHAIN_HOME}"; \
 	\
-	NODE_ID=`okp4d tendermint show-node-id --home ${CHAIN_HOME}`; \
-	okp4d gentx validator 1000000uknow \
+	NODE_ID=`${CHAIN_BINARY} tendermint show-node-id --home ${CHAIN_HOME}`; \
+	${CHAIN_BINARY} gentx validator 1000000uknow \
 	  --node-id $$NODE_ID \
 	  --chain-id=okp4-${CHAIN} \
 	  --keyring-backend test \
       --home "${CHAIN_HOME}"; \
 	\
-	okp4d collect-gentxs \
+	${CHAIN_BINARY} collect-gentxs \
 	  --home "${CHAIN_HOME}"
 
 chain-start: build ## Start the blockchain with existing configuration (see chain-init)
-	@echo "${COLOR_CYAN} 🛠️ Starting chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
-	@okp4d start --moniker ${CHAIN_MONIKER} \
+	@echo "${COLOR_CYAN} 🛠️ Starting chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"; \
+	${CHAIN_BINARY} start --moniker ${CHAIN_MONIKER} \
 	  --home ${CHAIN_HOME}
 
 chain-stop: ## Stop the blockchain
