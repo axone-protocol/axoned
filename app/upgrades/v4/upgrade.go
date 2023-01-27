@@ -9,9 +9,7 @@ import (
 
 const UpgradeName = "v4.0.0"
 
-var StoreUpgrades = &storetypes.StoreUpgrades{
-	Added: []string{"logic"},
-}
+var StoreUpgrades *storetypes.StoreUpgrades // No store root upgrade.
 
 func CreateUpgradeHandler(
 	mm *module.Manager,
