@@ -17,4 +17,5 @@ type BankKeeper interface {
 	GetAllBalances(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 	GetAccountsBalances(ctx sdk.Context) []bank.Balance
 	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
+	LockedCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
