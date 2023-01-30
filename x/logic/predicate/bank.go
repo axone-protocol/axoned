@@ -43,26 +43,26 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 		})
 }
 
-// BankSpendableCoins is a predicate which unifies the given terms with the list of spendable coins of the given account.
+// BankSpendableBalances is a predicate which unifies the given terms with the list of spendable coins of the given account.
 //
-//	bank_spendable_coins(?Account, ?Balances)
+//	bank_spendable_balances(?Account, ?Balances)
 //
 // where:
 //   - Account represents the account address (in Bech32 format).
-//   - Balances represents the spendable coins of the account as a list of pairs of coin denomination and amount.
+//   - Balances represents the spendable balances of the account as a list of pairs of coin denomination and amount.
 //
 // Example:
 //
-//	# Query the spendable coins of the account.
-//	- bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
+//	# Query the spendable balances of the account.
+//	- bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
 //
-// # Query the spendable coins of all accounts. The result is a list of pairs of account address and balances.
-// - bank_spendable_coins(X, Y).
+// # Query the spendable balances of all accounts. The result is a list of pairs of account address and balances.
+// - bank_spendable_balances(X, Y).
 //
-// # Query the first spendable coin of the given account by unifying the denomination and amount with the given terms.
-// - bank_spendable_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
-func BankSpendableCoins(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances("bank_spendable_coins/2",
+// # Query the first spendable balances of the given account by unifying the denomination and amount with the given terms.
+// - bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
+func BankSpendableBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return fetchBalances("bank_spendable_balances/2",
 		account,
 		balances,
 		vm,
@@ -73,26 +73,26 @@ func BankSpendableCoins(vm *engine.VM, account, balances engine.Term, cont engin
 		})
 }
 
-// BankLockedCoins is a predicate which unifies the given terms with the list of locked coins of the given account.
+// BankLockedBalances is a predicate which unifies the given terms with the list of locked coins of the given account.
 //
-//	bank_locked_coins(?Account, ?Balances)
+//	bank_locked_balances(?Account, ?Balances)
 //
 // where:
 //   - Account represents the account address (in Bech32 format).
-//   - Balances represents the locked coins of the account as a list of pairs of coin denomination and amount.
+//   - Balances represents the locked balances of the account as a list of pairs of coin denomination and amount.
 //
 // Example:
 //
 //	# Query the locked coins of the account.
-//	- bank_locked_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
+//	- bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
 //
-// # Query the locked coins of all accounts. The result is a list of pairs of account address and balances.
-// - bank_locked_coins(X, Y).
+// # Query the locked balances of all accounts. The result is a list of pairs of account address and balances.
+// - bank_locked_balances(X, Y).
 //
-// # Query the first locked coin of the given account by unifying the denomination and amount with the given terms.
-// - bank_locked_coins('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
-func BankLockedCoins(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances("bank_locked_coins/2",
+// # Query the first locked balances of the given account by unifying the denomination and amount with the given terms.
+// - bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
+func BankLockedBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return fetchBalances("bank_locked_balances/2",
 		account,
 		balances,
 		vm,
