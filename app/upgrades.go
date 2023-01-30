@@ -24,7 +24,7 @@ func (app *App) setupUpgradeHandlers() {
 	}
 
 	var storeUpgrades *storetypes.StoreUpgrades
-	switch upgradeInfo.Name {
+	switch upgradeInfo.Name { //nolint:gocritic // next upgrade will need switch case
 	case v4.UpgradeName:
 		storeUpgrades = v4.StoreUpgrades
 	}
@@ -33,5 +33,4 @@ func (app *App) setupUpgradeHandlers() {
 		// configure store loader that checks if version == upgradeHeight and applies store upgrades
 		app.SetStoreLoader(upgradetypes.UpgradeStoreLoader(upgradeInfo.Height, storeUpgrades))
 	}
-
 }
