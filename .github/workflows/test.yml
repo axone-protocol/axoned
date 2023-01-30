@@ -68,7 +68,7 @@ jobs:
 
       - name: Install OKP4 blockchain
         run: |
-          make install
+          make build && make install
 
       - name: Initialize blockchain
         run: |
