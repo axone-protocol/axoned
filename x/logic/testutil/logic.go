@@ -2,6 +2,8 @@ package testutil
 
 import (
 	"context"
+	"fmt"
+	"regexp"
 
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
@@ -39,4 +41,23 @@ func CompileMust(ctx context.Context, interpreter *prolog.Interpreter, s string,
 	if err != nil {
 		panic(err)
 	}
+}
+
+// ReindexUnknownVariables reindexes the variables in the given term so that the variables are numbered sequentially.
+// This is required for test predictability when the term is a result of a query and the variables are unknown.
+//
+// For example, the following term:
+//
+//	foo(_1, _2, _3, _1)
+//
+// is re-indexed as:
+//
+//	foo(_1, _2, _3, _4)
+func ReindexUnknownVariables(s prolog.TermString) prolog.TermString {
+	re := regexp.MustCompile("_([0-9]+)")
+	var index int
+	return prolog.TermString(re.ReplaceAllStringFunc(string(s), func(m string) string {
+		index++
+		return fmt.Sprintf("_%d", index)
+	}))
 }
