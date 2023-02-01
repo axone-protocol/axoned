@@ -38,12 +38,12 @@ func DIDComponents(vm *engine.VM, did, components engine.Term, cont engine.Cont,
 	switch t1 := env.Resolve(did).(type) {
 	case engine.Variable:
 	case engine.Atom:
-		c, err := godid.ParseDIDURL(t1.String())
+		parsedDid, err := godid.ParseDIDURL(t1.String())
 		if err != nil {
 			return engine.Error(fmt.Errorf("did_components/2: %w", err))
 		}
 
-		terms, err := didToTerms(c)
+		terms, err := didToTerms(parsedDid)
 		if err != nil {
 			return engine.Error(fmt.Errorf("did_components/2: %w", err))
 		}
