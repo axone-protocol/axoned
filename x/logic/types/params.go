@@ -18,7 +18,7 @@ var (
 var (
 	DefaultRegisteredPredicates = make([]string, 0)
 	DefaultBootstrap            = ""
-	DefaultMaxGas               = math.NewUint(uint64(100))
+	DefaultMaxGas               = math.NewUint(uint64(10000))
 	DefaultMaxSize              = math.NewUint(uint64(5000))
 	DefaultMaxResultCount       = math.NewUint(uint64(1))
 )
