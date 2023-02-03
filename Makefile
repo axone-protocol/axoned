@@ -249,7 +249,7 @@ chain-stop: ## Stop the blockchain
 	@echo "${COLOR_CYAN} ✋️ Stopping chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
 	@killall okp4d
 
-chain-upgrade: build
+chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION
 	@echo "${COLOR_CYAN} ⬆️ Upgrade the chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} from ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} to ${COLOR_YELLOW}${TO_VERSION}${COLOR_RESET}"
 	@killall cosmovisor || \
 	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
