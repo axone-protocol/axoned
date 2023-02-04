@@ -12,7 +12,7 @@ import (
 )
 
 // customQuery represents the wasm custom query structure, it is intended to allow wasm contracts to execute queries
-// against the logic modules.
+// against the logic module.
 type customQuery struct {
 	Ask *logicwasm.AskQuery `json:"ask,omitempty"`
 }
