@@ -6,7 +6,6 @@ import (
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/okp4/okp4d/x/logic/types"
-	"golang.org/x/net/context"
 )
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {
@@ -39,7 +38,7 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 
 	//nolint:contextcheck
 	return k.execute(
-		context.WithValue(sdkCtx, sdk.SdkContextKey, sdkCtx),
+		sdkCtx,
 		req.Program,
 		req.Query)
 }
