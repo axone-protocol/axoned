@@ -249,7 +249,7 @@ chain-stop: ## Stop the blockchain
 	@echo "${COLOR_CYAN} ✋️ Stopping chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
 	@killall okp4d
 
-chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION
+chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION. You can pass also the proposal json file on PROPOSAL var
 	@echo "${COLOR_CYAN} ⬆️ Upgrade the chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} from ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} to ${COLOR_YELLOW}${TO_VERSION}${COLOR_RESET}"
 	@killall cosmovisor || \
 	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
@@ -266,16 +266,21 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
 	export DAEMON_NAME=${DAEMON_NAME}; \
 	export DAEMON_HOME=${DAEMON_HOME}; \
 	\
-	echo '{"messages": [{"@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade","authority": "okp410d07y265gmmuvt4z0w9aw880jnsr700jh7kd2g","plan": {"name": "","time": "0001-01-01T00:00:00Z","height": "10","info": "","upgraded_client_state": null}}],"metadata": "ipfs://CID","deposit": "1uknow"}' | \
-		jq --arg name "${TO_VERSION}" '.messages[].plan.name = $$name' > ${TARGET_FOLDER}/proposal.json; \
-	cat <<< $$(jq '.app_state.gov.voting_params.voting_period = "20s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
+	PROPOSAL=${PROPOSAL}; \
+	if [[ ! -f "$$PROPOSAL" ]]; then \
+        echo "${COLOR_CYAN} 👩‍🚀 No proposal given  ${COLOR_RESET}"; \
+        echo '{"messages": [{"@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade","authority": "okp410d07y265gmmuvt4z0w9aw880jnsr700jh7kd2g","plan": {"name": "","time": "0001-01-01T00:00:00Z","height": "10","info": "","upgraded_client_state": null}}],"metadata": "ipfs://CID","deposit": "1uknow"}' | \
+        jq --arg name "${TO_VERSION}" '.messages[].plan.name = $$name' > ${TARGET_FOLDER}/proposal.json; \
+      	PROPOSAL=${TARGET_FOLDER}/proposal.json; \
+    fi; \
+    cat <<< $$(jq '.app_state.gov.voting_params.voting_period = "20s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
 	\
  	cosmovisor init $$BINARY_OLD; \
  	cosmovisor run start --moniker ${CHAIN_MONIKER} \
  		--home ${CHAIN_HOME} \
  		--log_level trace & \
 	sleep 10;\
- 	$$BINARY_OLD tx gov submit-proposal ${TARGET_FOLDER}/proposal.json \
+ 	$$BINARY_OLD tx gov submit-proposal $$PROPOSAL \
  		--from validator \
  		--yes \
  		--home ${CHAIN_HOME} \
