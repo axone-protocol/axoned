@@ -18,18 +18,28 @@ func (k Keeper) limits(ctx goctx.Context) types.Limits {
 	return params.GetLimits()
 }
 
-func (k Keeper) execute(goctx goctx.Context, program, query string) (*types.QueryServiceAskResponse, error) {
-	sdkCtx := sdk.UnwrapSDKContext(goctx)
-	i, err := k.newInterpreter(goctx)
+func (k Keeper) enhanceContext(ctx goctx.Context) goctx.Context {
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	sdkCtx = sdkCtx.WithValue(types.AuthKeeperContextKey, k.authKeeper)
+	sdkCtx = sdkCtx.WithValue(types.BankKeeperContextKey, k.bankKeeper)
+
+	return sdkCtx
+}
+
+func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryServiceAskResponse, error) {
+	ctx = k.enhanceContext(ctx)
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+
+	i, err := k.newInterpreter(ctx)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.Internal, "error creating interpreter: %v", err.Error())
 	}
 
-	if err := i.ExecContext(goctx, program); err != nil {
+	if err := i.ExecContext(ctx, program); err != nil {
 		return nil, sdkerrors.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
 	}
 
-	sols, err := i.QueryContext(goctx, query)
+	sols, err := i.QueryContext(ctx, query)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
 	}
@@ -38,7 +48,7 @@ func (k Keeper) execute(goctx goctx.Context, program, query string) (*types.Quer
 	}()
 
 	success := false
-	limits := k.limits(goctx)
+	limits := k.limits(ctx)
 	var variables []string
 	results := make([]types.Result, 0)
 	for nb := sdkmath.ZeroUint(); nb.LT(*limits.MaxResultCount) && sols.Next(); nb = nb.Incr() {
@@ -81,9 +91,6 @@ func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) err
 // newInterpreter creates a new interpreter properly configured.
 func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 	sdkctx := sdk.UnwrapSDKContext(ctx)
-	sdkctx = sdkctx.WithValue(types.AuthKeeperContextKey, k.authKeeper)
-	sdkctx = sdkctx.WithValue(types.BankKeeperContextKey, k.bankKeeper)
-
 	params := k.GetParams(sdkctx)
 
 	interpreterParams := params.GetInterpreter()
