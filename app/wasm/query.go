@@ -35,9 +35,9 @@ func makeCustomQuerier(logicQuerier logicwasm.LogicQuerier) wasmkeeper.CustomQue
 		}
 
 		if query.Ask != nil {
-			return logicQuerier.Ask(ctx, query.Ask)
+			return logicQuerier.Ask(ctx, *query.Ask)
 		}
 
-		return nil, sdkerrors.Wrap(wasmtypes.ErrInvalidMsg, "Unknown Custom query variant")
+		return nil, sdkerrors.Wrap(wasmtypes.ErrInvalidMsg, "Unknown custom query variant")
 	}
 }

@@ -8,13 +8,6 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
-// AskQuery contains Ask gRPC request parameters, it is redefined to keep control in case of eventual breaking change
-// in the logic module definition.
-type AskQuery struct {
-	Program string `json:"program"`
-	Query   string `json:"query"`
-}
-
 // LogicQuerier ease the bridge between the logic module with the wasm CustomQuerier to allow wasm contracts to query
 // the logic module.
 type LogicQuerier struct {
@@ -29,8 +22,8 @@ func MakeLogicQuerier(keeper keeper.Keeper) LogicQuerier {
 }
 
 // Ask is a proxy method with the gRPC request, returning the result in the json format.
-func (querier LogicQuerier) Ask(ctx sdk.Context, query *AskQuery) ([]byte, error) {
-	resp, err := querier.k.Ask(ctx, &types.QueryServiceAskRequest{
+func (querier LogicQuerier) Ask(ctx sdk.Context, query AskQuery) ([]byte, error) {
+	grpcResp, err := querier.k.Ask(ctx, &types.QueryServiceAskRequest{
 		Program: query.Program,
 		Query:   query.Query,
 	})
@@ -38,5 +31,11 @@ func (querier LogicQuerier) Ask(ctx sdk.Context, query *AskQuery) ([]byte, error
 		return nil, err
 	}
 
-	return json.Marshal(resp)
+	resp := new(AskResponse)
+	resp.from(*grpcResp)
+	raw, err := json.Marshal(resp)
+
+	querier.k.Logger(ctx).Debug("response to wasm ask", "json", string(raw))
+
+	return raw, err
 }
