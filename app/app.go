@@ -554,7 +554,7 @@ func New(
 		app.AccountKeeper,
 		app.BankKeeper,
 	)
-	logicModule := logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper)
+	logicModule := logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper, app.WasmKeeper)
 
 	wasmDir := filepath.Join(homePath, "wasm")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)

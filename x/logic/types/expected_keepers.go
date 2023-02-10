@@ -19,3 +19,8 @@ type BankKeeper interface {
 	SpendableCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 	LockedCoins(ctx sdk.Context, addr sdk.AccAddress) sdk.Coins
 }
+
+// WasmKeeper defines the expected interface needed to request smart contracts.
+type WasmKeeper interface {
+	QuerySmart(ctx sdk.Context, contractAddr sdk.AccAddress, req []byte) ([]byte, error)
+}
