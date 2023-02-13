@@ -127,10 +127,7 @@ OKP4 blockchain and hosted in the [okp4/contracts](https://github.com/okp4/contr
 The project comes with a convenient `Makefile` that helps you to build, install, lint and test the project.
 
 ```text
-$ make help
-
-Usage:
-  make <target>
+$ make <target>
 
 Targets:
   Lint:
@@ -154,6 +151,7 @@ Targets:
     chain-init          Initialize the blockchain with default settings.
     chain-start         Start the blockchain with existing configuration (see chain-init)
     chain-stop          Stop the blockchain
+    chain-upgrade       Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION
   Clean:
     clean               Remove all the files from the target folder
   Proto:
@@ -171,7 +169,6 @@ Targets:
     release-assets      Generate release assets
   Help:
     help                Show this help.
-
 
 This Makefile depends on docker. To install it, please follow the instructions:
 - for macOS: https://docs.docker.com/docker-for-mac/install/

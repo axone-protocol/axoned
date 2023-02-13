@@ -25,9 +25,13 @@ COLOR_RED    = $(shell tput -Txterm setaf 1)
 COLOR_RESET  = $(shell tput -Txterm sgr0)
 
 # Blockchain constants
-CHAIN         := localnet
-CHAIN_HOME    := ./target/deployment/${CHAIN}
-CHAIN_MONIKER := local-node
+CHAIN     		:= localnet
+CHAIN_HOME    	:= ./target/deployment/${CHAIN}
+CHAIN_MONIKER 	:= local-node
+CHAIN_BINARY 	:= ./${DIST_FOLDER}/${BINARY_NAME}
+
+DAEMON_NAME 	:= okp4d
+DAEMON_HOME 	:= `pwd`/${CHAIN_HOME}
 
 BUILD_TAGS += netgo
 BUILD_TAGS := $(strip $(BUILD_TAGS))
@@ -204,10 +208,11 @@ test-go: build ## Pass the test for the go source code
 	@go test -v -covermode=count -coverprofile ./target/coverage.out ./...
 
 ## Chain:
-chain-init: build ## Initialize the blockchain with default settings.
+chain-init: ## Initialize the blockchain with default settings.
 	@echo "${COLOR_CYAN} 🛠️ Initializing chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} under ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
+
 	@rm -rf "${CHAIN_HOME}"; \
-	okp4d init okp4-node \
+	${CHAIN_BINARY} init okp4-node \
 	  --chain-id=okp4-${CHAIN} \
 	  --home "${CHAIN_HOME}"; \
 	\
@@ -216,33 +221,90 @@ chain-init: build ## Initialize the blockchain with default settings.
 	MNEMONIC_VALIDATOR="island position immense mom cross enemy grab little deputy tray hungry detect state helmet \
 	  tomorrow trap expect admit inhale present vault reveal scene atom"; \
 	echo $$MNEMONIC_VALIDATOR \
-	  | okp4d keys add validator \
+	  | ${CHAIN_BINARY} keys add validator \
 	      --recover \
 	      --keyring-backend test \
 	      --home "${CHAIN_HOME}"; \
 	\
-	okp4d add-genesis-account validator 1000000000uknow \
+	${CHAIN_BINARY} add-genesis-account validator 1000000000uknow \
 	  --keyring-backend test \
 	  --home "${CHAIN_HOME}"; \
 	\
-	NODE_ID=`okp4d tendermint show-node-id --home ${CHAIN_HOME}`; \
-	okp4d gentx validator 1000000uknow \
+	NODE_ID=`${CHAIN_BINARY} tendermint show-node-id --home ${CHAIN_HOME}`; \
+	${CHAIN_BINARY} gentx validator 1000000uknow \
 	  --node-id $$NODE_ID \
 	  --chain-id=okp4-${CHAIN} \
 	  --keyring-backend test \
       --home "${CHAIN_HOME}"; \
 	\
-	okp4d collect-gentxs \
+	${CHAIN_BINARY} collect-gentxs \
 	  --home "${CHAIN_HOME}"
 
 chain-start: build ## Start the blockchain with existing configuration (see chain-init)
-	@echo "${COLOR_CYAN} 🛠️ Starting chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
-	@okp4d start --moniker ${CHAIN_MONIKER} \
+	@echo "${COLOR_CYAN} 🛠️ Starting chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"; \
+	${CHAIN_BINARY} start --moniker ${CHAIN_MONIKER} \
 	  --home ${CHAIN_HOME}
 
 chain-stop: ## Stop the blockchain
 	@echo "${COLOR_CYAN} ✋️ Stopping chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
 	@killall okp4d
+
+chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION. You can pass also the proposal json file on PROPOSAL var
+	@echo "${COLOR_CYAN} ⬆️ Upgrade the chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} from ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} to ${COLOR_YELLOW}${TO_VERSION}${COLOR_RESET}"
+	@killall cosmovisor || \
+	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
+	git clone -b ${FROM_VERSION} https://github.com/okp4/okp4d.git ${TARGET_FOLDER}/${FROM_VERSION}; \
+	echo "${COLOR_CYAN} 🏗 Build the ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} binary...${COLOR_RESET}"; \
+	cd ${TARGET_FOLDER}/${FROM_VERSION}; \
+	make build; \
+	BINARY_OLD=${TARGET_FOLDER}/${FROM_VERSION}/${DIST_FOLDER}/${DAEMON_NAME}; \
+	cd ../../; \
+	echo $$BINARY_OLD; \
+	make chain-init CHAIN_BINARY=$$BINARY_OLD; \
+	\
+	echo "${COLOR_CYAN} 👩‍🚀 Prepare cosmovisor ${COLOR_RESET}"; \
+	export DAEMON_NAME=${DAEMON_NAME}; \
+	export DAEMON_HOME=${DAEMON_HOME}; \
+	\
+	PROPOSAL=${PROPOSAL}; \
+	if [[ ! -f "$$PROPOSAL" ]]; then \
+        echo "${COLOR_CYAN} 👩‍🚀 No proposal given  ${COLOR_RESET}"; \
+        echo '{"messages": [{"@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade","authority": "okp410d07y265gmmuvt4z0w9aw880jnsr700jh7kd2g","plan": {"name": "","time": "0001-01-01T00:00:00Z","height": "10","info": "","upgraded_client_state": null}}],"metadata": "ipfs://CID","deposit": "1uknow"}' | \
+        jq --arg name "${TO_VERSION}" '.messages[].plan.name = $$name' > ${TARGET_FOLDER}/proposal.json; \
+      	PROPOSAL=${TARGET_FOLDER}/proposal.json; \
+    fi; \
+    cat <<< $$(jq '.app_state.gov.voting_params.voting_period = "20s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
+	\
+ 	cosmovisor init $$BINARY_OLD; \
+ 	cosmovisor run start --moniker ${CHAIN_MONIKER} \
+ 		--home ${CHAIN_HOME} \
+ 		--log_level trace & \
+	sleep 10;\
+ 	$$BINARY_OLD tx gov submit-proposal $$PROPOSAL \
+ 		--from validator \
+ 		--yes \
+ 		--home ${CHAIN_HOME} \
+ 		--chain-id okp4-${CHAIN} \
+ 		--keyring-backend test \
+ 		-b block; \
+ 	\
+ 	$$BINARY_OLD tx gov deposit 1 10000000uknow \
+     		--from validator \
+     		--yes \
+     		--home ${CHAIN_HOME} \
+     		--chain-id okp4-${CHAIN} \
+     		--keyring-backend test \
+     		-b block; \
+	\
+ 	$$BINARY_OLD tx gov vote 1 yes \
+     		--from validator \
+     		--yes \
+     		--home ${CHAIN_HOME} \
+     		--chain-id okp4-${CHAIN} \
+     		--keyring-backend test \
+     		-b block; \
+	mkdir -p ${DAEMON_HOME}/cosmovisor/upgrades/${TO_VERSION}/bin && cp ${CHAIN_BINARY} ${DAEMON_HOME}/cosmovisor/upgrades/${TO_VERSION}/bin; \
+	wait
 
 ## Clean:
 .PHONY: clean
