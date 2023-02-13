@@ -101,6 +101,7 @@ import (
 	intertx "github.com/cosmos/interchain-accounts/x/inter-tx"
 	intertxkeeper "github.com/cosmos/interchain-accounts/x/inter-tx/keeper"
 	intertxtypes "github.com/cosmos/interchain-accounts/x/inter-tx/types"
+	okp4wasm "github.com/okp4/okp4d/app/wasm"
 	logicmodule "github.com/okp4/okp4d/x/logic"
 	logicmodulekeeper "github.com/okp4/okp4d/x/logic/keeper"
 	logicmoduletypes "github.com/okp4/okp4d/x/logic/types"
@@ -545,6 +546,16 @@ func New(
 	// If evidence needs to be handled for the app, set routes in router here and seal
 	app.EvidenceKeeper = *evidenceKeeper
 
+	app.LogicKeeper = *logicmodulekeeper.NewKeeper(
+		appCodec,
+		keys[logicmoduletypes.StoreKey],
+		keys[logicmoduletypes.MemStoreKey],
+		app.GetSubspace(logicmoduletypes.ModuleName),
+		app.AccountKeeper,
+		app.BankKeeper,
+	)
+	logicModule := logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper)
+
 	wasmDir := filepath.Join(homePath, "wasm")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
 	if err != nil {
@@ -555,6 +566,8 @@ func New(
 	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
+
+	wasmOpts = append(wasmOpts, wasmkeeper.WithQueryPlugins(okp4wasm.CustomQueryPlugins(app.LogicKeeper)))
 
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
@@ -605,16 +618,6 @@ func New(
 		app.MsgServiceRouter(),
 		govConfig,
 	)
-
-	app.LogicKeeper = *logicmodulekeeper.NewKeeper(
-		appCodec,
-		keys[logicmoduletypes.StoreKey],
-		keys[logicmoduletypes.MemStoreKey],
-		app.GetSubspace(logicmoduletypes.ModuleName),
-		app.AccountKeeper,
-		app.BankKeeper,
-	)
-	logicModule := logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper)
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
