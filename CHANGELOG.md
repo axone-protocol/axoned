@@ -1,5 +1,76 @@
 # ØKP4 protocol changelog
 
+## [4.0.0](https://github.com/okp4/okp4d/compare/v3.0.0...v4.0.0) (2023-02-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* **proto:** align naming of a proto field in yaml marshal
+
+### Features
+
+* add utilitary functions ([830fe64](https://github.com/okp4/okp4d/commit/830fe64e586d7ccc6303b53dde8d71de84001b19))
+* **buf:** generate new proto ([af9e24d](https://github.com/okp4/okp4d/commit/af9e24df210833ed5150be0fae56012d808ce1c8))
+* **buf:** remove third party proto ([f65ba19](https://github.com/okp4/okp4d/commit/f65ba19dfc9fa12d908067a7e4b984383dd13b58))
+* **buf:** use buf deps instead of third party ([bbcde9e](https://github.com/okp4/okp4d/commit/bbcde9ed8d112ba7a6aeb4eb7a826051d505cde4))
+* compute total gas (sdk + interpreter) ([cd260df](https://github.com/okp4/okp4d/commit/cd260df292f2ed402d63eacd759af05f81a5ef37))
+* implement grpc ask service ([cab9522](https://github.com/okp4/okp4d/commit/cab95228b39438c7b49c1849705531ab830ac515))
+* implement logic business ([c4693bb](https://github.com/okp4/okp4d/commit/c4693bb54fcd30cb50d660f1122fd7a45eeef75b))
+* improve command description and example ([2be2ee8](https://github.com/okp4/okp4d/commit/2be2ee8c5de18277a654cee94a2c96c8918e9271))
+* **ledger:** fix Ledger build tag definition ([12cd92a](https://github.com/okp4/okp4d/commit/12cd92aa9340a615063fdf38b55e1f179193eae6))
+* **logic:** add bank_balances predicate ([b0cc5cc](https://github.com/okp4/okp4d/commit/b0cc5cc9ba2a390061bd5d55623e3f5133a112b1))
+* **logic:** add bank_spendable_coin predicate ([e7acefa](https://github.com/okp4/okp4d/commit/e7acefacfe999cd241854f140e04e2977654787a))
+* **logic:** add block_height/1 predicate ([70b0bc0](https://github.com/okp4/okp4d/commit/70b0bc063af66239e3f225cbb2da935d681dc86f))
+* **logic:** add block_time/1 predicate ([cc52351](https://github.com/okp4/okp4d/commit/cc523512347cb673518b4642d8d35955518c3489))
+* **logic:** add chain_id/1 predicate ([eaac24b](https://github.com/okp4/okp4d/commit/eaac24bb4641faed945dc167c48bf9e644157c47))
+* **logic:** add context extraction util ([64a5523](https://github.com/okp4/okp4d/commit/64a5523ba8e22da4f130efd300e51aed3ae9baa6))
+* **logic:** add did_components/2 predicate ([09976d9](https://github.com/okp4/okp4d/commit/09976d9c41ea19207528c24ca3cd2a7a3b1e3030))
+* **logic:** add go-routine safe version of GasMeter ([5c1b4b9](https://github.com/okp4/okp4d/commit/5c1b4b9356e3c7ab92ab87363b3dd7f4a8045e15))
+* **logic:** add limit context ([3569103](https://github.com/okp4/okp4d/commit/3569103e364093862b6fa8a922fd48f0984bba3b))
+* **logic:** add locked coins method on expected bank keeper ([48b10e5](https://github.com/okp4/okp4d/commit/48b10e5499905b67a9eeeea76f966c5172f187ae))
+* **logic:** add locked coins predicate implementation ([7a926c5](https://github.com/okp4/okp4d/commit/7a926c5937399be5b9cb11119c570169ee759b54))
+* **logic:** allow return all spendable coins balances ([e0a7de5](https://github.com/okp4/okp4d/commit/e0a7de5bfd0917a4480c16e0674f2a28c59298c4))
+* **logic:** call ask query from cli ([d8f343d](https://github.com/okp4/okp4d/commit/d8f343d95e92bc7220f5c3e6877e022816411d7d))
+* **logic:** change type of limit params as *Uint allowing nil value ([a8f5a60](https://github.com/okp4/okp4d/commit/a8f5a60dd2a6b830cddda2e56ff56def8625c466))
+* **logic:** decouple wasm ask response from grpc type ([03128f5](https://github.com/okp4/okp4d/commit/03128f5f3368af3a0104cd38356c4622fe94bbe3))
+* **logic:** improve error messages ([5f2028e](https://github.com/okp4/okp4d/commit/5f2028e617c6821e7966699fcbd90de1f9967589))
+* **logic:** improve parameters configuration ([d1396bb](https://github.com/okp4/okp4d/commit/d1396bb43339b25823f4179df994ae34a3d9685a))
+* **logic:** inject auth and bank keeper ([578fd39](https://github.com/okp4/okp4d/commit/578fd39fd21d3e17665ecc6b3e9779ebaf4c9b16))
+* **logic:** move logic query into a dedicated file ([9a4a047](https://github.com/okp4/okp4d/commit/9a4a0472dc1b4b367f90f4f65da218f5eca5e2e7))
+* **logic:** register params for genesis ([acb64a9](https://github.com/okp4/okp4d/commit/acb64a95390c7276f07c2c39938eea4d1ee66a6b))
+* **logic:** register the locked coins predicated ([b61ce52](https://github.com/okp4/okp4d/commit/b61ce526e0a5e1a38a8504f5cd96e3e79819b284))
+* **logic:** simplify wasm custom query integration ([383a0e7](https://github.com/okp4/okp4d/commit/383a0e7162a640c7799aa3ace2db4a3c5862a0c6))
+* **logic:** specify logic query operation ([8b385e0](https://github.com/okp4/okp4d/commit/8b385e0e1dc9eddca59daf1d42ef06fb3033ae27))
+* **logic:** specify parameters for module logic ([6297da0](https://github.com/okp4/okp4d/commit/6297da050c989ab5c11788cc2b3c8d987401c51f))
+* **upgrade:** allow add custom proposal file on chain-upgrade sript ([ef68aa4](https://github.com/okp4/okp4d/commit/ef68aa4592a2aa431fc2cff4575ff3ba21cfd8b5))
+* **upgrade:** create package for register upgrades ([ef21308](https://github.com/okp4/okp4d/commit/ef213086d5cf0f9df82a235cc64a42291aa3f065))
+* **wasm:** implements CustomQuerier with logic module ([3c68496](https://github.com/okp4/okp4d/commit/3c684960e4f2cfae8d278bb64db1e5ff2a2d4dbe))
+* **wasm:** wire the wasm CustomQuerier in the app ([9435cf6](https://github.com/okp4/okp4d/commit/9435cf6e0bdf9b6df6b8a418350623344172e41e))
+
+
+### Bug Fixes
+
+* **ci:** add build before install for test blockchain ([81c98c5](https://github.com/okp4/okp4d/commit/81c98c50afbca8ee83577cf4d1a9c0e18babc891))
+* **ci:** fix changed file conditions for run test workflows ([3496204](https://github.com/okp4/okp4d/commit/349620421a1f63265472acd714ecc2676e7a57f9))
+* **docs:** change boolean as string for trigger updtae doc ([8850aee](https://github.com/okp4/okp4d/commit/8850aee5c4e7ec78e8a033d4aaae1391f45b0753))
+* **docs:** fix linter generation ([0ffa36e](https://github.com/okp4/okp4d/commit/0ffa36eb6e70aaa659c08e1333975e0bf15337c6))
+* **docs:** set the workflow id instead of name to fix not found ([9040df8](https://github.com/okp4/okp4d/commit/9040df81f0feac0ad2b5d51fac312e7a45b187c7))
+* don't load program from filesystem ([eaef7b3](https://github.com/okp4/okp4d/commit/eaef7b3d80462393a411d29b65154519a301bd58))
+* fix error message (predicate name was incorrect) ([d4d6a2d](https://github.com/okp4/okp4d/commit/d4d6a2da1cf707eb31d8e4afb6f1ae1dc6d2a052))
+* fix typo in predicate name ([a80dd89](https://github.com/okp4/okp4d/commit/a80dd8913b091c40fffcbb4fd8e00757b6c744cd))
+* fix wrong types (was problematic for type assertions) ([2b7e7bc](https://github.com/okp4/okp4d/commit/2b7e7bcefee08315f82b82a365fbca8245ba6254))
+* **lint:** add updated generated doc ([0280a12](https://github.com/okp4/okp4d/commit/0280a12ce9c7fe0700401ec105de7ce6be6948c8))
+* **lint:** fix golangci lint ([cbbe5db](https://github.com/okp4/okp4d/commit/cbbe5dbecb61aad0bc46f7b3685996d6d4a9c20d))
+* **lint:** remove lint error for upgrade ([d5bb919](https://github.com/okp4/okp4d/commit/d5bb91990f0d0acef5db70e743377f6dc39f66b5))
+* **logic:** ensure keepers in interpreter exec ctx ([901d7f2](https://github.com/okp4/okp4d/commit/901d7f213c2b745744b46dcf72738bdbfb6c24dc))
+* **logic:** fix the description inversion of the flags ([5117430](https://github.com/okp4/okp4d/commit/5117430785a6930146259f928e118b074dbece39))
+* **logic:** insert bankKeeper and accountKeeper into context ([e5338c1](https://github.com/okp4/okp4d/commit/e5338c19a8871b55f622c27fad8298e9276e6061))
+* **logic:** register bank_balances predicate ([3ad6317](https://github.com/okp4/okp4d/commit/3ad6317717623ef5c61f69722e22c7f09dd64413))
+* **logic:** remove gocognit linter for tests ([28904d4](https://github.com/okp4/okp4d/commit/28904d49008d897581b90a797e5ee5ec8b32bc5f))
+* **logic:** sort result for locked coin denom ([bc5e867](https://github.com/okp4/okp4d/commit/bc5e8676f493ee4dc853d1aaedafa4533dfd1451))
+* **logic:** typo in doc comment ([d098256](https://github.com/okp4/okp4d/commit/d098256ed7c81d29b17bf413aa2448d6a42db004))
+* **proto:** align naming of a proto field in yaml marshal ([4fe9a67](https://github.com/okp4/okp4d/commit/4fe9a672f9d881b39394daf3b1a44b471e10f2c9))
+
 ## [3.0.0](https://github.com/okp4/okp4d/compare/v2.2.0...v3.0.0) (2022-11-30)
 
 
