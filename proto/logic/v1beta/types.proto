@@ -50,7 +50,7 @@ message Answer {
   // result is the result of the query.
   bool success = 1 [(gogoproto.moretags) = "yaml:\"success\",omitempty"];
   // has_more specifies if there are more solutions than the ones returned.
-  bool has_more = 2 [(gogoproto.moretags) = "yaml:\"has_next\",omitempty"];
+  bool has_more = 2 [(gogoproto.moretags) = "yaml:\"has_more\",omitempty"];
   // variables represent all the variables in the query.
   repeated string variables = 3 [
     (gogoproto.nullable) = true,
