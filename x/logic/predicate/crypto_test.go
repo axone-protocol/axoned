@@ -25,18 +25,18 @@ func TestCryptoHash(t *testing.T) {
 			wantError  error
 		}{
 			{
-				query:      `crypto_hash('foo', Hash).`,
+				query:      `sha_hash('foo', Hash).`,
 				wantResult: []types.TermResults{{"Hash": "[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]"}},
 			},
 			{
-				query:      `crypto_hash(Foo, Hash).`,
+				query:      `sha_hash(Foo, Hash).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("crypto_hash/2: invalid data type: engine.Variable, should be Atom"),
+				wantError:  fmt.Errorf("sha_hash/2: invalid data type: engine.Variable, should be Atom"),
 			},
 			{
-				query:      `crypto_hash(foo, bar).`,
+				query:      `sha_hash(foo, bar).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("crypto_hash/2: invalid hash type: engine.Atom, should be Variable"),
+				wantError:  fmt.Errorf("sha_hash/2: invalid hash type: engine.Atom, should be Variable"),
 			},
 		}
 		for nc, tc := range cases {
@@ -48,7 +48,7 @@ func TestCryptoHash(t *testing.T) {
 
 					Convey("and a vm", func() {
 						interpreter := testutil.NewInterpreterMust(ctx)
-						interpreter.Register2(engine.NewAtom("crypto_hash"), CryptoHash)
+						interpreter.Register2(engine.NewAtom("sha_hash"), SHAHash)
 
 						err := interpreter.Compile(ctx, tc.program)
 						So(err, ShouldBeNil)
