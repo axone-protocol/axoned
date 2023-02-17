@@ -52,3 +52,11 @@ func CoinsToTerm(coins sdk.Coins) engine.Term {
 func Tuple(args ...engine.Term) engine.Term {
 	return engine.Atom(0).Apply(args...)
 }
+
+func BytesToList(bt []byte) engine.Term {
+	terms := make([]engine.Term, 0, len(bt))
+	for _, b := range bt {
+		terms = append(terms, engine.Integer(b))
+	}
+	return engine.List(terms...)
+}

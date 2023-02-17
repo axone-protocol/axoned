@@ -26,7 +26,7 @@ func TestCryptoHash(t *testing.T) {
 		}{
 			{
 				query:      `crypto_hash('foo', Hash).`,
-				wantResult: []types.TermResults{{"Hash": "'2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae'"}},
+				wantResult: []types.TermResults{{"Hash": "[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]"}},
 			},
 			{
 				query:      `crypto_hash(Foo, Hash).`,

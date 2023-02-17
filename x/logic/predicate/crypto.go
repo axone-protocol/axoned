@@ -2,7 +2,6 @@ package predicate
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 
 	"github.com/ichiban/prolog/engine"
@@ -16,7 +15,7 @@ func CryptoHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *en
 			switch d := env.Resolve(data).(type) {
 			case engine.Atom:
 				result := crypto.Sha256([]byte(d.String()))
-				return engine.Unify(vm, hash, engine.NewAtom(hex.EncodeToString(result)), cont, env)
+				return engine.Unify(vm, hash, BytesToList(result), cont, env)
 			default:
 				return engine.Error(fmt.Errorf("crypto_hash/2: invalid data type: %T, should be Atom", d))
 			}
