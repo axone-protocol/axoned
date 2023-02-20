@@ -1,6 +1,7 @@
 package predicate
 
 import (
+	"fmt"
 	"sort"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -59,4 +60,22 @@ func BytesToList(bt []byte) engine.Term {
 		terms = append(terms, engine.Integer(b))
 	}
 	return engine.List(terms...)
+}
+
+func ListToBytes(terms engine.ListIterator, env *engine.Env) ([]byte, error) {
+	bt := make([]byte, 0)
+	for terms.Next() {
+		term := env.Resolve(terms.Current())
+		switch t := term.(type) {
+		case engine.Integer:
+			//b, ok :=
+			//if !ok {
+			//	return nil, fmt.Errorf("couldn't cast '%d' to byte", term)
+			//}
+			bt = append(bt, byte(t))
+		default:
+			return nil, fmt.Errorf("invalid term type in list %T, only integer allowed", term)
+		}
+	}
+	return bt, nil
 }

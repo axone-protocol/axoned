@@ -19,24 +19,46 @@ import (
 func TestCryptoHash(t *testing.T) {
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
-			program    string
-			query      string
-			wantResult []types.TermResults
-			wantError  error
+			program     string
+			query       string
+			wantResult  []types.TermResults
+			wantError   error
+			wantSuccess bool
 		}{
 			{
-				query:      `sha_hash('foo', Hash).`,
-				wantResult: []types.TermResults{{"Hash": "[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]"}},
+				query:       `sha_hash('foo', Hash).`,
+				wantResult:  []types.TermResults{{"Hash": "[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]"}},
+				wantSuccess: true,
 			},
 			{
-				query:      `sha_hash(Foo, Hash).`,
-				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("sha_hash/2: invalid data type: engine.Variable, should be Atom"),
+				query:       `sha_hash(Foo, Hash).`,
+				wantResult:  []types.TermResults{},
+				wantError:   fmt.Errorf("sha_hash/2: invalid data type: engine.Variable, should be Atom"),
+				wantSuccess: false,
 			},
 			{
-				query:      `sha_hash(foo, bar).`,
-				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("sha_hash/2: invalid hash type: engine.Atom, should be Variable"),
+				query:       `sha_hash('bar', [44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				wantSuccess: false,
+			},
+			{
+				query:       `sha_hash('bar', [252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185]).`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: true,
+			},
+			{
+				query:       `sha_hash('bar', [345,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185]).`,
+				wantSuccess: false,
+			},
+			{
+				program:     `test :- sha_hash('bar', H), H == [252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185].`,
+				query:       `test.`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: true,
+			},
+			{
+				program:     `test :- sha_hash('bar', H), H == [2252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185].`,
+				query:       `test.`,
+				wantSuccess: false,
 			},
 		}
 		for nc, tc := range cases {
@@ -74,11 +96,17 @@ func TestCryptoHash(t *testing.T) {
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 									} else {
 										So(sols.Err(), ShouldBeNil)
-										So(len(got), ShouldEqual, len(tc.wantResult))
-										for iGot, resultGot := range got {
-											for varGot, termGot := range resultGot {
-												So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.wantResult[iGot][varGot])
+
+										if tc.wantSuccess {
+											So(len(got), ShouldBeGreaterThan, 0)
+											So(len(got), ShouldEqual, len(tc.wantResult))
+											for iGot, resultGot := range got {
+												for varGot, termGot := range resultGot {
+													So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.wantResult[iGot][varGot])
+												}
 											}
+										} else {
+											So(len(got), ShouldEqual, 0)
 										}
 									}
 								})
