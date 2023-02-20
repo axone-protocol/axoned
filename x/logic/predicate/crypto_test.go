@@ -60,6 +60,34 @@ func TestCryptoHash(t *testing.T) {
 				query:       `test.`,
 				wantSuccess: false,
 			},
+			{
+				query:       `hex_bytes(Hex, [44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				wantResult:  []types.TermResults{{"Hex": "'2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae'"}},
+				wantSuccess: true,
+			},
+			{
+				query:       `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae', Bytes).`,
+				wantResult:  []types.TermResults{{"Bytes": "[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]"}},
+				wantSuccess: true,
+			},
+			{
+				query:       `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae', [44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: true,
+			},
+			{
+				query:       `hex_bytes('3c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae', [44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				wantSuccess: false,
+			},
+			{
+				query:       `hex_bytes('fail', [44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				wantError:   fmt.Errorf("hex_bytes/2: failed decode hexadecimal encoding/hex: invalid byte: U+0069 'i'"),
+				wantSuccess: false,
+			},
+			{
+				query:       `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae', [345,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				wantSuccess: false,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
@@ -71,6 +99,7 @@ func TestCryptoHash(t *testing.T) {
 					Convey("and a vm", func() {
 						interpreter := testutil.NewInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("sha_hash"), SHAHash)
+						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
 
 						err := interpreter.Compile(ctx, tc.program)
 						So(err, ShouldBeNil)
