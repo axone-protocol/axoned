@@ -68,10 +68,6 @@ func ListToBytes(terms engine.ListIterator, env *engine.Env) ([]byte, error) {
 		term := env.Resolve(terms.Current())
 		switch t := term.(type) {
 		case engine.Integer:
-			//b, ok :=
-			//if !ok {
-			//	return nil, fmt.Errorf("couldn't cast '%d' to byte", term)
-			//}
 			bt = append(bt, byte(t))
 		default:
 			return nil, fmt.Errorf("invalid term type in list %T, only integer allowed", term)

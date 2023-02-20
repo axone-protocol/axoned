@@ -116,6 +116,7 @@ var Registry = map[string]RegistryEntry{
 	"bank_locked_balances/2":    {predicate.BankLockedBalances, 1},
 	"did_components/2":          {predicate.DIDComponents, 1},
 	"sha_hash/2":                {predicate.SHAHash, 1},
+	"hex_bytes/2":               {predicate.HexBytes, 1},
 }
 
 // RegistryNames is the list of the predicate names in the Registry.
