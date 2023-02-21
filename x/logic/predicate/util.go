@@ -1,6 +1,7 @@
 package predicate
 
 import (
+	"fmt"
 	"sort"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -51,4 +52,26 @@ func CoinsToTerm(coins sdk.Coins) engine.Term {
 // Tuple is a predicate which unifies the given term with a tuple of the given arity.
 func Tuple(args ...engine.Term) engine.Term {
 	return engine.Atom(0).Apply(args...)
+}
+
+func BytesToList(bt []byte) engine.Term {
+	terms := make([]engine.Term, 0, len(bt))
+	for _, b := range bt {
+		terms = append(terms, engine.Integer(b))
+	}
+	return engine.List(terms...)
+}
+
+func ListToBytes(terms engine.ListIterator, env *engine.Env) ([]byte, error) {
+	bt := make([]byte, 0)
+	for terms.Next() {
+		term := env.Resolve(terms.Current())
+		switch t := term.(type) {
+		case engine.Integer:
+			bt = append(bt, byte(t))
+		default:
+			return nil, fmt.Errorf("invalid term type in list %T, only integer allowed", term)
+		}
+	}
+	return bt, nil
 }
