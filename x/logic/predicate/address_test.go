@@ -43,6 +43,13 @@ func TestBech32(t *testing.T) {
 				query:       `bech32_address('okp5', Address, 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
 				wantSuccess: false,
 			},
+			{
+				query: `bech32_address('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30], Bech32).`,
+				wantResult: []types.TermResults{{
+					"Bech32": "okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn",
+				}},
+				wantSuccess: true,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
