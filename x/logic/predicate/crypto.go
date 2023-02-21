@@ -61,6 +61,5 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 		default:
 			return engine.Error(fmt.Errorf("hex_bytes/2: invalid hex type: %T, should be Variable or List", b))
 		}
-
 	})
 }
