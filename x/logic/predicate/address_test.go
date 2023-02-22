@@ -1,3 +1,4 @@
+//nolint:gocognit,lll
 package predicate
 
 import (
@@ -49,6 +50,31 @@ func TestBech32(t *testing.T) {
 					"Bech32": "okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn",
 				}},
 				wantSuccess: true,
+			},
+			{
+				query:       `bech32_address('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30], 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: true,
+			},
+			{
+				query:       `bech32_address(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30], 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
+				wantResult:  []types.TermResults{{"Hrp": "okp4"}},
+				wantSuccess: true,
+			},
+			{
+				query:       `bech32_address(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30], 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
+				wantResult:  []types.TermResults{{"Hrp": "okp4"}},
+				wantSuccess: true,
+			},
+			{
+				query:       `bech32_address(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30], Bech32).`,
+				wantError:   fmt.Errorf("bech32_address/3: Hrp should be instantiated in Address convertion context"),
+				wantSuccess: false,
+			},
+			{
+				query:       `bech32_address('okp4', hey(2), Bech32).`,
+				wantError:   fmt.Errorf("bech32_address/3: Address should be a List of bytes, give hey/1"),
+				wantSuccess: false,
 			},
 		}
 		for nc, tc := range cases {

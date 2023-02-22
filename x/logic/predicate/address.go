@@ -26,7 +26,7 @@ func Bech32Address(vm *engine.VM, hrp, address, bech32 engine.Term, cont engine.
 		switch a := env.Resolve(address).(type) {
 		case engine.Compound:
 			if a.Arity() != 2 || a.Functor().String() != "." {
-				return engine.Error(fmt.Errorf("bech32_address/3: Address should be a List of bytes, give %T", a))
+				return engine.Error(fmt.Errorf("bech32_address/3: Address should be a List of bytes, give %s/%d", a.Functor().String(), a.Arity()))
 			}
 
 			iter := engine.ListIterator{List: a, Env: env}
@@ -44,8 +44,8 @@ func Bech32Address(vm *engine.VM, hrp, address, bech32 engine.Term, cont engine.
 			}
 
 			return engine.Unify(vm, bech32, util.StringToTerm(b), cont, env)
+		default:
+			return engine.Error(fmt.Errorf("bech32_address/3: Address should be a List of bytes when bech32 string encoded value is given"))
 		}
-
-		return engine.Error(fmt.Errorf("bech32_address/3: Address should be a List of bytes when bech32 string encoded value is given"))
 	})
 }
