@@ -26,7 +26,7 @@ func TestBech32(t *testing.T) {
 			wantSuccess bool
 		}{
 			{
-				query: `bech32_address(Hrp, Address, 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
+				query: `bech32_address(-(Hrp, Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
 				wantResult: []types.TermResults{{
 					"Hrp":     "okp4",
 					"Address": "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]",
@@ -34,46 +34,78 @@ func TestBech32(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
-				query: `bech32_address('okp4', Address, 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
+				query: `bech32_address(Address, 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
+				wantResult: []types.TermResults{{
+					"Address": "okp4-[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]",
+				}},
+				wantSuccess: true,
+			},
+			{
+				query:       `bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), foo(bar)).`,
+				wantError:   fmt.Errorf("bech32_address/2: invalid Bech32 type: *engine.compound, should be Atom or Variable"),
+				wantSuccess: false,
+			},
+			{
+				query: `bech32_address(-('okp4', Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
 				wantResult: []types.TermResults{{
 					"Address": "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]",
 				}},
 				wantSuccess: true,
 			},
 			{
-				query:       `bech32_address('okp5', Address, 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
+				query:       `bech32_address(-('okp5', Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
 				wantSuccess: false,
 			},
 			{
-				query: `bech32_address('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30], Bech32).`,
+				query: `bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
 				wantResult: []types.TermResults{{
 					"Bech32": "okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn",
 				}},
 				wantSuccess: true,
 			},
 			{
-				query:       `bech32_address('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30], 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
+				query:       `bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
 				wantResult:  []types.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
-				query:       `bech32_address(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30], 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
+				query:       `bech32_address(-(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
 				wantResult:  []types.TermResults{{"Hrp": "okp4"}},
 				wantSuccess: true,
 			},
 			{
-				query:       `bech32_address(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30], 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
+				query:       `bech32_address(-(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
 				wantResult:  []types.TermResults{{"Hrp": "okp4"}},
 				wantSuccess: true,
 			},
 			{
-				query:       `bech32_address(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30], Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/3: Hrp should be instantiated in Address convertion context"),
+				query:       `bech32_address(foo(Bar), Bech32).`,
+				wantError:   fmt.Errorf("bech32_address/2: address should be a Pair '-(Hrp, Address)'"),
 				wantSuccess: false,
 			},
 			{
-				query:       `bech32_address('okp4', hey(2), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/3: Address should be a List of bytes, give hey/1"),
+				query:       `bech32_address(-('okp4', ['8956',167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
+				wantError:   fmt.Errorf("bech32_address/2: failed convert term to bytes list: invalid term type in list engine.Atom, only integer allowed"),
+				wantSuccess: false,
+			},
+			{
+				query:       `bech32_address(-(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
+				wantError:   fmt.Errorf("bech32_address/2: HRP should be instantiated when trying convert bytes to bech32"),
+				wantSuccess: false,
+			},
+			{
+				query:       `bech32_address(-('okp4', hey(2)), Bech32).`,
+				wantError:   fmt.Errorf("bech32_address/2: address should be a List of bytes, give hey/1"),
+				wantSuccess: false,
+			},
+			{
+				query:       `bech32_address(-('okp4', 'foo'), Bech32).`,
+				wantError:   fmt.Errorf("bech32_address/2: address should be a Pair with a List of bytes in arity 2, give engine.Variable"),
+				wantSuccess: false,
+			},
+			{
+				query:       `bech32_address(Address, Bech32).`,
+				wantError:   fmt.Errorf("bech32_address/2: you should give at least on instantiated value (Address or Bech32)"),
 				wantSuccess: false,
 			},
 		}
@@ -86,7 +118,7 @@ func TestBech32(t *testing.T) {
 
 					Convey("and a vm", func() {
 						interpreter := testutil.NewInterpreterMust(ctx)
-						interpreter.Register3(engine.NewAtom("bech32_address"), Bech32Address)
+						interpreter.Register2(engine.NewAtom("bech32_address"), Bech32Address)
 
 						err := interpreter.Compile(ctx, tc.program)
 						So(err, ShouldBeNil)
