@@ -23,14 +23,14 @@ import (
 //
 // # Example:
 //
-// 	- Convert the given bech32 address into base64 encoded byte by unify the prefix of given address (Hrp) and
-// 	the base64 encoded value (Address).
+//   - Convert the given bech32 address into base64 encoded byte by unify the prefix of given address (Hrp) and
+//     the base64 encoded value (Address).
 //
-//	bech32_address(-(Hrp, Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').
+//     bech32_address(-(Hrp, Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').
 //
-//  - Convert the given pair of HRP and base64 encoded address byte by unify the Bech32 string encoded value.
+//   - Convert the given pair of HRP and base64 encoded address byte by unify the Bech32 string encoded value.
 //
-//	bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).
+//     bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).
 func Bech32Address(vm *engine.VM, address, bech32 engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		switch b := env.Resolve(bech32).(type) {

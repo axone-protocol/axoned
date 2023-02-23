@@ -85,17 +85,17 @@ func TestBech32(t *testing.T) {
 			},
 			{
 				query:       `bech32_address(-('okp4', ['8956',167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: failed convert term to bytes list: invalid term type in list engine.Atom, only integer allowed"),
+				wantError:   fmt.Errorf("bech32_address/2: failed to convert term to bytes list: invalid term type in list engine.Atom, only integer allowed"),
 				wantSuccess: false,
 			},
 			{
 				query:       `bech32_address(-(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: HRP should be instantiated when trying convert bytes to bech32"),
+				wantError:   fmt.Errorf("bech32_address/2: HRP should be instantiated"),
 				wantSuccess: false,
 			},
 			{
 				query:       `bech32_address(-('okp4', hey(2)), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: address should be a List of bytes, give hey/1"),
+				wantError:   fmt.Errorf("bech32_address/2: address should be a List of bytes"),
 				wantSuccess: false,
 			},
 			{
@@ -105,7 +105,7 @@ func TestBech32(t *testing.T) {
 			},
 			{
 				query:       `bech32_address(Address, Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: you should give at least on instantiated value (Address or Bech32)"),
+				wantError:   fmt.Errorf("bech32_address/2: invalid address type: engine.Variable, should be Compound (Hrp, Address)"),
 				wantSuccess: false,
 			},
 		}
