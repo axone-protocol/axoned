@@ -38,7 +38,7 @@ func Bech32Address(vm *engine.VM, address, bech32 engine.Term, cont engine.Cont,
 		case engine.Atom:
 			h, a, err := bech322.DecodeAndConvert(b.String())
 			if err != nil {
-				return engine.Error(fmt.Errorf("bech32_address/2: failed convert bech32 encoded string to base64: %w", err))
+				return engine.Error(fmt.Errorf("bech32_address/2: failed to decode Bech32: %w", err))
 			}
 			pair := AtomPair.Apply(util.StringToTerm(h), BytesToList(a))
 			return engine.Unify(vm, address, pair, cont, env)
@@ -54,7 +54,7 @@ func Bech32Address(vm *engine.VM, address, bech32 engine.Term, cont engine.Cont,
 			}
 			return engine.Unify(vm, bech32, util.StringToTerm(bech32Decoded), cont, env)
 		default:
-			return engine.Error(fmt.Errorf("bech32_address/2: you should give at least on instantiated value (Address or Bech32)"))
+			return engine.Error(fmt.Errorf("bech32_address/2: invalid address type: %T, should be Compound (Hrp, Address)", addressPair))
 		}
 	})
 }
@@ -67,21 +67,21 @@ func AddressPairToBech32(addressPair engine.Compound, env *engine.Env) (string, 
 	switch a := env.Resolve(addressPair.Arg(1)).(type) {
 	case engine.Compound:
 		if a.Arity() != 2 || a.Functor().String() != "." {
-			return "", fmt.Errorf("address should be a List of bytes, give %s/%d", a.Functor().String(), a.Arity())
+			return "", fmt.Errorf("address should be a List of bytes")
 		}
 
 		iter := engine.ListIterator{List: a, Env: env}
 		data, err := ListToBytes(iter, env)
 		if err != nil {
-			return "", fmt.Errorf("failed convert term to bytes list: %w", err)
+			return "", fmt.Errorf("failed to convert term to bytes list: %w", err)
 		}
 		hrp, ok := env.Resolve(addressPair.Arg(0)).(engine.Atom)
 		if !ok {
-			return "", fmt.Errorf("HRP should be instantiated when trying convert bytes to bech32")
+			return "", fmt.Errorf("HRP should be instantiated")
 		}
 		b, err := bech322.ConvertAndEncode(hrp.String(), data)
 		if err != nil {
-			return "", fmt.Errorf("failed convert base64 encoded address to bech32 string encoded: %w", err)
+			return "", fmt.Errorf("failed to convert base64 encoded address to bech32 string encoded: %w", err)
 		}
 
 		return b, nil
