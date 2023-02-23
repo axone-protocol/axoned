@@ -48,7 +48,7 @@ func Bech32Address(vm *engine.VM, address, bech32 engine.Term, cont engine.Cont,
 
 		switch addressPair := env.Resolve(address).(type) {
 		case engine.Compound:
-			bech32Decoded, err := AddressPairToBech32(addressPair, env)
+			bech32Decoded, err := addressPairToBech32(addressPair, env)
 			if err != nil {
 				return engine.Error(fmt.Errorf("bech32_address/2: %w", err))
 			}
@@ -59,7 +59,7 @@ func Bech32Address(vm *engine.VM, address, bech32 engine.Term, cont engine.Cont,
 	})
 }
 
-func AddressPairToBech32(addressPair engine.Compound, env *engine.Env) (string, error) {
+func addressPairToBech32(addressPair engine.Compound, env *engine.Env) (string, error) {
 	if addressPair.Functor() != AtomPair || addressPair.Arity() != 2 {
 		return "", fmt.Errorf("address should be a Pair '-(Hrp, Address)'")
 	}
