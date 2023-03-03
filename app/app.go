@@ -553,8 +553,8 @@ func New(
 		app.GetSubspace(logicmoduletypes.ModuleName),
 		app.AccountKeeper,
 		app.BankKeeper,
+		app.WasmKeeper,
 	)
-	logicModule := logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper, app.WasmKeeper)
 
 	wasmDir := filepath.Join(homePath, "wasm")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
@@ -591,6 +591,8 @@ func New(
 		availableCapabilities,
 		wasmOpts...,
 	)
+
+	app.LogicKeeper.WasmKeeper = app.WasmKeeper
 
 	govRouter := govv1beta1.NewRouter()
 	govRouter.
@@ -663,7 +665,7 @@ func New(
 		transferModule,
 		icaModule,
 		interTxModule,
-		logicModule,
+		logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -782,7 +784,7 @@ func New(
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		logicModule,
+		logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 	app.sm.RegisterStoreDecoders()
 

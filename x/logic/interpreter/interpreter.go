@@ -6,6 +6,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
+	"github.com/okp4/okp4d/x/logic/interpreter/fs"
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 // New creates a new prolog.Interpreter with:
@@ -20,8 +22,10 @@ func New(
 	predicates []string,
 	bootstrap string,
 	meter sdk.GasMeter,
+	wasmKeeper types.WasmKeeper,
 ) (*prolog.Interpreter, error) {
 	var i prolog.Interpreter
+	i.FS = fs.New(wasmKeeper)
 
 	for _, o := range predicates {
 		if err := Register(&i, o, meter); err != nil {

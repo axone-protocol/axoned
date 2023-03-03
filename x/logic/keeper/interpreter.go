@@ -100,6 +100,7 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 		util.NonZeroOrDefault(interpreterParams.GetRegisteredPredicates(), interpreter.RegistryNames),
 		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), interpreter.Bootstrap()),
 		sdkctx.GasMeter(),
+		k.WasmKeeper,
 	)
 
 	return interpreted, err
