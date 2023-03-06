@@ -23,6 +23,8 @@ func (k Keeper) enhanceContext(ctx goctx.Context) goctx.Context {
 	sdkCtx = sdkCtx.WithValue(types.AuthKeeperContextKey, k.authKeeper)
 	sdkCtx = sdkCtx.WithValue(types.BankKeeperContextKey, k.bankKeeper)
 
+	sdkCtx = sdkCtx.WithValue(types.WasmKeeperContextKey, k.WasmKeeper)
+
 	return sdkCtx
 }
 

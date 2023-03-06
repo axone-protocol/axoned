@@ -25,7 +25,7 @@ func New(
 	wasmKeeper types.WasmKeeper,
 ) (*prolog.Interpreter, error) {
 	var i prolog.Interpreter
-	i.FS = fs.New(wasmKeeper)
+	i.FS = fs.New(ctx, wasmKeeper)
 
 	for _, o := range predicates {
 		if err := Register(&i, o, meter); err != nil {

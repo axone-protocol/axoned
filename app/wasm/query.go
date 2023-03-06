@@ -19,7 +19,7 @@ type customQuery struct {
 
 // CustomQueryPlugins creates a wasm QueryPlugins containing the custom querier managing wasm contracts queries to the
 // logic module.
-func CustomQueryPlugins(logicKeeper logickeeper.Keeper) *wasmkeeper.QueryPlugins {
+func CustomQueryPlugins(logicKeeper *logickeeper.Keeper) *wasmkeeper.QueryPlugins {
 	return &wasmkeeper.QueryPlugins{
 		Custom: makeCustomQuerier(
 			logicwasm.MakeLogicQuerier(logicKeeper),

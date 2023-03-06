@@ -567,7 +567,7 @@ func New(
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
 
-	wasmOpts = append(wasmOpts, wasmkeeper.WithQueryPlugins(okp4wasm.CustomQueryPlugins(app.LogicKeeper)))
+	wasmOpts = append(wasmOpts, wasmkeeper.WithQueryPlugins(okp4wasm.CustomQueryPlugins(&app.LogicKeeper)))
 
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
@@ -591,7 +591,6 @@ func New(
 		availableCapabilities,
 		wasmOpts...,
 	)
-
 	app.LogicKeeper.WasmKeeper = app.WasmKeeper
 
 	govRouter := govv1beta1.NewRouter()
