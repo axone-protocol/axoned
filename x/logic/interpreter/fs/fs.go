@@ -2,27 +2,21 @@ package fs
 
 import (
 	goctx "context"
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
 	"io/fs"
 	"time"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/okp4/okp4d/x/logic/types"
 )
 
 type FileSystem struct {
-	ctx        goctx.Context
-	wasmKeeper types.WasmKeeper
+	ctx    goctx.Context
+	parser Parser
 }
 
 // New return a new FileSystem object that will handle all virtual file on the interpreter.
 // File can be provided from different sources like CosmWasm cw-storage smart contract.
-func New(ctx goctx.Context, keeper types.WasmKeeper) FileSystem {
+func New(ctx goctx.Context, handlers []URIHandler) FileSystem {
 	return FileSystem{
-		ctx:        ctx,
-		wasmKeeper: keeper,
+		ctx:    ctx,
+		parser: Parser{handlers},
 	}
 }
 
@@ -39,26 +33,7 @@ func (f FileSystem) Open(name string) (fs.File, error) {
 // The caller is permitted to modify the returned byte slice.
 // This method should return a copy of the underlying data.
 func (f FileSystem) ReadFile(name string) ([]byte, error) {
-	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
-
-	req := []byte(fmt.Sprintf("{\"object_data\":{\"id\": \"%s\"}}", name))
-	contractAddr, err := sdk.AccAddressFromBech32("okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht")
-	if err != nil {
-		return nil, err
-	}
-
-	data, err := f.wasmKeeper.QuerySmart(sdkCtx, contractAddr, req)
-	if err != nil {
-		return nil, err
-	}
-	var program string
-	err = json.Unmarshal(data, &program)
-	if err != nil {
-		return nil, err
-	}
-
-	decoded, err := base64.StdEncoding.DecodeString(program)
-	return decoded, err
+	return f.parser.Parse(f.ctx, name)
 }
 
 type Object []byte
