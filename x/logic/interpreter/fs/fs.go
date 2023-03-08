@@ -79,7 +79,7 @@ func (o Object) Stat() (fs.FileInfo, error) {
 }
 
 func (o Object) Read(bytes []byte) (int, error) {
-	//TODO implement me
+	// TODO implement me
 	panic("implement me")
 }
 
