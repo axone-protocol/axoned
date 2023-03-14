@@ -2,10 +2,13 @@ package fs
 
 import (
 	goctx "context"
+	"io"
 	"io/fs"
 	"time"
 )
 
+// FileSystem is the custom virtual file system used into the blockchain.
+// It will hold a list of handler that can resolve file URI and return the corresponding binary file.
 type FileSystem struct {
 	ctx    goctx.Context
 	parser Parser
@@ -20,18 +23,22 @@ func New(ctx goctx.Context, handlers []URIHandler) FileSystem {
 	}
 }
 
+// Open will read the entire file from ReadFile interface,
+// Since file is provided by a provider that do not support streams.
 func (f FileSystem) Open(name string) (fs.File, error) {
 	data, err := f.ReadFile(name)
-	return Object(data), err
+	if err != nil {
+		return nil, &fs.PathError{
+			Op:   "open",
+			Path: name,
+			Err:  err,
+		}
+	}
+	return Object(data), nil
 }
 
-// ReadFile reads the named file and returns its contents.
-// A successful call returns a nil error, not io.EOF.
-// (Because ReadFi   le reads the whole file, the expected EOF
-// from the final Read is not treated as an error to be reported.)
-//
-// The caller is permitted to modify the returned byte slice.
-// This method should return a copy of the underlying data.
+// ReadFile read the entire file at the uri provided.
+// Parse all handler and return the first supported handler file response.
 func (f FileSystem) ReadFile(name string) ([]byte, error) {
 	return f.parser.Parse(f.ctx, name)
 }
@@ -79,8 +86,8 @@ func (o Object) Stat() (fs.FileInfo, error) {
 }
 
 func (o Object) Read(bytes []byte) (int, error) {
-	// TODO implement me
-	panic("implement me")
+	copy(bytes, o)
+	return 0, io.EOF
 }
 
 func (o Object) Close() error {
