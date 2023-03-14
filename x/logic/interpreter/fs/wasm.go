@@ -13,7 +13,7 @@ import (
 )
 
 const queryKey = "query"
-const hostName = "wasm"
+const scheme = "cosmwasm"
 
 type WasmFS struct {
 	wasmKeeper types.WasmKeeper
@@ -24,7 +24,7 @@ func NewWasmFS(keeper types.WasmKeeper) WasmFS {
 }
 
 func (w WasmFS) CanOpen(ctx context.Context, uri *url.URL) bool {
-	return uri.Host == hostName
+	return uri.Scheme == scheme
 }
 
 func (w WasmFS) Open(ctx context.Context, uri *url.URL) ([]byte, error) {
