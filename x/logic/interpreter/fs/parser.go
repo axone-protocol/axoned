@@ -21,10 +21,6 @@ func (p *Parser) Parse(ctx context.Context, name string) ([]byte, error) {
 		return nil, err
 	}
 
-	if uri.Scheme != "okp4" {
-		return nil, fmt.Errorf("incompatible schema '%s' for %s", uri.Scheme, name)
-	}
-
 	for _, handler := range p.Handlers {
 		if handler.CanOpen(ctx, uri) {
 			return handler.Open(ctx, uri)
