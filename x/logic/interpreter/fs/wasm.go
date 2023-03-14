@@ -25,8 +25,8 @@ func NewWasmFS(keeper types.WasmKeeper) WasmFS {
 	return WasmFS{wasmKeeper: keeper}
 }
 
-func (w WasmFS) CanOpen(ctx context.Context, uri *url.URL) bool {
-	return uri.Scheme == scheme
+func (w WasmFS) Scheme() string {
+	return scheme
 }
 
 func (w WasmFS) Open(ctx context.Context, uri *url.URL) ([]byte, error) {

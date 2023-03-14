@@ -25,7 +25,6 @@ func TestWasmHandler(t *testing.T) {
 			contractAddress string
 			query           []byte
 			data            []byte
-			canOpen         bool
 			uri             string
 			wantResult      []byte
 			wantError       error
@@ -34,7 +33,6 @@ func TestWasmHandler(t *testing.T) {
 				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
 				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
 				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
-				canOpen:         true,
 				uri:             `cosmwasm:cw-storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("calc(X) :-  X is 100 + 200."),
 			},
@@ -42,7 +40,6 @@ func TestWasmHandler(t *testing.T) {
 				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
 				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
 				data:            []byte("Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu"),
-				canOpen:         true,
 				uri:             `cosmwasm:cw-storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
 				wantError:       fmt.Errorf("failed unmarshal json wasm response to string: invalid character 'Y' looking for beginning of value"),
@@ -51,7 +48,6 @@ func TestWasmHandler(t *testing.T) {
 				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
 				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
 				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
-				canOpen:         true,
 				uri:             `cosmwasm:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("calc(X) :-  X is 100 + 200."),
 			},
@@ -59,14 +55,13 @@ func TestWasmHandler(t *testing.T) {
 				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
 				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
 				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
-				canOpen:         false,
 				uri:             `okp4:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
+				wantError:       fmt.Errorf("invalid scheme"),
 			},
 			{
 				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
 				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
 				data:            []byte("\"hey\""),
-				canOpen:         true,
 				uri:             `cosmwasm:cw-storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
 				wantError:       fmt.Errorf("failed decode wasm base64 respone: illegal base64 data at input byte 0"),
@@ -75,7 +70,6 @@ func TestWasmHandler(t *testing.T) {
 				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
 				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
 				data:            []byte("\"hey\""),
-				canOpen:         true,
 				uri:             `cosmwasm:cw-storage?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
 				wantError:       fmt.Errorf("failed convert path 'cw-storage' to contract address: decoding bech32 failed: invalid separator index -1"),
@@ -84,7 +78,6 @@ func TestWasmHandler(t *testing.T) {
 				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
 				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
 				data:            []byte("\"hey\""),
-				canOpen:         true,
 				uri:             `cosmwasm:cw-storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?wasm=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
 				wantError:       fmt.Errorf("uri should contains `query` params"),
@@ -93,7 +86,6 @@ func TestWasmHandler(t *testing.T) {
 				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
 				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
 				data:            []byte("\"hey\""),
-				canOpen:         true,
 				uri:             `cosmwasm:?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
 				wantError:       fmt.Errorf("emtpy path given, should be 'cosmwasm:{contractName}:{contractAddr}?query={query}'"),
@@ -122,23 +114,18 @@ func TestWasmHandler(t *testing.T) {
 
 							So(err, ShouldBeNil)
 
-							result := handler.CanOpen(ctx, uri)
+							Convey("Then handler response should be as expected", func() {
+								data, err := handler.Open(ctx, uri)
 
-							So(result, ShouldEqual, tc.canOpen)
+								if tc.wantError != nil {
+									So(err, ShouldNotBeNil)
+									So(err.Error(), ShouldEqual, tc.wantError.Error())
+								} else {
+									So(err, ShouldBeNil)
+									So(data, ShouldResemble, tc.wantResult)
+								}
+							})
 
-							if result {
-								Convey("Then handler response should be as expected", func() {
-									data, err := handler.Open(ctx, uri)
-
-									if tc.wantError != nil {
-										So(err, ShouldNotBeNil)
-										So(err.Error(), ShouldEqual, tc.wantError.Error())
-									} else {
-										So(err, ShouldBeNil)
-										So(data, ShouldResemble, tc.wantResult)
-									}
-								})
-							}
 						})
 					})
 				})
