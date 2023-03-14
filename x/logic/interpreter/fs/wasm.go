@@ -32,7 +32,7 @@ func (w WasmFS) Open(ctx context.Context, uri *url.URL) ([]byte, error) {
 
 	paths := strings.SplitAfter(uri.Opaque, ":")
 	pathsLen := len(paths)
-	if pathsLen <= 1 {
+	if pathsLen < 1 {
 		return nil, fmt.Errorf("incorect path, should contains eithier contract address or contract name and contract address : '%s:{contractName}:{contractAddr}?query={query}'", scheme)
 	}
 
@@ -42,7 +42,7 @@ func (w WasmFS) Open(ctx context.Context, uri *url.URL) ([]byte, error) {
 	}
 
 	if !uri.Query().Has(queryKey) {
-		return nil, fmt.Errorf("uri should contains query params")
+		return nil, fmt.Errorf("uri should contains `query` params")
 	}
 	query := uri.Query().Get(queryKey)
 

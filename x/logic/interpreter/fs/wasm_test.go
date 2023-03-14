@@ -38,22 +38,57 @@ func TestWasmHandler(t *testing.T) {
 				uri:             `cosmwasm:cw-storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("calc(X) :-  X is 100 + 200."),
 			},
-			//{
-			//	contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
-			//	query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-			//	data:            []byte(""),
-			//	canOpen:         true,
-			//	uri:             `cosmwasm:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-			//	wantResult:      []byte("\"\""),
-			//},
-			//{
-			//	contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
-			//	query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-			//	data:            []byte(""),
-			//	canOpen:         true,
-			//	uri:             `cosmwasm:?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-			//	wantResult:      []byte("\"\""),
-			//},
+			{
+				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu"),
+				canOpen:         true,
+				uri:             `cosmwasm:cw-storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
+				wantResult:      []byte("\"\""),
+				wantError:       fmt.Errorf("failed unmarshal json wasm response to string: invalid character 'Y' looking for beginning of value"),
+			},
+			{
+				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
+				canOpen:         true,
+				uri:             `cosmwasm:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
+				wantResult:      []byte("calc(X) :-  X is 100 + 200."),
+			},
+			{
+				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
+				canOpen:         false,
+				uri:             `okp4:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
+			},
+			{
+				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("\"hey\""),
+				canOpen:         true,
+				uri:             `cosmwasm:cw-storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
+				wantResult:      []byte("\"\""),
+				wantError:       fmt.Errorf("failed decode wasm base64 respone: illegal base64 data at input byte 0"),
+			},
+			{
+				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("\"hey\""),
+				canOpen:         true,
+				uri:             `cosmwasm:cw-storage?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
+				wantResult:      []byte("\"\""),
+				wantError:       fmt.Errorf("failed convert path 'cw-storage' to contract address: decoding bech32 failed: invalid separator index -1"),
+			},
+			{
+				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("\"hey\""),
+				canOpen:         true,
+				uri:             `cosmwasm:cw-storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?wasm=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
+				wantResult:      []byte("\"\""),
+				wantError:       fmt.Errorf("uri should contains `query` params"),
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the uri #%d: %s", nc, tc.uri), func() {
@@ -88,7 +123,7 @@ func TestWasmHandler(t *testing.T) {
 
 									if tc.wantError != nil {
 										So(err, ShouldNotBeNil)
-										So(err, ShouldEqual, tc.wantError.Error())
+										So(err.Error(), ShouldEqual, tc.wantError.Error())
 									} else {
 										So(err, ShouldBeNil)
 										So(data, ShouldResemble, tc.wantResult)
