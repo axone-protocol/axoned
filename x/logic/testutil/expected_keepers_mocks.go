@@ -115,6 +115,20 @@ func (mr *MockBankKeeperMockRecorder) GetBalance(ctx, addr, denom interface{}) *
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetBalance", reflect.TypeOf((*MockBankKeeper)(nil).GetBalance), ctx, addr, denom)
 }
 
+// LockedCoins mocks base method.
+func (m *MockBankKeeper) LockedCoins(ctx types.Context, addr types.AccAddress) types.Coins {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "LockedCoins", ctx, addr)
+	ret0, _ := ret[0].(types.Coins)
+	return ret0
+}
+
+// LockedCoins indicates an expected call of LockedCoins.
+func (mr *MockBankKeeperMockRecorder) LockedCoins(ctx, addr interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LockedCoins", reflect.TypeOf((*MockBankKeeper)(nil).LockedCoins), ctx, addr)
+}
+
 // SpendableCoins mocks base method.
 func (m *MockBankKeeper) SpendableCoins(ctx types.Context, addr types.AccAddress) types.Coins {
 	m.ctrl.T.Helper()
@@ -129,16 +143,40 @@ func (mr *MockBankKeeperMockRecorder) SpendableCoins(ctx, addr interface{}) *gom
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "SpendableCoins", reflect.TypeOf((*MockBankKeeper)(nil).SpendableCoins), ctx, addr)
 }
 
-// LockedCoins mocks base method.
-func (m *MockBankKeeper) LockedCoins(ctx types.Context, addr types.AccAddress) types.Coins {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "LockedCoins", ctx, addr)
-	ret0, _ := ret[0].(types.Coins)
-	return ret0
+// MockWasmKeeper is a mock of WasmKeeper interface.
+type MockWasmKeeper struct {
+	ctrl     *gomock.Controller
+	recorder *MockWasmKeeperMockRecorder
 }
 
-// LockedCoins indicates an expected call of LockedCoins.
-func (mr *MockBankKeeperMockRecorder) LockedCoins(ctx, addr interface{}) *gomock.Call {
+// MockWasmKeeperMockRecorder is the mock recorder for MockWasmKeeper.
+type MockWasmKeeperMockRecorder struct {
+	mock *MockWasmKeeper
+}
+
+// NewMockWasmKeeper creates a new mock instance.
+func NewMockWasmKeeper(ctrl *gomock.Controller) *MockWasmKeeper {
+	mock := &MockWasmKeeper{ctrl: ctrl}
+	mock.recorder = &MockWasmKeeperMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockWasmKeeper) EXPECT() *MockWasmKeeperMockRecorder {
+	return m.recorder
+}
+
+// QuerySmart mocks base method.
+func (m *MockWasmKeeper) QuerySmart(ctx types.Context, contractAddr types.AccAddress, req []byte) ([]byte, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "QuerySmart", ctx, contractAddr, req)
+	ret0, _ := ret[0].([]byte)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// QuerySmart indicates an expected call of QuerySmart.
+func (mr *MockWasmKeeperMockRecorder) QuerySmart(ctx, contractAddr, req interface{}) *gomock.Call {
 	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "LockedCoins", reflect.TypeOf((*MockBankKeeper)(nil).LockedCoins), ctx, addr)
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "QuerySmart", reflect.TypeOf((*MockWasmKeeper)(nil).QuerySmart), ctx, contractAddr, req)
 }
