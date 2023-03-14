@@ -30,14 +30,15 @@ func (w WasmFS) CanOpen(ctx context.Context, uri *url.URL) bool {
 func (w WasmFS) Open(ctx context.Context, uri *url.URL) ([]byte, error) {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
-	paths := strings.SplitAfter(uri.Path, "/")
-	if len(paths) != 2 {
-		return nil, fmt.Errorf("incorect path, should contains only contract address : '://wasm/{contractAddr}?query={query}'")
+	paths := strings.SplitAfter(uri.Opaque, ":")
+	pathsLen := len(paths)
+	if pathsLen <= 1 {
+		return nil, fmt.Errorf("incorect path, should contains eithier contract address or contract name and contract address : '%s:{contractName}:{contractAddr}?query={query}'", scheme)
 	}
 
-	contractAddr, err := sdk.AccAddressFromBech32(paths[1])
+	contractAddr, err := sdk.AccAddressFromBech32(paths[pathsLen-1])
 	if err != nil {
-		return nil, fmt.Errorf("failed convert path '%s' to contract address: %w", uri.Path, err)
+		return nil, fmt.Errorf("failed convert path '%s' to contract address: %w", paths[pathsLen-1], err)
 	}
 
 	if !uri.Query().Has(queryKey) {

@@ -23,7 +23,7 @@ func TestWasmHandler(t *testing.T) {
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			contractAddress string
-			query           string
+			query           []byte
 			data            []byte
 			canOpen         bool
 			uri             string
@@ -32,12 +32,28 @@ func TestWasmHandler(t *testing.T) {
 		}{
 			{
 				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
-				query:           "",
-				data:            []byte(""),
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
 				canOpen:         true,
 				uri:             `cosmwasm:cw-storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				wantResult:      []byte("\"\""),
+				wantResult:      []byte("calc(X) :-  X is 100 + 200."),
 			},
+			//{
+			//	contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+			//	query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+			//	data:            []byte(""),
+			//	canOpen:         true,
+			//	uri:             `cosmwasm:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
+			//	wantResult:      []byte("\"\""),
+			//},
+			//{
+			//	contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+			//	query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+			//	data:            []byte(""),
+			//	canOpen:         true,
+			//	uri:             `cosmwasm:?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
+			//	wantResult:      []byte("\"\""),
+			//},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the uri #%d: %s", nc, tc.uri), func() {
@@ -47,9 +63,10 @@ func TestWasmHandler(t *testing.T) {
 					wasmKeeper := testutil.NewMockWasmKeeper(ctrl)
 					ctx := sdk.
 						NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
+					sdk.GetConfig().SetBech32PrefixForAccount("okp4", "okp4pub")
 
 					wasmKeeper.EXPECT().
-						QuerySmart(ctx, tc.contractAddress, tc.query).
+						QuerySmart(ctx, sdk.MustAccAddressFromBech32(tc.contractAddress), tc.query).
 						AnyTimes().
 						Return(tc.data, nil)
 
@@ -74,7 +91,7 @@ func TestWasmHandler(t *testing.T) {
 										So(err, ShouldEqual, tc.wantError.Error())
 									} else {
 										So(err, ShouldBeNil)
-										So(data, ShouldEqual, tc.wantResult)
+										So(data, ShouldResemble, tc.wantResult)
 									}
 								})
 							}
