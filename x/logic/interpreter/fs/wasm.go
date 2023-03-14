@@ -12,8 +12,10 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
-const queryKey = "query"
-const scheme = "cosmwasm"
+const (
+	queryKey = "query"
+	scheme   = "cosmwasm"
+)
 
 type WasmFS struct {
 	wasmKeeper types.WasmKeeper
@@ -32,8 +34,9 @@ func (w WasmFS) Open(ctx context.Context, uri *url.URL) ([]byte, error) {
 
 	paths := strings.SplitAfter(uri.Opaque, ":")
 	pathsLen := len(paths)
-	if pathsLen < 1 {
-		return nil, fmt.Errorf("incorect path, should contains eithier contract address or contract name and contract address : '%s:{contractName}:{contractAddr}?query={query}'", scheme)
+	if pathsLen < 1 || paths[pathsLen-1] == "" {
+		return nil, fmt.Errorf("emtpy path given, should be '%s:{contractName}:{contractAddr}?query={query}'",
+			scheme)
 	}
 
 	contractAddr, err := sdk.AccAddressFromBech32(paths[pathsLen-1])
