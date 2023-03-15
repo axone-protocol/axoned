@@ -25,10 +25,16 @@ func New(ctx goctx.Context, handlers []URIHandler) FileSystem {
 	}
 }
 
-// Open will read the entire file from ReadFile interface,
-// Since file is provided by a provider that do not support streams.
+// Open opens the named file.
+//
+// When Open returns an error, it should be of type *PathError
+// with the Op field set to "open", the Path field set to name,
+// and the Err field describing the problem.
+//
+// Open should reject attempts to open names that do not satisfy
+// ValidPath(name), returning a *PathError with Err set to
+// ErrInvalid or ErrNotExist.
 func (f FileSystem) Open(name string) (fs.File, error) {
-	//data, err := f.ReadFile(name)
 	data, err := f.router.Open(f.ctx, name)
 	if err != nil {
 		return nil, &fs.PathError{
@@ -39,9 +45,3 @@ func (f FileSystem) Open(name string) (fs.File, error) {
 	}
 	return data, nil
 }
-
-// ReadFile read the entire file at the uri provided.
-// Parse all handler and return the first supported handler file response.
-//func (f FileSystem) ReadFile(name string) ([]byte, error) {
-//	return f.router.Open(f.ctx, name)
-//}
