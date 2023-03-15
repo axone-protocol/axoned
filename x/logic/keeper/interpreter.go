@@ -8,8 +8,8 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
+	fs2 "github.com/okp4/okp4d/x/logic/fs"
 	"github.com/okp4/okp4d/x/logic/interpreter"
-	"github.com/okp4/okp4d/x/logic/interpreter/fs"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
 )
@@ -98,14 +98,14 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 
 	interpreterParams := params.GetInterpreter()
 
-	wasmHandler := fs.NewWasmHandler(k.WasmKeeper)
+	wasmHandler := fs2.NewWasmHandler(k.WasmKeeper)
 
 	interpreted, err := interpreter.New(
 		ctx,
 		util.NonZeroOrDefault(interpreterParams.GetRegisteredPredicates(), interpreter.RegistryNames),
 		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), interpreter.Bootstrap()),
 		sdkctx.GasMeter(),
-		[]fs.URIHandler{wasmHandler},
+		[]fs2.URIHandler{wasmHandler},
 	)
 
 	return interpreted, err

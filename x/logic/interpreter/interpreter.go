@@ -6,7 +6,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
-	"github.com/okp4/okp4d/x/logic/interpreter/fs"
+	"github.com/okp4/okp4d/x/logic/fs"
 )
 
 // New creates a new prolog.Interpreter with:
