@@ -98,7 +98,7 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 
 	interpreterParams := params.GetInterpreter()
 
-	wasmHandler := fs.NewWasmFS(k.WasmKeeper)
+	wasmHandler := fs.NewWasmHandler(k.WasmKeeper)
 
 	interpreted, err := interpreter.New(
 		ctx,

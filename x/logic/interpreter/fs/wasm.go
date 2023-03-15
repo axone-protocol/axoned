@@ -18,19 +18,21 @@ const (
 	scheme   = "cosmwasm"
 )
 
-type WasmFS struct {
+type WasmHandler struct {
 	wasmKeeper types.WasmKeeper
 }
 
-func NewWasmFS(keeper types.WasmKeeper) WasmFS {
-	return WasmFS{wasmKeeper: keeper}
+var _ URIHandler = (*WasmHandler)(nil)
+
+func NewWasmHandler(keeper types.WasmKeeper) WasmHandler {
+	return WasmHandler{wasmKeeper: keeper}
 }
 
-func (w WasmFS) Scheme() string {
+func (w WasmHandler) Scheme() string {
 	return scheme
 }
 
-func (w WasmFS) Open(ctx context.Context, uri *url.URL) (fs.File, error) {
+func (w WasmHandler) Open(ctx context.Context, uri *url.URL) (fs.File, error) {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	if uri.Scheme != scheme {

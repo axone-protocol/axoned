@@ -5,21 +5,23 @@ import (
 	"io/fs"
 )
 
-// FileSystem is the custom virtual file system used into the blockchain.
+// VirtualFS is the custom virtual file system used into the blockchain.
 // It will hold a list of handler that can resolve file URI and return the corresponding binary file.
-type FileSystem struct {
+type VirtualFS struct {
 	ctx    goctx.Context
 	router Router
 }
 
-// New return a new FileSystem object that will handle all virtual file on the interpreter.
+var _ fs.FS = (*VirtualFS)(nil)
+
+// New return a new VirtualFS object that will handle all virtual file on the interpreter.
 // File can be provided from different sources like CosmWasm cw-storage smart contract.
-func New(ctx goctx.Context, handlers []URIHandler) FileSystem {
+func New(ctx goctx.Context, handlers []URIHandler) VirtualFS {
 	router := NewRouter()
 	for _, handler := range handlers {
 		router.RegisterHandler(handler)
 	}
-	return FileSystem{
+	return VirtualFS{
 		ctx:    ctx,
 		router: router,
 	}
@@ -34,7 +36,7 @@ func New(ctx goctx.Context, handlers []URIHandler) FileSystem {
 // Open should reject attempts to open names that do not satisfy
 // ValidPath(name), returning a *PathError with Err set to
 // ErrInvalid or ErrNotExist.
-func (f FileSystem) Open(name string) (fs.File, error) {
+func (f VirtualFS) Open(name string) (fs.File, error) {
 	data, err := f.router.Open(f.ctx, name)
 	if err != nil {
 		return nil, &fs.PathError{

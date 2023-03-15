@@ -107,7 +107,7 @@ func TestWasmHandler(t *testing.T) {
 						Return(tc.data, nil)
 
 					Convey("and wasm handler", func() {
-						handler := NewWasmFS(wasmKeeper)
+						handler := NewWasmHandler(wasmKeeper)
 
 						Convey("When ask handler if it can open uri", func() {
 							uri, err := url.Parse(tc.uri)
