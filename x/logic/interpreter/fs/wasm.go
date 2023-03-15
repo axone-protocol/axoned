@@ -32,6 +32,10 @@ func (w WasmFS) Scheme() string {
 func (w WasmFS) Open(ctx context.Context, uri *url.URL) ([]byte, error) {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
+	if uri.Scheme != scheme {
+		return nil, fmt.Errorf("invalid scheme")
+	}
+
 	paths := strings.SplitAfter(uri.Opaque, ":")
 	pathsLen := len(paths)
 	if pathsLen < 1 || paths[pathsLen-1] == "" {
