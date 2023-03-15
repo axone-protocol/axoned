@@ -2,7 +2,9 @@
 package fs
 
 import (
+	"errors"
 	"fmt"
+	"io"
 	"net/url"
 	"testing"
 
@@ -115,17 +117,27 @@ func TestWasmHandler(t *testing.T) {
 							So(err, ShouldBeNil)
 
 							Convey("Then handler response should be as expected", func() {
-								data, err := handler.Open(ctx, uri)
+								file, err := handler.Open(ctx, uri)
 
 								if tc.wantError != nil {
 									So(err, ShouldNotBeNil)
 									So(err.Error(), ShouldEqual, tc.wantError.Error())
 								} else {
 									So(err, ShouldBeNil)
+
+									defer file.Close()
+									data := make([]byte, file.(Object).Size())
+									for {
+										_, err := file.Read(data)
+										if errors.Is(err, io.EOF) {
+											break
+										}
+										continue
+									}
+
 									So(data, ShouldResemble, tc.wantResult)
 								}
 							})
-
 						})
 					})
 				})

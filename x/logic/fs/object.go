@@ -13,8 +13,10 @@ type Object struct {
 	modTime time.Time
 }
 
-var _ fs.File = (*Object)(nil)
-var _ fs.FileInfo = (*Object)(nil)
+var (
+	_ fs.File     = (*Object)(nil)
+	_ fs.FileInfo = (*Object)(nil)
+)
 
 func NewObject(src []byte, uri *url.URL, modTime time.Time) Object {
 	return Object{

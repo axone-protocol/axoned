@@ -21,6 +21,7 @@ func NewRouter() Router {
 		handlers: make(map[string]URIHandler),
 	}
 }
+
 func (r *Router) Open(ctx context.Context, name string) (fs.File, error) {
 	uri, err := url.Parse(name)
 	if err != nil {
