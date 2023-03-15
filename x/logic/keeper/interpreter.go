@@ -8,7 +8,6 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
-	fs2 "github.com/okp4/okp4d/x/logic/fs"
 	"github.com/okp4/okp4d/x/logic/interpreter"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
@@ -23,9 +22,6 @@ func (k Keeper) enhanceContext(ctx goctx.Context) goctx.Context {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	sdkCtx = sdkCtx.WithValue(types.AuthKeeperContextKey, k.authKeeper)
 	sdkCtx = sdkCtx.WithValue(types.BankKeeperContextKey, k.bankKeeper)
-
-	sdkCtx = sdkCtx.WithValue(types.WasmKeeperContextKey, k.WasmKeeper)
-
 	return sdkCtx
 }
 
@@ -98,14 +94,12 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 
 	interpreterParams := params.GetInterpreter()
 
-	wasmHandler := fs2.NewWasmHandler(k.WasmKeeper)
-
 	interpreted, err := interpreter.New(
 		ctx,
 		util.NonZeroOrDefault(interpreterParams.GetRegisteredPredicates(), interpreter.RegistryNames),
 		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), interpreter.Bootstrap()),
 		sdkctx.GasMeter(),
-		[]fs2.URIHandler{wasmHandler},
+		k.fsProvider(ctx),
 	)
 
 	return interpreted, err

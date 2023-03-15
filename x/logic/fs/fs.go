@@ -14,9 +14,9 @@ type VirtualFS struct {
 
 var _ fs.FS = (*VirtualFS)(nil)
 
-// New return a new VirtualFS object that will handle all virtual file on the interpreter.
+// NewVirtualFS return a new VirtualFS object that will handle all virtual file on the interpreter.
 // File can be provided from different sources like CosmWasm cw-storage smart contract.
-func New(ctx goctx.Context, handlers []URIHandler) VirtualFS {
+func NewVirtualFS(ctx goctx.Context, handlers []URIHandler) VirtualFS {
 	router := NewRouter()
 	for _, handler := range handlers {
 		router.RegisterHandler(handler)

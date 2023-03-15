@@ -3,10 +3,10 @@ package interpreter
 import (
 	goctx "context"
 	"fmt"
+	"io/fs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
-	"github.com/okp4/okp4d/x/logic/fs"
 )
 
 // New creates a new prolog.Interpreter with:
@@ -21,10 +21,10 @@ func New(
 	predicates []string,
 	bootstrap string,
 	meter sdk.GasMeter,
-	uriHandlers []fs.URIHandler,
+	fs fs.FS,
 ) (*prolog.Interpreter, error) {
 	var i prolog.Interpreter
-	i.FS = fs.New(ctx, uriHandlers)
+	i.FS = fs
 
 	for _, o := range predicates {
 		if err := Register(&i, o, meter); err != nil {

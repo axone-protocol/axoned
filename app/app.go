@@ -1,8 +1,10 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -103,6 +105,7 @@ import (
 	intertxtypes "github.com/cosmos/interchain-accounts/x/inter-tx/types"
 	okp4wasm "github.com/okp4/okp4d/app/wasm"
 	logicmodule "github.com/okp4/okp4d/x/logic"
+	logicfs "github.com/okp4/okp4d/x/logic/fs"
 	logicmodulekeeper "github.com/okp4/okp4d/x/logic/keeper"
 	logicmoduletypes "github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/mint"
@@ -553,7 +556,7 @@ func New(
 		app.GetSubspace(logicmoduletypes.ModuleName),
 		app.AccountKeeper,
 		app.BankKeeper,
-		app.WasmKeeper,
+		app.provideFS,
 	)
 
 	wasmDir := filepath.Join(homePath, "wasm")
@@ -591,7 +594,6 @@ func New(
 		availableCapabilities,
 		wasmOpts...,
 	)
-	app.LogicKeeper.WasmKeeper = app.WasmKeeper
 
 	govRouter := govv1beta1.NewRouter()
 	govRouter.
@@ -1011,4 +1013,11 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 // SimulationManager implements the SimulationApp interface.
 func (app *App) SimulationManager() *module.SimulationManager {
 	return app.sm
+}
+
+// provideFS is used to provide the virtual file system used for the logic module
+// to load external file.
+func (app *App) provideFS(ctx context.Context) fs.FS {
+	wasmHandler := logicfs.NewWasmHandler(app.WasmKeeper)
+	return logicfs.NewVirtualFS(ctx, []logicfs.URIHandler{wasmHandler})
 }
