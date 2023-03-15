@@ -70,5 +70,5 @@ func (w WasmFS) Open(ctx context.Context, uri *url.URL) (fs.File, error) {
 		return nil, fmt.Errorf("failed decode wasm base64 respone: %w", err)
 	}
 
-	return NewObject(decoded, uri), nil
+	return NewObject(decoded, uri, sdkCtx.BlockTime()), nil
 }

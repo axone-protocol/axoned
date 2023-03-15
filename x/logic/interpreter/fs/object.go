@@ -8,14 +8,16 @@ import (
 )
 
 type Object struct {
-	reader *bytes.Reader
-	uri    *url.URL
+	reader  *bytes.Reader
+	uri     *url.URL
+	modTime time.Time
 }
 
-func NewObject(src []byte, uri *url.URL) Object {
+func NewObject(src []byte, uri *url.URL, modTime time.Time) Object {
 	return Object{
-		reader: bytes.NewReader(src),
-		uri:    uri,
+		reader:  bytes.NewReader(src),
+		uri:     uri,
+		modTime: modTime,
 	}
 }
 
@@ -32,7 +34,7 @@ func (o Object) Mode() fs.FileMode {
 }
 
 func (o Object) ModTime() time.Time {
-	return time.Now() // TODO: change time
+	return o.modTime
 }
 
 func (o Object) IsDir() bool {
