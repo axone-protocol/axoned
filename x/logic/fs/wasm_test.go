@@ -126,7 +126,8 @@ func TestWasmHandler(t *testing.T) {
 									So(err, ShouldBeNil)
 
 									defer file.Close()
-									data := make([]byte, file.(VirtualFile).Size())
+									info, _ := file.Stat()
+									data := make([]byte, info.Size())
 									for {
 										_, err := file.Read(data)
 										if errors.Is(err, io.EOF) {

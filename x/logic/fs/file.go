@@ -8,50 +8,59 @@ import (
 )
 
 type VirtualFile struct {
-	reader  *bytes.Reader
-	uri     *url.URL
+	reader *bytes.Reader
+	info   *VirtualFileInfo
+}
+
+type VirtualFileInfo struct {
+	name    string
+	size    int64
 	modTime time.Time
 }
 
 var (
 	_ fs.File     = (*VirtualFile)(nil)
-	_ fs.FileInfo = (*VirtualFile)(nil)
+	_ fs.FileInfo = (*VirtualFileInfo)(nil)
 )
 
 func NewVirtualFile(src []byte, uri *url.URL, modTime time.Time) VirtualFile {
+	reader := bytes.NewReader(src)
 	return VirtualFile{
-		reader:  bytes.NewReader(src),
-		uri:     uri,
-		modTime: modTime,
+		reader: reader,
+		info: &VirtualFileInfo{
+			name:    uri.String(),
+			size:    reader.Size(),
+			modTime: modTime,
+		},
 	}
 }
 
-func (o VirtualFile) Name() string {
-	return o.uri.String()
+func (i VirtualFileInfo) Name() string {
+	return i.name
 }
 
-func (o VirtualFile) Size() int64 {
-	return o.reader.Size()
+func (i VirtualFileInfo) Size() int64 {
+	return i.size
 }
 
-func (o VirtualFile) Mode() fs.FileMode {
+func (i VirtualFileInfo) Mode() fs.FileMode {
 	return fs.ModeIrregular
 }
 
-func (o VirtualFile) ModTime() time.Time {
-	return o.modTime
+func (i VirtualFileInfo) ModTime() time.Time {
+	return i.modTime
 }
 
-func (o VirtualFile) IsDir() bool {
+func (i VirtualFileInfo) IsDir() bool {
 	return false
 }
 
-func (o VirtualFile) Sys() any {
+func (i VirtualFileInfo) Sys() any {
 	return nil
 }
 
 func (o VirtualFile) Stat() (fs.FileInfo, error) {
-	return o, nil
+	return o.info, nil
 }
 
 func (o VirtualFile) Read(b []byte) (int, error) {
