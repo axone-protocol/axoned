@@ -22,7 +22,6 @@ func (k Keeper) enhanceContext(ctx goctx.Context) goctx.Context {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	sdkCtx = sdkCtx.WithValue(types.AuthKeeperContextKey, k.authKeeper)
 	sdkCtx = sdkCtx.WithValue(types.BankKeeperContextKey, k.bankKeeper)
-
 	return sdkCtx
 }
 
@@ -100,6 +99,7 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 		util.NonZeroOrDefault(interpreterParams.GetRegisteredPredicates(), interpreter.RegistryNames),
 		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), interpreter.Bootstrap()),
 		sdkctx.GasMeter(),
+		k.fsProvider(ctx),
 	)
 
 	return interpreted, err

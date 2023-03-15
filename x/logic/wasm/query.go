@@ -11,11 +11,11 @@ import (
 // LogicQuerier ease the bridge between the logic module with the wasm CustomQuerier to allow wasm contracts to query
 // the logic module.
 type LogicQuerier struct {
-	k keeper.Keeper
+	k *keeper.Keeper
 }
 
 // MakeLogicQuerier creates a new LogicQuerier based on the logic keeper.
-func MakeLogicQuerier(keeper keeper.Keeper) LogicQuerier {
+func MakeLogicQuerier(keeper *keeper.Keeper) LogicQuerier {
 	return LogicQuerier{
 		k: keeper,
 	}

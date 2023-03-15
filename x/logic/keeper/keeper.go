@@ -1,7 +1,9 @@
 package keeper
 
 import (
+	goctx "context"
 	"fmt"
+	"io/fs"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -10,6 +12,8 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/tendermint/tendermint/libs/log"
 )
+
+type FSProvider = func(ctx goctx.Context) fs.FS
 
 type (
 	Keeper struct {
@@ -20,6 +24,7 @@ type (
 
 		authKeeper types.AccountKeeper
 		bankKeeper types.BankKeeper
+		fsProvider FSProvider
 	}
 )
 
@@ -30,6 +35,7 @@ func NewKeeper(
 	ps paramtypes.Subspace,
 	authKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
+	fsProvider FSProvider,
 ) *Keeper {
 	// set KeyTable if it has not already been set
 	if !ps.HasKeyTable() {
@@ -43,6 +49,7 @@ func NewKeeper(
 		paramstore: ps,
 		authKeeper: authKeeper,
 		bankKeeper: bankKeeper,
+		fsProvider: fsProvider,
 	}
 }
 

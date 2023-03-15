@@ -1,8 +1,10 @@
 package app
 
 import (
+	"context"
 	"fmt"
 	"io"
+	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -103,6 +105,7 @@ import (
 	intertxtypes "github.com/cosmos/interchain-accounts/x/inter-tx/types"
 	okp4wasm "github.com/okp4/okp4d/app/wasm"
 	logicmodule "github.com/okp4/okp4d/x/logic"
+	logicfs "github.com/okp4/okp4d/x/logic/fs"
 	logicmodulekeeper "github.com/okp4/okp4d/x/logic/keeper"
 	logicmoduletypes "github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/mint"
@@ -553,8 +556,8 @@ func New(
 		app.GetSubspace(logicmoduletypes.ModuleName),
 		app.AccountKeeper,
 		app.BankKeeper,
+		app.provideFS,
 	)
-	logicModule := logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper)
 
 	wasmDir := filepath.Join(homePath, "wasm")
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
@@ -567,7 +570,7 @@ func New(
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
 
-	wasmOpts = append(wasmOpts, wasmkeeper.WithQueryPlugins(okp4wasm.CustomQueryPlugins(app.LogicKeeper)))
+	wasmOpts = append(wasmOpts, wasmkeeper.WithQueryPlugins(okp4wasm.CustomQueryPlugins(&app.LogicKeeper)))
 
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
@@ -663,7 +666,7 @@ func New(
 		transferModule,
 		icaModule,
 		interTxModule,
-		logicModule,
+		logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -782,7 +785,7 @@ func New(
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		logicModule,
+		logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper),
 	)
 	app.sm.RegisterStoreDecoders()
 
@@ -1010,4 +1013,11 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 // SimulationManager implements the SimulationApp interface.
 func (app *App) SimulationManager() *module.SimulationManager {
 	return app.sm
+}
+
+// provideFS is used to provide the virtual file system used for the logic module
+// to load external file.
+func (app *App) provideFS(ctx context.Context) fs.FS {
+	wasmHandler := logicfs.NewWasmHandler(app.WasmKeeper)
+	return logicfs.NewVirtualFS(ctx, []logicfs.URIHandler{wasmHandler})
 }
