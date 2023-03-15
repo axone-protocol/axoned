@@ -5,6 +5,7 @@ import (
 	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"io/fs"
 	"net/url"
 	"strings"
 
@@ -29,7 +30,7 @@ func (w WasmFS) Scheme() string {
 	return scheme
 }
 
-func (w WasmFS) Open(ctx context.Context, uri *url.URL) ([]byte, error) {
+func (w WasmFS) Open(ctx context.Context, uri *url.URL) (fs.File, error) {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	if uri.Scheme != scheme {
@@ -68,5 +69,6 @@ func (w WasmFS) Open(ctx context.Context, uri *url.URL) ([]byte, error) {
 	if err != nil {
 		return nil, fmt.Errorf("failed decode wasm base64 respone: %w", err)
 	}
-	return decoded, nil
+
+	return NewObject(decoded, uri), nil
 }

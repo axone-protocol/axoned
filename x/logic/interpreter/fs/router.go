@@ -3,12 +3,13 @@ package fs
 import (
 	"context"
 	"fmt"
+	"io/fs"
 	"net/url"
 )
 
 type URIHandler interface {
 	Scheme() string
-	Open(ctx context.Context, uri *url.URL) ([]byte, error)
+	Open(ctx context.Context, uri *url.URL) (fs.File, error)
 }
 
 type Router struct {
@@ -20,7 +21,7 @@ func NewRouter() Router {
 		handlers: make(map[string]URIHandler),
 	}
 }
-func (r *Router) Open(ctx context.Context, name string) ([]byte, error) {
+func (r *Router) Open(ctx context.Context, name string) (fs.File, error) {
 	uri, err := url.Parse(name)
 	if err != nil {
 		return nil, err

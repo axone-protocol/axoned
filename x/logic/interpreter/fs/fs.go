@@ -2,9 +2,7 @@ package fs
 
 import (
 	goctx "context"
-	"io"
 	"io/fs"
-	"time"
 )
 
 // FileSystem is the custom virtual file system used into the blockchain.
@@ -30,7 +28,8 @@ func New(ctx goctx.Context, handlers []URIHandler) FileSystem {
 // Open will read the entire file from ReadFile interface,
 // Since file is provided by a provider that do not support streams.
 func (f FileSystem) Open(name string) (fs.File, error) {
-	data, err := f.ReadFile(name)
+	//data, err := f.ReadFile(name)
+	data, err := f.router.Open(f.ctx, name)
 	if err != nil {
 		return nil, &fs.PathError{
 			Op:   "open",
@@ -38,62 +37,11 @@ func (f FileSystem) Open(name string) (fs.File, error) {
 			Err:  err,
 		}
 	}
-	return Object(data), nil
+	return data, nil
 }
 
 // ReadFile read the entire file at the uri provided.
 // Parse all handler and return the first supported handler file response.
-func (f FileSystem) ReadFile(name string) ([]byte, error) {
-	return f.router.Open(f.ctx, name)
-}
-
-type Object []byte
-
-type ObjectInfo struct {
-	name string
-	size int64
-}
-
-func From(object Object) ObjectInfo {
-	return ObjectInfo{
-		name: "contract",
-		size: int64(len(object)),
-	}
-}
-
-func (o ObjectInfo) Name() string {
-	return o.name
-}
-
-func (o ObjectInfo) Size() int64 {
-	return o.size
-}
-
-func (o ObjectInfo) Mode() fs.FileMode {
-	return fs.ModeIrregular
-}
-
-func (o ObjectInfo) ModTime() time.Time {
-	return time.Now()
-}
-
-func (o ObjectInfo) IsDir() bool {
-	return false
-}
-
-func (o ObjectInfo) Sys() any {
-	return nil
-}
-
-func (o Object) Stat() (fs.FileInfo, error) {
-	return From(o), nil
-}
-
-func (o Object) Read(bytes []byte) (int, error) {
-	copy(bytes, o)
-	return 0, io.EOF
-}
-
-func (o Object) Close() error {
-	return nil
-}
+//func (f FileSystem) ReadFile(name string) ([]byte, error) {
+//	return f.router.Open(f.ctx, name)
+//}
