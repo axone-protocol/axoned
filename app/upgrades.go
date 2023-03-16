@@ -6,12 +6,18 @@ import (
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	v4 "github.com/okp4/okp4d/app/upgrades/v4"
+	v41 "github.com/okp4/okp4d/app/upgrades/v41"
 )
 
 func (app *App) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v4.UpgradeName,
 		v4.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v41.UpgradeName,
+		v41.CreateUpgradeHandler(app.mm, app.configurator),
 	)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
@@ -24,9 +30,11 @@ func (app *App) setupUpgradeHandlers() {
 	}
 
 	var storeUpgrades *storetypes.StoreUpgrades
-	switch upgradeInfo.Name { //nolint:gocritic // next upgrade will need switch case
+	switch upgradeInfo.Name {
 	case v4.UpgradeName:
 		storeUpgrades = v4.StoreUpgrades
+	case v41.UpgradeName:
+		storeUpgrades = v41.StoreUpgrades
 	}
 
 	if storeUpgrades != nil {
