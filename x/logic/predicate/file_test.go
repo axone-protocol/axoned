@@ -46,12 +46,11 @@ func TestSourceFile(t *testing.T) {
 			},
 			{
 				query:       "source_file(X).",
-				wantResult:  []types.TermResults{{"X": "[]"}},
-				wantSuccess: true,
+				wantSuccess: false,
 			},
 			{
 				query:       "consult(file1), consult(file2), source_file(X).",
-				wantResult:  []types.TermResults{{"X": "[file1,file2]"}},
+				wantResult:  []types.TermResults{{"X": "file1"}, {"X": "file2"}},
 				wantSuccess: true,
 			},
 			{

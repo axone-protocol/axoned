@@ -1,6 +1,7 @@
 package predicate
 
 import (
+	"context"
 	"fmt"
 	"reflect"
 	"sort"
@@ -20,21 +21,27 @@ func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.E
 		if _, ok := loaded[*inputFile]; ok {
 			return engine.Unify(vm, file, engine.NewAtom(*inputFile), cont, env)
 		}
-		return engine.Unify(vm, file, engine.List(), cont, env)
+		return engine.Delay()
 	}
 
-	result := make([]engine.Term, 0, len(loaded))
-	for _, filename := range sortLoadedSources(loaded) {
-		result = append(result, engine.NewAtom(filename))
+	promises := make([]func(ctx context.Context) *engine.Promise, 0, len(loaded))
+	sortedSource := sortLoadedSources(loaded)
+	for i := range sortedSource {
+		term := engine.NewAtom(sortedSource[i])
+		promises = append(
+			promises,
+			func(ctx context.Context) *engine.Promise {
+				return engine.Unify(
+					vm,
+					file,
+					term,
+					cont,
+					env,
+				)
+			})
 	}
 
-	return engine.Unify(
-		vm,
-		file,
-		engine.List(result...),
-		cont,
-		env,
-	)
+	return engine.Delay(promises...)
 }
 
 func getLoadedSources(vm *engine.VM) map[string]interface{} {
