@@ -9,6 +9,19 @@ import (
 	"github.com/ichiban/prolog/engine"
 )
 
+// SourceFile is a predicate that unify the given term with the currently loaded source file. The signature is as follows:
+//
+// source_file(?File).
+//
+// Where File represents a loaded source file.
+//
+// Example:
+//
+//	# Query all the loaded source files.
+//	- source_file(File).
+//
+//	# Query the given source file is loaded.
+//	- source_file('foo.pl').
 func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	loaded := getLoadedSources(vm)
 
