@@ -3,12 +3,12 @@ package keeper
 import (
 	goctx "context"
 	"fmt"
-	"io/fs"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	"github.com/okp4/okp4d/x/logic/fs"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/tendermint/tendermint/libs/log"
 )

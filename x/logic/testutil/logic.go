@@ -7,6 +7,7 @@ import (
 
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
+	"github.com/okp4/okp4d/x/logic/fs"
 )
 
 // NewInterpreterMust returns a new Interpreter with the given context or panics if it fails.
@@ -16,6 +17,7 @@ func NewInterpreterMust(ctx context.Context) (interpreter *prolog.Interpreter) {
 	interpreter.Register3(engine.NewAtom("op"), engine.Op)
 	interpreter.Register3(engine.NewAtom("compare"), engine.Compare)
 	interpreter.Register2(engine.NewAtom("="), engine.Unify)
+	interpreter.Register1(engine.NewAtom("consult"), engine.Consult)
 
 	err := interpreter.Compile(ctx, `
 						:-(op(1200, xfx, ':-')).
@@ -30,6 +32,13 @@ func NewInterpreterMust(ctx context.Context) (interpreter *prolog.Interpreter) {
 	if err != nil {
 		panic(err)
 	}
+
+	return
+}
+
+func NewInterpreterWithFSMust(ctx context.Context, filesystem fs.FS) (interpreter *prolog.Interpreter) {
+	interpreter = NewInterpreterMust(ctx)
+	interpreter.FS = filesystem
 
 	return
 }

@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -1017,7 +1016,7 @@ func (app *App) SimulationManager() *module.SimulationManager {
 
 // provideFS is used to provide the virtual file system used for the logic module
 // to load external file.
-func (app *App) provideFS(ctx context.Context) fs.FS {
+func (app *App) provideFS(ctx context.Context) logicfs.FS {
 	wasmHandler := logicfs.NewWasmHandler(app.WasmKeeper)
 	return logicfs.NewVirtualFS(ctx, []logicfs.URIHandler{wasmHandler})
 }
