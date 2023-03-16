@@ -59,6 +59,7 @@ func sortLoadedSources(sources map[string]interface{}) []string {
 	return result
 }
 
+//nolint:nilnil
 func getFile(env *engine.Env, term engine.Term) (*string, error) {
 	switch file := env.Resolve(term).(type) {
 	case engine.Variable:
