@@ -30,7 +30,7 @@ func (app *App) setupUpgradeHandlers() {
 	}
 
 	var storeUpgrades *storetypes.StoreUpgrades
-	switch upgradeInfo.Name { //nolint:gocritic // next upgrade will need switch case
+	switch upgradeInfo.Name {
 	case v4.UpgradeName:
 		storeUpgrades = v4.StoreUpgrades
 	case v41.UpgradeName:
