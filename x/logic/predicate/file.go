@@ -17,7 +17,7 @@ import (
 //
 // Example:
 //
-//	# Query all the loaded source files.
+//	# Query all the loaded source files, in alphanumeric order.
 //	- source_file(File).
 //
 //	# Query the given source file is loaded.
