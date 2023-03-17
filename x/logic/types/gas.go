@@ -1,6 +1,7 @@
 package types
 
 import (
+	"runtime"
 	"sync"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -18,6 +19,14 @@ type safeGasMeter struct {
 
 func (m *safeGasMeter) ConsumeGas(amount uint64, descriptor string) {
 	m.mutex.Lock()
+	defer func() {
+		if r := recover(); r != nil {
+			if _, ok := r.(sdk.ErrorOutOfGas); ok {
+				runtime.Goexit()
+			}
+			panic(r)
+		}
+	}()
 	defer m.mutex.Unlock()
 
 	m.gasMeter.ConsumeGas(amount, descriptor)
