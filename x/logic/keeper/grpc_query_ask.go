@@ -33,6 +33,13 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 
 			panic(r)
 		}
+		if sdkCtx.GasMeter().IsOutOfGas() {
+			response, err = nil, sdkerrors.Wrapf(
+				types.LimitExceeded, "out of gas: %s (%d/%d)",
+				types.ModuleName, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
+
+			return
+		}
 	}()
 	sdkCtx.GasMeter().ConsumeGas(sdkCtx.GasMeter().GasConsumed(), types.ModuleName)
 
