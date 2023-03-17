@@ -22,9 +22,9 @@ func (m *safeGasMeter) ConsumeGas(amount uint64, descriptor string) {
 	defer func() {
 		if r := recover(); r != nil {
 			if _, ok := r.(sdk.ErrorOutOfGas); ok {
-				// Since predicate is call into a goroutine, when out of gas is throw, the main caller
+				// Since predicate is called into a goroutine, when out of gas is thrown, the main caller
 				// (grpc: https://github.com/okp4/okp4d/blob/main/x/logic/keeper/grpc_query_ask.go#L25-L36, or querier)
-				// cannot recover ErrOutOfGas. To avoid the chain panic, we need to exit without panic.
+				// cannot recover ErrOutOfGas. To avoid the chain panicking, we need to exit without panic.
 				// Goexit runs all deferred calls before terminating the goroutine. Because Goexit
 				// is not a panic, any recover calls in those deferred functions will return nil.
 				// This is a temporary solution before implementing a context cancellation.
