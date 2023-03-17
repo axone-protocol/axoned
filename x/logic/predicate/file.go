@@ -57,17 +57,17 @@ func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.E
 	return engine.Delay(promises...)
 }
 
-func getLoadedSources(vm *engine.VM) map[string]interface{} {
+func getLoadedSources(vm *engine.VM) map[string]struct{} {
 	loadedField := reflect.ValueOf(vm).Elem().FieldByName("loaded").MapKeys()
-	loaded := make(map[string]interface{}, len(loadedField))
+	loaded := make(map[string]struct{}, len(loadedField))
 	for _, value := range loadedField {
-		loaded[value.String()] = nil
+		loaded[value.String()] = struct{}{}
 	}
 
 	return loaded
 }
 
-func sortLoadedSources(sources map[string]interface{}) []string {
+func sortLoadedSources(sources map[string]struct{}) []string {
 	result := make([]string, 0, len(sources))
 	for filename := range sources {
 		result = append(result, filename)
