@@ -1,5 +1,41 @@
 # ØKP4 protocol changelog
 
+## [4.1.0](https://github.com/okp4/okp4d/compare/v4.0.0...v4.1.0) (2023-03-17)
+
+
+### Features
+
+* **logic:** add crypto_hash/2 predicate ([5c70aba](https://github.com/okp4/okp4d/commit/5c70aba06fbccf0ac73893ae41a883e62d23f248))
+* **logic:** add hex_bytes/2 predicate ([eb167ee](https://github.com/okp4/okp4d/commit/eb167ee688e0200a4449ba1d76ce7f7a041242d5))
+* **logic:** add wasm keeper interface ([4ccc32b](https://github.com/okp4/okp4d/commit/4ccc32bd7b71556330a2997b0b3dcd0c268d1f3e))
+* **logic:** bech32_address/3 predicate conversion in one way ([ba1195a](https://github.com/okp4/okp4d/commit/ba1195a6dbb6bb9a23c9377913e488522a7208a2))
+* **logic:** call wasm contract from fileSystem ([4eb6b47](https://github.com/okp4/okp4d/commit/4eb6b478cd9ab1b3d4268028611abfa86a3381e2))
+* **logic:** convert base64 bech32 to bech32 encoded string ([7b24610](https://github.com/okp4/okp4d/commit/7b24610494bf338b2a47ec9d4c96a24caca812f3))
+* **logic:** create custom file system handler ([b9cd4fb](https://github.com/okp4/okp4d/commit/b9cd4fb287baac37cbe0c1b90a8923523a03f7a3))
+* **logic:** handle wasm uri on consult/1 predicate ([bbc7aae](https://github.com/okp4/okp4d/commit/bbc7aaedb828959ee1865ab24042e1ec2c15366d))
+* **logic:** impl Read on Object file ([02cc0d1](https://github.com/okp4/okp4d/commit/02cc0d17e4bb7adf77f9a51cc442f9782ad0347e))
+* **logic:** implements source_file/1 predicate ([8ceede1](https://github.com/okp4/okp4d/commit/8ceede17e4bb17b64eee8c26e17b174363781d8a))
+* **logic:** return List of byte for crypto_hash/2 ([6534b9b](https://github.com/okp4/okp4d/commit/6534b9b5afc1a6f40680b159b149d4d4fc6f149c))
+
+
+### Bug Fixes
+
+* **linter:** remove unsused directive linter ([d61a5d6](https://github.com/okp4/okp4d/commit/d61a5d68ff19d0c4e38eedcb1c3bf7d1b0b55643))
+* **logic:** add type safety on interface and rename it corrctly ([010bcc7](https://github.com/okp4/okp4d/commit/010bcc708c0724b404ddbd576fcf61dae75d4406))
+* **logic:** check scheme on wasm fs ([a6f522b](https://github.com/okp4/okp4d/commit/a6f522b9afca923e4a2a4814736b956a231609c5))
+* **logic:** comment typo ([04dcf6e](https://github.com/okp4/okp4d/commit/04dcf6ef416e7aa01056d6738abd827030c22169))
+* **logic:** file time is the block height time ([a869ec6](https://github.com/okp4/okp4d/commit/a869ec691f8e4c84847a76116cf8bf31766c0f9c))
+* **logic:** fix linter and empty path error ([db727a0](https://github.com/okp4/okp4d/commit/db727a06dce0859a22f8ebdd3856b9d3fafc0aad))
+* **logic:** fix out of gas on goroutine ([b38ab90](https://github.com/okp4/okp4d/commit/b38ab902d643855e10723f135c27815ed8b71d26))
+* **logic:** fix test after reviews ([bd57659](https://github.com/okp4/okp4d/commit/bd57659aac7c747ad6e3493da7ab6b0b1ddf72d5))
+* **logic:** implement open on fs ([9bb1c10](https://github.com/okp4/okp4d/commit/9bb1c10649a5b19dd2750759542247af82fe7981))
+* **logic:** linter and unit tests ([1ac14dd](https://github.com/okp4/okp4d/commit/1ac14dd826858dd9e777d82a1830c65a10da18cc))
+* **logic:** make addressPairToBech32 private ([c31ba77](https://github.com/okp4/okp4d/commit/c31ba77dbd2b82c000078bdf8c89f8ce4fa432d3))
+* **logic:** make source_file return multiple results instead of list ([d7e9526](https://github.com/okp4/okp4d/commit/d7e952666a10b86003a1ab033a7e8d84e0dc3449))
+* **logic:** remove chek okp4 scheme ([dc53827](https://github.com/okp4/okp4d/commit/dc5382701292a12a13481752a16853f5720a0315))
+* **logic:** remove unsued wasm on context ([306e364](https://github.com/okp4/okp4d/commit/306e3648ee0ed65fbeeadb95cb11f5996bad6b32))
+* **logic:** remove unused files ([71f94b4](https://github.com/okp4/okp4d/commit/71f94b44a81ad661fbdaf675a9b042583f19b842))
+
 ## [4.0.0](https://github.com/okp4/okp4d/compare/v3.0.0...v4.0.0) (2023-02-15)
 
 
