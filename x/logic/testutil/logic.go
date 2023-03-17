@@ -16,6 +16,7 @@ func NewInterpreterMust(ctx context.Context) (interpreter *prolog.Interpreter) {
 	interpreter.Register3(engine.NewAtom("op"), engine.Op)
 	interpreter.Register3(engine.NewAtom("compare"), engine.Compare)
 	interpreter.Register2(engine.NewAtom("="), engine.Unify)
+	interpreter.Register1(engine.NewAtom("consult"), engine.Consult)
 
 	err := interpreter.Compile(ctx, `
 						:-(op(1200, xfx, ':-')).
