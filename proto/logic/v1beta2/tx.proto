@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package logic.v1beta;
+package logic.v1beta2;
 
 option go_package = "github.com/okp4/okp4d/x/logic/types";
 

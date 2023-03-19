@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package logic.v1beta;
+package logic.v1beta2;
 
 import "gogoproto/gogo.proto";
 
@@ -60,17 +60,31 @@ message Limits {
 message Interpreter {
   option (gogoproto.goproto_stringer) = true;
 
-  // registered_predicates specifies the list of registered predicates/operators, in the form of: `<predicate_name>/<arity>`.
-  // For instance: `findall/3`.
-  // If not specified, the default set of predicates/operators will be registered.
-  repeated string registered_predicates = 1 [
+  // predicates_whitelist specifies a list of prolog predicates that are allowed and can be used by the interpreter.
+  // The predicates are represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity
+  // is included in this list, then all predicates with that name will be considered regardless of arity. For example, if `call` is included
+  // in the whitelist, then all predicates `call/1`, `call/2`, `call/3`... will be allowed.
+  // If this field is not specified, the interpreter will use the default set of predicates.
+  repeated string predicates_whitelist = 1 [
     (gogoproto.nullable) = true,
-    (gogoproto.moretags) = "yaml:\"registered_predicates\""
+    (gogoproto.moretags) = "yaml:\"predicates_whitelist\""
+  ];
+
+  // predicates_blacklist specifies a list of prolog predicates that are excluded from the set of registered predicates
+  // and can never be executed by the interpreter.
+  // The predicates are represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity
+  // is included in this list, then all predicates with that name will be considered regardless of arity. For example, if `call` is included
+  // in the blacklist, then all predicates `call/1`, `call/2`, `call/3`... will be excluded.
+  // If a predicate is included in both whitelist and blacklist, it will be excluded. This means that blacklisted predicates prevails
+  // on whitelisted predicates.
+  repeated string predicates_blacklist = 2 [
+    (gogoproto.nullable) = true,
+    (gogoproto.moretags) = "yaml:\"predicates_blacklist\""
   ];
 
   // bootstrap specifies the initial program to run when booting the logic interpreter.
   // If not specified, the default boot sequence will be executed.
-  string bootstrap = 2 [
+  string bootstrap = 3 [
     (gogoproto.nullable) = true,
     (gogoproto.moretags) = "yaml:\"bootstrap\""
   ];

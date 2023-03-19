@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-package logic.v1beta;
+package logic.v1beta2;
 
 import "gogoproto/gogo.proto";
-import "logic/v1beta/params.proto";
+import "logic/v1beta2/params.proto";
 
 option go_package = "github.com/okp4/okp4d/x/logic/types";
 

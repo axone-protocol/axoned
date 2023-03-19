@@ -1,11 +1,11 @@
 syntax = "proto3";
 
-package logic.v1beta;
+package logic.v1beta2;
 
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "logic/v1beta/params.proto";
-import "logic/v1beta/types.proto";
+import "logic/v1beta2/params.proto";
+import "logic/v1beta2/types.proto";
 
 option go_package = "github.com/okp4/okp4d/x/logic/types";
 
