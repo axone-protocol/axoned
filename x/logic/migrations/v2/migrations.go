@@ -8,14 +8,18 @@ import (
 )
 
 func MigrateStore(ctx sdk.Context, paramstore paramtypes.Subspace, cdc codec.BinaryCodec) error {
-	logger := ctx.Logger().With("migration", "logic")
+	logger := ctx.Logger().
+		With("module", "logic").
+		With("migration", "v2")
 
-	logger.Debug("start module migration")
+	logger.Debug("starting module migration")
 
 	// Add default params keys / values
 	logger.Debug("set params default values")
 	params := types.DefaultParams()
 	paramstore.SetParamSet(ctx, &params)
+
+	logger.Debug("module migration done")
 
 	return nil
 }

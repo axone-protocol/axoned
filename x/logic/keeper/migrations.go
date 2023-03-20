@@ -3,6 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	v2 "github.com/okp4/okp4d/x/logic/migrations/v2"
+	v3 "github.com/okp4/okp4d/x/logic/migrations/v3"
 )
 
 type Migrator struct {
@@ -15,4 +16,8 @@ func NewMigrator(keeper Keeper) Migrator {
 
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
 	return v2.MigrateStore(ctx, m.keeper.paramstore, m.keeper.cdc)
+}
+
+func (m Migrator) Migrate2to3(ctx sdk.Context) error {
+	return v3.MigrateStore(ctx, m.keeper.paramstore, m.keeper.cdc)
 }
