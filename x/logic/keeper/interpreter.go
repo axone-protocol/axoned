@@ -73,6 +73,10 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 		results = append(results, types.Result{Substitutions: m.ToSubstitutions()})
 	}
 
+	if sols.Err() != nil && sdkCtx.GasMeter().IsOutOfGas() {
+		panic(sdk.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
+	}
+
 	return &types.QueryServiceAskResponse{
 		Height:  uint64(sdkCtx.BlockHeight()),
 		GasUsed: sdkCtx.GasMeter().GasConsumed(),
