@@ -38,7 +38,7 @@ func TestBlock(t *testing.T) {
 				ctx := sdk.NewContext(stateStore, tc.header, false, log.NewNopLogger())
 
 				Convey("and a vm", func() {
-					interpreter := testutil.NewInterpreterMust(ctx)
+					interpreter := testutil.NewLightInterpreterMust(ctx)
 					interpreter.Register1(engine.NewAtom("block_height"), BlockHeight)
 					interpreter.Register1(engine.NewAtom("block_time"), BlockTime)
 					testutil.CompileMust(ctx, interpreter, fmt.Sprintf("test :- %s.", tc.implication))

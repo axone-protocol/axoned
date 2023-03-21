@@ -95,7 +95,7 @@ func TestDID(t *testing.T) {
 					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 					Convey("and a vm", func() {
-						interpreter := testutil.NewInterpreterMust(ctx)
+						interpreter := testutil.NewLightInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("did_components"), DIDComponents)
 
 						err := interpreter.Compile(ctx, tc.program)

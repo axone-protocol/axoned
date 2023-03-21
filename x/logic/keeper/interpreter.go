@@ -9,6 +9,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
 	"github.com/okp4/okp4d/x/logic/interpreter"
+	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
 )
@@ -97,7 +98,7 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 	interpreted, err := interpreter.New(
 		ctx,
 		util.NonZeroOrDefault(interpreterParams.GetRegisteredPredicates(), interpreter.RegistryNames),
-		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), interpreter.Bootstrap()),
+		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap()),
 		sdkctx.GasMeter(),
 		k.fsProvider(ctx),
 	)
