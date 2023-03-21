@@ -23,6 +23,9 @@ message Params {
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"limits\""
   ];
+
+  // GasPolicy defines the parameters for calculating predicate invocation costs.
+  GasPolicy gas_policy = 3;
 }
 
 // Limits defines the limits of the logic module.
@@ -88,4 +91,37 @@ message Interpreter {
     (gogoproto.nullable) = true,
     (gogoproto.moretags) = "yaml:\"bootstrap\""
   ];
+}
+
+// PredicateCost defines the unit cost of a predicate during its invocation by the interpreter.
+message PredicateCost {
+  // Predicate is the name of the predicate, optionally followed by its arity (e.g. "findall/3").
+  // If no arity is specified, the unit cost is applied to all predicates with the same name.
+  string predicate = 1 [
+    (gogoproto.nullable) = true,
+    (gogoproto.moretags) = "yaml:\"predicate\""
+  ];
+
+  // UnitCost is the unit cost of the predicate.
+  string cost = 2 [
+    (gogoproto.moretags) = "yaml:\"cost\",omitempty",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = true
+  ];
+}
+
+// GasPolicy defines the policy for calculating predicate invocation costs and the resulting gas consumption.
+message GasPolicy {
+  // WeightingFactor is the factor that is applied to the unit cost of each predicate
+  // to yield the gas value.
+  // If not provided or set to 0, the default value of 1 is used.
+  string weighting_factor = 1 [
+    (gogoproto.moretags) = "yaml:\"weighting_factor\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = true
+  ];
+
+  // PredicateCosts is the list of predicates and their associated unit costs.
+  // If not provided, all predicates have a unit cost of 1 by default.
+  repeated PredicateCost predicate_costs = 2;
 }
