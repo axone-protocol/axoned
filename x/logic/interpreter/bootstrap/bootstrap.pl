@@ -253,3 +253,5 @@ maplist(_Cont_7, [], [], [], [], [], [], []).
 maplist(Cont_7, [E1|E1s], [E2|E2s], [E3|E3s], [E4|E4s], [E5|E5s], [E6|E6s], [E7|E7s]) :-
   call(Cont_7, E1, E2, E3, E4, E5, E6, E7),
   maplist(Cont_7, E1s, E2s, E3s, E4s, E5s, E6s, E7s).
+
+source_files(Files) :- bagof(File, source_file(File), Files).
