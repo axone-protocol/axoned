@@ -454,7 +454,7 @@ func TestBank(t *testing.T) {
 							Return(tc.balances)
 
 						Convey("and a vm", func() {
-							interpreter := testutil.NewInterpreterMust(ctx)
+							interpreter := testutil.NewLightInterpreterMust(ctx)
 							interpreter.Register2(engine.NewAtom("bank_balances"), BankBalances)
 							interpreter.Register2(engine.NewAtom("bank_spendable_balances"), BankSpendableBalances)
 							interpreter.Register2(engine.NewAtom("bank_locked_balances"), BankLockedBalances)

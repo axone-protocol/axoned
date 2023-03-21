@@ -117,7 +117,7 @@ H == [2252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,
 					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 					Convey("and a vm", func() {
-						interpreter := testutil.NewInterpreterMust(ctx)
+						interpreter := testutil.NewLightInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("sha_hash"), SHAHash)
 						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
 

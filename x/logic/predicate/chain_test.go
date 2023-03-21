@@ -34,7 +34,7 @@ func TestChainID(t *testing.T) {
 				ctx := sdk.NewContext(stateStore, tc.header, false, log.NewNopLogger())
 
 				Convey("and an interpreter", func() {
-					interpreter := testutil.NewInterpreterMust(ctx)
+					interpreter := testutil.NewLightInterpreterMust(ctx)
 					interpreter.Register1(engine.NewAtom("chain_id"), ChainID)
 					testutil.CompileMust(ctx, interpreter, fmt.Sprintf("test :- %s.", tc.implication))
 
