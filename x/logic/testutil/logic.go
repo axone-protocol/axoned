@@ -7,18 +7,19 @@ import (
 
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
+	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
 )
 
-// NewInterpreterMust returns a new Interpreter with the given context or panics if it fails.
+// NewLightInterpreterMust returns a new Interpreter with the given context or panics if it fails.
 // The Interpreter is configured with minimal settings to support testing.
-func NewInterpreterMust(ctx context.Context) (interpreter *prolog.Interpreter) {
-	interpreter = &prolog.Interpreter{}
-	interpreter.Register3(engine.NewAtom("op"), engine.Op)
-	interpreter.Register3(engine.NewAtom("compare"), engine.Compare)
-	interpreter.Register2(engine.NewAtom("="), engine.Unify)
-	interpreter.Register1(engine.NewAtom("consult"), engine.Consult)
+func NewLightInterpreterMust(ctx context.Context) (i *prolog.Interpreter) {
+	i = &prolog.Interpreter{}
+	i.Register3(engine.NewAtom("op"), engine.Op)
+	i.Register3(engine.NewAtom("compare"), engine.Compare)
+	i.Register2(engine.NewAtom("="), engine.Unify)
+	i.Register1(engine.NewAtom("consult"), engine.Consult)
 
-	err := interpreter.Compile(ctx, `
+	err := i.Compile(ctx, `
 						:-(op(1200, xfx, ':-')).
 						:-(op(1000, xfy, ',')).
 						:-(op(700, xfx, [==, \==, @<, @=<, @>, @>=])).
@@ -35,10 +36,28 @@ func NewInterpreterMust(ctx context.Context) (interpreter *prolog.Interpreter) {
 	return
 }
 
+// NewComprehensiveInterpreterMust returns a new Interpreter with the given context or panics if it fails.
+// The Interpreter is configured with the full boostrap but with a minimal set of predicates.
+func NewComprehensiveInterpreterMust(ctx context.Context) (i *prolog.Interpreter) {
+	i = &prolog.Interpreter{}
+	i.Register3(engine.NewAtom("op"), engine.Op)
+	i.Register3(engine.NewAtom("compare"), engine.Compare)
+	i.Register2(engine.NewAtom("="), engine.Unify)
+	i.Register1(engine.NewAtom("consult"), engine.Consult)
+	i.Register3(engine.NewAtom("bagof"), engine.BagOf)
+
+	err := i.Compile(ctx, bootstrap.Bootstrap())
+	if err != nil {
+		panic(err)
+	}
+
+	return
+}
+
 // CompileMust compiles the given source code and panics if it fails.
 // This is a convenience function for testing.
-func CompileMust(ctx context.Context, interpreter *prolog.Interpreter, s string, args ...interface{}) {
-	err := interpreter.Compile(ctx, s, args...)
+func CompileMust(ctx context.Context, i *prolog.Interpreter, s string, args ...interface{}) {
+	err := i.Compile(ctx, s, args...)
 	if err != nil {
 		panic(err)
 	}

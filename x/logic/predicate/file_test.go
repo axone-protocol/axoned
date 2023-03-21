@@ -7,9 +7,12 @@ import (
 	"testing"
 	"time"
 
+	goctx "context"
+
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/golang/mock/gomock"
+	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
 	"github.com/okp4/okp4d/x/logic/fs"
 	"github.com/okp4/okp4d/x/logic/testutil"
@@ -26,47 +29,90 @@ func TestSourceFile(t *testing.T) {
 		defer ctrl.Finish()
 
 		cases := []struct {
+			interpreter func(ctx goctx.Context) (i *prolog.Interpreter)
 			query       string
 			wantResult  []types.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
 			{
+				interpreter: testutil.NewLightInterpreterMust,
 				query:       "source_file(file).",
 				wantSuccess: false,
 			},
 			{
+				interpreter: testutil.NewLightInterpreterMust,
 				query:       "consult(file1), consult(file2), source_file(file1).",
 				wantResult:  []types.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
+				interpreter: testutil.NewLightInterpreterMust,
 				query:       "consult(file1), consult(file2), consult(file3), source_file(file2).",
 				wantResult:  []types.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
+				interpreter: testutil.NewLightInterpreterMust,
 				query:       "consult(file1), consult(file2), source_file(file3).",
 				wantSuccess: false,
 			},
 			{
+				interpreter: testutil.NewLightInterpreterMust,
 				query:       "source_file(X).",
 				wantSuccess: false,
 			},
 			{
+				interpreter: testutil.NewLightInterpreterMust,
 				query:       "consult(file1), consult(file2), source_file(X).",
 				wantResult:  []types.TermResults{{"X": "file1"}, {"X": "file2"}},
 				wantSuccess: true,
 			},
 			{
+				interpreter: testutil.NewLightInterpreterMust,
 				query:       "consult(file2), consult(file3), consult(file1), source_file(X).",
 				wantResult:  []types.TermResults{{"X": "file1"}, {"X": "file2"}, {"X": "file3"}},
 				wantSuccess: true,
 			},
 			{
-				query:      "source_file(foo(bar)).",
-				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("source_file/1: cannot unify file with *engine.compound"),
+				interpreter: testutil.NewLightInterpreterMust,
+				query:       "source_file(foo(bar)).",
+				wantResult:  []types.TermResults{},
+				wantError:   fmt.Errorf("source_file/1: cannot unify file with *engine.compound"),
+			},
+
+			{
+				interpreter: testutil.NewComprehensiveInterpreterMust,
+				query:       "source_files([file]).",
+				wantSuccess: false,
+			},
+			{
+				interpreter: testutil.NewComprehensiveInterpreterMust,
+				query:       "consult(file1), consult(file2), source_files([file1, file2]).",
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: true,
+			},
+			{
+				interpreter: testutil.NewComprehensiveInterpreterMust,
+				query:       "consult(file1), consult(file2), source_files([file1, file2, file3]).",
+				wantSuccess: false,
+			},
+			{
+				interpreter: testutil.NewComprehensiveInterpreterMust,
+				query:       "source_files(X).",
+				wantSuccess: false,
+			},
+			{
+				interpreter: testutil.NewComprehensiveInterpreterMust,
+				query:       "consult(file2), consult(file1), source_files(X).",
+				wantResult:  []types.TermResults{{"X": "[file1,file2]"}},
+				wantSuccess: true,
+			},
+			{
+				interpreter: testutil.NewComprehensiveInterpreterMust,
+				query:       "consult(file2), consult(file1), source_files([file1, X]).",
+				wantResult:  []types.TermResults{{"X": "file2"}},
+				wantSuccess: true,
 			},
 		}
 
@@ -87,7 +133,7 @@ func TestSourceFile(t *testing.T) {
 						ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 						Convey("and a vm", func() {
-							interpreter := testutil.NewInterpreterMust(ctx)
+							interpreter := tc.interpreter(ctx)
 							interpreter.FS = mockedFS
 							interpreter.Register1(engine.NewAtom("source_file"), SourceFile)
 
