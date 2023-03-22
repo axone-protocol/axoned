@@ -11,6 +11,7 @@ import (
 	"github.com/ichiban/prolog"
 	"github.com/okp4/okp4d/x/logic/interpreter"
 	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
+	"github.com/okp4/okp4d/x/logic/meter"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
 	u "github.com/rjNemo/underscore"
@@ -96,14 +97,16 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 	params := k.GetParams(sdkctx)
 
 	interpreterParams := params.GetInterpreter()
+	gasPolicy := params.GetGasPolicy()
 
 	whitelist := util.NonZeroOrDefault(interpreterParams.PredicatesWhitelist, interpreter.RegistryNames)
 	blacklist := interpreterParams.GetPredicatesBlacklist()
+	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), gasPolicy.WeightingFactor.Uint64())
 	interpreted, err := interpreter.New(
 		ctx,
 		filterPredicates(interpreter.RegistryNames, whitelist, blacklist),
 		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap()),
-		sdkctx.GasMeter(),
+		gasMeter,
 		k.fsProvider(ctx),
 	)
 
