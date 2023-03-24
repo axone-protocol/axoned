@@ -5,15 +5,11 @@ import (
 	"io"
 )
 
-var (
-	_ = io.Writer(&BoundedBuffer{})
-)
+var _ = io.Writer(&BoundedBuffer{})
 
-var (
-	ErrInvalidSize = func(size int) error {
-		return fmt.Errorf("invalid buffer size %d", size)
-	}
-)
+var ErrInvalidSize = func(size int) error {
+	return fmt.Errorf("invalid buffer size %d", size)
+}
 
 // BoundedBuffer is a fixed size buffer that overwrites older data when the buffer is full.
 type BoundedBuffer struct {

@@ -3,42 +3,71 @@ package interpreter
 import (
 	goctx "context"
 	"fmt"
+	"io"
 	"io/fs"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
+	"github.com/ichiban/prolog/engine"
 )
 
 // Predicates is a map of predicate names to their execution costs.
 type Predicates map[string]uint64
 
-// New creates a new prolog.Interpreter with:
-// - a list of predefined predicates (with their execution costs).
-// - a compiled bootstrap script, that can be used to perform setup tasks.
-// - a meter to track gas consumption.
-// - a file system to load external files.
-//
+// Option is a function that configures an Interpreter.
+type Option func(*prolog.Interpreter) error
+
+// WithPredicates configures the interpreter to register the specified predicates.
 // The predicates names must be present in the registry, otherwise the function will return an error.
-// The bootstrap script can be an empty string if no bootstrap script is needed. If compilation of the bootstrap script
-// fails, the function will return an error.
+func WithPredicates(_ goctx.Context, predicates Predicates, meter sdk.GasMeter) Option {
+	return func(i *prolog.Interpreter) error {
+		for predicate, cost := range predicates {
+			if err := Register(i, predicate, cost, meter); err != nil {
+				return fmt.Errorf("error registering predicate '%s': %w", predicate, err)
+			}
+		}
+		return nil
+	}
+}
+
+// WithBootstrap configures the interpreter to compile the specified bootstrap script to serve as setup context.
+// If compilation of the bootstrap script fails, the function will return an error.
+func WithBootstrap(ctx goctx.Context, bootstrap string) Option {
+	return func(i *prolog.Interpreter) error {
+		if err := i.Compile(ctx, bootstrap); err != nil {
+			return fmt.Errorf("error compiling bootstrap script: %w", err)
+		}
+		return nil
+	}
+}
+
+// WithUserOutputWriter configures the interpreter to use the specified writer for user output.
+func WithUserOutputWriter(w io.Writer) Option {
+	return func(i *prolog.Interpreter) error {
+		i.SetUserOutput(engine.NewOutputTextStream(w))
+
+		return nil
+	}
+}
+
+// WithFS configures the interpreter to use the specified file system.
+func WithFS(fs fs.FS) Option {
+	return func(i *prolog.Interpreter) error {
+		i.FS = fs
+		return nil
+	}
+}
+
+// New creates a new prolog.Interpreter with the specified options.
 func New(
-	ctx goctx.Context,
-	predicates Predicates,
-	bootstrap string,
-	meter sdk.GasMeter,
-	fs fs.FS,
+	opts ...Option,
 ) (*prolog.Interpreter, error) {
 	var i prolog.Interpreter
-	i.FS = fs
 
-	for predicate, cost := range predicates {
-		if err := Register(&i, predicate, cost, meter); err != nil {
-			return nil, fmt.Errorf("error registering predicate '%s': %w", predicate, err)
+	for _, opt := range opts {
+		if err := opt(&i); err != nil {
+			return nil, err
 		}
-	}
-
-	if err := i.Compile(ctx, bootstrap); err != nil {
-		return nil, fmt.Errorf("error compiling bootstrap script: %w", err)
 	}
 
 	return &i, nil
