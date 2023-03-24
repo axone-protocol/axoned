@@ -102,6 +102,10 @@ type Limits struct {
 	// max_result_count specifies the maximum number of results that can be requested for a query.
 	// nil value remove max result count limitation.
 	MaxResultCount *github_com_cosmos_cosmos_sdk_types.Uint `protobuf:"bytes,2,opt,name=max_result_count,json=maxResultCount,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"max_result_count,omitempty" yaml:"max_result_count"`
+	// max_user_output_size specifies the maximum number of bytes to keep in the user output. If the user output exceeds
+	// this size, the interpreter will overwrite the oldest bytes with the new ones to keep the size constant.
+	// nil value or 0 value means that no user output is used at all.
+	MaxUserOutputSize *github_com_cosmos_cosmos_sdk_types.Uint `protobuf:"bytes,4,opt,name=max_user_output_size,json=maxUserOutputSize,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"max_user_output_size,omitempty" yaml:"max_user_output_size"`
 }
 
 func (m *Limits) Reset()         { *m = Limits{} }
@@ -445,6 +449,18 @@ func (m *Limits) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	if m.MaxUserOutputSize != nil {
+		{
+			size := m.MaxUserOutputSize.Size()
+			i -= size
+			if _, err := m.MaxUserOutputSize.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintParams(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x22
+	}
 	if m.MaxSize != nil {
 		{
 			size := m.MaxSize.Size()
@@ -677,6 +693,10 @@ func (m *Limits) Size() (n int) {
 	}
 	if m.MaxSize != nil {
 		l = m.MaxSize.Size()
+		n += 1 + l + sovParams(uint64(l))
+	}
+	if m.MaxUserOutputSize != nil {
+		l = m.MaxUserOutputSize.Size()
 		n += 1 + l + sovParams(uint64(l))
 	}
 	return n
@@ -1036,6 +1056,42 @@ func (m *Limits) Unmarshal(dAtA []byte) error {
 			var v github_com_cosmos_cosmos_sdk_types.Uint
 			m.MaxSize = &v
 			if err := m.MaxSize.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 4:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field MaxUserOutputSize", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthParams
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthParams
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_cosmos_cosmos_sdk_types.Uint
+			m.MaxUserOutputSize = &v
+			if err := m.MaxUserOutputSize.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
