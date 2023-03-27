@@ -37,7 +37,6 @@ func NewKeeper(
 	bankKeeper types.BankKeeper,
 	fsProvider FSProvider,
 ) *Keeper {
-
 	// ensure gov module account is set and is not nil
 	if err := sdk.VerifyAddressFormat(authority); err != nil {
 		panic(err)

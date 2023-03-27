@@ -2,12 +2,12 @@ syntax = "proto3";
 
 package logic.v1beta2;
 
-option go_package = "github.com/okp4/okp4d/x/logic/types";
-
 import "cosmos/msg/v1/msg.proto";
-import "logic/v1beta2/params.proto";
-import "gogoproto/gogo.proto";
 import "cosmos_proto/cosmos.proto";
+import "gogoproto/gogo.proto";
+import "logic/v1beta2/params.proto";
+
+option go_package = "github.com/okp4/okp4d/x/logic/types";
 
 // MsgService defines the service for the logic module.
 // Do nothing for now as the service is without any side effects.
@@ -16,7 +16,6 @@ service MsgService {
   // The authority is hard-coded to the Cosmos SDK x/gov module account
   rpc UpdateParams(MsgUpdateParams) returns (MsgUpdateParamsResponse);
 }
-
 
 // MsgUpdateParams defines a Msg for updating the x/logic module parameters.
 message MsgUpdateParams {

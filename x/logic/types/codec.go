@@ -28,17 +28,17 @@ var (
 )
 
 const (
-	// Amino names
+	// Amino names.
 	updateParamsName = "okp4/logic/MsgUpdateParams"
 )
 
-// NOTE: This is required for the GetSignBytes function
+// NOTE: This is required for the GetSignBytes function.
 func init() {
 	RegisterLegacyAminoCodec(Amino)
 	Amino.Seal()
 }
 
-// RegisterLegacyAminoCodec required for EIP-712
+// RegisterLegacyAminoCodec required for EIP-712.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgUpdateParams{}, updateParamsName, nil)
 }

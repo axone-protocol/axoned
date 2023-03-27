@@ -24,7 +24,8 @@ func v2ParamKeyTable() paramtypes.KeyTable {
 func MigrateStore(ctx sdk.Context,
 	storeKey storetypes.StoreKey,
 	cdc codec.BinaryCodec,
-	legacySubspace exported.Subspace) error {
+	legacySubspace exported.Subspace,
+) error {
 	logger := ctx.Logger().
 		With("module", "logic").
 		With("migration", "v3")
