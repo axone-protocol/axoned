@@ -18,7 +18,7 @@ service MsgService {
 }
 
 
-// MsgUpdateParams defines a Msg for updating the x/incentives module parameters.
+// MsgUpdateParams defines a Msg for updating the x/logic module parameters.
 message MsgUpdateParams {
   option (cosmos.msg.v1.signer) = "authority";
   // authority is the address of the governance account.

@@ -219,6 +219,9 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
   - [QueryService](#logic.v1beta2.QueryService)
   
 - [logic/v1beta2/tx.proto](#logic/v1beta2/tx.proto)
+  - [MsgUpdateParams](#logic.v1beta2.MsgUpdateParams)
+  - [MsgUpdateParamsResponse](#logic.v1beta2.MsgUpdateParamsResponse)
+  
   - [MsgService](#logic.v1beta2.MsgService)
   
 - [Scalar Value Types](#scalar-value-types)
@@ -420,6 +423,24 @@ QueryService defines the gRPC querier service.
 
 ## logic/v1beta2/tx.proto
 
+<a name="logic.v1beta2.MsgUpdateParams"></a>
+
+### MsgUpdateParams
+
+MsgUpdateParams defines a Msg for updating the x/logic module parameters.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `authority` | [string](#string) |  | authority is the address of the governance account. |
+| `params` | [Params](#logic.v1beta2.Params) |  | params defines the x/logic parameters to update. NOTE: All parameters must be supplied. |
+
+<a name="logic.v1beta2.MsgUpdateParamsResponse"></a>
+
+### MsgUpdateParamsResponse
+
+MsgUpdateParamsResponse defines the response structure for executing a
+MsgUpdateParams message.
+
  [//]: # (end messages)
 
  [//]: # (end enums)
@@ -435,6 +456,7 @@ Do nothing for now as the service is without any side effects.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `UpdateParams` | [MsgUpdateParams](#logic.v1beta2.MsgUpdateParams) | [MsgUpdateParamsResponse](#logic.v1beta2.MsgUpdateParamsResponse) | UpdateParams defined a governance operation for updating the x/logic module parameters. The authority is hard-coded to the Cosmos SDK x/gov module account | |
 
  [//]: # (end services)
 
