@@ -2,13 +2,19 @@ package v2
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
+	"github.com/okp4/okp4d/x/logic/exported"
 	v2types "github.com/okp4/okp4d/x/logic/migrations/v2/types"
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
-func MigrateStore(ctx sdk.Context, paramstore paramtypes.Subspace, cdc codec.BinaryCodec) error {
+func v2ParamKeyTable() paramtypes.KeyTable {
+	return paramtypes.NewKeyTable().RegisterParamSet(&v2types.Params{})
+}
+
+func MigrateStore(ctx sdk.Context, storeKey storetypes.StoreKey, paramstore paramtypes.Subspace, cdc codec.BinaryCodec, legacySubspace exported.Subspace) error {
 	logger := ctx.Logger().
 		With("module", "logic").
 		With("migration", "v3")
