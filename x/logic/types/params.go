@@ -4,13 +4,11 @@ import (
 	"fmt"
 
 	"cosmossdk.io/math"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 )
-
-var _ paramtypes.ParamSet = (*Params)(nil)
 
 // Parameter store keys.
 var (
+	ParamsKey      = []byte("Params")
 	KeyInterpreter = []byte("Interpreter")
 	KeyLimits      = []byte("Limits")
 )
@@ -24,11 +22,6 @@ var (
 	DefaultMaxResultCount      = math.NewUint(uint64(1))
 )
 
-// ParamKeyTable the param key table for launch module.
-func ParamKeyTable() paramtypes.KeyTable {
-	return paramtypes.NewKeyTable().RegisterParamSet(&Params{})
-}
-
 // NewParams creates a new Params object.
 func NewParams(interpreter Interpreter, limits Limits) Params {
 	return Params{
@@ -40,14 +33,6 @@ func NewParams(interpreter Interpreter, limits Limits) Params {
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
 	return NewParams(NewInterpreter(), DefaultLimits())
-}
-
-// ParamSetPairs get the params.ParamSet.
-func (p *Params) ParamSetPairs() paramtypes.ParamSetPairs {
-	return []paramtypes.ParamSetPair{
-		paramtypes.NewParamSetPair(KeyInterpreter, &p.Interpreter, validateInterpreter),
-		paramtypes.NewParamSetPair(KeyLimits, &p.Limits, validateLimits),
-	}
 }
 
 // Validate validates the set of params.

@@ -552,7 +552,7 @@ func New(
 		appCodec,
 		keys[logicmoduletypes.StoreKey],
 		keys[logicmoduletypes.MemStoreKey],
-		app.GetSubspace(logicmoduletypes.ModuleName),
+		authtypes.NewModuleAddress(govtypes.ModuleName),
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.provideFS,

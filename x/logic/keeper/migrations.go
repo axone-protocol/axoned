@@ -20,9 +20,9 @@ func NewMigrator(keeper Keeper, legacySubspace exported.Subspace) Migrator {
 }
 
 func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	return v2.MigrateStore(ctx, m.keeper.paramstore, m.keeper.cdc)
+	return v2.MigrateStore(ctx, m.legacySubspace, m.keeper.cdc)
 }
 
 func (m Migrator) Migrate2to3(ctx sdk.Context) error {
-	return v3.MigrateStore(ctx, m.keeper.storeKey, m.keeper.paramstore, m.keeper.cdc, m.legacySubspace)
+	return v3.MigrateStore(ctx, m.keeper.storeKey, m.keeper.cdc, m.legacySubspace)
 }

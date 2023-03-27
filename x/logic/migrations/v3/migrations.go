@@ -14,7 +14,17 @@ func v2ParamKeyTable() paramtypes.KeyTable {
 	return paramtypes.NewKeyTable().RegisterParamSet(&v2types.Params{})
 }
 
-func MigrateStore(ctx sdk.Context, storeKey storetypes.StoreKey, paramstore paramtypes.Subspace, cdc codec.BinaryCodec, legacySubspace exported.Subspace) error {
+// MigrateStore migrates the x/logic module state from the consensus version 2 to
+// version 3.
+// Specifically, it takes the parameters that are currently stored
+// and managed by the x/params modules and stores them directly into the x/logic
+// module state.
+// Then, `RegisteredPredicates` has been renamed to `PredicatesWhitelist` and add new
+// `PredicatesBlacklist`.
+func MigrateStore(ctx sdk.Context,
+	storeKey storetypes.StoreKey,
+	cdc codec.BinaryCodec,
+	legacySubspace exported.Subspace) error {
 	logger := ctx.Logger().
 		With("module", "logic").
 		With("migration", "v3")
@@ -22,8 +32,12 @@ func MigrateStore(ctx sdk.Context, storeKey storetypes.StoreKey, paramstore para
 	logger.Debug("starting module migration")
 
 	logger.Debug("migrate logic params")
+
+	store := ctx.KVStore(storeKey)
+
 	var oldParams v2types.Params
-	paramstore.GetParamSet(ctx, &oldParams)
+	legacySubspace.WithKeyTable(v2ParamKeyTable()).
+		GetParamSet(ctx, &oldParams)
 
 	newParams := types.Params{
 		Interpreter: types.Interpreter{
@@ -37,7 +51,16 @@ func MigrateStore(ctx sdk.Context, storeKey storetypes.StoreKey, paramstore para
 			MaxResultCount: oldParams.Limits.MaxResultCount,
 		},
 	}
-	paramstore.SetParamSet(ctx, &newParams)
+
+	if err := newParams.Validate(); err != nil {
+		return err
+	}
+
+	bz, err := cdc.Marshal(&newParams)
+	if err != nil {
+		return err
+	}
+	store.Set(types.ParamsKey, bz)
 
 	logger.Debug("module migration done")
 
