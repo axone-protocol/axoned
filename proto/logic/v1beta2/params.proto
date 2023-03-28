@@ -25,7 +25,10 @@ message Params {
   ];
 
   // GasPolicy defines the parameters for calculating predicate invocation costs.
-  GasPolicy gas_policy = 3;
+  GasPolicy gas_policy = 3 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"gas_policy\""
+  ];
 }
 
 // Limits defines the limits of the logic module.
@@ -93,23 +96,6 @@ message Interpreter {
   ];
 }
 
-// PredicateCost defines the unit cost of a predicate during its invocation by the interpreter.
-message PredicateCost {
-  // Predicate is the name of the predicate, optionally followed by its arity (e.g. "findall/3").
-  // If no arity is specified, the unit cost is applied to all predicates with the same name.
-  string predicate = 1 [
-    (gogoproto.nullable) = true,
-    (gogoproto.moretags) = "yaml:\"predicate\""
-  ];
-
-  // UnitCost is the unit cost of the predicate.
-  string cost = 2 [
-    (gogoproto.moretags) = "yaml:\"cost\",omitempty",
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
-    (gogoproto.nullable) = true
-  ];
-}
-
 // GasPolicy defines the policy for calculating predicate invocation costs and the resulting gas consumption.
 message GasPolicy {
   // WeightingFactor is the factor that is applied to the unit cost of each predicate
@@ -123,5 +109,25 @@ message GasPolicy {
 
   // PredicateCosts is the list of predicates and their associated unit costs.
   // If not provided, all predicates have a unit cost of 1 by default.
-  repeated PredicateCost predicate_costs = 2;
+  repeated PredicateCost predicate_costs = 2 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"predicate_cost\""
+  ];
+}
+
+// PredicateCost defines the unit cost of a predicate during its invocation by the interpreter.
+message PredicateCost {
+  // Predicate is the name of the predicate, optionally followed by its arity (e.g. "findall/3").
+  // If no arity is specified, the unit cost is applied to all predicates with the same name.
+  string predicate = 1 [
+    (gogoproto.nullable) = true,
+    (gogoproto.moretags) = "yaml:\"predicate\""
+  ];
+
+  // Cost is the unit cost of the predicate.
+  string cost = 2 [
+    (gogoproto.moretags) = "yaml:\"cost\",omitempty",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = true
+  ];
 }
