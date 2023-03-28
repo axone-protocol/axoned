@@ -14,8 +14,10 @@ import (
 	"github.com/okp4/okp4d/x/logic/meter"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
-	u "github.com/rjNemo/underscore"
+	"github.com/samber/lo"
 )
+
+const defaultCost = uint64(1)
 
 func (k Keeper) limits(ctx goctx.Context) types.Limits {
 	params := k.GetParams(sdk.UnwrapSDKContext(ctx))
@@ -102,9 +104,19 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 	whitelist := util.NonZeroOrDefault(interpreterParams.PredicatesWhitelist, interpreter.RegistryNames)
 	blacklist := interpreterParams.GetPredicatesBlacklist()
 	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), gasPolicy.WeightingFactor.Uint64())
+
+	predicates := lo.Reduce(
+		lo.Map(
+			lo.Filter(interpreter.RegistryNames, filterPredicates(whitelist, blacklist)),
+			toPredicate(gasPolicy.GetPredicateCosts())),
+		func(agg interpreter.Predicates, item lo.Tuple2[string, uint64], index int) interpreter.Predicates {
+			agg[item.A] = item.B
+			return agg
+		}, interpreter.Predicates{})
+
 	interpreted, err := interpreter.New(
 		ctx,
-		filterPredicates(interpreter.RegistryNames, whitelist, blacklist),
+		predicates,
 		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap()),
 		gasMeter,
 		k.fsProvider(ctx),
@@ -113,27 +125,42 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 	return interpreted, err
 }
 
-// filterPredicates constructs the predicate list from the given registry.
-// The given whitelist and blacklist are applied to the registry to determine
-// the final predicate list.
-func filterPredicates(registry []string, whitelist []string, blacklist []string) []string {
-	match := func(a string) func(b string) bool {
-		return func(b string) bool {
-			if strings.Contains(b, "/") {
-				return a == b
-			}
-			return strings.Split(a, "/")[0] == b
-		}
+// filterPredicates filters the given predicate (with arity) according to the given whitelist and blacklist.
+// The whitelist and blacklist are applied to the registry to determine the final predicate list.
+// The whitelist and blacklist can contain predicates with or without arity, e.g. "foo/0", "foo", "bar/1".
+func filterPredicates(whitelist []string, blacklist []string) func(string, int) bool {
+	return func(predicate string, _ int) bool {
+		return lo.ContainsBy(whitelist, matchPredicate(predicate)) && !lo.ContainsBy(blacklist, matchPredicate(predicate))
 	}
+}
 
-	return util.NonZeroOrDefault(
-		u.NewPipe(registry).
-			Filter(func(predicate string) bool {
-				return u.Any(whitelist, match(predicate))
-			}).
-			Filter(func(predicate string) bool {
-				return !u.Any(blacklist, match(predicate))
-			}).
-			Value,
-		[]string{})
+// matchPredicate returns a function that matches the given predicate against the given other predicate.
+// If the other predicate contains a slash, it is matched as is. Otherwise, the other predicate is matched against the
+// first part of the given predicate.
+// For example:
+//   - matchPredicate("foo/0")("foo/0") -> true
+//   - matchPredicate("foo/0")("foo/1") -> false
+//   - matchPredicate("foo/0")("foo") -> true
+//   - matchPredicate("foo/0")("bar") -> false
+func matchPredicate(predicate string) func(b string) bool {
+	return func(other string) bool {
+		if strings.Contains(other, "/") {
+			return predicate == other
+		}
+		return strings.Split(predicate, "/")[0] == other
+	}
+}
+
+// toPredicate converts the given predicate costs to a function that returns the cost for the given predicate as
+// a pair of predicate name and cost.
+func toPredicate(predicateCosts []types.PredicateCost) func(string, int) lo.Tuple2[string, uint64] {
+	return func(predicate string, _ int) lo.Tuple2[string, uint64] {
+		for _, c := range predicateCosts {
+			if matchPredicate(predicate)(c.Predicate) {
+				return lo.T2(predicate, c.Cost.Uint64())
+			}
+		}
+
+		return lo.T2(predicate, defaultCost)
+	}
 }

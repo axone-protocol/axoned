@@ -9,8 +9,11 @@ import (
 	"github.com/ichiban/prolog"
 )
 
+// Predicates is a map of predicate names to their gas costs.
+type Predicates map[string]uint64
+
 // New creates a new prolog.Interpreter with:
-// - a list of predefined predicates
+// - a list of predefined predicates (with their gas costs).
 // - a compiled bootstrap script, that can be used to perform setup tasks.
 //
 // The predicates names must be present in the registry, otherwise the function will return an error.
@@ -18,7 +21,7 @@ import (
 // fails, the function will return an error.
 func New(
 	ctx goctx.Context,
-	predicates []string,
+	predicates Predicates,
 	bootstrap string,
 	meter sdk.GasMeter,
 	fs fs.FS,
@@ -26,9 +29,9 @@ func New(
 	var i prolog.Interpreter
 	i.FS = fs
 
-	for _, o := range predicates {
-		if err := Register(&i, o, meter); err != nil {
-			return nil, fmt.Errorf("error registering predicate '%s': %w", o, err)
+	for predicate, cost := range predicates {
+		if err := Register(&i, predicate, cost, meter); err != nil {
+			return nil, fmt.Errorf("error registering predicate '%s': %w", predicate, err)
 		}
 	}
 

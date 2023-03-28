@@ -42,7 +42,7 @@ func (m *WeightedMeterDecorator) Limit() types.Gas {
 
 // ConsumeGas consumes the given amount of gas from the decorated gas meter.
 func (m *WeightedMeterDecorator) ConsumeGas(amount types.Gas, descriptor string) {
-	consumed, overflow := multiplyUint64Overflow(m.decorated.GasConsumed(), amount)
+	consumed, overflow := multiplyUint64Overflow(m.weight, amount)
 	if overflow {
 		m.decorated.ConsumeGas(math.MaxUint64, descriptor)
 	} else {

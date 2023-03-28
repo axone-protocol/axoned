@@ -11,116 +11,106 @@ import (
 	"github.com/okp4/okp4d/x/logic/predicate"
 )
 
-// RegistryEntry is the type of registry entry.
-type RegistryEntry struct {
-	// predicate is the registered predicate(ctx).
-	predicate any
-	// cost is the cost of the predicate when it is called.
-	cost uint64
-}
-
-const defaultCost = 1
-
-// Registry is a map from predicate names (in the form of "atom/arity") to predicates and their costs.
-var Registry = map[string]RegistryEntry{
-	"call/1":                    {engine.Call, defaultCost},
-	"catch/3":                   {engine.Catch, defaultCost},
-	"throw/1":                   {engine.Throw, defaultCost},
-	"=/2":                       {engine.Unify, defaultCost},
-	"unify_with_occurs_check/2": {engine.UnifyWithOccursCheck, defaultCost},
-	"subsumes_term/2":           {engine.SubsumesTerm, defaultCost},
-	"var/1":                     {engine.TypeVar, defaultCost},
-	"atom/1":                    {engine.TypeAtom, defaultCost},
-	"integer/1":                 {engine.TypeInteger, defaultCost},
-	"float/1":                   {engine.TypeFloat, defaultCost},
-	"compound/1":                {engine.TypeCompound, defaultCost},
-	"acyclic_term/1":            {engine.AcyclicTerm, defaultCost},
-	"compare/3":                 {engine.Compare, defaultCost},
-	"sort/2":                    {engine.Sort, defaultCost},
-	"keysort/2":                 {engine.KeySort, defaultCost},
-	"functor/3":                 {engine.Functor, defaultCost},
-	"arg/3":                     {engine.Arg, defaultCost},
-	"=../2":                     {engine.Univ, defaultCost},
-	"copy_term/2":               {engine.CopyTerm, defaultCost},
-	"term_variables/2":          {engine.TermVariables, defaultCost},
-	"is/2":                      {engine.Is, defaultCost},
-	"=:=/2":                     {engine.Equal, defaultCost},
-	"=\\=/2":                    {engine.NotEqual, defaultCost},
-	"</2":                       {engine.LessThan, defaultCost},
-	"=</2":                      {engine.LessThanOrEqual, defaultCost},
-	">/2":                       {engine.GreaterThan, defaultCost},
-	">=/2":                      {engine.GreaterThanOrEqual, defaultCost},
-	"clause/2":                  {engine.Clause, defaultCost},
-	"current_predicate/1":       {engine.CurrentPredicate, defaultCost},
-	"asserta/1":                 {engine.Asserta, defaultCost},
-	"assertz/1":                 {engine.Assertz, defaultCost},
-	"retract/1":                 {engine.Retract, defaultCost},
-	"abolish/1":                 {engine.Abolish, defaultCost},
-	"findall/3":                 {engine.FindAll, defaultCost},
-	"bagof/3":                   {engine.BagOf, defaultCost},
-	"setof/3":                   {engine.SetOf, defaultCost},
-	"current_input/1":           {engine.CurrentInput, defaultCost},
-	"current_output/1":          {engine.CurrentOutput, defaultCost},
-	"set_input/1":               {engine.SetInput, defaultCost},
-	"set_output/1":              {engine.SetOutput, defaultCost},
-	"open/4":                    {engine.Open, defaultCost},
-	"close/2":                   {engine.Close, defaultCost},
-	"flush_output/1":            {engine.FlushOutput, defaultCost},
-	"stream_property/2":         {engine.StreamProperty, defaultCost},
-	"set_stream_position/2":     {engine.SetStreamPosition, defaultCost},
-	"get_char/2":                {engine.GetChar, defaultCost},
-	"peek_char/2":               {engine.PeekChar, defaultCost},
-	"put_char/2":                {engine.PutChar, defaultCost},
-	"get_byte/2":                {engine.GetByte, defaultCost},
-	"peek_byte/2":               {engine.PeekByte, defaultCost},
-	"put_byte/2":                {engine.PutByte, defaultCost},
-	"read_term/3":               {engine.ReadTerm, defaultCost},
-	"write_term/3":              {engine.WriteTerm, defaultCost},
-	"op/3":                      {engine.Op, defaultCost},
-	"current_op/3":              {engine.CurrentOp, defaultCost},
-	"char_conversion/2":         {engine.CharConversion, defaultCost},
-	"current_char_conversion/2": {engine.CurrentCharConversion, defaultCost},
-	`\+/1`:                      {engine.Negate, defaultCost},
-	"repeat/0":                  {engine.Repeat, defaultCost},
-	"call/2":                    {engine.Call1, defaultCost},
-	"call/3":                    {engine.Call2, defaultCost},
-	"call/4":                    {engine.Call3, defaultCost},
-	"call/5":                    {engine.Call4, defaultCost},
-	"call/6":                    {engine.Call5, defaultCost},
-	"call/7":                    {engine.Call6, defaultCost},
-	"call/8":                    {engine.Call7, defaultCost},
-	"atom_length/2":             {engine.AtomLength, defaultCost},
-	"atom_concat/3":             {engine.AtomConcat, defaultCost},
-	"sub_atom/5":                {engine.SubAtom, defaultCost},
-	"atom_chars/2":              {engine.AtomChars, defaultCost},
-	"atom_codes/2":              {engine.AtomCodes, defaultCost},
-	"char_code/2":               {engine.CharCode, defaultCost},
-	"number_chars/2":            {engine.NumberChars, defaultCost},
-	"number_codes/2":            {engine.NumberCodes, defaultCost},
-	"set_prolog_flag/2":         {engine.SetPrologFlag, defaultCost},
-	"current_prolog_flag/2":     {engine.CurrentPrologFlag, defaultCost},
-	"halt/1":                    {engine.Halt, defaultCost},
-	"consult/1":                 {engine.Consult, defaultCost},
-	"phrase/3":                  {engine.Phrase, defaultCost},
-	"expand_term/2":             {engine.ExpandTerm, defaultCost},
-	"append/3":                  {engine.Append, defaultCost},
-	"length/2":                  {engine.Length, defaultCost},
-	"between/3":                 {engine.Between, defaultCost},
-	"succ/2":                    {engine.Succ, defaultCost},
-	"nth0/3":                    {engine.Nth0, defaultCost},
-	"nth1/3":                    {engine.Nth1, defaultCost},
-	"call_nth/2":                {engine.CallNth, defaultCost},
-	"chain_id/1":                {predicate.ChainID, defaultCost},
-	"block_height/1":            {predicate.BlockHeight, defaultCost},
-	"block_time/1":              {predicate.BlockTime, defaultCost},
-	"bank_balances/2":           {predicate.BankBalances, defaultCost},
-	"bank_spendable_balances/2": {predicate.BankSpendableBalances, defaultCost},
-	"bank_locked_balances/2":    {predicate.BankLockedBalances, defaultCost},
-	"did_components/2":          {predicate.DIDComponents, defaultCost},
-	"sha_hash/2":                {predicate.SHAHash, defaultCost},
-	"hex_bytes/2":               {predicate.HexBytes, defaultCost},
-	"bech32_address/2":          {predicate.Bech32Address, defaultCost},
-	"source_file/1":             {predicate.SourceFile, defaultCost},
+// Registry is a map from predicate names (in the form of "atom/arity") to predicates functions.
+var Registry = map[string]any{
+	"call/1":                    engine.Call,
+	"catch/3":                   engine.Catch,
+	"throw/1":                   engine.Throw,
+	"=/2":                       engine.Unify,
+	"unify_with_occurs_check/2": engine.UnifyWithOccursCheck,
+	"subsumes_term/2":           engine.SubsumesTerm,
+	"var/1":                     engine.TypeVar,
+	"atom/1":                    engine.TypeAtom,
+	"integer/1":                 engine.TypeInteger,
+	"float/1":                   engine.TypeFloat,
+	"compound/1":                engine.TypeCompound,
+	"acyclic_term/1":            engine.AcyclicTerm,
+	"compare/3":                 engine.Compare,
+	"sort/2":                    engine.Sort,
+	"keysort/2":                 engine.KeySort,
+	"functor/3":                 engine.Functor,
+	"arg/3":                     engine.Arg,
+	"=../2":                     engine.Univ,
+	"copy_term/2":               engine.CopyTerm,
+	"term_variables/2":          engine.TermVariables,
+	"is/2":                      engine.Is,
+	"=:=/2":                     engine.Equal,
+	"=\\=/2":                    engine.NotEqual,
+	"</2":                       engine.LessThan,
+	"=</2":                      engine.LessThanOrEqual,
+	">/2":                       engine.GreaterThan,
+	">=/2":                      engine.GreaterThanOrEqual,
+	"clause/2":                  engine.Clause,
+	"current_predicate/1":       engine.CurrentPredicate,
+	"asserta/1":                 engine.Asserta,
+	"assertz/1":                 engine.Assertz,
+	"retract/1":                 engine.Retract,
+	"abolish/1":                 engine.Abolish,
+	"findall/3":                 engine.FindAll,
+	"bagof/3":                   engine.BagOf,
+	"setof/3":                   engine.SetOf,
+	"current_input/1":           engine.CurrentInput,
+	"current_output/1":          engine.CurrentOutput,
+	"set_input/1":               engine.SetInput,
+	"set_output/1":              engine.SetOutput,
+	"open/4":                    engine.Open,
+	"close/2":                   engine.Close,
+	"flush_output/1":            engine.FlushOutput,
+	"stream_property/2":         engine.StreamProperty,
+	"set_stream_position/2":     engine.SetStreamPosition,
+	"get_char/2":                engine.GetChar,
+	"peek_char/2":               engine.PeekChar,
+	"put_char/2":                engine.PutChar,
+	"get_byte/2":                engine.GetByte,
+	"peek_byte/2":               engine.PeekByte,
+	"put_byte/2":                engine.PutByte,
+	"read_term/3":               engine.ReadTerm,
+	"write_term/3":              engine.WriteTerm,
+	"op/3":                      engine.Op,
+	"current_op/3":              engine.CurrentOp,
+	"char_conversion/2":         engine.CharConversion,
+	"current_char_conversion/2": engine.CurrentCharConversion,
+	`\+/1`:                      engine.Negate,
+	"repeat/0":                  engine.Repeat,
+	"call/2":                    engine.Call1,
+	"call/3":                    engine.Call2,
+	"call/4":                    engine.Call3,
+	"call/5":                    engine.Call4,
+	"call/6":                    engine.Call5,
+	"call/7":                    engine.Call6,
+	"call/8":                    engine.Call7,
+	"atom_length/2":             engine.AtomLength,
+	"atom_concat/3":             engine.AtomConcat,
+	"sub_atom/5":                engine.SubAtom,
+	"atom_chars/2":              engine.AtomChars,
+	"atom_codes/2":              engine.AtomCodes,
+	"char_code/2":               engine.CharCode,
+	"number_chars/2":            engine.NumberChars,
+	"number_codes/2":            engine.NumberCodes,
+	"set_prolog_flag/2":         engine.SetPrologFlag,
+	"current_prolog_flag/2":     engine.CurrentPrologFlag,
+	"halt/1":                    engine.Halt,
+	"consult/1":                 engine.Consult,
+	"phrase/3":                  engine.Phrase,
+	"expand_term/2":             engine.ExpandTerm,
+	"append/3":                  engine.Append,
+	"length/2":                  engine.Length,
+	"between/3":                 engine.Between,
+	"succ/2":                    engine.Succ,
+	"nth0/3":                    engine.Nth0,
+	"nth1/3":                    engine.Nth1,
+	"call_nth/2":                engine.CallNth,
+	"chain_id/1":                predicate.ChainID,
+	"block_height/1":            predicate.BlockHeight,
+	"block_time/1":              predicate.BlockTime,
+	"bank_balances/2":           predicate.BankBalances,
+	"bank_spendable_balances/2": predicate.BankSpendableBalances,
+	"bank_locked_balances/2":    predicate.BankLockedBalances,
+	"did_components/2":          predicate.DIDComponents,
+	"sha_hash/2":                predicate.SHAHash,
+	"hex_bytes/2":               predicate.HexBytes,
+	"bech32_address/2":          predicate.Bech32Address,
+	"source_file/1":             predicate.SourceFile,
 }
 
 // RegistryNames is the list of the predicate names in the Registry.
@@ -135,12 +125,13 @@ var RegistryNames = func() []string {
 
 // Register registers a well-known predicate in the interpreter with support for consumption measurement.
 // name is the name of the predicate in the form of "atom/arity".
+// cost is the cost of executing the predicate.
 // meter is the gas meter object that is called when the predicate is called and which allows to count the cost of
 // executing the predicate(ctx).
 //
 //nolint:lll
-func Register(i *prolog.Interpreter, name string, meter sdk.GasMeter) error {
-	if entry, ok := Registry[name]; ok {
+func Register(i *prolog.Interpreter, name string, cost uint64, meter sdk.GasMeter) error {
+	if p, ok := Registry[name]; ok {
 		parts := strings.Split(name, "/")
 		if len(parts) == 2 {
 			atom := engine.NewAtom(parts[0])
@@ -150,11 +141,10 @@ func Register(i *prolog.Interpreter, name string, meter sdk.GasMeter) error {
 			}
 
 			hook := func() sdk.Gas {
-				meter.ConsumeGas(entry.cost, fmt.Sprintf("predicate %s", name))
+				meter.ConsumeGas(cost, fmt.Sprintf("predicate %s", name))
 
 				return meter.GasRemaining()
 			}
-			p := entry.predicate
 
 			switch arity {
 			case 0:
