@@ -11,8 +11,8 @@ import (
 	"github.com/okp4/okp4d/x/logic/predicate"
 )
 
-// Registry is a map from predicate names (in the form of "atom/arity") to predicates functions.
-var Registry = map[string]any{
+// registry is a map from predicate names (in the form of "atom/arity") to predicates functions.
+var registry = map[string]any{
 	"call/1":                    engine.Call,
 	"catch/3":                   engine.Catch,
 	"throw/1":                   engine.Throw,
@@ -115,9 +115,9 @@ var Registry = map[string]any{
 
 // RegistryNames is the list of the predicate names in the Registry.
 var RegistryNames = func() []string {
-	names := make([]string, 0, len(Registry))
+	names := make([]string, 0, len(registry))
 
-	for name := range Registry {
+	for name := range registry {
 		names = append(names, name)
 	}
 	return names
@@ -131,7 +131,7 @@ var RegistryNames = func() []string {
 //
 //nolint:lll
 func Register(i *prolog.Interpreter, name string, cost uint64, meter sdk.GasMeter) error {
-	if p, ok := Registry[name]; ok {
+	if p, ok := registry[name]; ok {
 		parts := strings.Split(name, "/")
 		if len(parts) == 2 {
 			atom := engine.NewAtom(parts[0])

@@ -3,7 +3,6 @@ package keeper
 import (
 	goctx "context"
 	"math"
-	"strings"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -107,12 +106,15 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 
 	predicates := lo.Reduce(
 		lo.Map(
-			lo.Filter(interpreter.RegistryNames, filterPredicates(whitelist, blacklist)),
+			lo.Filter(
+				interpreter.RegistryNames,
+				filterPredicates(whitelist, blacklist)),
 			toPredicate(gasPolicy.GetPredicateCosts())),
 		func(agg interpreter.Predicates, item lo.Tuple2[string, uint64], index int) interpreter.Predicates {
 			agg[item.A] = item.B
 			return agg
-		}, interpreter.Predicates{})
+		},
+		interpreter.Predicates{})
 
 	interpreted, err := interpreter.New(
 		ctx,
@@ -130,24 +132,7 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 // The whitelist and blacklist can contain predicates with or without arity, e.g. "foo/0", "foo", "bar/1".
 func filterPredicates(whitelist []string, blacklist []string) func(string, int) bool {
 	return func(predicate string, _ int) bool {
-		return lo.ContainsBy(whitelist, matchPredicate(predicate)) && !lo.ContainsBy(blacklist, matchPredicate(predicate))
-	}
-}
-
-// matchPredicate returns a function that matches the given predicate against the given other predicate.
-// If the other predicate contains a slash, it is matched as is. Otherwise, the other predicate is matched against the
-// first part of the given predicate.
-// For example:
-//   - matchPredicate("foo/0")("foo/0") -> true
-//   - matchPredicate("foo/0")("foo/1") -> false
-//   - matchPredicate("foo/0")("foo") -> true
-//   - matchPredicate("foo/0")("bar") -> false
-func matchPredicate(predicate string) func(b string) bool {
-	return func(other string) bool {
-		if strings.Contains(other, "/") {
-			return predicate == other
-		}
-		return strings.Split(predicate, "/")[0] == other
+		return lo.ContainsBy(whitelist, util.PredicateEq(predicate)) && !lo.ContainsBy(blacklist, util.PredicateEq(predicate))
 	}
 }
 
@@ -156,7 +141,7 @@ func matchPredicate(predicate string) func(b string) bool {
 func toPredicate(predicateCosts []types.PredicateCost) func(string, int) lo.Tuple2[string, uint64] {
 	return func(predicate string, _ int) lo.Tuple2[string, uint64] {
 		for _, c := range predicateCosts {
-			if matchPredicate(predicate)(c.Predicate) {
+			if util.PredicateEq(predicate)(c.Predicate) {
 				return lo.T2(predicate, c.Cost.Uint64())
 			}
 		}

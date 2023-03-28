@@ -9,12 +9,14 @@ import (
 	"github.com/ichiban/prolog"
 )
 
-// Predicates is a map of predicate names to their gas costs.
+// Predicates is a map of predicate names to their execution costs.
 type Predicates map[string]uint64
 
 // New creates a new prolog.Interpreter with:
-// - a list of predefined predicates (with their gas costs).
+// - a list of predefined predicates (with their execution costs).
 // - a compiled bootstrap script, that can be used to perform setup tasks.
+// - a meter to track gas consumption.
+// - a file system to load external files.
 //
 // The predicates names must be present in the registry, otherwise the function will return an error.
 // The bootstrap script can be an empty string if no bootstrap script is needed. If compilation of the bootstrap script
