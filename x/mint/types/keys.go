@@ -2,6 +2,7 @@ package types
 
 // MinterKey is the key to use for the keeper store.
 var MinterKey = []byte{0x00}
+var ParamsKey = []byte{0x01}
 
 const (
 	// module name.
