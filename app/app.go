@@ -552,7 +552,7 @@ func New(
 		appCodec,
 		keys[logicmoduletypes.StoreKey],
 		keys[logicmoduletypes.MemStoreKey],
-		app.GetSubspace(logicmoduletypes.ModuleName),
+		authtypes.NewModuleAddress(govtypes.ModuleName),
 		app.AccountKeeper,
 		app.BankKeeper,
 		app.provideFS,
@@ -665,7 +665,7 @@ func New(
 		transferModule,
 		icaModule,
 		interTxModule,
-		logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper),
+		logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(logicmoduletypes.ModuleName)),
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -784,7 +784,7 @@ func New(
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper),
+		logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(logicmoduletypes.ModuleName)),
 	)
 	app.sm.RegisterStoreDecoders()
 

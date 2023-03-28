@@ -196,39 +196,42 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
 
 ## Table of Contents
 
-- [logic/v1beta/params.proto](#logic/v1beta/params.proto)
-  - [Interpreter](#logic.v1beta.Interpreter)
-  - [Limits](#logic.v1beta.Limits)
-  - [Params](#logic.v1beta.Params)
+- [logic/v1beta2/params.proto](#logic/v1beta2/params.proto)
+  - [Interpreter](#logic.v1beta2.Interpreter)
+  - [Limits](#logic.v1beta2.Limits)
+  - [Params](#logic.v1beta2.Params)
   
-- [logic/v1beta/genesis.proto](#logic/v1beta/genesis.proto)
-  - [GenesisState](#logic.v1beta.GenesisState)
+- [logic/v1beta2/genesis.proto](#logic/v1beta2/genesis.proto)
+  - [GenesisState](#logic.v1beta2.GenesisState)
   
-- [logic/v1beta/types.proto](#logic/v1beta/types.proto)
-  - [Answer](#logic.v1beta.Answer)
-  - [Result](#logic.v1beta.Result)
-  - [Substitution](#logic.v1beta.Substitution)
-  - [Term](#logic.v1beta.Term)
+- [logic/v1beta2/types.proto](#logic/v1beta2/types.proto)
+  - [Answer](#logic.v1beta2.Answer)
+  - [Result](#logic.v1beta2.Result)
+  - [Substitution](#logic.v1beta2.Substitution)
+  - [Term](#logic.v1beta2.Term)
   
-- [logic/v1beta/query.proto](#logic/v1beta/query.proto)
-  - [QueryServiceAskRequest](#logic.v1beta.QueryServiceAskRequest)
-  - [QueryServiceAskResponse](#logic.v1beta.QueryServiceAskResponse)
-  - [QueryServiceParamsRequest](#logic.v1beta.QueryServiceParamsRequest)
-  - [QueryServiceParamsResponse](#logic.v1beta.QueryServiceParamsResponse)
+- [logic/v1beta2/query.proto](#logic/v1beta2/query.proto)
+  - [QueryServiceAskRequest](#logic.v1beta2.QueryServiceAskRequest)
+  - [QueryServiceAskResponse](#logic.v1beta2.QueryServiceAskResponse)
+  - [QueryServiceParamsRequest](#logic.v1beta2.QueryServiceParamsRequest)
+  - [QueryServiceParamsResponse](#logic.v1beta2.QueryServiceParamsResponse)
   
-  - [QueryService](#logic.v1beta.QueryService)
+  - [QueryService](#logic.v1beta2.QueryService)
   
-- [logic/v1beta/tx.proto](#logic/v1beta/tx.proto)
-  - [MsgService](#logic.v1beta.MsgService)
+- [logic/v1beta2/tx.proto](#logic/v1beta2/tx.proto)
+  - [MsgUpdateParams](#logic.v1beta2.MsgUpdateParams)
+  - [MsgUpdateParamsResponse](#logic.v1beta2.MsgUpdateParamsResponse)
+  
+  - [MsgService](#logic.v1beta2.MsgService)
   
 - [Scalar Value Types](#scalar-value-types)
 
-<a name="logic/v1beta/params.proto"></a>
+<a name="logic/v1beta2/params.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta/params.proto
+## logic/v1beta2/params.proto
 
-<a name="logic.v1beta.Interpreter"></a>
+<a name="logic.v1beta2.Interpreter"></a>
 
 ### Interpreter
 
@@ -236,10 +239,11 @@ Interpreter defines the various parameters for the interpreter.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `registered_predicates` | [string](#string) | repeated | registered_predicates specifies the list of registered predicates/operators, in the form of: `<predicate_name>/<arity>`. For instance: `findall/3`. If not specified, the default set of predicates/operators will be registered. |
+| `predicates_whitelist` | [string](#string) | repeated | predicates_whitelist specifies a list of prolog predicates that are allowed and can be used by the interpreter. The predicates are represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity is included in this list, then all predicates with that name will be considered regardless of arity. For example, if `call` is included in the whitelist, then all predicates `call/1`, `call/2`, `call/3`... will be allowed. If this field is not specified, the interpreter will use the default set of predicates. |
+| `predicates_blacklist` | [string](#string) | repeated | predicates_blacklist specifies a list of prolog predicates that are excluded from the set of registered predicates and can never be executed by the interpreter. The predicates are represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity is included in this list, then all predicates with that name will be considered regardless of arity. For example, if `call` is included in the blacklist, then all predicates `call/1`, `call/2`, `call/3`... will be excluded. If a predicate is included in both whitelist and blacklist, it will be excluded. This means that blacklisted predicates prevails on whitelisted predicates. |
 | `bootstrap` | [string](#string) |  | bootstrap specifies the initial program to run when booting the logic interpreter. If not specified, the default boot sequence will be executed. |
 
-<a name="logic.v1beta.Limits"></a>
+<a name="logic.v1beta2.Limits"></a>
 
 ### Limits
 
@@ -251,7 +255,7 @@ Limits defines the limits of the logic module.
 | `max_size` | [string](#string) |  | max_size specifies the maximum size, in bytes, that is accepted for a program. nil value remove size limitation. |
 | `max_result_count` | [string](#string) |  | max_result_count specifies the maximum number of results that can be requested for a query. nil value remove max result count limitation. |
 
-<a name="logic.v1beta.Params"></a>
+<a name="logic.v1beta2.Params"></a>
 
 ### Params
 
@@ -259,8 +263,8 @@ Params defines all the configuration parameters of the "logic" module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `interpreter` | [Interpreter](#logic.v1beta.Interpreter) |  | Interpreter specifies the parameter for the logic interpreter. |
-| `limits` | [Limits](#logic.v1beta.Limits) |  | Limits defines the limits of the logic module. The limits are used to prevent the interpreter from running for too long. If the interpreter runs for too long, the execution will be aborted. |
+| `interpreter` | [Interpreter](#logic.v1beta2.Interpreter) |  | Interpreter specifies the parameter for the logic interpreter. |
+| `limits` | [Limits](#logic.v1beta2.Limits) |  | Limits defines the limits of the logic module. The limits are used to prevent the interpreter from running for too long. If the interpreter runs for too long, the execution will be aborted. |
 
  [//]: # (end messages)
 
@@ -270,12 +274,12 @@ Params defines all the configuration parameters of the "logic" module.
 
  [//]: # (end services)
 
-<a name="logic/v1beta/genesis.proto"></a>
+<a name="logic/v1beta2/genesis.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta/genesis.proto
+## logic/v1beta2/genesis.proto
 
-<a name="logic.v1beta.GenesisState"></a>
+<a name="logic.v1beta2.GenesisState"></a>
 
 ### GenesisState
 
@@ -283,7 +287,7 @@ GenesisState defines the logic module's genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `params` | [Params](#logic.v1beta.Params) |  | The state parameters for the logic module. |
+| `params` | [Params](#logic.v1beta2.Params) |  | The state parameters for the logic module. |
 
  [//]: # (end messages)
 
@@ -293,12 +297,12 @@ GenesisState defines the logic module's genesis state.
 
  [//]: # (end services)
 
-<a name="logic/v1beta/types.proto"></a>
+<a name="logic/v1beta2/types.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta/types.proto
+## logic/v1beta2/types.proto
 
-<a name="logic.v1beta.Answer"></a>
+<a name="logic.v1beta2.Answer"></a>
 
 ### Answer
 
@@ -309,9 +313,9 @@ Answer represents the answer to a logic query.
 | `success` | [bool](#bool) |  | result is the result of the query. |
 | `has_more` | [bool](#bool) |  | has_more specifies if there are more solutions than the ones returned. |
 | `variables` | [string](#string) | repeated | variables represent all the variables in the query. |
-| `results` | [Result](#logic.v1beta.Result) | repeated | results represent all the results of the query. |
+| `results` | [Result](#logic.v1beta2.Result) | repeated | results represent all the results of the query. |
 
-<a name="logic.v1beta.Result"></a>
+<a name="logic.v1beta2.Result"></a>
 
 ### Result
 
@@ -319,9 +323,9 @@ Result represents the result of a query.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `substitutions` | [Substitution](#logic.v1beta.Substitution) | repeated | substitutions represent all the substitutions made to the variables in the query to obtain the answer. |
+| `substitutions` | [Substitution](#logic.v1beta2.Substitution) | repeated | substitutions represent all the substitutions made to the variables in the query to obtain the answer. |
 
-<a name="logic.v1beta.Substitution"></a>
+<a name="logic.v1beta2.Substitution"></a>
 
 ### Substitution
 
@@ -330,9 +334,9 @@ Substitution represents a substitution made to the variables in the query to obt
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `variable` | [string](#string) |  | variable is the name of the variable. |
-| `term` | [Term](#logic.v1beta.Term) |  | term is the term that the variable is substituted with. |
+| `term` | [Term](#logic.v1beta2.Term) |  | term is the term that the variable is substituted with. |
 
-<a name="logic.v1beta.Term"></a>
+<a name="logic.v1beta2.Term"></a>
 
 ### Term
 
@@ -341,7 +345,7 @@ Term is the representation of a piece of data and can be a constant, a variable,
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `name` | [string](#string) |  | name is the name of the term. |
-| `arguments` | [Term](#logic.v1beta.Term) | repeated | arguments are the arguments of the term, which can be constants, variables, or atoms. |
+| `arguments` | [Term](#logic.v1beta2.Term) | repeated | arguments are the arguments of the term, which can be constants, variables, or atoms. |
 
  [//]: # (end messages)
 
@@ -351,12 +355,12 @@ Term is the representation of a piece of data and can be a constant, a variable,
 
  [//]: # (end services)
 
-<a name="logic/v1beta/query.proto"></a>
+<a name="logic/v1beta2/query.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta/query.proto
+## logic/v1beta2/query.proto
 
-<a name="logic.v1beta.QueryServiceAskRequest"></a>
+<a name="logic.v1beta2.QueryServiceAskRequest"></a>
 
 ### QueryServiceAskRequest
 
@@ -367,7 +371,7 @@ QueryServiceAskRequest is request type for the QueryService/Ask RPC method.
 | `program` | [string](#string) |  | program is the logic program to be queried. |
 | `query` | [string](#string) |  | query is the query string to be executed. |
 
-<a name="logic.v1beta.QueryServiceAskResponse"></a>
+<a name="logic.v1beta2.QueryServiceAskResponse"></a>
 
 ### QueryServiceAskResponse
 
@@ -377,15 +381,15 @@ QueryServiceAskResponse is response type for the QueryService/Ask RPC method.
 | ----- | ---- | ----- | ----------- |
 | `height` | [uint64](#uint64) |  | height is the block height at which the query was executed. |
 | `gas_used` | [uint64](#uint64) |  | gas_used is the amount of gas used to execute the query. |
-| `answer` | [Answer](#logic.v1beta.Answer) |  | answer is the answer to the query. |
+| `answer` | [Answer](#logic.v1beta2.Answer) |  | answer is the answer to the query. |
 
-<a name="logic.v1beta.QueryServiceParamsRequest"></a>
+<a name="logic.v1beta2.QueryServiceParamsRequest"></a>
 
 ### QueryServiceParamsRequest
 
 QueryServiceParamsRequest is request type for the QueryService/Params RPC method.
 
-<a name="logic.v1beta.QueryServiceParamsResponse"></a>
+<a name="logic.v1beta2.QueryServiceParamsResponse"></a>
 
 ### QueryServiceParamsResponse
 
@@ -393,7 +397,7 @@ QueryServiceParamsResponse is response type for the QueryService/Params RPC meth
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `params` | [Params](#logic.v1beta.Params) |  | params holds all the parameters of this module. |
+| `params` | [Params](#logic.v1beta2.Params) |  | params holds all the parameters of this module. |
 
  [//]: # (end messages)
 
@@ -401,7 +405,7 @@ QueryServiceParamsResponse is response type for the QueryService/Params RPC meth
 
  [//]: # (end HasExtensions)
 
-<a name="logic.v1beta.QueryService"></a>
+<a name="logic.v1beta2.QueryService"></a>
 
 ### QueryService
 
@@ -409,15 +413,33 @@ QueryService defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `Params` | [QueryServiceParamsRequest](#logic.v1beta.QueryServiceParamsRequest) | [QueryServiceParamsResponse](#logic.v1beta.QueryServiceParamsResponse) | Params queries all parameters for the logic module. | GET|/okp4/okp4d/logic/params|
-| `Ask` | [QueryServiceAskRequest](#logic.v1beta.QueryServiceAskRequest) | [QueryServiceAskResponse](#logic.v1beta.QueryServiceAskResponse) | Ask executes a logic query and returns the solutions found. Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee is charged for this, but the execution is constrained by the current limits configured in the module. | GET|/okp4/okp4d/logic/ask|
+| `Params` | [QueryServiceParamsRequest](#logic.v1beta2.QueryServiceParamsRequest) | [QueryServiceParamsResponse](#logic.v1beta2.QueryServiceParamsResponse) | Params queries all parameters for the logic module. | GET|/okp4/okp4d/logic/params|
+| `Ask` | [QueryServiceAskRequest](#logic.v1beta2.QueryServiceAskRequest) | [QueryServiceAskResponse](#logic.v1beta2.QueryServiceAskResponse) | Ask executes a logic query and returns the solutions found. Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee is charged for this, but the execution is constrained by the current limits configured in the module. | GET|/okp4/okp4d/logic/ask|
 
  [//]: # (end services)
 
-<a name="logic/v1beta/tx.proto"></a>
+<a name="logic/v1beta2/tx.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta/tx.proto
+## logic/v1beta2/tx.proto
+
+<a name="logic.v1beta2.MsgUpdateParams"></a>
+
+### MsgUpdateParams
+
+MsgUpdateParams defines a Msg for updating the x/logic module parameters.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `authority` | [string](#string) |  | authority is the address of the governance account. |
+| `params` | [Params](#logic.v1beta2.Params) |  | params defines the x/logic parameters to update. NOTE: All parameters must be supplied. |
+
+<a name="logic.v1beta2.MsgUpdateParamsResponse"></a>
+
+### MsgUpdateParamsResponse
+
+MsgUpdateParamsResponse defines the response structure for executing a
+MsgUpdateParams message.
 
  [//]: # (end messages)
 
@@ -425,7 +447,7 @@ QueryService defines the gRPC querier service.
 
  [//]: # (end HasExtensions)
 
-<a name="logic.v1beta.MsgService"></a>
+<a name="logic.v1beta2.MsgService"></a>
 
 ### MsgService
 
@@ -434,6 +456,7 @@ Do nothing for now as the service is without any side effects.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `UpdateParams` | [MsgUpdateParams](#logic.v1beta2.MsgUpdateParams) | [MsgUpdateParamsResponse](#logic.v1beta2.MsgUpdateParamsResponse) | UpdateParams defined a governance operation for updating the x/logic module parameters. The authority is hard-coded to the Cosmos SDK x/gov module account | |
 
  [//]: # (end services)
 
