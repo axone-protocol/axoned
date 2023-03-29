@@ -7,6 +7,7 @@ import (
 	"math/rand"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
+	"github.com/okp4/okp4d/x/mint/exported"
 	"github.com/spf13/cobra"
 	abci "github.com/tendermint/tendermint/abci/types"
 
@@ -85,14 +86,17 @@ type AppModule struct {
 
 	keeper     keeper.Keeper
 	authKeeper types.AccountKeeper
+	// legacySubspace is used principally for migration
+	legacySubspace exported.Subspace
 }
 
 // NewAppModule creates a new AppModule object.
-func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, ak types.AccountKeeper) AppModule {
+func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, ak types.AccountKeeper, legacySubspace exported.Subspace) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},
 		keeper:         keeper,
 		authKeeper:     ak,
+		legacySubspace: legacySubspace,
 	}
 }
 
@@ -122,6 +126,22 @@ func (am AppModule) LegacyQuerierHandler(legacyQuerierCdc *codec.LegacyAmino) sd
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServiceServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
+
+	migrator := keeper.NewMigrator(am.keeper, am.legacySubspace)
+
+	migrations := []struct {
+		fromVersion uint64
+		migrator    func(ctx sdk.Context) error
+	}{
+		{1, migrator.Migrate1to2},
+	}
+
+	for _, migration := range migrations {
+		if err := cfg.RegisterMigration(types.ModuleName, migration.fromVersion, migration.migrator); err != nil {
+			panic(fmt.Errorf("failed to migrate %s from version %d to v%d: %w",
+				types.ModuleName, migration.fromVersion, migration.fromVersion+1, err))
+		}
+	}
 }
 
 // InitGenesis performs genesis initialization for the mint module. It returns
