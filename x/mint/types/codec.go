@@ -29,7 +29,7 @@ const (
 	updateParamsName = "okp4/mint/MsgUpdateParams"
 )
 
-// RegisterInterfaces register implementations
+// RegisterInterfaces register implementations.
 func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
@@ -39,7 +39,7 @@ func RegisterInterfaces(registry codectypes.InterfaceRegistry) {
 	msgservice.RegisterMsgServiceDesc(registry, &_MsgService_serviceDesc)
 }
 
-// RegisterLegacyAminoCodec required for EIP-712
+// RegisterLegacyAminoCodec required for EIP-712.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(&MsgUpdateParams{}, updateParamsName, nil)
 }

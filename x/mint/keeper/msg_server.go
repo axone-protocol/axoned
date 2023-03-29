@@ -27,7 +27,8 @@ var _ types.MsgServiceServer = msgServer{}
 // account.
 func (ms msgServer) UpdateParams(goCtx context.Context, req *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
 	if ms.authority.String() != req.Authority {
-		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", ms.authority.String(), req.Authority)
+		return nil, errorsmod.Wrapf(govtypes.ErrInvalidSigner,
+			"invalid authority; expected %s, got %s", ms.authority.String(), req.Authority)
 	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)

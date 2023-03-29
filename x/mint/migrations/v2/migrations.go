@@ -29,8 +29,8 @@ func MigrateStore(ctx sdk.Context,
 	store := ctx.KVStore(storeKey)
 
 	var params types.Params
-	legacySubspace.WithKeyTable(types.ParamKeyTable()).
-		GetParamSet(ctx, &params)
+	legacySubspace.WithKeyTable(types.ParamKeyTable()). //nolint:staticcheck
+								GetParamSet(ctx, &params)
 
 	if err := params.Validate(); err != nil {
 		return err
