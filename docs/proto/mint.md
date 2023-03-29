@@ -42,6 +42,12 @@ then the new `annual_provisions` and `target_supply` is deducted based on the cu
   
   - [Query](#mint.v1beta1.Query)
   
+- [mint/v1beta1/tx.proto](#mint/v1beta1/tx.proto)
+  - [MsgUpdateParams](#mint.v1beta1.MsgUpdateParams)
+  - [MsgUpdateParamsResponse](#mint.v1beta1.MsgUpdateParamsResponse)
+  
+  - [MsgService](#mint.v1beta1.MsgService)
+  
 - [Scalar Value Types](#scalar-value-types)
 
 <a name="mint/v1beta1/mint.proto"></a>
@@ -188,6 +194,48 @@ Query provides defines the gRPC querier service.
 | `Params` | [QueryParamsRequest](#mint.v1beta1.QueryParamsRequest) | [QueryParamsResponse](#mint.v1beta1.QueryParamsResponse) | Params returns the total set of minting parameters. | GET|/cosmos/mint/v1beta1/params|
 | `Inflation` | [QueryInflationRequest](#mint.v1beta1.QueryInflationRequest) | [QueryInflationResponse](#mint.v1beta1.QueryInflationResponse) | Inflation returns the current minting inflation value. | GET|/cosmos/mint/v1beta1/inflation|
 | `AnnualProvisions` | [QueryAnnualProvisionsRequest](#mint.v1beta1.QueryAnnualProvisionsRequest) | [QueryAnnualProvisionsResponse](#mint.v1beta1.QueryAnnualProvisionsResponse) | AnnualProvisions current minting annual provisions value. | GET|/cosmos/mint/v1beta1/annual_provisions|
+
+ [//]: # (end services)
+
+<a name="mint/v1beta1/tx.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## mint/v1beta1/tx.proto
+
+<a name="mint.v1beta1.MsgUpdateParams"></a>
+
+### MsgUpdateParams
+
+MsgUpdateParams defines a Msg for updating the x/mint module parameters.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `authority` | [string](#string) |  | authority is the address of the governance account. |
+| `params` | [Params](#mint.v1beta1.Params) |  | params defines the x/mint parameters to update. NOTE: All parameters must be supplied. |
+
+<a name="mint.v1beta1.MsgUpdateParamsResponse"></a>
+
+### MsgUpdateParamsResponse
+
+MsgUpdateParamsResponse defines the response structure for executing a
+MsgUpdateParams message.
+
+ [//]: # (end messages)
+
+ [//]: # (end enums)
+
+ [//]: # (end HasExtensions)
+
+<a name="mint.v1beta1.MsgService"></a>
+
+### MsgService
+
+MsgService defines the service for the logic module.
+Do nothing for now as the service is without any side effects.
+
+| Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
+| ----------- | ------------ | ------------- | ------------| ------- | -------- |
+| `UpdateParams` | [MsgUpdateParams](#mint.v1beta1.MsgUpdateParams) | [MsgUpdateParamsResponse](#mint.v1beta1.MsgUpdateParamsResponse) | UpdateParams defined a governance operation for updating the x/mint module parameters. The authority is hard-coded to the Cosmos SDK x/gov module account | |
 
  [//]: # (end services)
 
