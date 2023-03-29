@@ -1291,10 +1291,6 @@ github.com/regen-network/cosmos-proto v0.3.1/go.mod h1:jO0sVX6a1B36nmE8C9xBFXpNw
 github.com/regen-network/protobuf v1.3.3-alpha.regen.1 h1:OHEc+q5iIAXpqiqFKeLpu5NwTIkVXUs48vFMwzqpqY4=
 github.com/regen-network/protobuf v1.3.3-alpha.regen.1/go.mod h1:2DjTFR1HhMQhiWC5sZ4OhQ3+NtdbZ6oBDKQwq5Ou+FI=
 github.com/retailnext/hllpp v1.0.1-0.20180308014038-101a6d2f8b52/go.mod h1:RDpi1RftBQPUCDRw6SmxeaREsAaRKnOclghuzp/WRzc=
-github.com/rjNemo/underscore v0.3.1-0.20220323145844-235b36b7f6e8 h1:4gIyk0JDuOJaKQyPWv9wXL0F128xIMjw4c0z61yAnxE=
-github.com/rjNemo/underscore v0.3.1-0.20220323145844-235b36b7f6e8/go.mod h1:y3LuKy2UP6zp7yZff5ZGRm1s/s9QvCoCoQZVqAkk3hM=
-github.com/rjNemo/underscore v0.5.0 h1:Pa58PfchgZWgCY1eBKjER/lm0repbGrTzq6RRxtnGmg=
-github.com/rjNemo/underscore v0.5.0/go.mod h1:y3LuKy2UP6zp7yZff5ZGRm1s/s9QvCoCoQZVqAkk3hM=
 github.com/rjeczalik/notify v0.9.1/go.mod h1:rKwnCoCGeuQnwBtTSPL9Dad03Vh2n40ePRrjvIXnJho=
 github.com/rogpeppe/fastuuid v0.0.0-20150106093220-6724a57986af/go.mod h1:XWv6SoW27p1b0cqNHllgS5HIMJraePCO15w5zCzIWYg=
 github.com/rogpeppe/fastuuid v1.2.0/go.mod h1:jVj6XXZzXRy/MSR5jhDC/2q6DgLz+nrA6LYCDYWNEvQ=
@@ -1469,8 +1465,6 @@ github.com/vishvananda/netns v0.0.0-20191106174202-0a2b9b5464df/go.mod h1:JP3t17
 github.com/vishvananda/netns v0.0.0-20200728191858-db3c7e526aae/go.mod h1:DD4vA1DwXk04H54A1oHXtwZmA0grkVMdPxx/VGLCah0=
 github.com/vmihailenco/msgpack/v5 v5.3.5/go.mod h1:7xyJ9e+0+9SaZT0Wt1RGleJXzli6Q/V5KbhBonMG9jc=
 github.com/vmihailenco/tagparser/v2 v2.0.0/go.mod h1:Wri+At7QHww0WTrCBeu4J6bNtoV6mEfg5OIWRZA9qds=
-github.com/vtashkov/pair v1.0.0 h1:/Va7p1w7aMGvTwIRPc9a4vev7VzLZWmdsDuSwUbVEkU=
-github.com/vtashkov/pair v1.0.0/go.mod h1:LkKTX9jk5yBudj8pt6NQHxexCC0lQrt79JwUhYs2RJI=
 github.com/willf/bitset v1.1.3/go.mod h1:RjeCKbqT1RxIR/KWY6phxZiaY1IyutSBfGjNPySAYV4=
 github.com/willf/bitset v1.1.11-0.20200630133818-d5bec3311243/go.mod h1:RjeCKbqT1RxIR/KWY6phxZiaY1IyutSBfGjNPySAYV4=
 github.com/willf/bitset v1.1.11/go.mod h1:83CECat5yLh5zVOf4P1ErAgKA5UDvKtgyUABdr3+MjI=
