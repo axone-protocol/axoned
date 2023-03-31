@@ -7,15 +7,15 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	"github.com/okp4/okp4d/x/mint/types"
 )
 
 // Keeper of the mint store.
 type Keeper struct {
-	cdc              codec.BinaryCodec
-	storeKey         storetypes.StoreKey
-	paramSpace       paramtypes.Subspace
+	cdc      codec.BinaryCodec
+	storeKey storetypes.StoreKey
+	// the address capable of executing a MsgUpdateParams message. Typically, this should be the x/gov module account.
+	authority        sdk.AccAddress
 	stakingKeeper    types.StakingKeeper
 	bankKeeper       types.BankKeeper
 	feeCollectorName string
@@ -23,8 +23,12 @@ type Keeper struct {
 
 // NewKeeper creates a new mint Keeper instance.
 func NewKeeper(
-	cdc codec.BinaryCodec, key storetypes.StoreKey, paramSpace paramtypes.Subspace,
-	sk types.StakingKeeper, ak types.AccountKeeper, bk types.BankKeeper,
+	cdc codec.BinaryCodec,
+	key storetypes.StoreKey,
+	authority sdk.AccAddress,
+	sk types.StakingKeeper,
+	ak types.AccountKeeper,
+	bk types.BankKeeper,
 	feeCollectorName string,
 ) Keeper {
 	// ensure mint module account is set
@@ -32,15 +36,15 @@ func NewKeeper(
 		panic("the mint module account has not been set")
 	}
 
-	// set KeyTable if it has not already been set
-	if !paramSpace.HasKeyTable() {
-		paramSpace = paramSpace.WithKeyTable(types.ParamKeyTable())
+	// ensure gov module account is set and is not nil
+	if err := sdk.VerifyAddressFormat(authority); err != nil {
+		panic(err)
 	}
 
 	return Keeper{
 		cdc:              cdc,
 		storeKey:         key,
-		paramSpace:       paramSpace,
+		authority:        authority,
 		stakingKeeper:    sk,
 		bankKeeper:       bk,
 		feeCollectorName: feeCollectorName,
@@ -73,13 +77,28 @@ func (k Keeper) SetMinter(ctx sdk.Context, minter types.Minter) {
 
 // GetParams returns the total set of minting parameters.
 func (k Keeper) GetParams(ctx sdk.Context) (params types.Params) {
-	k.paramSpace.GetParamSet(ctx, &params)
+	store := ctx.KVStore(k.storeKey)
+	bz := store.Get(types.ParamsKey)
+	if bz == nil {
+		return params
+	}
+	k.cdc.MustUnmarshal(bz, &params)
 	return params
 }
 
 // SetParams sets the total set of minting parameters.
-func (k Keeper) SetParams(ctx sdk.Context, params types.Params) {
-	k.paramSpace.SetParamSet(ctx, &params)
+func (k Keeper) SetParams(ctx sdk.Context, params types.Params) error {
+	if err := params.Validate(); err != nil {
+		return err
+	}
+
+	store := ctx.KVStore(k.storeKey)
+	bz, err := k.cdc.Marshal(&params)
+	if err != nil {
+		return err
+	}
+	store.Set(types.ParamsKey, bz)
+	return nil
 }
 
 // TokenSupply implements an alias call to the underlying bank keeper's

@@ -1,6 +1,7 @@
 package keeper
 
 import (
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/okp4/okp4d/x/mint/types"
 )
@@ -8,7 +9,10 @@ import (
 // InitGenesis new mint genesis.
 func (k Keeper) InitGenesis(ctx sdk.Context, ak types.AccountKeeper, data *types.GenesisState) {
 	k.SetMinter(ctx, data.Minter)
-	k.SetParams(ctx, data.Params)
+	err := k.SetParams(ctx, data.Params)
+	if err != nil {
+		panic(errorsmod.Wrapf(err, "error setting params"))
+	}
 	ak.GetModuleAccount(ctx, types.ModuleName)
 }
 
