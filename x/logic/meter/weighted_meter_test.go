@@ -5,6 +5,8 @@ import (
 	"math"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+	"github.com/okp4/okp4d/x/logic/testutil"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -37,5 +39,49 @@ func TestMultiplyUint64Overflow(t *testing.T) {
 				})
 			})
 		}
+	})
+}
+
+func TestWeightedMeter(t *testing.T) {
+	Convey("Under a mocked environment", t, func() {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		// for _, _ = range cases {
+		Convey("with a context", func() {
+			mockGasMeter := testutil.NewMockGasMeter(ctrl)
+
+			Convey("and a weighted gas meter", func() {
+				sut := WithWeightedMeter(mockGasMeter, 2)
+
+				Convey("then we should be able to get the gas consumed", func() {
+					mockGasMeter.EXPECT().GasConsumed().Return(uint64(100)).Times(1)
+					mockGasMeter.EXPECT().GasConsumedToLimit().Return(uint64(200)).Times(1)
+					mockGasMeter.EXPECT().GasRemaining().Return(uint64(300)).Times(1)
+					mockGasMeter.EXPECT().Limit().Return(uint64(400)).Times(1)
+					mockGasMeter.EXPECT().IsPastLimit().Return(false).Times(1)
+					mockGasMeter.EXPECT().IsOutOfGas().Return(false).Times(1)
+
+					So(uint64(100), ShouldEqual, sut.GasConsumed())
+					So(uint64(200), ShouldEqual, sut.GasConsumedToLimit())
+					So(uint64(300), ShouldEqual, sut.GasRemaining())
+					So(uint64(400), ShouldEqual, sut.Limit())
+					So(sut.IsPastLimit(), ShouldBeFalse)
+					So(sut.IsOutOfGas(), ShouldBeFalse)
+				})
+
+				Convey("then we should be able to consume gas without overflow", func() {
+					mockGasMeter.EXPECT().ConsumeGas(uint64(200), "mock").Times(1)
+
+					sut.ConsumeGas(100, "mock")
+				})
+
+				Convey("then we should be able to consume gas with overflow", func() {
+					mockGasMeter.EXPECT().ConsumeGas(uint64(math.MaxUint64), "mock").Times(1)
+
+					sut.ConsumeGas(uint64(math.MaxUint64)>>1+1, "mock")
+				})
+			})
+		})
 	})
 }
