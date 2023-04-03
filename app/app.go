@@ -406,7 +406,7 @@ func New(
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
-	stakingKeeper := stakingkeeper.NewKeeper(
+	app.StakingKeeper = stakingkeeper.NewKeeper(
 		appCodec,
 		keys[stakingtypes.StoreKey],
 		app.AccountKeeper,
@@ -424,7 +424,7 @@ func New(
 		appCodec,
 		keys[minttypes.StoreKey],
 		authtypes.NewModuleAddress(govtypes.ModuleName),
-		stakingKeeper,
+		app.StakingKeeper,
 		app.AccountKeeper,
 		app.BankKeeper,
 		authtypes.FeeCollectorName,
@@ -435,7 +435,7 @@ func New(
 		keys[distrtypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
-		stakingKeeper,
+		app.StakingKeeper,
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
@@ -444,7 +444,7 @@ func New(
 		appCodec,
 		cdc,
 		keys[slashingtypes.StoreKey],
-		stakingKeeper,
+		app.StakingKeeper,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
 
@@ -610,7 +610,7 @@ func New(
 		keys[govtypes.StoreKey],
 		app.AccountKeeper,
 		app.BankKeeper,
-		stakingKeeper,
+		app.StakingKeeper,
 		app.MsgServiceRouter(),
 		govConfig,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
@@ -656,7 +656,7 @@ func New(
 		),
 	)
 
-	stakingKeeper.SetHooks(
+	app.StakingKeeper.SetHooks(
 		stakingtypes.NewMultiStakingHooks(app.DistrKeeper.Hooks(), app.SlashingKeeper.Hooks()),
 	)
 
