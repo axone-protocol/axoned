@@ -16,7 +16,10 @@ import (
 	"github.com/samber/lo"
 )
 
-const defaultCost = uint64(1)
+const (
+	defaultPredicateCost = uint64(1)
+	defaultWeightFactor  = uint64(1)
+)
 
 func (k Keeper) limits(ctx goctx.Context) types.Limits {
 	params := k.GetParams(sdk.UnwrapSDKContext(ctx))
@@ -102,14 +105,16 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 
 	whitelist := util.NonZeroOrDefault(interpreterParams.PredicatesWhitelist, interpreter.RegistryNames)
 	blacklist := interpreterParams.GetPredicatesBlacklist()
-	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), gasPolicy.WeightingFactor.Uint64())
+	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), nonNilNorZeroOrDefaultUint64(gasPolicy.WeightingFactor, defaultWeightFactor))
 
 	predicates := lo.Reduce(
 		lo.Map(
 			lo.Filter(
 				interpreter.RegistryNames,
 				filterPredicates(whitelist, blacklist)),
-			toPredicate(gasPolicy.GetPredicateCosts())),
+			toPredicate(
+				nonNilNorZeroOrDefaultUint64(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
+				gasPolicy.GetPredicateCosts())),
 		func(agg interpreter.Predicates, item lo.Tuple2[string, uint64], index int) interpreter.Predicates {
 			agg[item.A] = item.B
 			return agg
@@ -138,14 +143,24 @@ func filterPredicates(whitelist []string, blacklist []string) func(string, int) 
 
 // toPredicate converts the given predicate costs to a function that returns the cost for the given predicate as
 // a pair of predicate name and cost.
-func toPredicate(predicateCosts []types.PredicateCost) func(string, int) lo.Tuple2[string, uint64] {
+func toPredicate(defaultCost uint64, predicateCosts []types.PredicateCost) func(string, int) lo.Tuple2[string, uint64] {
 	return func(predicate string, _ int) lo.Tuple2[string, uint64] {
 		for _, c := range predicateCosts {
 			if util.PredicateEq(predicate)(c.Predicate) {
-				return lo.T2(predicate, c.Cost.Uint64())
+				return lo.T2(predicate, nonNilNorZeroOrDefaultUint64(c.Cost, defaultCost))
 			}
 		}
 
 		return lo.T2(predicate, defaultCost)
 	}
+}
+
+// nonNilNorZeroOrDefaultUint64 returns the value of the given sdkmath.Uint if it is not nil and not zero, otherwise it returns the
+// given default value.
+func nonNilNorZeroOrDefaultUint64(v *sdkmath.Uint, defaultValue uint64) uint64 {
+	if v == nil || v.IsZero() {
+		return defaultValue
+	}
+
+	return v.Uint64()
 }
