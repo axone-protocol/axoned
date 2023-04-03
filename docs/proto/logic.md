@@ -238,11 +238,14 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
 ### GasPolicy
 
 GasPolicy defines the policy for calculating predicate invocation costs and the resulting gas consumption.
+The gas policy is defined as a list of predicates and their associated unit costs, a default unit cost for predicates
+if not specified in the list, and a weighting factor that is applied to the unit cost of each predicate to yield.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `weighting_factor` | [string](#string) |  | WeightingFactor is the factor that is applied to the unit cost of each predicate to yield the gas value. If not provided or set to 0, the default value of 10000 is used. |
-| `predicate_costs` | [PredicateCost](#logic.v1beta2.PredicateCost) | repeated | PredicateCosts is the list of predicates and their associated unit costs. If not provided, all predicates have a unit cost of 1 by default. |
+| `weighting_factor` | [string](#string) |  | WeightingFactor is the factor that is applied to the unit cost of each predicate to yield the gas value. If not provided or set to 0, the value is set to 1. |
+| `default_predicate_cost` | [string](#string) |  | DefaultPredicateCost is the default unit cost of a predicate when not specified in the PredicateCosts list. If not provided or set to 0, the value is set to 1. |
+| `predicate_costs` | [PredicateCost](#logic.v1beta2.PredicateCost) | repeated | PredicateCosts is the list of predicates and their associated unit costs. |
 
 <a name="logic.v1beta2.Interpreter"></a>
 
