@@ -3,6 +3,7 @@ syntax = "proto3";
 package mint.v1beta1;
 
 import "gogoproto/gogo.proto";
+import "cosmos_proto/cosmos.proto";
 import "mint/v1beta1/mint.proto";
 
 option go_package = "github.com/okp4/okp4d/x/mint/types";
