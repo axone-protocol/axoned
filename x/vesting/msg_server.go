@@ -87,13 +87,6 @@ func (s msgServer) CreateVestingAccount(goCtx context.Context,
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	)
-
 	return &types.MsgCreateVestingAccountResponse{}, nil
 }
 
@@ -150,13 +143,6 @@ func (s msgServer) CreatePermanentLockedAccount(goCtx context.Context,
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	)
-
 	return &types.MsgCreatePermanentLockedAccountResponse{}, nil
 }
 
@@ -187,6 +173,10 @@ func (s msgServer) CreatePeriodicVestingAccount(goCtx context.Context,
 		totalCoins = totalCoins.Add(period.Amount...)
 	}
 
+	if err := bk.IsSendEnabledCoins(ctx, totalCoins...); err != nil {
+		return nil, err
+	}
+
 	baseAccount := authtypes.NewBaseAccountWithAddress(to)
 	baseAccount = ak.NewAccount(ctx, baseAccount).(*authtypes.BaseAccount)
 	vestingAccount := types.NewPeriodicVestingAccount(baseAccount, totalCoins.Sort(), msg.StartTime, msg.VestingPeriods)
@@ -212,12 +202,6 @@ func (s msgServer) CreatePeriodicVestingAccount(goCtx context.Context,
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	)
 	return &types.MsgCreatePeriodicVestingAccountResponse{}, nil
 }
 
@@ -276,13 +260,6 @@ func (s msgServer) CreateCliffVestingAccount(goCtx context.Context,
 	if err != nil {
 		return nil, err
 	}
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	)
 
 	return &types.MsgCreateCliffVestingAccountResponse{}, nil
 }

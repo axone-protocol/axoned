@@ -403,6 +403,7 @@ mock: ## Generate all the mocks (for tests)
 	@echo "${COLOR_CYAN} 🧱 Generating all the mocks${COLOR_RESET}"
 	@go install github.com/golang/mock/mockgen@v1.6.0
 	@mockgen -source=x/mint/types/expected_keepers.go -package testutil -destination x/mint/testutil/expected_keepers_mocks.go
+	@mockgen -source=x/vesting/types/expected_keepers.go -package testutil -destination x/vesting/testutil/expected_keepers_mocks.go
 	@mockgen -source=x/logic/types/expected_keepers.go -package testutil -destination x/logic/testutil/expected_keepers_mocks.go
 	@mockgen -destination x/logic/testutil/gas_mocks.go -package testutil github.com/cosmos/cosmos-sdk/store/types GasMeter
 	@mockgen -destination x/logic/testutil/fs_mocks.go -package testutil -source=x/logic/fs/fs.go
