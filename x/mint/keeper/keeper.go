@@ -2,7 +2,8 @@ package keeper
 
 import (
 	"cosmossdk.io/math"
-	"github.com/tendermint/tendermint/libs/log"
+
+	"github.com/cometbft/cometbft/libs/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -25,11 +26,11 @@ type Keeper struct {
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	key storetypes.StoreKey,
-	authority sdk.AccAddress,
 	sk types.StakingKeeper,
 	ak types.AccountKeeper,
 	bk types.BankKeeper,
 	feeCollectorName string,
+	authority string,
 ) Keeper {
 	// ensure mint module account is set
 	if addr := ak.GetModuleAddress(types.ModuleName); addr == nil {
@@ -37,18 +38,27 @@ func NewKeeper(
 	}
 
 	// ensure gov module account is set and is not nil
-	if err := sdk.VerifyAddressFormat(authority); err != nil {
+	addr, err := sdk.AccAddressFromBech32(authority)
+	if err != nil {
+		panic(err)
+	}
+	if err := sdk.VerifyAddressFormat(addr); err != nil {
 		panic(err)
 	}
 
 	return Keeper{
 		cdc:              cdc,
 		storeKey:         key,
-		authority:        authority,
+		authority:        addr,
 		stakingKeeper:    sk,
 		bankKeeper:       bk,
 		feeCollectorName: feeCollectorName,
 	}
+}
+
+// GetAuthority returns the x/mint module's authority.
+func (k Keeper) GetAuthority() string {
+	return k.authority.String()
 }
 
 // Logger returns a module-specific logger.

@@ -423,11 +423,11 @@ func New(
 	app.MintKeeper = mintkeeper.NewKeeper(
 		appCodec,
 		keys[minttypes.StoreKey],
-		authtypes.NewModuleAddress(govtypes.ModuleName),
 		app.StakingKeeper,
 		app.AccountKeeper,
 		app.BankKeeper,
 		authtypes.FeeCollectorName,
+		authtypes.NewModuleAddress(govtypes.ModuleName),
 	)
 
 	app.DistrKeeper = distrkeeper.NewKeeper(
