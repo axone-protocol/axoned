@@ -11,7 +11,7 @@ LEDGER_ENABLED         ?= true
 # Docker images
 DOCKER_IMAGE_GOLANG		  = golang:1.19-alpine3.16
 DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v1.49
-DOCKER_IMAGE_BUF  		  = okp4/buf-cosmos:0.3.1
+DOCKER_IMAGE_BUF  		  = okp4/buf-cosmos:1.4.7
 DOCKER_BUILDX_BUILDER     = okp4-builder
 DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
 DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
