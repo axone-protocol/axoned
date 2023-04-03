@@ -17,7 +17,7 @@ import (
 func TestProposalMsgs(t *testing.T) {
 	// initialize parameters
 	s := rand.NewSource(1)
-	r := rand.New(s)
+	r := rand.New(s) //nolint:gosec
 
 	ctx := sdk.NewContext(nil, tmproto.Header{}, true, nil)
 	accounts := simtypes.RandomAccounts(r, 3)

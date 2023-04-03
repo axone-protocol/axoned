@@ -26,7 +26,6 @@ func NewMsgServerImpl(k keeper.AccountKeeper, bk types.BankKeeper) types.MsgServ
 
 var _ types.MsgServer = msgServer{}
 
-//nolint:funlen
 func (s msgServer) CreateVestingAccount(goCtx context.Context,
 	msg *types.MsgCreateVestingAccount,
 ) (*types.MsgCreateVestingAccountResponse, error) {
@@ -205,7 +204,6 @@ func (s msgServer) CreatePeriodicVestingAccount(goCtx context.Context,
 	return &types.MsgCreatePeriodicVestingAccountResponse{}, nil
 }
 
-//nolint:funlen
 func (s msgServer) CreateCliffVestingAccount(goCtx context.Context,
 	msg *types.MsgCreateCliffVestingAccount,
 ) (*types.MsgCreateCliffVestingAccountResponse, error) {

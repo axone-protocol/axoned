@@ -234,6 +234,8 @@ type appCreator struct {
 }
 
 // newApp creates a new Cosmos SDK app.
+//
+//nolint:funlen
 func (a appCreator) newApp(
 	logger log.Logger,
 	db dbm.DB,

@@ -10,14 +10,14 @@ import (
 	"github.com/okp4/okp4d/x/mint/types"
 )
 
-// Simulation operation weights constants
+// Simulation operation weights constants.
 const (
 	DefaultWeightMsgUpdateParams int = 100
 
 	OpWeightMsgUpdateParams = "op_weight_msg_update_params" //nolint:gosec
 )
 
-// ProposalMsgs defines the module weighted proposals' contents
+// ProposalMsgs defines the module weighted proposals' contents.
 func ProposalMsgs() []simtypes.WeightedProposalMsg {
 	return []simtypes.WeightedProposalMsg{
 		simulation.NewWeightedProposalMsg(
@@ -28,7 +28,7 @@ func ProposalMsgs() []simtypes.WeightedProposalMsg {
 	}
 }
 
-// SimulateMsgUpdateParams returns a random MsgUpdateParams
+// SimulateMsgUpdateParams returns a random MsgUpdateParams.
 func SimulateMsgUpdateParams(r *rand.Rand, _ sdk.Context, _ []simtypes.Account) sdk.Msg {
 	// use the default gov module account address as authority
 	var authority sdk.AccAddress = address.Module("gov")
