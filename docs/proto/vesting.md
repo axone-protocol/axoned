@@ -47,7 +47,7 @@ the necessary fields needed for any vesting account implementation.
 | `original_vesting` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `delegated_free` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `delegated_vesting` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
-| `end_time` | [int64](#int64) |  |  |
+| `end_time` | [int64](#int64) |  | Vesting end time, as unix timestamp (in seconds). |
 
 <a name="vesting.v1beta1.CliffVestingAccount"></a>
 
@@ -72,7 +72,7 @@ continuously vests by unlocking coins linearly with respect to time.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `base_vesting_account` | [BaseVestingAccount](#vesting.v1beta1.BaseVestingAccount) |  |  |
-| `start_time` | [int64](#int64) |  |  |
+| `start_time` | [int64](#int64) |  | Vesting start time, as unix timestamp (in seconds). |
 
 <a name="vesting.v1beta1.DelayedVestingAccount"></a>
 
@@ -171,7 +171,7 @@ Since: cosmos-sdk 0.46
 | ----- | ---- | ----- | ----------- |
 | `from_address` | [string](#string) |  |  |
 | `to_address` | [string](#string) |  |  |
-| `start_time` | [int64](#int64) |  |  |
+| `start_time` | [int64](#int64) |  | start of vesting as unix time (in seconds). |
 | `vesting_periods` | [Period](#vesting.v1beta1.Period) | repeated |  |
 
 <a name="vesting.v1beta1.MsgCreatePeriodicVestingAccountResponse"></a>
