@@ -32,6 +32,8 @@ type Params struct {
 	// The limits are used to prevent the interpreter from running for too long.
 	// If the interpreter runs for too long, the execution will be aborted.
 	Limits Limits `protobuf:"bytes,2,opt,name=limits,proto3" json:"limits" yaml:"limits"`
+	// GasPolicy defines the parameters for calculating predicate invocation costs.
+	GasPolicy GasPolicy `protobuf:"bytes,3,opt,name=gas_policy,json=gasPolicy,proto3" json:"gas_policy" yaml:"gas_policy"`
 }
 
 func (m *Params) Reset()      { *m = Params{} }
@@ -78,6 +80,13 @@ func (m *Params) GetLimits() Limits {
 		return m.Limits
 	}
 	return Limits{}
+}
+
+func (m *Params) GetGasPolicy() GasPolicy {
+	if m != nil {
+		return m.GasPolicy
+	}
+	return GasPolicy{}
 }
 
 // Limits defines the limits of the logic module.
@@ -203,47 +212,164 @@ func (m *Interpreter) GetBootstrap() string {
 	return ""
 }
 
+// GasPolicy defines the policy for calculating predicate invocation costs and the resulting gas consumption.
+// The gas policy is defined as a list of predicates and their associated unit costs, a default unit cost for predicates
+// if not specified in the list, and a weighting factor that is applied to the unit cost of each predicate to yield.
+type GasPolicy struct {
+	// WeightingFactor is the factor that is applied to the unit cost of each predicate
+	// to yield the gas value.
+	// If not provided or set to 0, the value is set to 1.
+	WeightingFactor *github_com_cosmos_cosmos_sdk_types.Uint `protobuf:"bytes,1,opt,name=weighting_factor,json=weightingFactor,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"weighting_factor,omitempty" yaml:"weighting_factor"`
+	// DefaultPredicateCost is the default unit cost of a predicate when not specified in the PredicateCosts list.
+	// If not provided or set to 0, the value is set to 1.
+	DefaultPredicateCost *github_com_cosmos_cosmos_sdk_types.Uint `protobuf:"bytes,2,opt,name=default_predicate_cost,json=defaultPredicateCost,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"default_predicate_cost,omitempty" yaml:"default_predicate_cost"`
+	// PredicateCosts is the list of predicates and their associated unit costs.
+	PredicateCosts []PredicateCost `protobuf:"bytes,3,rep,name=predicate_costs,json=predicateCosts,proto3" json:"predicate_costs" yaml:"predicate_cost"`
+}
+
+func (m *GasPolicy) Reset()         { *m = GasPolicy{} }
+func (m *GasPolicy) String() string { return proto.CompactTextString(m) }
+func (*GasPolicy) ProtoMessage()    {}
+func (*GasPolicy) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3af0daa241de0fa3, []int{3}
+}
+func (m *GasPolicy) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *GasPolicy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_GasPolicy.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *GasPolicy) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_GasPolicy.Merge(m, src)
+}
+func (m *GasPolicy) XXX_Size() int {
+	return m.Size()
+}
+func (m *GasPolicy) XXX_DiscardUnknown() {
+	xxx_messageInfo_GasPolicy.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_GasPolicy proto.InternalMessageInfo
+
+func (m *GasPolicy) GetPredicateCosts() []PredicateCost {
+	if m != nil {
+		return m.PredicateCosts
+	}
+	return nil
+}
+
+// PredicateCost defines the unit cost of a predicate during its invocation by the interpreter.
+type PredicateCost struct {
+	// Predicate is the name of the predicate, optionally followed by its arity (e.g. "findall/3").
+	// If no arity is specified, the unit cost is applied to all predicates with the same name.
+	Predicate string `protobuf:"bytes,1,opt,name=predicate,proto3" json:"predicate,omitempty" yaml:"predicate"`
+	// Cost is the unit cost of the predicate.
+	Cost *github_com_cosmos_cosmos_sdk_types.Uint `protobuf:"bytes,2,opt,name=cost,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Uint" json:"cost,omitempty" yaml:"cost",omitempty`
+}
+
+func (m *PredicateCost) Reset()         { *m = PredicateCost{} }
+func (m *PredicateCost) String() string { return proto.CompactTextString(m) }
+func (*PredicateCost) ProtoMessage()    {}
+func (*PredicateCost) Descriptor() ([]byte, []int) {
+	return fileDescriptor_3af0daa241de0fa3, []int{4}
+}
+func (m *PredicateCost) XXX_Unmarshal(b []byte) error {
+	return m.Unmarshal(b)
+}
+func (m *PredicateCost) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	if deterministic {
+		return xxx_messageInfo_PredicateCost.Marshal(b, m, deterministic)
+	} else {
+		b = b[:cap(b)]
+		n, err := m.MarshalToSizedBuffer(b)
+		if err != nil {
+			return nil, err
+		}
+		return b[:n], nil
+	}
+}
+func (m *PredicateCost) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_PredicateCost.Merge(m, src)
+}
+func (m *PredicateCost) XXX_Size() int {
+	return m.Size()
+}
+func (m *PredicateCost) XXX_DiscardUnknown() {
+	xxx_messageInfo_PredicateCost.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_PredicateCost proto.InternalMessageInfo
+
+func (m *PredicateCost) GetPredicate() string {
+	if m != nil {
+		return m.Predicate
+	}
+	return ""
+}
+
 func init() {
 	proto.RegisterType((*Params)(nil), "logic.v1beta2.Params")
 	proto.RegisterType((*Limits)(nil), "logic.v1beta2.Limits")
 	proto.RegisterType((*Interpreter)(nil), "logic.v1beta2.Interpreter")
+	proto.RegisterType((*GasPolicy)(nil), "logic.v1beta2.GasPolicy")
+	proto.RegisterType((*PredicateCost)(nil), "logic.v1beta2.PredicateCost")
 }
 
 func init() { proto.RegisterFile("logic/v1beta2/params.proto", fileDescriptor_3af0daa241de0fa3) }
 
 var fileDescriptor_3af0daa241de0fa3 = []byte{
-	// 488 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x93, 0x4f, 0x6b, 0xd4, 0x40,
-	0x18, 0xc6, 0x33, 0x5b, 0x89, 0xee, 0x2c, 0xd5, 0x12, 0x5b, 0x0c, 0x2b, 0x24, 0x65, 0x7a, 0xb0,
-	0x07, 0x4d, 0xb0, 0x8a, 0x87, 0x82, 0x97, 0x28, 0x88, 0x7f, 0x0e, 0x12, 0xf1, 0x0f, 0x82, 0x2c,
-	0x93, 0xec, 0x90, 0x0e, 0x9b, 0xd9, 0x09, 0x99, 0x77, 0x75, 0xb7, 0x9f, 0xc2, 0xa3, 0x47, 0x3f,
-	0x81, 0x9f, 0x63, 0xbd, 0xf5, 0x28, 0x1e, 0x82, 0xec, 0x7e, 0x83, 0xbd, 0x7a, 0x91, 0x4c, 0xd2,
-	0x26, 0x2d, 0x42, 0xd9, 0x4b, 0x12, 0xde, 0xe7, 0x79, 0x7f, 0xcf, 0x9b, 0x77, 0x18, 0xdc, 0x4f,
-	0x65, 0xc2, 0x63, 0xff, 0xf3, 0xfd, 0x88, 0x01, 0x3d, 0xf0, 0x33, 0x9a, 0x53, 0xa1, 0xbc, 0x2c,
-	0x97, 0x20, 0xad, 0x4d, 0xad, 0x79, 0xb5, 0xd6, 0xdf, 0x4e, 0x64, 0x22, 0xb5, 0xe2, 0x97, 0x5f,
-	0x95, 0x89, 0xfc, 0x40, 0xd8, 0x7c, 0xad, 0xbb, 0xac, 0x0f, 0xb8, 0xc7, 0xc7, 0xc0, 0xf2, 0x2c,
-	0x67, 0xc0, 0x72, 0x1b, 0xed, 0xa2, 0xfd, 0xde, 0x41, 0xdf, 0x3b, 0x47, 0xf1, 0x9e, 0x37, 0x8e,
-	0xa0, 0x3f, 0x2f, 0x5c, 0x63, 0x55, 0xb8, 0xd6, 0x8c, 0x8a, 0xf4, 0x90, 0xb4, 0x9a, 0x49, 0xd8,
-	0x46, 0x59, 0x4f, 0xb1, 0x99, 0x72, 0xc1, 0x41, 0xd9, 0x1d, 0x0d, 0xdd, 0xb9, 0x00, 0x7d, 0xa5,
-	0xc5, 0x60, 0xa7, 0xe6, 0x6d, 0x56, 0xbc, 0xaa, 0x85, 0x84, 0x75, 0xef, 0xe1, 0x95, 0x6f, 0xdf,
-	0x5d, 0x83, 0xfc, 0xec, 0x60, 0xb3, 0xf2, 0x5b, 0x43, 0x7c, 0x55, 0xd0, 0xe9, 0x20, 0xa1, 0x4a,
-	0x0f, 0xdb, 0x0d, 0x5e, 0xce, 0x0b, 0x17, 0xfd, 0x2e, 0xdc, 0x3b, 0x09, 0x87, 0xa3, 0x49, 0xe4,
-	0xc5, 0x52, 0xf8, 0xb1, 0x54, 0x42, 0xaa, 0xfa, 0x75, 0x4f, 0x0d, 0x47, 0x3e, 0xcc, 0x32, 0xa6,
-	0xbc, 0xb7, 0x7c, 0x0c, 0xab, 0xc2, 0xb5, 0xab, 0xac, 0x9a, 0x43, 0xee, 0x4a, 0xc1, 0x81, 0x89,
-	0x0c, 0x66, 0xa1, 0x29, 0xe8, 0xf4, 0x19, 0x55, 0xd6, 0x27, 0x7c, 0xad, 0x54, 0x15, 0x3f, 0x66,
-	0xf6, 0x86, 0x8e, 0x09, 0xd6, 0x8f, 0xb9, 0xd1, 0xc4, 0x94, 0x20, 0x12, 0x96, 0x93, 0xbf, 0xe1,
-	0xc7, 0xcc, 0x02, 0xbc, 0x55, 0x56, 0x73, 0xa6, 0x26, 0x29, 0x0c, 0x62, 0x39, 0x19, 0x83, 0xde,
-	0x52, 0x37, 0x78, 0xb1, 0x7e, 0xcc, 0xad, 0x26, 0xa6, 0x0d, 0x24, 0xe1, 0x75, 0x41, 0xa7, 0xa1,
-	0xae, 0x3c, 0x29, 0x0b, 0x7a, 0x97, 0x88, 0xfc, 0x45, 0xb8, 0xd7, 0x3a, 0x50, 0xeb, 0x1d, 0xde,
-	0xce, 0x72, 0x36, 0xe4, 0x31, 0x05, 0xa6, 0x06, 0x5f, 0x8e, 0x38, 0xb0, 0x94, 0x2b, 0xb0, 0xd1,
-	0xee, 0xc6, 0x7e, 0x37, 0xd8, 0x2b, 0xe7, 0x59, 0x15, 0xee, 0xed, 0x2a, 0xe4, 0x7f, 0x4e, 0x12,
-	0xde, 0x6c, 0xca, 0xef, 0x4f, 0xab, 0x17, 0xb8, 0x51, 0x4a, 0xe3, 0x91, 0xe6, 0x76, 0x2e, 0xe1,
-	0x9e, 0x39, 0xcf, 0x71, 0x83, 0xd3, 0xaa, 0xf5, 0x08, 0x77, 0x23, 0x29, 0x41, 0x41, 0x4e, 0xb3,
-	0xfa, 0x6c, 0xec, 0x1a, 0xb6, 0x55, 0xc1, 0xce, 0x64, 0x12, 0x36, 0xd6, 0xea, 0xef, 0x83, 0xc7,
-	0xf3, 0x85, 0x83, 0x4e, 0x16, 0x0e, 0xfa, 0xb3, 0x70, 0xd0, 0xd7, 0xa5, 0x63, 0x9c, 0x2c, 0x1d,
-	0xe3, 0xd7, 0xd2, 0x31, 0x3e, 0xee, 0xb5, 0x36, 0x2e, 0x47, 0xd9, 0x43, 0xfd, 0x18, 0xfa, 0x53,
-	0xbf, 0xba, 0x6d, 0x7a, 0xe5, 0x91, 0xa9, 0x2f, 0xd0, 0x83, 0x7f, 0x01, 0x00, 0x00, 0xff, 0xff,
-	0x76, 0x62, 0xe7, 0x7f, 0x83, 0x03, 0x00, 0x00,
+	// 666 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x9c, 0x94, 0xbd, 0x6f, 0xd3, 0x4e,
+	0x18, 0xc7, 0xe3, 0xa4, 0xca, 0xef, 0xe7, 0x8b, 0xfa, 0xc2, 0xd1, 0x82, 0x09, 0x34, 0xa9, 0xae,
+	0x03, 0x1d, 0x20, 0x16, 0x05, 0x75, 0xa8, 0xc4, 0xe2, 0x22, 0xca, 0xdb, 0x10, 0x1d, 0xe2, 0x45,
+	0x08, 0x14, 0x5d, 0x9c, 0xab, 0x7b, 0xaa, 0x9d, 0xb3, 0x7c, 0x17, 0x9a, 0x74, 0x64, 0x60, 0x66,
+	0x64, 0x64, 0xe1, 0x7f, 0x29, 0x5b, 0x47, 0xc4, 0x10, 0xa1, 0xf6, 0x2f, 0xa0, 0x2b, 0x0b, 0xf2,
+	0xf9, 0x62, 0x3b, 0x56, 0x25, 0x14, 0x96, 0x36, 0x7a, 0x9e, 0xef, 0xf3, 0xf9, 0x3e, 0xf7, 0x3c,
+	0x77, 0x06, 0x75, 0x9f, 0x7b, 0xcc, 0xb5, 0xdf, 0xdf, 0xe9, 0x52, 0x49, 0x36, 0xed, 0x90, 0x44,
+	0x24, 0x10, 0xad, 0x30, 0xe2, 0x92, 0xc3, 0x79, 0x95, 0x6b, 0xe9, 0x5c, 0x7d, 0xd9, 0xe3, 0x1e,
+	0x57, 0x19, 0x3b, 0xfe, 0x95, 0x88, 0xd0, 0x87, 0x32, 0xa8, 0xb6, 0x55, 0x15, 0x7c, 0x0d, 0x6a,
+	0xac, 0x2f, 0x69, 0x14, 0x46, 0x54, 0xd2, 0xc8, 0x32, 0xd6, 0x8c, 0x8d, 0xda, 0x66, 0xbd, 0x35,
+	0x45, 0x69, 0x3d, 0xce, 0x14, 0x4e, 0xfd, 0x78, 0xdc, 0x2c, 0x9d, 0x8f, 0x9b, 0x70, 0x44, 0x02,
+	0x7f, 0x1b, 0xe5, 0x8a, 0x11, 0xce, 0xa3, 0xe0, 0x03, 0x50, 0xf5, 0x59, 0xc0, 0xa4, 0xb0, 0xca,
+	0x0a, 0xba, 0x52, 0x80, 0x3e, 0x53, 0x49, 0x67, 0x45, 0xf3, 0xe6, 0x13, 0x5e, 0x52, 0x82, 0xb0,
+	0xae, 0x85, 0x18, 0x00, 0x8f, 0x88, 0x4e, 0xc8, 0x7d, 0xe6, 0x8e, 0xac, 0x8a, 0x22, 0x59, 0x05,
+	0xd2, 0x2e, 0x11, 0x6d, 0x95, 0x77, 0xae, 0x69, 0xd8, 0xa5, 0x04, 0x96, 0x55, 0x22, 0x6c, 0x7a,
+	0x13, 0xd5, 0xf6, 0xdc, 0xe7, 0x2f, 0xcd, 0x12, 0xfa, 0x56, 0x06, 0xd5, 0xa4, 0x07, 0xd8, 0x03,
+	0xff, 0x05, 0x64, 0xd8, 0xf1, 0x88, 0x50, 0x03, 0x30, 0x9d, 0xa7, 0xc7, 0xe3, 0xa6, 0xf1, 0x63,
+	0xdc, 0xbc, 0xe9, 0x31, 0xb9, 0x3f, 0xe8, 0xb6, 0x5c, 0x1e, 0xd8, 0x2e, 0x17, 0x01, 0x17, 0xfa,
+	0xdf, 0x6d, 0xd1, 0x3b, 0xb0, 0xe5, 0x28, 0xa4, 0xa2, 0xf5, 0x82, 0xf5, 0xe5, 0xf9, 0xb8, 0x69,
+	0x25, 0x96, 0x9a, 0x83, 0x6e, 0xf1, 0x80, 0x49, 0x1a, 0x84, 0x72, 0x84, 0xab, 0x01, 0x19, 0xee,
+	0x12, 0x01, 0xdf, 0x81, 0xff, 0xe3, 0xac, 0x60, 0x47, 0x54, 0x1d, 0xc4, 0x74, 0x9c, 0xd9, 0x6d,
+	0x16, 0x33, 0x9b, 0x18, 0x84, 0x70, 0xdc, 0xf9, 0x73, 0x76, 0x44, 0xa1, 0x04, 0x4b, 0x71, 0x34,
+	0xa2, 0x62, 0xe0, 0xcb, 0x8e, 0xcb, 0x07, 0x7d, 0xa9, 0x26, 0x6f, 0x3a, 0x4f, 0x66, 0xb7, 0xb9,
+	0x9a, 0xd9, 0xe4, 0x81, 0x08, 0x2f, 0x04, 0x64, 0x88, 0x55, 0x64, 0x27, 0x0e, 0xa8, 0x59, 0x1a,
+	0xe8, 0xb7, 0x01, 0x6a, 0xb9, 0x4b, 0x02, 0x5f, 0x82, 0xe5, 0x30, 0xa2, 0x3d, 0xe6, 0x12, 0x49,
+	0x45, 0xe7, 0x70, 0x9f, 0x49, 0xea, 0x33, 0x21, 0x2d, 0x63, 0xad, 0xb2, 0x61, 0x3a, 0xeb, 0x71,
+	0x3f, 0xe7, 0xe3, 0xe6, 0xf5, 0xc4, 0xe4, 0x22, 0x25, 0xc2, 0x97, 0xb3, 0xf0, 0xab, 0x49, 0xb4,
+	0xc0, 0xed, 0xfa, 0xc4, 0x3d, 0x50, 0xdc, 0xf2, 0x5f, 0xb8, 0xa9, 0x72, 0x8a, 0xeb, 0x4c, 0xa2,
+	0x70, 0x0b, 0x98, 0x5d, 0xce, 0xa5, 0x90, 0x11, 0x09, 0xf5, 0x6e, 0x2c, 0x0d, 0x5b, 0x4a, 0x60,
+	0x69, 0x1a, 0xe1, 0x4c, 0xaa, 0x4f, 0xff, 0xab, 0x0c, 0xcc, 0xf4, 0x0e, 0xc2, 0x01, 0x58, 0x3a,
+	0xa4, 0xcc, 0xdb, 0x97, 0xac, 0xef, 0x75, 0xf6, 0x88, 0x2b, 0x79, 0xa4, 0x6f, 0xd5, 0xbf, 0xef,
+	0xa1, 0x08, 0x44, 0x78, 0x31, 0x0d, 0x3d, 0x54, 0x11, 0xf8, 0xd1, 0x00, 0x57, 0x7a, 0x74, 0x8f,
+	0xc4, 0xbb, 0x4a, 0x8f, 0xd8, 0x71, 0xb9, 0x98, 0xdc, 0x82, 0xf6, 0xec, 0xee, 0xab, 0x89, 0xfb,
+	0xc5, 0x58, 0x84, 0x97, 0x75, 0xa2, 0x3d, 0x89, 0xef, 0x70, 0x21, 0x61, 0x0f, 0x2c, 0x4e, 0x0b,
+	0x85, 0x55, 0x59, 0xab, 0x6c, 0xd4, 0x36, 0x6f, 0x14, 0x9e, 0xed, 0x54, 0x99, 0xb3, 0xaa, 0x9f,
+	0xee, 0x4a, 0x61, 0x79, 0xda, 0x6b, 0x21, 0xcc, 0xab, 0x05, 0xfa, 0x6a, 0x80, 0xf9, 0x69, 0xdf,
+	0x2d, 0x60, 0xa6, 0x1a, 0x3d, 0xf0, 0xc2, 0x0e, 0xd3, 0x34, 0xc2, 0x99, 0x14, 0xbe, 0x05, 0x73,
+	0xb9, 0x29, 0x3d, 0x9a, 0x7d, 0x4a, 0xba, 0x63, 0xd5, 0x67, 0xee, 0xd9, 0x2b, 0xaa, 0x73, 0xff,
+	0xf8, 0xb4, 0x61, 0x9c, 0x9c, 0x36, 0x8c, 0x9f, 0xa7, 0x0d, 0xe3, 0xd3, 0x59, 0xa3, 0x74, 0x72,
+	0xd6, 0x28, 0x7d, 0x3f, 0x6b, 0x94, 0xde, 0xac, 0xe7, 0x1c, 0xf8, 0x41, 0x78, 0x4f, 0xfd, 0xe9,
+	0xd9, 0x43, 0x3b, 0xf9, 0xba, 0x2b, 0x8b, 0x6e, 0x55, 0x7d, 0xb0, 0xef, 0xfe, 0x09, 0x00, 0x00,
+	0xff, 0xff, 0xc3, 0xc1, 0xb6, 0x82, 0xf3, 0x05, 0x00, 0x00,
 }
 
 func (m *Params) Marshal() (dAtA []byte, err error) {
@@ -266,6 +392,16 @@ func (m *Params) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
+	{
+		size, err := m.GasPolicy.MarshalToSizedBuffer(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarintParams(dAtA, i, uint64(size))
+	}
+	i--
+	dAtA[i] = 0x1a
 	{
 		size, err := m.Limits.MarshalToSizedBuffer(dAtA[:i])
 		if err != nil {
@@ -396,6 +532,109 @@ func (m *Interpreter) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	return len(dAtA) - i, nil
 }
 
+func (m *GasPolicy) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *GasPolicy) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *GasPolicy) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if len(m.PredicateCosts) > 0 {
+		for iNdEx := len(m.PredicateCosts) - 1; iNdEx >= 0; iNdEx-- {
+			{
+				size, err := m.PredicateCosts[iNdEx].MarshalToSizedBuffer(dAtA[:i])
+				if err != nil {
+					return 0, err
+				}
+				i -= size
+				i = encodeVarintParams(dAtA, i, uint64(size))
+			}
+			i--
+			dAtA[i] = 0x1a
+		}
+	}
+	if m.DefaultPredicateCost != nil {
+		{
+			size := m.DefaultPredicateCost.Size()
+			i -= size
+			if _, err := m.DefaultPredicateCost.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintParams(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if m.WeightingFactor != nil {
+		{
+			size := m.WeightingFactor.Size()
+			i -= size
+			if _, err := m.WeightingFactor.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintParams(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
+func (m *PredicateCost) Marshal() (dAtA []byte, err error) {
+	size := m.Size()
+	dAtA = make([]byte, size)
+	n, err := m.MarshalToSizedBuffer(dAtA[:size])
+	if err != nil {
+		return nil, err
+	}
+	return dAtA[:n], nil
+}
+
+func (m *PredicateCost) MarshalTo(dAtA []byte) (int, error) {
+	size := m.Size()
+	return m.MarshalToSizedBuffer(dAtA[:size])
+}
+
+func (m *PredicateCost) MarshalToSizedBuffer(dAtA []byte) (int, error) {
+	i := len(dAtA)
+	_ = i
+	var l int
+	_ = l
+	if m.Cost != nil {
+		{
+			size := m.Cost.Size()
+			i -= size
+			if _, err := m.Cost.MarshalTo(dAtA[i:]); err != nil {
+				return 0, err
+			}
+			i = encodeVarintParams(dAtA, i, uint64(size))
+		}
+		i--
+		dAtA[i] = 0x12
+	}
+	if len(m.Predicate) > 0 {
+		i -= len(m.Predicate)
+		copy(dAtA[i:], m.Predicate)
+		i = encodeVarintParams(dAtA, i, uint64(len(m.Predicate)))
+		i--
+		dAtA[i] = 0xa
+	}
+	return len(dAtA) - i, nil
+}
+
 func encodeVarintParams(dAtA []byte, offset int, v uint64) int {
 	offset -= sovParams(v)
 	base := offset
@@ -416,6 +655,8 @@ func (m *Params) Size() (n int) {
 	l = m.Interpreter.Size()
 	n += 1 + l + sovParams(uint64(l))
 	l = m.Limits.Size()
+	n += 1 + l + sovParams(uint64(l))
+	l = m.GasPolicy.Size()
 	n += 1 + l + sovParams(uint64(l))
 	return n
 }
@@ -461,6 +702,46 @@ func (m *Interpreter) Size() (n int) {
 	}
 	l = len(m.Bootstrap)
 	if l > 0 {
+		n += 1 + l + sovParams(uint64(l))
+	}
+	return n
+}
+
+func (m *GasPolicy) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	if m.WeightingFactor != nil {
+		l = m.WeightingFactor.Size()
+		n += 1 + l + sovParams(uint64(l))
+	}
+	if m.DefaultPredicateCost != nil {
+		l = m.DefaultPredicateCost.Size()
+		n += 1 + l + sovParams(uint64(l))
+	}
+	if len(m.PredicateCosts) > 0 {
+		for _, e := range m.PredicateCosts {
+			l = e.Size()
+			n += 1 + l + sovParams(uint64(l))
+		}
+	}
+	return n
+}
+
+func (m *PredicateCost) Size() (n int) {
+	if m == nil {
+		return 0
+	}
+	var l int
+	_ = l
+	l = len(m.Predicate)
+	if l > 0 {
+		n += 1 + l + sovParams(uint64(l))
+	}
+	if m.Cost != nil {
+		l = m.Cost.Size()
 		n += 1 + l + sovParams(uint64(l))
 	}
 	return n
@@ -564,6 +845,39 @@ func (m *Params) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			if err := m.Limits.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field GasPolicy", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthParams
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthParams
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if err := m.GasPolicy.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
@@ -870,6 +1184,280 @@ func (m *Interpreter) Unmarshal(dAtA []byte) error {
 				return io.ErrUnexpectedEOF
 			}
 			m.Bootstrap = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipParams(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthParams
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *GasPolicy) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowParams
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: GasPolicy: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: GasPolicy: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field WeightingFactor", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthParams
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthParams
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_cosmos_cosmos_sdk_types.Uint
+			m.WeightingFactor = &v
+			if err := m.WeightingFactor.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field DefaultPredicateCost", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthParams
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthParams
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_cosmos_cosmos_sdk_types.Uint
+			m.DefaultPredicateCost = &v
+			if err := m.DefaultPredicateCost.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		case 3:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field PredicateCosts", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLengthParams
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLengthParams
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.PredicateCosts = append(m.PredicateCosts, PredicateCost{})
+			if err := m.PredicateCosts[len(m.PredicateCosts)-1].Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
+		default:
+			iNdEx = preIndex
+			skippy, err := skipParams(dAtA[iNdEx:])
+			if err != nil {
+				return err
+			}
+			if (skippy < 0) || (iNdEx+skippy) < 0 {
+				return ErrInvalidLengthParams
+			}
+			if (iNdEx + skippy) > l {
+				return io.ErrUnexpectedEOF
+			}
+			iNdEx += skippy
+		}
+	}
+
+	if iNdEx > l {
+		return io.ErrUnexpectedEOF
+	}
+	return nil
+}
+func (m *PredicateCost) Unmarshal(dAtA []byte) error {
+	l := len(dAtA)
+	iNdEx := 0
+	for iNdEx < l {
+		preIndex := iNdEx
+		var wire uint64
+		for shift := uint(0); ; shift += 7 {
+			if shift >= 64 {
+				return ErrIntOverflowParams
+			}
+			if iNdEx >= l {
+				return io.ErrUnexpectedEOF
+			}
+			b := dAtA[iNdEx]
+			iNdEx++
+			wire |= uint64(b&0x7F) << shift
+			if b < 0x80 {
+				break
+			}
+		}
+		fieldNum := int32(wire >> 3)
+		wireType := int(wire & 0x7)
+		if wireType == 4 {
+			return fmt.Errorf("proto: PredicateCost: wiretype end group for non-group")
+		}
+		if fieldNum <= 0 {
+			return fmt.Errorf("proto: PredicateCost: illegal tag %d (wire type %d)", fieldNum, wire)
+		}
+		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Predicate", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthParams
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthParams
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			m.Predicate = string(dAtA[iNdEx:postIndex])
+			iNdEx = postIndex
+		case 2:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field Cost", wireType)
+			}
+			var stringLen uint64
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflowParams
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				stringLen |= uint64(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			intStringLen := int(stringLen)
+			if intStringLen < 0 {
+				return ErrInvalidLengthParams
+			}
+			postIndex := iNdEx + intStringLen
+			if postIndex < 0 {
+				return ErrInvalidLengthParams
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			var v github_com_cosmos_cosmos_sdk_types.Uint
+			m.Cost = &v
+			if err := m.Cost.Unmarshal(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
 			iNdEx = postIndex
 		default:
 			iNdEx = preIndex

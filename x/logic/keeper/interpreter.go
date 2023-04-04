@@ -3,7 +3,6 @@ package keeper
 import (
 	goctx "context"
 	"math"
-	"strings"
 
 	sdkerrors "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -11,9 +10,15 @@ import (
 	"github.com/ichiban/prolog"
 	"github.com/okp4/okp4d/x/logic/interpreter"
 	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
+	"github.com/okp4/okp4d/x/logic/meter"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
-	u "github.com/rjNemo/underscore"
+	"github.com/samber/lo"
+)
+
+const (
+	defaultPredicateCost = uint64(1)
+	defaultWeightFactor  = uint64(1)
 )
 
 func (k Keeper) limits(ctx goctx.Context) types.Limits {
@@ -96,41 +101,66 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 	params := k.GetParams(sdkctx)
 
 	interpreterParams := params.GetInterpreter()
+	gasPolicy := params.GetGasPolicy()
 
 	whitelist := util.NonZeroOrDefault(interpreterParams.PredicatesWhitelist, interpreter.RegistryNames)
 	blacklist := interpreterParams.GetPredicatesBlacklist()
+	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), nonNilNorZeroOrDefaultUint64(gasPolicy.WeightingFactor, defaultWeightFactor))
+
+	predicates := lo.Reduce(
+		lo.Map(
+			lo.Filter(
+				interpreter.RegistryNames,
+				filterPredicates(whitelist, blacklist)),
+			toPredicate(
+				nonNilNorZeroOrDefaultUint64(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
+				gasPolicy.GetPredicateCosts())),
+		func(agg interpreter.Predicates, item lo.Tuple2[string, uint64], index int) interpreter.Predicates {
+			agg[item.A] = item.B
+			return agg
+		},
+		interpreter.Predicates{})
+
 	interpreted, err := interpreter.New(
 		ctx,
-		filterPredicates(interpreter.RegistryNames, whitelist, blacklist),
+		predicates,
 		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap()),
-		sdkctx.GasMeter(),
+		gasMeter,
 		k.fsProvider(ctx),
 	)
 
 	return interpreted, err
 }
 
-// filterPredicates constructs the predicate list from the given registry.
-// The given whitelist and blacklist are applied to the registry to determine
-// the final predicate list.
-func filterPredicates(registry []string, whitelist []string, blacklist []string) []string {
-	match := func(a string) func(b string) bool {
-		return func(b string) bool {
-			if strings.Contains(b, "/") {
-				return a == b
+// filterPredicates filters the given predicate (with arity) according to the given whitelist and blacklist.
+// The whitelist and blacklist are applied to the registry to determine the final predicate list.
+// The whitelist and blacklist can contain predicates with or without arity, e.g. "foo/0", "foo", "bar/1".
+func filterPredicates(whitelist []string, blacklist []string) func(string, int) bool {
+	return func(predicate string, _ int) bool {
+		return lo.ContainsBy(whitelist, util.PredicateEq(predicate)) && !lo.ContainsBy(blacklist, util.PredicateEq(predicate))
+	}
+}
+
+// toPredicate converts the given predicate costs to a function that returns the cost for the given predicate as
+// a pair of predicate name and cost.
+func toPredicate(defaultCost uint64, predicateCosts []types.PredicateCost) func(string, int) lo.Tuple2[string, uint64] {
+	return func(predicate string, _ int) lo.Tuple2[string, uint64] {
+		for _, c := range predicateCosts {
+			if util.PredicateEq(predicate)(c.Predicate) {
+				return lo.T2(predicate, nonNilNorZeroOrDefaultUint64(c.Cost, defaultCost))
 			}
-			return strings.Split(a, "/")[0] == b
 		}
+
+		return lo.T2(predicate, defaultCost)
+	}
+}
+
+// nonNilNorZeroOrDefaultUint64 returns the value of the given sdkmath.Uint if it is not nil and not zero, otherwise it returns the
+// given default value.
+func nonNilNorZeroOrDefaultUint64(v *sdkmath.Uint, defaultValue uint64) uint64 {
+	if v == nil || v.IsZero() {
+		return defaultValue
 	}
 
-	return util.NonZeroOrDefault(
-		u.NewPipe(registry).
-			Filter(func(predicate string) bool {
-				return u.Any(whitelist, match(predicate))
-			}).
-			Filter(func(predicate string) bool {
-				return !u.Any(blacklist, match(predicate))
-			}).
-			Value,
-		[]string{})
+	return v.Uint64()
 }

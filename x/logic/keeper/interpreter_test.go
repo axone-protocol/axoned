@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/samber/lo"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -82,7 +83,7 @@ func TestFilterPredicates(t *testing.T) {
 				fmt.Sprintf("Given test case #%d with registry: %v, whitelist: %v, and blacklist: %v",
 					nc, tc.registry, tc.whitelist, tc.blacklist), func() {
 					Convey("When the function filterPredicates() is called", func() {
-						result := filterPredicates(tc.registry, tc.whitelist, tc.blacklist)
+						result := lo.Filter(tc.registry, filterPredicates(tc.whitelist, tc.blacklist))
 
 						Convey(fmt.Sprintf("Then it should return the expected output: %v", tc.wantResult), func() {
 							So(result, ShouldResemble, tc.wantResult)

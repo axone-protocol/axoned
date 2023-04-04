@@ -197,9 +197,11 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
 ## Table of Contents
 
 - [logic/v1beta2/params.proto](#logic/v1beta2/params.proto)
+  - [GasPolicy](#logic.v1beta2.GasPolicy)
   - [Interpreter](#logic.v1beta2.Interpreter)
   - [Limits](#logic.v1beta2.Limits)
   - [Params](#logic.v1beta2.Params)
+  - [PredicateCost](#logic.v1beta2.PredicateCost)
   
 - [logic/v1beta2/genesis.proto](#logic/v1beta2/genesis.proto)
   - [GenesisState](#logic.v1beta2.GenesisState)
@@ -230,6 +232,20 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
 <p align="right"><a href="#top">Top</a></p>
 
 ## logic/v1beta2/params.proto
+
+<a name="logic.v1beta2.GasPolicy"></a>
+
+### GasPolicy
+
+GasPolicy defines the policy for calculating predicate invocation costs and the resulting gas consumption.
+The gas policy is defined as a list of predicates and their associated unit costs, a default unit cost for predicates
+if not specified in the list, and a weighting factor that is applied to the unit cost of each predicate to yield.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `weighting_factor` | [string](#string) |  | WeightingFactor is the factor that is applied to the unit cost of each predicate to yield the gas value. If not provided or set to 0, the value is set to 1. |
+| `default_predicate_cost` | [string](#string) |  | DefaultPredicateCost is the default unit cost of a predicate when not specified in the PredicateCosts list. If not provided or set to 0, the value is set to 1. |
+| `predicate_costs` | [PredicateCost](#logic.v1beta2.PredicateCost) | repeated | PredicateCosts is the list of predicates and their associated unit costs. |
 
 <a name="logic.v1beta2.Interpreter"></a>
 
@@ -265,6 +281,18 @@ Params defines all the configuration parameters of the "logic" module.
 | ----- | ---- | ----- | ----------- |
 | `interpreter` | [Interpreter](#logic.v1beta2.Interpreter) |  | Interpreter specifies the parameter for the logic interpreter. |
 | `limits` | [Limits](#logic.v1beta2.Limits) |  | Limits defines the limits of the logic module. The limits are used to prevent the interpreter from running for too long. If the interpreter runs for too long, the execution will be aborted. |
+| `gas_policy` | [GasPolicy](#logic.v1beta2.GasPolicy) |  | GasPolicy defines the parameters for calculating predicate invocation costs. |
+
+<a name="logic.v1beta2.PredicateCost"></a>
+
+### PredicateCost
+
+PredicateCost defines the unit cost of a predicate during its invocation by the interpreter.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `predicate` | [string](#string) |  | Predicate is the name of the predicate, optionally followed by its arity (e.g. "findall/3"). If no arity is specified, the unit cost is applied to all predicates with the same name. |
+| `cost` | [string](#string) |  | Cost is the unit cost of the predicate. |
 
  [//]: # (end messages)
 

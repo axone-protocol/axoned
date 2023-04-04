@@ -5,6 +5,7 @@ import (
 
 	sdkerrors "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/okp4/okp4d/x/logic/meter"
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
@@ -53,7 +54,7 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 // withGasMeter returns a new context with a gas meter that has the given limit.
 // The gas meter is go-router-safe.
 func withGasMeter(sdkCtx sdk.Context, limits types.Limits) sdk.Context {
-	gasMeter := types.NewSafeGasMeter(sdk.NewGasMeter(limits.MaxGas.Uint64()))
+	gasMeter := meter.WithSafeMeter(sdk.NewGasMeter(limits.MaxGas.Uint64()))
 
 	return sdkCtx.WithGasMeter(gasMeter)
 }
