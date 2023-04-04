@@ -208,7 +208,7 @@ test-go: build ## Pass the test for the go source code
 	@go test -v -covermode=count -coverprofile ./target/coverage.out ./...
 
 ## Chain:
-chain-init: ## Initialize the blockchain with default settings.
+chain-init: build ## Initialize the blockchain with default settings.
 	@echo "${COLOR_CYAN} 🛠️ Initializing chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} under ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
 
 	@rm -rf "${CHAIN_HOME}"; \
