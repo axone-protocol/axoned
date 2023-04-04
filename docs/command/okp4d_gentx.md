@@ -35,7 +35,7 @@ okp4d gentx [key_name] [amount] [flags]
   -a, --account-number uint                 The account number of the signing account (offline mode only)
       --amount string                       Amount of coins to bond
       --aux                                 Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string               Transaction broadcasting mode (sync|async|block) (default "sync")
+  -b, --broadcast-mode string               Transaction broadcasting mode (sync|async) (default "sync")
       --chain-id string                     The network chain ID (default "okp4d")
       --commission-max-change-rate string   The maximum commission change rate percentage (per day)
       --commission-max-rate string          The maximum commission rate percentage
@@ -53,7 +53,7 @@ okp4d gentx [key_name] [amount] [flags]
   -h, --help                                help for gentx
       --home string                         The application home directory (default "/home/john/.okp4d")
       --identity string                     The (optional) identity signature (ex. UPort or Keybase)
-      --ip string                           The node's public IP (default "127.0.0.1")
+      --ip string                           The node's public P2P IP (default "127.0.0.1")
       --keyring-backend string              Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string                  The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                              Use a connected Ledger device
@@ -65,6 +65,7 @@ okp4d gentx [key_name] [amount] [flags]
       --offline                             Offline mode (does not allow any online functionality)
   -o, --output string                       Output format (text|json) (default "json")
       --output-document string              Write the genesis transaction JSON document to the given file instead of the default location
+      --p2p-port uint                       The node's public P2P port (default 26656)
       --pubkey string                       The validator's Protobuf JSON encoded public key
       --security-contact string             The validator's (optional) security contact email
   -s, --sequence uint                       The sequence number of the signing account (offline mode only)

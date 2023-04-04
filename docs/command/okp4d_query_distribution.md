@@ -26,4 +26,5 @@ okp4d query distribution [flags]
 * [okp4d query distribution params](okp4d_query_distribution_params.md)	 - Query distribution params
 * [okp4d query distribution rewards](okp4d_query_distribution_rewards.md)	 - Query all distribution delegator rewards or rewards from a particular validator
 * [okp4d query distribution slashes](okp4d_query_distribution_slashes.md)	 - Query distribution validator slashes
+* [okp4d query distribution validator-distribution-info](okp4d_query_distribution_validator-distribution-info.md)	 - Query validator distribution info
 * [okp4d query distribution validator-outstanding-rewards](okp4d_query_distribution_validator-outstanding-rewards.md)	 - Query distribution outstanding (un-withdrawn) rewards for a validator and all their delegations

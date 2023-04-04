@@ -4,7 +4,7 @@ List all pinned code ids
 
 ### Synopsis
 
-		Long:    List all pinned code ids,
+List all pinned code ids
 
 ```
 okp4d query wasm pinned [flags]

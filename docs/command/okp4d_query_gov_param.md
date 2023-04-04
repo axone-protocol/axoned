@@ -5,7 +5,6 @@ Query the parameters (voting|tallying|deposit) of the governance process
 ### Synopsis
 
 Query the all the parameters for the governance process.
-
 Example:
 $ okp4d query gov param voting
 $ okp4d query gov param tallying

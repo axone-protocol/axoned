@@ -23,7 +23,8 @@ okp4d tx feegrant grant [granter_key_or_address] [grantee] [flags]
   -a, --account-number uint        The account number of the signing account (offline mode only)
       --allowed-messages strings   Set of allowed messages for fee allowance
       --aux                        Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string      Transaction broadcasting mode (sync|async|block) (default "sync")
+  -b, --broadcast-mode string      Transaction broadcasting mode (sync|async) (default "sync")
+      --chain-id string            The network chain ID (default "okp4d")
       --dry-run                    ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
       --expiration string          The RFC 3339 timestamp after which the grant expires for the user
       --fee-granter string         Fee granter grants fees for the transaction
@@ -50,12 +51,6 @@ okp4d tx feegrant grant [granter_key_or_address] [grantee] [flags]
       --timeout-height uint        Set a block timeout height to prevent the tx from being committed past a certain height
       --tip string                 Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator
   -y, --yes                        Skip tx broadcasting prompt confirmation
-```
-
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
 ```
 
 ### SEE ALSO

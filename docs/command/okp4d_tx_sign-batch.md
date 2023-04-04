@@ -33,8 +33,8 @@ okp4d tx sign-batch [file] ([file2]...) [flags]
   -a, --account-number uint      The account number of the signing account (offline mode only)
       --append                   Combine all message and generate single signed transaction for broadcast.
       --aux                      Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async|block) (default "sync")
-      --chain-id string          network chain ID (default "okp4d")
+  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
+      --chain-id string          The network chain ID (default "okp4d")
       --dry-run                  ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
       --fee-granter string       Fee granter grants fees for the transaction
       --fee-payer string         Fee payer pays fees for the transaction instead of deducting from the signer

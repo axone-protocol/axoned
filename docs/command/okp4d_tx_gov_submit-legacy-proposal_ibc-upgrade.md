@@ -25,7 +25,8 @@ okp4d tx gov submit-legacy-proposal ibc-upgrade [name] [height] [path/to/upgrade
 ```
   -a, --account-number uint      The account number of the signing account (offline mode only)
       --aux                      Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async|block) (default "sync")
+  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
+      --chain-id string          The network chain ID (default "okp4d")
       --deposit string           deposit of proposal
       --description string       description of proposal
       --dry-run                  ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
@@ -51,12 +52,6 @@ okp4d tx gov submit-legacy-proposal ibc-upgrade [name] [height] [path/to/upgrade
       --tip string               Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator
       --title string             title of proposal
   -y, --yes                      Skip tx broadcasting prompt confirmation
-```
-
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
 ```
 
 ### SEE ALSO

@@ -1,7 +1,18 @@
-## okp4d tx intertx register
+## okp4d tx interchain-accounts controller register
+
+Register an interchain account on the provided connection.
+
+### Synopsis
+
+Register an account on the counterparty chain via the
+connection id from the source chain. Connection identifier should be for the source chain
+and the interchain account will be created on the counterparty chain. Callers are expected to
+provide the appropriate application version string via {version} flag. Generates a new
+port identifier using the provided owner string, binds to the port identifier and claims
+the associated capability.
 
 ```
-okp4d tx intertx register [flags]
+okp4d tx interchain-accounts controller register [connection-id] [flags]
 ```
 
 ### Options
@@ -9,8 +20,8 @@ okp4d tx intertx register [flags]
 ```
   -a, --account-number uint      The account number of the signing account (offline mode only)
       --aux                      Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async|block) (default "sync")
-      --connection-id string     Connection ID
+  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
+      --chain-id string          The network chain ID (default "okp4d")
       --dry-run                  ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
       --fee-granter string       Fee granter grants fees for the transaction
       --fee-payer string         Fee payer pays fees for the transaction instead of deducting from the signer
@@ -32,16 +43,10 @@ okp4d tx intertx register [flags]
       --sign-mode string         Choose sign mode (direct|amino-json|direct-aux), this is an advanced feature
       --timeout-height uint      Set a block timeout height to prevent the tx from being committed past a certain height
       --tip string               Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator
-      --version string           Version
+      --version string           Controller chain channel version
   -y, --yes                      Skip tx broadcasting prompt confirmation
-```
-
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
 ```
 
 ### SEE ALSO
 
-* [okp4d tx intertx](okp4d_tx_intertx.md)	 - intertx transactions subcommands
+* [okp4d tx interchain-accounts controller](okp4d_tx_interchain-accounts_controller.md)	 - IBC interchain accounts controller transaction subcommands

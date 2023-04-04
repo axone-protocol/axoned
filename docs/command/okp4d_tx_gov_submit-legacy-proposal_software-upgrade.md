@@ -17,7 +17,8 @@ okp4d tx gov submit-legacy-proposal software-upgrade [name] (--upgrade-height [h
 ```
   -a, --account-number uint      The account number of the signing account (offline mode only)
       --aux                      Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async|block) (default "sync")
+  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
+      --chain-id string          The network chain ID (default "okp4d")
       --daemon-name string       The name of the executable being upgraded (for upgrade-info validation). Default is the DAEMON_NAME env var if set, or else this executable (default "generate_command_doc")
       --deposit string           deposit of proposal
       --description string       description of proposal
@@ -47,12 +48,6 @@ okp4d tx gov submit-legacy-proposal software-upgrade [name] (--upgrade-height [h
       --upgrade-height int       The height at which the upgrade must happen
       --upgrade-info string      Info for the upgrade plan such as new version download urls, etc.
   -y, --yes                      Skip tx broadcasting prompt confirmation
-```
-
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
 ```
 
 ### SEE ALSO

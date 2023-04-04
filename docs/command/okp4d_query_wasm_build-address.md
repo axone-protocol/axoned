@@ -3,13 +3,16 @@
 build contract address
 
 ```
-okp4d query wasm build-address [code-hash] [creator-address] [label] [flags]
+okp4d query wasm build-address [code-hash] [creator-address] [salt-hex-encoded] [json_encoded_init_args (required when set as fixed)] [flags]
 ```
 
 ### Options
 
 ```
-  -h, --help   help for build-address
+      --ascii   ascii encoded salt
+      --b64     base64 encoded salt
+  -h, --help    help for build-address
+      --hex     hex encoded salt
 ```
 
 ### Options inherited from parent commands

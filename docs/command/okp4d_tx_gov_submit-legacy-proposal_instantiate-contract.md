@@ -10,10 +10,11 @@ okp4d tx gov submit-legacy-proposal instantiate-contract [code_id_int64] [json_e
 
 ```
   -a, --account-number uint      The account number of the signing account (offline mode only)
-      --admin string             Address of an admin
+      --admin string             Address or key name of an admin
       --amount string            Coins to send to the contract during instantiation
       --aux                      Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async|block) (default "sync")
+  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
+      --chain-id string          The network chain ID (default "okp4d")
       --deposit string           Deposit of proposal
       --description string       Description of proposal
       --dry-run                  ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
@@ -35,21 +36,13 @@ okp4d tx gov submit-legacy-proposal instantiate-contract [code_id_int64] [json_e
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")
-      --proposal string          Proposal file path (if this path is given, other proposal flags are ignored)
       --run-as string            The address that pays the init funds. It is the creator of the contract and passed to the contract as sender on proposal execution
   -s, --sequence uint            The sequence number of the signing account (offline mode only)
       --sign-mode string         Choose sign mode (direct|amino-json|direct-aux), this is an advanced feature
       --timeout-height uint      Set a block timeout height to prevent the tx from being committed past a certain height
       --tip string               Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator
       --title string             Title of proposal
-      --type string              Permission of proposal, types: store-code/instantiate/migrate/update-admin/clear-admin/text/parameter_change/software_upgrade
   -y, --yes                      Skip tx broadcasting prompt confirmation
-```
-
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
 ```
 
 ### SEE ALSO

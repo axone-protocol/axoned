@@ -31,7 +31,7 @@ The pass backend requires GnuPG: <https://gnupg.org/>
 ```
   -h, --help                     help for keys
       --home string              The application home directory (default "/home/john/.okp4d")
-      --keyring-backend string   Select keyring's backend (os|file|test) (default "test")
+      --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --output string            Output format (text|json) (default "text")
 ```
@@ -44,6 +44,7 @@ The pass backend requires GnuPG: <https://gnupg.org/>
 * [okp4d keys export](okp4d_keys_export.md)	 - Export private keys
 * [okp4d keys import](okp4d_keys_import.md)	 - Import private keys into the local keybase
 * [okp4d keys list](okp4d_keys_list.md)	 - List all keys
+* [okp4d keys list-key-types](okp4d_keys_list-key-types.md)	 - List all key types
 * [okp4d keys migrate](okp4d_keys_migrate.md)	 - Migrate keys from amino to proto serialization format
 * [okp4d keys mnemonic](okp4d_keys_mnemonic.md)	 - Compute the bip39 mnemonic for some input entropy
 * [okp4d keys parse](okp4d_keys_parse.md)	 - Parse address from hex to bech32 and vice versa

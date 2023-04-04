@@ -31,7 +31,7 @@ okp4d tx [flags]
 * [okp4d tx ibc](okp4d_tx_ibc.md)	 - IBC transaction subcommands
 * [okp4d tx ibc-fee](okp4d_tx_ibc-fee.md)	 - IBC relayer incentivization transaction subcommands
 * [okp4d tx ibc-transfer](okp4d_tx_ibc-transfer.md)	 - IBC fungible token transfer transaction subcommands
-* [okp4d tx intertx](okp4d_tx_intertx.md)	 - intertx transactions subcommands
+* [okp4d tx interchain-accounts](okp4d_tx_interchain-accounts.md)	 - IBC interchain accounts transaction subcommands
 * [okp4d tx logic](okp4d_tx_logic.md)	 - logic transactions subcommands
 * [okp4d tx multi-sign](okp4d_tx_multi-sign.md)	 - Generate multisig signatures for transactions generated offline
 * [okp4d tx sign](okp4d_tx_sign.md)	 - Sign a transaction generated offline

@@ -14,6 +14,8 @@ okp4d export [flags]
   -h, --help                         help for export
       --home string                  The application home directory (default "/home/john/.okp4d")
       --jail-allowed-addrs strings   Comma-separated list of operator addresses of jailed validators to unjail
+      --modules-to-export strings    Comma-separated list of modules to export. If empty, will export all modules
+      --output-document string       Exported state is written to the given file instead of STDOUT
 ```
 
 ### SEE ALSO

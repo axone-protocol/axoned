@@ -26,6 +26,7 @@ okp4d query group [flags]
 * [okp4d query group group-policies-by-admin](okp4d_query_group_group-policies-by-admin.md)	 - Query for group policies by admin account address with pagination flags
 * [okp4d query group group-policies-by-group](okp4d_query_group_group-policies-by-group.md)	 - Query for group policies by group id with pagination flags
 * [okp4d query group group-policy-info](okp4d_query_group_group-policy-info.md)	 - Query for group policy info by account address of group policy
+* [okp4d query group groups](okp4d_query_group_groups.md)	 - Query for groups present in the state
 * [okp4d query group groups-by-admin](okp4d_query_group_groups-by-admin.md)	 - Query for groups by admin account address with pagination flags
 * [okp4d query group groups-by-member](okp4d_query_group_groups-by-member.md)	 - Query for groups by member address with pagination flags
 * [okp4d query group proposal](okp4d_query_group_proposal.md)	 - Query for proposal by id
