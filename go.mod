@@ -19,7 +19,7 @@ require (
 	github.com/ichiban/prolog v1.1.0
 	github.com/ignite/cli v0.25.2
 	github.com/nuts-foundation/go-did v0.4.0
-	github.com/prometheus/client_golang v1.13.0
+	github.com/prometheus/client_golang v1.14.0
 	github.com/samber/lo v1.38.1
 	github.com/smartystreets/goconvey v1.7.2
 	github.com/spf13/cast v1.5.0
@@ -175,7 +175,7 @@ require (
 	github.com/petermattis/goid v0.0.0-20180202154549-b0b1615b78e5 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
-	github.com/prometheus/client_model v0.2.0 // indirect
+	github.com/prometheus/client_model v0.3.0 // indirect
 	github.com/prometheus/common v0.37.0 // indirect
 	github.com/prometheus/procfs v0.8.0 // indirect
 	github.com/radovskyb/watcher v1.0.7 // indirect
