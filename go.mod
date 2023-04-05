@@ -16,7 +16,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.2
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/ichiban/prolog v0.15.1
+	github.com/ichiban/prolog v1.1.0
 	github.com/ignite/cli v0.25.2
 	github.com/nuts-foundation/go-did v0.4.0
 	github.com/prometheus/client_golang v1.13.0

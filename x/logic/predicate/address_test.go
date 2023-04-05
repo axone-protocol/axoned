@@ -100,7 +100,7 @@ func TestBech32(t *testing.T) {
 			},
 			{
 				query:       `bech32_address(-('okp4', 'foo'), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: address should be a Pair with a List of bytes in arity 2, give engine.Variable"),
+				wantError:   fmt.Errorf("bech32_address/2: address should be a Pair with a List of bytes in arity 2, give engine.Atom"),
 				wantSuccess: false,
 			},
 			{
