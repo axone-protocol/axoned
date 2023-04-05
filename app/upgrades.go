@@ -23,7 +23,7 @@ func (app *App) setupUpgradeHandlers() {
 
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v5.UpgradeName,
-		v5.CreateUpgradeHandler(app, app.mm, app.configurator),
+		v5.CreateUpgradeHandler(app.ParamsKeeper, &app.ConsensusParamsKeeper, app.mm, app.configurator),
 	)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
