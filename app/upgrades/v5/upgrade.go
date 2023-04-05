@@ -49,7 +49,6 @@ func CreateUpgradeHandler(
 	mm *module.Manager,
 	configurator module.Configurator,
 ) upgradetypes.UpgradeHandler {
-
 	// Set param key table for params module migration
 	for _, subspace := range paramsKeeper.GetSubspaces() {
 		subspace := subspace
