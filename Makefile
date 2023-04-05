@@ -278,7 +278,7 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
  	cosmovisor init $$BINARY_OLD; \
  	cosmovisor run start --moniker ${CHAIN_MONIKER} \
  		--home ${CHAIN_HOME} \
- 		--log_level trace & \
+ 		--log_level debug & \
 	sleep 10;\
  	$$BINARY_OLD tx gov submit-proposal $$PROPOSAL \
  		--from validator \
