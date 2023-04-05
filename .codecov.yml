@@ -1,7 +1,0 @@
-ignore:
-  - "cmd/"
-  - "docs/"
-  - "scripts/"
-  - "*.md"
-  - "x/**/*.pb.go"
-  - "x/**/*.pb.gw.go"

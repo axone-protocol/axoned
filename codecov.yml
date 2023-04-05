@@ -1,0 +1,16 @@
+comment:
+  layout: "reach, diff, flags, files"
+  behavior: default
+
+flags:
+  modules:
+    paths:
+      - "x/"
+
+ignore:
+  - "cmd/"
+  - "docs/"
+  - "scripts/"
+  - "*.md"
+  - "x/**/*.pb.go"
+  - "x/**/*.pb.gw.go"
