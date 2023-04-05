@@ -60,6 +60,15 @@ message Limits {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
     (gogoproto.nullable) = true
   ];
+
+  // max_user_output_size specifies the maximum number of bytes to keep in the user output. If the user output exceeds
+  // this size, the interpreter will overwrite the oldest bytes with the new ones to keep the size constant.
+  // nil value or 0 value means that no user output is used at all.
+  string max_user_output_size = 4 [
+    (gogoproto.moretags) = "yaml:\"max_user_output_size\"",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Uint",
+    (gogoproto.nullable) = true
+  ];
 }
 
 // Interpreter defines the various parameters for the interpreter.

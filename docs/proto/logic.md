@@ -270,6 +270,7 @@ Limits defines the limits of the logic module.
 | `max_gas` | [string](#string) |  | max_gas specifies the maximum amount of computing power, measured in "gas," that is allowed to be consumed when executing a request by the interpreter. The interpreter calculates the gas consumption based on the number and type of operations that are executed, as well as, in some cases, the complexity of the processed data. nil value remove max gas limitation. |
 | `max_size` | [string](#string) |  | max_size specifies the maximum size, in bytes, that is accepted for a program. nil value remove size limitation. |
 | `max_result_count` | [string](#string) |  | max_result_count specifies the maximum number of results that can be requested for a query. nil value remove max result count limitation. |
+| `max_user_output_size` | [string](#string) |  | max_user_output_size specifies the maximum number of bytes to keep in the user output. If the user output exceeds this size, the interpreter will overwrite the oldest bytes with the new ones to keep the size constant. nil value or 0 value means that no user output is used at all. |
 
 <a name="logic.v1beta2.Params"></a>
 
@@ -410,6 +411,7 @@ QueryServiceAskResponse is response type for the QueryService/Ask RPC method.
 | `height` | [uint64](#uint64) |  | height is the block height at which the query was executed. |
 | `gas_used` | [uint64](#uint64) |  | gas_used is the amount of gas used to execute the query. |
 | `answer` | [Answer](#logic.v1beta2.Answer) |  | answer is the answer to the query. |
+| `user_output` | [string](#string) |  | user_output is the output of the query execution, if any. the length of the output is limited by the max_query_output_size parameter. |
 
 <a name="logic.v1beta2.QueryServiceParamsRequest"></a>
 

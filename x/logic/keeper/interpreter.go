@@ -37,7 +37,7 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 	ctx = k.enhanceContext(ctx)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
-	i, err := k.newInterpreter(ctx)
+	i, userOutputBuffer, err := k.newInterpreter(ctx)
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.Internal, "error creating interpreter: %v", err.Error())
 	}
@@ -77,6 +77,11 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 		panic(sdk.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
 	}
 
+	var userOutput string
+	if userOutputBuffer != nil {
+		userOutput = userOutputBuffer.String()
+	}
+
 	return &types.QueryServiceAskResponse{
 		Height:  uint64(sdkCtx.BlockHeight()),
 		GasUsed: sdkCtx.GasMeter().GasConsumed(),
@@ -86,6 +91,7 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 			Variables: variables,
 			Results:   results,
 		},
+		UserOutput: userOutput,
 	}, nil
 }
 
@@ -100,12 +106,13 @@ func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) err
 }
 
 // newInterpreter creates a new interpreter properly configured.
-func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
+func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.BoundedBuffer, error) {
 	sdkctx := sdk.UnwrapSDKContext(ctx)
 	params := k.GetParams(sdkctx)
 
 	interpreterParams := params.GetInterpreter()
 	gasPolicy := params.GetGasPolicy()
+	limits := params.GetLimits()
 
 	whitelist := util.NonZeroOrDefault(interpreterParams.PredicatesWhitelist, interpreter.RegistryNames)
 	blacklist := interpreterParams.GetPredicatesBlacklist()
@@ -125,15 +132,21 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, error) {
 		},
 		interpreter.Predicates{})
 
-	interpreted, err := interpreter.New(
-		ctx,
-		predicates,
-		util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap()),
-		gasMeter,
-		k.fsProvider(ctx),
-	)
+	options := []interpreter.Option{
+		interpreter.WithPredicates(ctx, predicates, gasMeter),
+		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
+		interpreter.WithFS(k.fsProvider(ctx)),
+	}
 
-	return interpreted, err
+	var userOutputBuffer *util.BoundedBuffer
+	if limits.MaxUserOutputSize != nil && limits.MaxUserOutputSize.GT(sdkmath.ZeroUint()) {
+		userOutputBuffer = util.NewBoundedBufferMust(int(limits.MaxUserOutputSize.Uint64()))
+		options = append(options, interpreter.WithUserOutputWriter(userOutputBuffer))
+	}
+
+	i, err := interpreter.New(options...)
+
+	return i, userOutputBuffer, err
 }
 
 // filterPredicates filters the given predicate (with arity) according to the given whitelist and blacklist.
