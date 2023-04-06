@@ -205,7 +205,7 @@ test: test-go ## Pass all the tests
 .PHONY: test-go
 test-go: build ## Pass the test for the go source code
 	@echo "${COLOR_CYAN} 🧪 Passing go tests${COLOR_RESET}"
-	@go test -v -coverpkg ./x/... -coverprofile ./target/coverage.txt ./...
+	@go test -v -coverprofile ./target/coverage.txt ./...
 
 ## Chain:
 chain-init: build ## Initialize the blockchain with default settings.
