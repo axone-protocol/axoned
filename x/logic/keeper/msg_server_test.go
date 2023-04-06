@@ -45,9 +45,7 @@ func TestUpdateParams(t *testing.T) {
 
 		for nc, tc := range cases {
 			Convey(
-				fmt.Sprintf("Given test case #%d: %v, with request: %v",
-					nc, tc.name, tc.request), func() {
-
+				fmt.Sprintf("Given test case #%d: %v, with request: %v", nc, tc.name, tc.request), func() {
 					encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
 					key := storetypes.NewKVStoreKey(types.StoreKey)
 					testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
@@ -85,7 +83,6 @@ func TestUpdateParams(t *testing.T) {
 							}
 						})
 					})
-
 				})
 		}
 	})

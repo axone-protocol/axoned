@@ -45,9 +45,7 @@ func TestGRPCParams(t *testing.T) {
 
 		for nc, tc := range cases {
 			Convey(
-				fmt.Sprintf("Given test case #%d with params: %v",
-					nc, tc.params), func() {
-
+				fmt.Sprintf("Given test case #%d with params: %v", nc, tc.params), func() {
 					encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
 					key := storetypes.NewKVStoreKey(types.StoreKey)
 					testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
