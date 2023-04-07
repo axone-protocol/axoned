@@ -49,6 +49,15 @@ jobs:
         run: |
           make test-go
 
+      - name: Upload coverage
+        uses: codecov/codecov-action@v3
+        if: github.actor != 'dependabot[bot]'
+        with:
+          files: ./target/coverage.txt
+          env_vars: OS,GOLANG
+          fail_ci_if_error: false
+          verbose: true
+
   test-blockchain:
     runs-on: ubuntu-22.04
     timeout-minutes: 10
