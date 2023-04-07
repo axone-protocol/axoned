@@ -26,7 +26,6 @@ func NewMsgServerImpl(k keeper.AccountKeeper, bk types.BankKeeper) types.MsgServ
 
 var _ types.MsgServer = msgServer{}
 
-//nolint:funlen
 func (s msgServer) CreateVestingAccount(goCtx context.Context,
 	msg *types.MsgCreateVestingAccount,
 ) (*types.MsgCreateVestingAccountResponse, error) {
@@ -87,13 +86,6 @@ func (s msgServer) CreateVestingAccount(goCtx context.Context,
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	)
-
 	return &types.MsgCreateVestingAccountResponse{}, nil
 }
 
@@ -150,13 +142,6 @@ func (s msgServer) CreatePermanentLockedAccount(goCtx context.Context,
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	)
-
 	return &types.MsgCreatePermanentLockedAccountResponse{}, nil
 }
 
@@ -187,6 +172,10 @@ func (s msgServer) CreatePeriodicVestingAccount(goCtx context.Context,
 		totalCoins = totalCoins.Add(period.Amount...)
 	}
 
+	if err := bk.IsSendEnabledCoins(ctx, totalCoins...); err != nil {
+		return nil, err
+	}
+
 	baseAccount := authtypes.NewBaseAccountWithAddress(to)
 	baseAccount = ak.NewAccount(ctx, baseAccount).(*authtypes.BaseAccount)
 	vestingAccount := types.NewPeriodicVestingAccount(baseAccount, totalCoins.Sort(), msg.StartTime, msg.VestingPeriods)
@@ -212,16 +201,9 @@ func (s msgServer) CreatePeriodicVestingAccount(goCtx context.Context,
 		return nil, err
 	}
 
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	)
 	return &types.MsgCreatePeriodicVestingAccountResponse{}, nil
 }
 
-//nolint:funlen
 func (s msgServer) CreateCliffVestingAccount(goCtx context.Context,
 	msg *types.MsgCreateCliffVestingAccount,
 ) (*types.MsgCreateCliffVestingAccountResponse, error) {
@@ -276,13 +258,6 @@ func (s msgServer) CreateCliffVestingAccount(goCtx context.Context,
 	if err != nil {
 		return nil, err
 	}
-
-	ctx.EventManager().EmitEvent(
-		sdk.NewEvent(
-			sdk.EventTypeMessage,
-			sdk.NewAttribute(sdk.AttributeKeyModule, types.AttributeValueCategory),
-		),
-	)
 
 	return &types.MsgCreateCliffVestingAccountResponse{}, nil
 }

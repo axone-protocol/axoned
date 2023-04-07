@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package mint.v1beta1;
 
+import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 
 option go_package = "github.com/okp4/okp4d/x/mint/types";
@@ -15,11 +16,13 @@ option go_package = "github.com/okp4/okp4d/x/mint/types";
 message Minter {
   // current annual inflation rate
   string inflation = 1 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
   // current annual expected provisions
   string annual_provisions = 2 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
@@ -43,6 +46,7 @@ message Params {
   string mint_denom = 1;
   // annual reduction factor inflation rate change
   string annual_reduction_factor = 2 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];

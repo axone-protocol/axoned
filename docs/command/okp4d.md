@@ -29,7 +29,6 @@ Want to lean more about OKP4 network? Complete documentation is available at <ht
 * [okp4d query](okp4d_query.md)	 - Querying subcommands
 * [okp4d rollback](okp4d_rollback.md)	 - rollback cosmos-sdk and tendermint state by one height
 * [okp4d start](okp4d_start.md)	 - Run the full node
-* [okp4d start-with-http-tunneling](okp4d_start-with-http-tunneling.md)	 - Run the full node with http tunneling
 * [okp4d status](okp4d_status.md)	 - Query remote node for status
 * [okp4d tendermint](okp4d_tendermint.md)	 - Tendermint subcommands
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands

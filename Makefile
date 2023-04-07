@@ -11,7 +11,7 @@ LEDGER_ENABLED         ?= true
 # Docker images
 DOCKER_IMAGE_GOLANG		  = golang:1.19-alpine3.16
 DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v1.49
-DOCKER_IMAGE_BUF  		  = okp4/buf-cosmos:0.3.1
+DOCKER_IMAGE_BUF  		  = okp4/buf-cosmos:1.4.7
 DOCKER_BUILDX_BUILDER     = okp4-builder
 DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
 DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
@@ -402,7 +402,9 @@ doc-command: ## Generate markdown documentation for the command
 mock: ## Generate all the mocks (for tests)
 	@echo "${COLOR_CYAN} 🧱 Generating all the mocks${COLOR_RESET}"
 	@go install github.com/golang/mock/mockgen@v1.6.0
-	@mockgen -destination x/logic/testutil/expected_keepers_mocks.go -package testutil -source=x/logic/types/expected_keepers.go
+	@mockgen -source=x/mint/types/expected_keepers.go -package testutil -destination x/mint/testutil/expected_keepers_mocks.go
+	@mockgen -source=x/vesting/types/expected_keepers.go -package testutil -destination x/vesting/testutil/expected_keepers_mocks.go
+	@mockgen -source=x/logic/types/expected_keepers.go -package testutil -destination x/logic/testutil/expected_keepers_mocks.go
 	@mockgen -destination x/logic/testutil/gas_mocks.go -package testutil github.com/cosmos/cosmos-sdk/store/types GasMeter
 	@mockgen -destination x/logic/testutil/fs_mocks.go -package testutil -source=x/logic/fs/fs.go
 

@@ -46,7 +46,7 @@ then the new `annual_provisions` and `target_supply` is deducted based on the cu
   - [MsgUpdateParams](#mint.v1beta1.MsgUpdateParams)
   - [MsgUpdateParamsResponse](#mint.v1beta1.MsgUpdateParamsResponse)
   
-  - [MsgService](#mint.v1beta1.MsgService)
+  - [Msg](#mint.v1beta1.Msg)
   
 - [Scalar Value Types](#scalar-value-types)
 
@@ -111,7 +111,7 @@ GenesisState defines the mint module's genesis state.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `minter` | [Minter](#mint.v1beta1.Minter) |  | minter is a space for holding current inflation information. |
-| `params` | [Params](#mint.v1beta1.Params) |  | params defines all the paramaters of the module. |
+| `params` | [Params](#mint.v1beta1.Params) |  | params defines all the parameters of the module. |
 
  [//]: # (end messages)
 
@@ -206,12 +206,16 @@ Query provides defines the gRPC querier service.
 
 ### MsgUpdateParams
 
-MsgUpdateParams defines a Msg for updating the x/mint module parameters.
+MsgUpdateParams is the Msg/UpdateParams request type.
+
+Since: cosmos-sdk 0.47
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `authority` | [string](#string) |  | authority is the address of the governance account. |
-| `params` | [Params](#mint.v1beta1.Params) |  | params defines the x/mint parameters to update. NOTE: All parameters must be supplied. |
+| `authority` | [string](#string) |  | authority is the address that controls the module (defaults to x/gov unless overwritten). |
+| `params` | [Params](#mint.v1beta1.Params) |  | params defines the x/mint parameters to update.
+
+NOTE: All parameters must be supplied. |
 
 <a name="mint.v1beta1.MsgUpdateParamsResponse"></a>
 
@@ -220,22 +224,25 @@ MsgUpdateParams defines a Msg for updating the x/mint module parameters.
 MsgUpdateParamsResponse defines the response structure for executing a
 MsgUpdateParams message.
 
+Since: cosmos-sdk 0.47
+
  [//]: # (end messages)
 
  [//]: # (end enums)
 
  [//]: # (end HasExtensions)
 
-<a name="mint.v1beta1.MsgService"></a>
+<a name="mint.v1beta1.Msg"></a>
 
-### MsgService
+### Msg
 
-MsgService defines the service for the logic module.
-Do nothing for now as the service is without any side effects.
+Msg defines the x/mint Msg service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `UpdateParams` | [MsgUpdateParams](#mint.v1beta1.MsgUpdateParams) | [MsgUpdateParamsResponse](#mint.v1beta1.MsgUpdateParamsResponse) | UpdateParams defined a governance operation for updating the x/mint module parameters. The authority is hard-coded to the Cosmos SDK x/gov module account | |
+| `UpdateParams` | [MsgUpdateParams](#mint.v1beta1.MsgUpdateParams) | [MsgUpdateParamsResponse](#mint.v1beta1.MsgUpdateParamsResponse) | UpdateParams defines a governance operation for updating the x/mint module parameters. The authority is defaults to the x/gov module account.
+
+Since: cosmos-sdk 0.47 | |
 
  [//]: # (end services)
 

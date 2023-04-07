@@ -18,6 +18,7 @@ okp4d rollback [flags]
 ### Options
 
 ```
+      --hard          remove last block as well as state
   -h, --help          help for rollback
       --home string   The application home directory (default "/home/john/.okp4d")
 ```

@@ -2,13 +2,15 @@
 package predicate
 
 import (
+	goctx "context"
 	"fmt"
 	"net/url"
 	"testing"
 	"time"
 
-	goctx "context"
-
+	tmdb "github.com/cometbft/cometbft-db"
+	"github.com/cometbft/cometbft/libs/log"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/golang/mock/gomock"
@@ -18,9 +20,6 @@ import (
 	"github.com/okp4/okp4d/x/logic/testutil"
 	"github.com/okp4/okp4d/x/logic/types"
 	. "github.com/smartystreets/goconvey/convey"
-	"github.com/tendermint/tendermint/libs/log"
-	tmproto "github.com/tendermint/tendermint/proto/tendermint/types"
-	tmdb "github.com/tendermint/tm-db"
 )
 
 func TestSourceFile(t *testing.T) {

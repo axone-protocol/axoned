@@ -29,8 +29,7 @@ okp4d query [flags]
 * [okp4d query ibc](okp4d_query_ibc.md)	 - Querying commands for the IBC module
 * [okp4d query ibc-fee](okp4d_query_ibc-fee.md)	 - IBC relayer incentivization query subcommands
 * [okp4d query ibc-transfer](okp4d_query_ibc-transfer.md)	 - IBC fungible token transfer query subcommands
-* [okp4d query interchain-accounts](okp4d_query_interchain-accounts.md)	 - interchain-accounts subcommands
-* [okp4d query intertx](okp4d_query_intertx.md)	 - Querying commands for the inter-tx module
+* [okp4d query interchain-accounts](okp4d_query_interchain-accounts.md)	 - IBC interchain accounts query subcommands
 * [okp4d query logic](okp4d_query_logic.md)	 - Querying commands for the logic module
 * [okp4d query mint](okp4d_query_mint.md)	 - Querying commands for the minting module
 * [okp4d query params](okp4d_query_params.md)	 - Querying commands for the params module

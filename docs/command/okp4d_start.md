@@ -40,26 +40,26 @@ okp4d start [flags]
 ```
       --abci string                                     specify abci transport (socket | grpc) (default "socket")
       --address string                                  Listen address (default "tcp://0.0.0.0:26658")
-      --api.address string                              the API server address to listen on (default "tcp://0.0.0.0:1317")
+      --api.address string                              the API server address to listen on (default "tcp://localhost:1317")
       --api.enable                                      Define if the API server should be enabled
       --api.enabled-unsafe-cors                         Define if CORS should be enabled (unsafe - use it at your own risk)
       --api.max-open-connections uint                   Define the number of maximum open connections (default 1000)
-      --api.rpc-max-body-bytes uint                     Define the Tendermint maximum response body (in bytes) (default 1000000)
+      --api.rpc-max-body-bytes uint                     Define the Tendermint maximum request body (in bytes) (default 1000000)
       --api.rpc-read-timeout uint                       Define the Tendermint RPC read timeout (in seconds) (default 10)
       --api.rpc-write-timeout uint                      Define the Tendermint RPC write timeout (in seconds)
       --api.swagger                                     Define if swagger documentation should automatically be registered (Note: the API must also be enabled)
+      --block_sync                                      sync the block chain using the blocksync algorithm (default true)
       --consensus.create_empty_blocks                   set this to false to only produce blocks when there are txs or when the AppHash changes (default true)
       --consensus.create_empty_blocks_interval string   the possible interval between empty blocks (default "0s")
       --consensus.double_sign_check_height int          how many blocks to look back to check existence of the node's consensus votes before joining consensus
       --cpu-profile string                              Enable CPU profiling and write to the provided file
       --db_backend string                               database backend: goleveldb | cleveldb | boltdb | rocksdb | badgerdb (default "goleveldb")
       --db_dir string                                   database directory (default "data")
-      --fast_sync                                       fast blockchain syncing (default true)
       --genesis_hash bytesHex                           optional SHA-256 hash of the genesis file
       --grpc-only                                       Start the node in gRPC query only mode (no Tendermint process is started)
-      --grpc-web.address string                         The gRPC-Web server address to listen on (default "0.0.0.0:9091")
+      --grpc-web.address string                         The gRPC-Web server address to listen on (default "localhost:9091")
       --grpc-web.enable                                 Define if the gRPC-Web server should be enabled. (Note: gRPC must also be enabled) (default true)
-      --grpc.address string                             the gRPC server address to listen on (default "0.0.0.0:9090")
+      --grpc.address string                             the gRPC server address to listen on (default "localhost:9090")
       --grpc.enable                                     Define if the gRPC server should be enabled (default true)
       --halt-height uint                                Block height at which to gracefully halt the chain and shutdown the node
       --halt-time uint                                  Minimum block time (in Unix seconds) at which to gracefully halt the chain and shutdown the node
@@ -68,6 +68,7 @@ okp4d start [flags]
       --iavl-disable-fastnode                           Disable fast node for IAVL tree
       --inter-block-cache                               Enable inter-block caching (default true)
       --inv-check-period uint                           Assert registered invariants every N blocks
+      --mempool.max-txs int                             Sets MaxTx value for the app-side mempool
       --min-retain-blocks uint                          Minimum block height offset during ABCI commit to prune Tendermint blocks
       --minimum-gas-prices string                       Minimum gas prices to accept for transactions; Any fee in a tx must meet this minimum (e.g. 0.01photino;0.0001stake)
       --moniker string                                  node name (default "my-machine")
@@ -81,7 +82,7 @@ okp4d start [flags]
       --p2p.unconditional_peer_ids string               comma-delimited IDs of unconditional peers
       --p2p.upnp                                        enable/disable UPNP port forwarding
       --priv_validator_laddr string                     socket address to listen on for connections from external priv_validator process
-      --proxy_app string                                proxy app address, or one of: 'kvstore', 'persistent_kvstore', 'counter', 'e2e' or 'noop' for local testing. (default "tcp://127.0.0.1:26658")
+      --proxy_app string                                proxy app address, or one of: 'kvstore', 'persistent_kvstore' or 'noop' for local testing. (default "tcp://127.0.0.1:26658")
       --pruning string                                  Pruning strategy (default|nothing|everything|custom) (default "default")
       --pruning-interval uint                           Height interval at which pruned heights are removed from disk (ignored if pruning is not 'custom')
       --pruning-keep-recent uint                        Number of recent heights to keep on disk (ignored if pruning is not 'custom')

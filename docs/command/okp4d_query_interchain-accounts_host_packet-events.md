@@ -35,4 +35,4 @@ okp4d query interchain-accounts host packet-events channel-0 100
 
 ### SEE ALSO
 
-* [okp4d query interchain-accounts host](okp4d_query_interchain-accounts_host.md)	 - interchain-accounts host subcommands
+* [okp4d query interchain-accounts host](okp4d_query_interchain-accounts_host.md)	 - IBC interchain accounts host query subcommands

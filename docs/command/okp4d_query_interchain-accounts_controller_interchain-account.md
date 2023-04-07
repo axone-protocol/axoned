@@ -35,4 +35,4 @@ okp4d query interchain-accounts controller interchain-account cosmos1layxcsmyye0
 
 ### SEE ALSO
 
-* [okp4d query interchain-accounts controller](okp4d_query_interchain-accounts_controller.md)	 - interchain-accounts controller subcommands
+* [okp4d query interchain-accounts controller](okp4d_query_interchain-accounts_controller.md)	 - IBC interchain accounts controller query subcommands

@@ -32,7 +32,8 @@ okp4d tx gov submit-legacy-proposal [flags]
 ```
   -a, --account-number uint      The account number of the signing account (offline mode only)
       --aux                      Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async|block) (default "sync")
+  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
+      --chain-id string          The network chain ID (default "okp4d")
       --deposit string           The proposal deposit
       --description string       The proposal description
       --dry-run                  ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
@@ -62,26 +63,21 @@ okp4d tx gov submit-legacy-proposal [flags]
   -y, --yes                      Skip tx broadcasting prompt confirmation
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d tx gov](okp4d_tx_gov.md)	 - Governance transactions subcommands
 * [okp4d tx gov submit-legacy-proposal cancel-software-upgrade](okp4d_tx_gov_submit-legacy-proposal_cancel-software-upgrade.md)	 - Cancel the current software upgrade proposal
 * [okp4d tx gov submit-legacy-proposal clear-contract-admin](okp4d_tx_gov_submit-legacy-proposal_clear-contract-admin.md)	 - Submit a clear admin for a contract to prevent further migrations proposal
-* [okp4d tx gov submit-legacy-proposal community-pool-spend](okp4d_tx_gov_submit-legacy-proposal_community-pool-spend.md)	 - Submit a community pool spend proposal
 * [okp4d tx gov submit-legacy-proposal execute-contract](okp4d_tx_gov_submit-legacy-proposal_execute-contract.md)	 - Submit a execute wasm contract proposal (run by any address)
 * [okp4d tx gov submit-legacy-proposal ibc-upgrade](okp4d_tx_gov_submit-legacy-proposal_ibc-upgrade.md)	 - Submit an IBC upgrade proposal
 * [okp4d tx gov submit-legacy-proposal instantiate-contract](okp4d_tx_gov_submit-legacy-proposal_instantiate-contract.md)	 - Submit an instantiate wasm contract proposal
+* [okp4d tx gov submit-legacy-proposal instantiate-contract-2](okp4d_tx_gov_submit-legacy-proposal_instantiate-contract-2.md)	 - Submit an instantiate wasm contract proposal with predictable address
 * [okp4d tx gov submit-legacy-proposal migrate-contract](okp4d_tx_gov_submit-legacy-proposal_migrate-contract.md)	 - Submit a migrate wasm contract to a new code version proposal
 * [okp4d tx gov submit-legacy-proposal param-change](okp4d_tx_gov_submit-legacy-proposal_param-change.md)	 - Submit a parameter change proposal
 * [okp4d tx gov submit-legacy-proposal pin-codes](okp4d_tx_gov_submit-legacy-proposal_pin-codes.md)	 - Submit a pin code proposal for pinning a code to cache
 * [okp4d tx gov submit-legacy-proposal set-contract-admin](okp4d_tx_gov_submit-legacy-proposal_set-contract-admin.md)	 - Submit a new admin for a contract proposal
 * [okp4d tx gov submit-legacy-proposal software-upgrade](okp4d_tx_gov_submit-legacy-proposal_software-upgrade.md)	 - Submit a software upgrade proposal
+* [okp4d tx gov submit-legacy-proposal store-instantiate](okp4d_tx_gov_submit-legacy-proposal_store-instantiate.md)	 - Submit and instantiate a wasm contract proposal
 * [okp4d tx gov submit-legacy-proposal sudo-contract](okp4d_tx_gov_submit-legacy-proposal_sudo-contract.md)	 - Submit a sudo wasm contract proposal (to call privileged commands)
 * [okp4d tx gov submit-legacy-proposal unpin-codes](okp4d_tx_gov_submit-legacy-proposal_unpin-codes.md)	 - Submit a unpin code proposal for unpinning a code to cache
 * [okp4d tx gov submit-legacy-proposal update-client](okp4d_tx_gov_submit-legacy-proposal_update-client.md)	 - Submit an update IBC client proposal

@@ -7,13 +7,13 @@ submit a client misbehaviour
 submit a client misbehaviour to prevent future updates
 
 ```
-okp4d tx ibc client misbehaviour [path/to/misbehaviour.json] [flags]
+okp4d tx ibc client misbehaviour [clientID] [path/to/misbehaviour.json] [flags]
 ```
 
 ### Examples
 
 ```
-okp4d tx ibc client misbehaviour [path/to/misbehaviour.json] --from node0 --home ../node0/&lt;app&gt;cli --chain-id $CID
+okp4d tx ibc client misbehaviour [clientID] [path/to/misbehaviour.json] --from node0 --home ../node0/&lt;app&gt;cli --chain-id $CID
 ```
 
 ### Options
@@ -21,7 +21,8 @@ okp4d tx ibc client misbehaviour [path/to/misbehaviour.json] --from node0 --home
 ```
   -a, --account-number uint      The account number of the signing account (offline mode only)
       --aux                      Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async|block) (default "sync")
+  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
+      --chain-id string          The network chain ID (default "okp4d")
       --dry-run                  ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
       --fee-granter string       Fee granter grants fees for the transaction
       --fee-payer string         Fee payer pays fees for the transaction instead of deducting from the signer
@@ -44,12 +45,6 @@ okp4d tx ibc client misbehaviour [path/to/misbehaviour.json] --from node0 --home
       --timeout-height uint      Set a block timeout height to prevent the tx from being committed past a certain height
       --tip string               Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator
   -y, --yes                      Skip tx broadcasting prompt confirmation
-```
-
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
 ```
 
 ### SEE ALSO

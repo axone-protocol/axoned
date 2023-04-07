@@ -9,17 +9,17 @@ import (
 	"github.com/okp4/okp4d/x/mint/types"
 )
 
+var _ types.MsgServer = msgServer{}
+
 type msgServer struct {
 	Keeper
 }
 
 // NewMsgServerImpl returns an implementation of the MsgServer interface
 // for the provided Keeper.
-func NewMsgServerImpl(keeper Keeper) types.MsgServiceServer {
+func NewMsgServerImpl(keeper Keeper) types.MsgServer {
 	return &msgServer{Keeper: keeper}
 }
-
-var _ types.MsgServiceServer = msgServer{}
 
 // UpdateParams implements the gRPC MsgServer interface. When an UpdateParams
 // proposal passes, it updates the module parameters. The update can only be

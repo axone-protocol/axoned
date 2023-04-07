@@ -12,7 +12,8 @@ okp4d tx staking create-validator [flags]
   -a, --account-number uint                 The account number of the signing account (offline mode only)
       --amount string                       Amount of coins to bond
       --aux                                 Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string               Transaction broadcasting mode (sync|async|block) (default "sync")
+  -b, --broadcast-mode string               Transaction broadcasting mode (sync|async) (default "sync")
+      --chain-id string                     The network chain ID (default "okp4d")
       --commission-max-change-rate string   The maximum commission change rate percentage (per day)
       --commission-max-rate string          The maximum commission rate percentage
       --commission-rate string              The initial commission rate percentage
@@ -47,12 +48,6 @@ okp4d tx staking create-validator [flags]
       --tip string                          Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator
       --website string                      The validator's (optional) website
   -y, --yes                                 Skip tx broadcasting prompt confirmation
-```
-
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
 ```
 
 ### SEE ALSO

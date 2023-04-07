@@ -4,7 +4,7 @@ Encode transactions generated offline
 
 ### Synopsis
 
-Encode transactions created with the --generate-only flag and signed with the sign command.
+Encode transactions created with the --generate-only flag or signed with the sign command.
 Read a transaction from &lt;file&gt;, serialize it to the Protobuf wire protocol, and output it as base64.
 If you supply a dash (-) argument in place of an input filename, the command reads from standard input.
 
@@ -17,7 +17,8 @@ okp4d tx encode [file] [flags]
 ```
   -a, --account-number uint      The account number of the signing account (offline mode only)
       --aux                      Generate aux signer data instead of sending a tx
-  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async|block) (default "sync")
+  -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
+      --chain-id string          The network chain ID (default "okp4d")
       --dry-run                  ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
       --fee-granter string       Fee granter grants fees for the transaction
       --fee-payer string         Fee payer pays fees for the transaction instead of deducting from the signer
@@ -40,12 +41,6 @@ okp4d tx encode [file] [flags]
       --timeout-height uint      Set a block timeout height to prevent the tx from being committed past a certain height
       --tip string               Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator
   -y, --yes                      Skip tx broadcasting prompt confirmation
-```
-
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
 ```
 
 ### SEE ALSO
