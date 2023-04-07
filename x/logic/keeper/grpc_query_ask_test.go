@@ -34,7 +34,7 @@ func TestGRPCAsk(t *testing.T) {
 					Success:   true,
 					HasMore:   false,
 					Variables: []string{"X"},
-					Results: []types.Result{types.Result{Substitutions: []types.Substitution{types.Substitution{
+					Results: []types.Result{{Substitutions: []types.Substitution{{
 						Variable: "X",
 						Term: types.Term{
 							Name:      "alice",
