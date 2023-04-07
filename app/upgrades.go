@@ -7,6 +7,7 @@ import (
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	v4 "github.com/okp4/okp4d/app/upgrades/v4"
 	v41 "github.com/okp4/okp4d/app/upgrades/v41"
+	v5 "github.com/okp4/okp4d/app/upgrades/v5"
 )
 
 func (app *App) setupUpgradeHandlers() {
@@ -18,6 +19,11 @@ func (app *App) setupUpgradeHandlers() {
 	app.UpgradeKeeper.SetUpgradeHandler(
 		v41.UpgradeName,
 		v41.CreateUpgradeHandler(app.mm, app.configurator),
+	)
+
+	app.UpgradeKeeper.SetUpgradeHandler(
+		v5.UpgradeName,
+		v5.CreateUpgradeHandler(app.ParamsKeeper, &app.ConsensusParamsKeeper, app.mm, app.configurator),
 	)
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
@@ -35,6 +41,8 @@ func (app *App) setupUpgradeHandlers() {
 		storeUpgrades = v4.StoreUpgrades
 	case v41.UpgradeName:
 		storeUpgrades = v41.StoreUpgrades
+	case v5.UpgradeName:
+		storeUpgrades = v5.StoreUpgrades
 	}
 
 	if storeUpgrades != nil {
