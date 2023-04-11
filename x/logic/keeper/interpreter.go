@@ -114,8 +114,8 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.Bo
 	gasPolicy := params.GetGasPolicy()
 	limits := params.GetLimits()
 
-	whitelist := util.NonZeroOrDefault(interpreterParams.PredicatesWhitelist, interpreter.RegistryNames)
-	blacklist := interpreterParams.GetPredicatesBlacklist()
+	whitelist := util.NonZeroOrDefault(interpreterParams.PredicatesFilter.Whitelist, interpreter.RegistryNames)
+	blacklist := interpreterParams.PredicatesFilter.Blacklist
 	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), nonNilNorZeroOrDefaultUint64(gasPolicy.WeightingFactor, defaultWeightFactor))
 
 	predicates := lo.Reduce(

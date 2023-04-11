@@ -71,30 +71,38 @@ message Limits {
   ];
 }
 
+// Filter defines the parameters for filtering the set of strings which can designate anything.
+// The filter is used to whitelist or blacklist strings.
+message Filter {
+  // whitelist specifies a list of strings that are allowed.
+  // If this field is not specified, all strings (in the context of the filter) are allowed.
+  repeated string whitelist = 1 [
+    (gogoproto.nullable) = true,
+    (gogoproto.moretags) = "yaml:\"whitelist\""
+  ];
+
+  // blacklist specifies a list of strings that are excluded from the set of allowed strings.
+  // If a string is included in both whitelist and blacklist, it will be excluded. This means that
+  // blacklisted strings prevails over whitelisted ones.
+  // If this field is not specified, no strings are excluded.
+  repeated string blacklist = 2 [
+    (gogoproto.nullable) = true,
+    (gogoproto.moretags) = "yaml:\"blacklist\""
+  ];
+}
+
 // Interpreter defines the various parameters for the interpreter.
 message Interpreter {
   option (gogoproto.goproto_stringer) = true;
 
-  // predicates_whitelist specifies a list of prolog predicates that are allowed and can be used by the interpreter.
-  // The predicates are represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity
-  // is included in this list, then all predicates with that name will be considered regardless of arity. For example, if `call` is included
-  // in the whitelist, then all predicates `call/1`, `call/2`, `call/3`... will be allowed.
-  // If this field is not specified, the interpreter will use the default set of predicates.
-  repeated string predicates_whitelist = 1 [
-    (gogoproto.nullable) = true,
-    (gogoproto.moretags) = "yaml:\"predicates_whitelist\""
-  ];
-
-  // predicates_blacklist specifies a list of prolog predicates that are excluded from the set of registered predicates
-  // and can never be executed by the interpreter.
-  // The predicates are represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity
-  // is included in this list, then all predicates with that name will be considered regardless of arity. For example, if `call` is included
-  // in the blacklist, then all predicates `call/1`, `call/2`, `call/3`... will be excluded.
-  // If a predicate is included in both whitelist and blacklist, it will be excluded. This means that blacklisted predicates prevails
-  // on whitelisted predicates.
-  repeated string predicates_blacklist = 2 [
-    (gogoproto.nullable) = true,
-    (gogoproto.moretags) = "yaml:\"predicates_blacklist\""
+  // predicates_filter specifies the filter for the predicates that are allowed to be used by the interpreter.
+  // The filter is used to whitelist or blacklist predicates represented as `<predicate_name>/[<arity>]`, for example:
+  // `findall/3`, or `call`. If a predicate name without arity is included in the filter, then all predicates with that
+  // name will be considered regardless of arity. For example, if `call` is included in the filter, then all predicates
+  // `call/1`, `call/2`, `call/3`... will be allowed.
+  Filter predicates_filter = 1 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"predicates_filter\""
   ];
 
   // bootstrap specifies the initial program to run when booting the logic interpreter.

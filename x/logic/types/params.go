@@ -60,12 +60,12 @@ func NewInterpreter(opts ...InterpreterOption) Interpreter {
 		opt(&i)
 	}
 
-	if i.PredicatesWhitelist == nil {
-		i.PredicatesWhitelist = DefaultPredicatesWhitelist
+	if i.PredicatesFilter.Whitelist == nil {
+		i.PredicatesFilter.Whitelist = DefaultPredicatesWhitelist
 	}
 
-	if i.PredicatesBlacklist == nil {
-		i.PredicatesBlacklist = DefaultPredicatesBlacklist
+	if i.PredicatesFilter.Blacklist == nil {
+		i.PredicatesFilter.Blacklist = DefaultPredicatesBlacklist
 	}
 
 	return i
@@ -77,14 +77,14 @@ type InterpreterOption func(*Interpreter)
 // WithPredicatesWhitelist sets the whitelist of predicates.
 func WithPredicatesWhitelist(whitelist []string) InterpreterOption {
 	return func(i *Interpreter) {
-		i.PredicatesWhitelist = whitelist
+		i.PredicatesFilter.Whitelist = whitelist
 	}
 }
 
 // WithPredicatesBlacklist sets the blacklist of predicates.
 func WithPredicatesBlacklist(blacklist []string) InterpreterOption {
 	return func(i *Interpreter) {
-		i.PredicatesBlacklist = blacklist
+		i.PredicatesFilter.Blacklist = blacklist
 	}
 }
 
