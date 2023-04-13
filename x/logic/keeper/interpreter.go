@@ -134,10 +134,10 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.Bo
 
 	whitelistUrls := lo.Map(
 		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
-		util.Indexed(util.ParseUrlMust))
+		util.Indexed(util.ParseURLMust))
 	blacklistUrls := lo.Map(
 		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
-		util.Indexed(util.ParseUrlMust))
+		util.Indexed(util.ParseURLMust))
 
 	options := []interpreter.Option{
 		interpreter.WithPredicates(ctx, predicates, gasMeter),

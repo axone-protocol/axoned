@@ -12,13 +12,12 @@ var (
 	predicateMatches = PredicateMatches
 	urlMatches       = func(this string) func(string) bool {
 		return func(that string) bool {
-			return UrlMatches(ParseUrlMust(this))(ParseUrlMust(that))
+			return URLMatches(ParseURLMust(this))(ParseURLMust(that))
 		}
 	}
 )
 
 func TestWhitelistBlacklistMatches(t *testing.T) {
-
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			values     []string

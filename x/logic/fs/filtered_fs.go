@@ -37,7 +37,7 @@ func (f *FilteredFS) Open(name string) (fs.File, error) {
 		return nil, err
 	}
 
-	if !util.WhitelistBlacklistMatches(f.whitelist, f.blacklist, util.UrlMatches)(urlFile) {
+	if !util.WhitelistBlacklistMatches(f.whitelist, f.blacklist, util.URLMatches)(urlFile) {
 		return nil, &fs.PathError{
 			Op:   "open",
 			Path: name,

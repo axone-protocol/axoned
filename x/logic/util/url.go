@@ -4,17 +4,17 @@ import (
 	"net/url"
 )
 
-// UrlMatches is a function that returns a function that matches the given url against the given other item.
+// URLMatches is a function that returns a function that matches the given url against the given other item.
 //
 // The function matches the components of the given url against the components of the given other url. If the component
 // of the given other url is empty, it is considered to match the component of the given url.
 // For example:
-//   - matchUrl("http://example.com/foo")("http://example.com/foo") -> true
-//   - matchUrl("http://example.com/foo")("http://example.com/foo?bar=baz") -> false
-//   - matchUrl("tel:123456789")("tel:") -> true
+//   - URLMatches("http://example.com/foo")("http://example.com/foo") -> true
+//   - URLMatches("http://example.com/foo")("http://example.com/foo?bar=baz") -> false
+//   - URLMatches("tel:123456789")("tel:") -> true
 //
 // The function is curried, and is a binary relation that is reflexive, associative (but not commutative).
-func UrlMatches(this *url.URL) func(*url.URL) bool {
+func URLMatches(this *url.URL) func(*url.URL) bool {
 	return func(that *url.URL) bool {
 		return (that.Scheme == "" || that.Scheme == this.Scheme) &&
 			(that.Opaque == "" || that.Opaque == this.Opaque) &&
@@ -26,9 +26,9 @@ func UrlMatches(this *url.URL) func(*url.URL) bool {
 	}
 }
 
-// ParseUrlMust parses the given url and panics if it fails.
+// ParseURLMust parses the given url and panics if it fails.
 // You have been warned.
-func ParseUrlMust(s string) *url.URL {
+func ParseURLMust(s string) *url.URL {
 	u, err := url.Parse(s)
 	if err != nil {
 		panic(err)
