@@ -197,6 +197,7 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
 ## Table of Contents
 
 - [logic/v1beta2/params.proto](#logic/v1beta2/params.proto)
+  - [Filter](#logic.v1beta2.Filter)
   - [GasPolicy](#logic.v1beta2.GasPolicy)
   - [Interpreter](#logic.v1beta2.Interpreter)
   - [Limits](#logic.v1beta2.Limits)
@@ -233,6 +234,18 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
 
 ## logic/v1beta2/params.proto
 
+<a name="logic.v1beta2.Filter"></a>
+
+### Filter
+
+Filter defines the parameters for filtering the set of strings which can designate anything.
+The filter is used to whitelist or blacklist strings.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `whitelist` | [string](#string) | repeated | whitelist specifies a list of strings that are allowed. If this field is not specified, all strings (in the context of the filter) are allowed. |
+| `blacklist` | [string](#string) | repeated | blacklist specifies a list of strings that are excluded from the set of allowed strings. If a string is included in both whitelist and blacklist, it will be excluded. This means that blacklisted strings prevails over whitelisted ones. If this field is not specified, no strings are excluded. |
+
 <a name="logic.v1beta2.GasPolicy"></a>
 
 ### GasPolicy
@@ -255,9 +268,9 @@ Interpreter defines the various parameters for the interpreter.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `predicates_whitelist` | [string](#string) | repeated | predicates_whitelist specifies a list of prolog predicates that are allowed and can be used by the interpreter. The predicates are represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity is included in this list, then all predicates with that name will be considered regardless of arity. For example, if `call` is included in the whitelist, then all predicates `call/1`, `call/2`, `call/3`... will be allowed. If this field is not specified, the interpreter will use the default set of predicates. |
-| `predicates_blacklist` | [string](#string) | repeated | predicates_blacklist specifies a list of prolog predicates that are excluded from the set of registered predicates and can never be executed by the interpreter. The predicates are represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity is included in this list, then all predicates with that name will be considered regardless of arity. For example, if `call` is included in the blacklist, then all predicates `call/1`, `call/2`, `call/3`... will be excluded. If a predicate is included in both whitelist and blacklist, it will be excluded. This means that blacklisted predicates prevails on whitelisted predicates. |
+| `predicates_filter` | [Filter](#logic.v1beta2.Filter) |  | predicates_filter specifies the filter for the predicates that are allowed to be used by the interpreter. The filter is used to whitelist or blacklist predicates represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity is included in the filter, then all predicates with that name will be considered regardless of arity. For example, if `call` is included in the filter, then all predicates `call/1`, `call/2`, `call/3`... will be allowed. |
 | `bootstrap` | [string](#string) |  | bootstrap specifies the initial program to run when booting the logic interpreter. If not specified, the default boot sequence will be executed. |
+| `virtual_files_filter` | [Filter](#logic.v1beta2.Filter) |  | virtual_files_filter specifies the filter for the virtual files that are allowed to be used by the interpreter. The filter is used to whitelist or blacklist virtual files represented as URI, for example: `file:///path/to/file`, `cosmwasm:cw-storage:okp4...?query=foo` The filter is applied to the components of the URI, for example: `file:///path/to/file` -> `file`, `/path/to/file` `cosmwasm:cw-storage:okp4...?query=foo` -> `cosmwasm`, `cw-storage`, `okp4...`, `query=foo` If a component is included in the filter, then all components with that name will be considered, starting from the beginning of the URI. For example, if `file` is included in the filter, then all URIs that start with `file` will be allowed, regardless of the rest of the components. But `file2` will not be allowed. If the component is not included in the filter, then the component is ignored and the next component is considered. |
 
 <a name="logic.v1beta2.Limits"></a>
 
