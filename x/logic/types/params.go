@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"net/url"
 
 	"cosmossdk.io/math"
 )
@@ -96,12 +97,22 @@ func WithBootstrap(bootstrap string) InterpreterOption {
 }
 
 func validateInterpreter(i interface{}) error {
-	_, ok := i.(Interpreter)
+	interpreter, ok := i.(Interpreter)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	// TODO: Validate interpreter params.
+	for _, file := range interpreter.VirtualFilesFilter.Whitelist {
+		if _, err := url.Parse(file); err != nil {
+			return fmt.Errorf("invalid virtual file in whitelist: %s", file)
+		}
+	}
+	for _, file := range interpreter.VirtualFilesFilter.Blacklist {
+		if _, err := url.Parse(file); err != nil {
+			return fmt.Errorf("invalid virtual file in blacklist: %s", file)
+		}
+	}
+
 	return nil
 }
 

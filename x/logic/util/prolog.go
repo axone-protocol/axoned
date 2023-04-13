@@ -26,7 +26,7 @@ func Resolve(env *engine.Env, t engine.Term) (engine.Atom, bool) {
 	}
 }
 
-// PredicateEq returns a function that matches the given predicate against the given other predicate.
+// PredicateMatches returns a function that matches the given predicate against the given other predicate.
 // If the other predicate contains a slash, it is matched as is. Otherwise, the other predicate is matched against the
 // first part of the given predicate.
 // For example:
@@ -34,11 +34,13 @@ func Resolve(env *engine.Env, t engine.Term) (engine.Atom, bool) {
 //   - matchPredicate("foo/0")("foo/1") -> false
 //   - matchPredicate("foo/0")("foo") -> true
 //   - matchPredicate("foo/0")("bar") -> false
-func PredicateEq(predicate string) func(b string) bool {
-	return func(other string) bool {
-		if strings.Contains(other, "/") {
-			return predicate == other
+//
+// The function is curried, and is a binary relation that is reflexive, associative (but not commutative).
+func PredicateMatches(this string) func(string) bool {
+	return func(that string) bool {
+		if strings.Contains(that, "/") {
+			return this == that
 		}
-		return strings.Split(predicate, "/")[0] == other
+		return strings.Split(this, "/")[0] == that
 	}
 }
