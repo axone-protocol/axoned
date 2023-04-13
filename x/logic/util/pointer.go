@@ -18,3 +18,8 @@ func NonZeroOrDefault[T any](v, defaultValue T) T {
 	}
 	return defaultValue
 }
+
+// IsNil returns true if the given value is nil, false otherwise.
+func IsNil(t any) bool {
+	return t == nil
+}
