@@ -34,7 +34,11 @@ func NewFilteredFS(whitelist, blacklist []*url.URL, decorated fs.FS) *FilteredFS
 func (f *FilteredFS) Open(name string) (fs.File, error) {
 	urlFile, err := url.Parse(name)
 	if err != nil {
-		return nil, err
+		return nil, &fs.PathError{
+			Op:   "open",
+			Path: name,
+			Err:  err,
+		}
 	}
 
 	if !util.WhitelistBlacklistMatches(f.whitelist, f.blacklist, util.URLMatches)(urlFile) {
