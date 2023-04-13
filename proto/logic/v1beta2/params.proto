@@ -111,6 +111,21 @@ message Interpreter {
     (gogoproto.nullable) = true,
     (gogoproto.moretags) = "yaml:\"bootstrap\""
   ];
+
+  // virtual_files_filter specifies the filter for the virtual files that are allowed to be used by the interpreter.
+  // The filter is used to whitelist or blacklist virtual files represented as URI, for example:
+  // `file:///path/to/file`, `cosmwasm:cw-storage:okp4...?query=foo`
+  // The filter is applied to the components of the URI, for example:
+  // `file:///path/to/file` -> `file`, `/path/to/file`
+  // `cosmwasm:cw-storage:okp4...?query=foo` -> `cosmwasm`, `cw-storage`, `okp4...`, `query=foo`
+  // If a component is included in the filter, then all components with that name will be considered, starting from the
+  // beginning of the URI. For example, if `file` is included in the filter, then all URIs that start with `file` will be
+  // allowed, regardless of the rest of the components. But `file2` will not be allowed.
+  // If the component is not included in the filter, then the component is ignored and the next component is considered.
+  Filter virtual_files_filter = 4 [
+    (gogoproto.nullable) = false,
+    (gogoproto.moretags) = "yaml:\"filesystem_filter\""
+  ];
 }
 
 // GasPolicy defines the policy for calculating predicate invocation costs and the resulting gas consumption.
