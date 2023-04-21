@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"net/url"
 
 	"cosmossdk.io/math"
 )
@@ -60,12 +61,12 @@ func NewInterpreter(opts ...InterpreterOption) Interpreter {
 		opt(&i)
 	}
 
-	if i.PredicatesWhitelist == nil {
-		i.PredicatesWhitelist = DefaultPredicatesWhitelist
+	if i.PredicatesFilter.Whitelist == nil {
+		i.PredicatesFilter.Whitelist = DefaultPredicatesWhitelist
 	}
 
-	if i.PredicatesBlacklist == nil {
-		i.PredicatesBlacklist = DefaultPredicatesBlacklist
+	if i.PredicatesFilter.Blacklist == nil {
+		i.PredicatesFilter.Blacklist = DefaultPredicatesBlacklist
 	}
 
 	return i
@@ -77,14 +78,14 @@ type InterpreterOption func(*Interpreter)
 // WithPredicatesWhitelist sets the whitelist of predicates.
 func WithPredicatesWhitelist(whitelist []string) InterpreterOption {
 	return func(i *Interpreter) {
-		i.PredicatesWhitelist = whitelist
+		i.PredicatesFilter.Whitelist = whitelist
 	}
 }
 
 // WithPredicatesBlacklist sets the blacklist of predicates.
 func WithPredicatesBlacklist(blacklist []string) InterpreterOption {
 	return func(i *Interpreter) {
-		i.PredicatesBlacklist = blacklist
+		i.PredicatesFilter.Blacklist = blacklist
 	}
 }
 
@@ -96,12 +97,22 @@ func WithBootstrap(bootstrap string) InterpreterOption {
 }
 
 func validateInterpreter(i interface{}) error {
-	_, ok := i.(Interpreter)
+	interpreter, ok := i.(Interpreter)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
-	// TODO: Validate interpreter params.
+	for _, file := range interpreter.VirtualFilesFilter.Whitelist {
+		if _, err := url.Parse(file); err != nil {
+			return fmt.Errorf("invalid virtual file in whitelist: %s", file)
+		}
+	}
+	for _, file := range interpreter.VirtualFilesFilter.Blacklist {
+		if _, err := url.Parse(file); err != nil {
+			return fmt.Errorf("invalid virtual file in blacklist: %s", file)
+		}
+	}
+
 	return nil
 }
 

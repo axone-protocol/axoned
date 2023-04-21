@@ -42,9 +42,11 @@ func MigrateStore(ctx sdk.Context,
 
 	newParams := types.Params{
 		Interpreter: types.Interpreter{
-			Bootstrap:           oldParams.Interpreter.Bootstrap,
-			PredicatesWhitelist: oldParams.Interpreter.RegisteredPredicates,
-			PredicatesBlacklist: []string{},
+			Bootstrap: oldParams.Interpreter.Bootstrap,
+			PredicatesFilter: types.Filter{
+				Whitelist: oldParams.Interpreter.RegisteredPredicates,
+				Blacklist: []string{},
+			},
 		},
 		Limits: types.Limits{
 			MaxGas:         oldParams.Limits.MaxGas,

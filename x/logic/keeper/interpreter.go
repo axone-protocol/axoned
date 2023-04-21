@@ -8,6 +8,7 @@ import (
 	sdkmath "cosmossdk.io/math"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
+	"github.com/okp4/okp4d/x/logic/fs"
 	"github.com/okp4/okp4d/x/logic/interpreter"
 	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
 	"github.com/okp4/okp4d/x/logic/meter"
@@ -113,16 +114,15 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.Bo
 	interpreterParams := params.GetInterpreter()
 	gasPolicy := params.GetGasPolicy()
 	limits := params.GetLimits()
-
-	whitelist := util.NonZeroOrDefault(interpreterParams.PredicatesWhitelist, interpreter.RegistryNames)
-	blacklist := interpreterParams.GetPredicatesBlacklist()
 	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), nonNilNorZeroOrDefaultUint64(gasPolicy.WeightingFactor, defaultWeightFactor))
 
+	whitelistPredicates := util.NonZeroOrDefault(interpreterParams.PredicatesFilter.Whitelist, interpreter.RegistryNames)
+	blacklistPredicates := interpreterParams.PredicatesFilter.Blacklist
 	predicates := lo.Reduce(
 		lo.Map(
 			lo.Filter(
 				interpreter.RegistryNames,
-				filterPredicates(whitelist, blacklist)),
+				util.Indexed(util.WhitelistBlacklistMatches(whitelistPredicates, blacklistPredicates, util.PredicateMatches))),
 			toPredicate(
 				nonNilNorZeroOrDefaultUint64(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
 				gasPolicy.GetPredicateCosts())),
@@ -132,10 +132,17 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.Bo
 		},
 		interpreter.Predicates{})
 
+	whitelistUrls := lo.Map(
+		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
+		util.Indexed(util.ParseURLMust))
+	blacklistUrls := lo.Map(
+		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
+		util.Indexed(util.ParseURLMust))
+
 	options := []interpreter.Option{
 		interpreter.WithPredicates(ctx, predicates, gasMeter),
 		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
-		interpreter.WithFS(k.fsProvider(ctx)),
+		interpreter.WithFS(fs.NewFilteredFS(whitelistUrls, blacklistUrls, k.fsProvider(ctx))),
 	}
 
 	var userOutputBuffer *util.BoundedBuffer
@@ -149,21 +156,12 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.Bo
 	return i, userOutputBuffer, err
 }
 
-// filterPredicates filters the given predicate (with arity) according to the given whitelist and blacklist.
-// The whitelist and blacklist are applied to the registry to determine the final predicate list.
-// The whitelist and blacklist can contain predicates with or without arity, e.g. "foo/0", "foo", "bar/1".
-func filterPredicates(whitelist []string, blacklist []string) func(string, int) bool {
-	return func(predicate string, _ int) bool {
-		return lo.ContainsBy(whitelist, util.PredicateEq(predicate)) && !lo.ContainsBy(blacklist, util.PredicateEq(predicate))
-	}
-}
-
 // toPredicate converts the given predicate costs to a function that returns the cost for the given predicate as
 // a pair of predicate name and cost.
 func toPredicate(defaultCost uint64, predicateCosts []types.PredicateCost) func(string, int) lo.Tuple2[string, uint64] {
 	return func(predicate string, _ int) lo.Tuple2[string, uint64] {
 		for _, c := range predicateCosts {
-			if util.PredicateEq(predicate)(c.Predicate) {
+			if util.PredicateMatches(predicate)(c.Predicate) {
 				return lo.T2(predicate, nonNilNorZeroOrDefaultUint64(c.Cost, defaultCost))
 			}
 		}
