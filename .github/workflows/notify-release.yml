@@ -1,4 +1,4 @@
-name: notify-release
+name: Notify release
 
 on:
   release:
