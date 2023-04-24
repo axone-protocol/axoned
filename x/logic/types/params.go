@@ -89,6 +89,20 @@ func WithPredicatesBlacklist(blacklist []string) InterpreterOption {
 	}
 }
 
+// WithVirtualFilesWhitelist sets the whitelist of predicates.
+func WithVirtualFilesWhitelist(whitelist []string) InterpreterOption {
+	return func(i *Interpreter) {
+		i.VirtualFilesFilter.Whitelist = whitelist
+	}
+}
+
+// WithVirtualFilesBlacklist sets the blacklist of predicates.
+func WithVirtualFilesBlacklist(blacklist []string) InterpreterOption {
+	return func(i *Interpreter) {
+		i.VirtualFilesFilter.Blacklist = blacklist
+	}
+}
+
 // WithBootstrap sets the bootstrap program.
 func WithBootstrap(bootstrap string) InterpreterOption {
 	return func(i *Interpreter) {
