@@ -32,6 +32,8 @@ func TestGRPCParams(t *testing.T) {
 						types.WithBootstrap("bootstrap"),
 						types.WithPredicatesBlacklist([]string{"halt/1"}),
 						types.WithPredicatesWhitelist([]string{"source_file/1"}),
+						types.WithVirtualFilesBlacklist([]string{"file1"}),
+						types.WithVirtualFilesWhitelist([]string{"file2"}),
 					),
 					types.NewLimits(
 						types.WithMaxGas(math.NewUint(1)),
