@@ -1,4 +1,4 @@
-name: update-draft-docs
+name: Update Draft docs
 
 on:
   push:
