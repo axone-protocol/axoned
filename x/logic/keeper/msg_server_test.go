@@ -3,6 +3,7 @@ package keeper_test
 import (
 	gocontext "context"
 	"fmt"
+	"io/fs"
 	"testing"
 
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -12,7 +13,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 	"github.com/golang/mock/gomock"
 	"github.com/okp4/okp4d/x/logic"
-	"github.com/okp4/okp4d/x/logic/fs"
 	"github.com/okp4/okp4d/x/logic/keeper"
 	logictestutil "github.com/okp4/okp4d/x/logic/testutil"
 	"github.com/okp4/okp4d/x/logic/types"
