@@ -118,6 +118,16 @@ func TestJsonProlog(t *testing.T) {
 				}},
 				wantSuccess: true,
 			},
+			// ** JSON -> Prolog **
+			// Null
+			{
+				description: "convert json null value into prolog",
+				query:       `json_prolog('null', Term).`,
+				wantResult: []types.TermResults{{
+					"Term": "@(null)",
+				}},
+				wantSuccess: true,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {

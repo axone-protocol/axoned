@@ -66,6 +66,8 @@ func jsonToTerms(value any) (engine.Term, error) {
 		return engine.Integer(r.Int64()), nil
 	case bool:
 		return AtomBool(v), nil
+	case nil:
+		return AtomNull, nil
 	case map[string]any:
 		keys := lo.Keys(v)
 		sort.Strings(keys)

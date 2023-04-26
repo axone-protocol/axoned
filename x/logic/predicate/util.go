@@ -85,3 +85,5 @@ func AtomBool(b bool) engine.Term {
 	}
 	return engine.NewAtom("@").Apply(r)
 }
+
+var AtomNull = engine.NewAtom("@").Apply(engine.NewAtom("null"))
