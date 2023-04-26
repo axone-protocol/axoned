@@ -4,7 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strings"
 
+	"cosmossdk.io/math"
 	"github.com/ichiban/prolog/engine"
 	"github.com/okp4/okp4d/x/logic/util"
 	"github.com/samber/lo"
@@ -39,7 +41,12 @@ func JsonProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engin
 
 func jsonStringToTerms(j string) (engine.Term, error) {
 	var values any
-	json.Unmarshal([]byte(j), &values)
+	decoder := json.NewDecoder(strings.NewReader(j))
+	decoder.UseNumber() // unmarshal a number into an interface{} as a Number instead of as a float64
+
+	if err := decoder.Decode(&values); err != nil {
+		return nil, err
+	}
 
 	return jsonToTerms(values)
 }
@@ -48,6 +55,15 @@ func jsonToTerms(value any) (engine.Term, error) {
 	switch v := value.(type) {
 	case string:
 		return util.StringToTerm(v), nil
+	case json.Number:
+		r, ok := math.NewIntFromString(string(v))
+		if !ok {
+			return nil, fmt.Errorf("could not convert number '%s' into integer term, decimal number is not handled yet", v)
+		}
+		if !r.IsInt64() {
+			return nil, fmt.Errorf("could not convert number '%s' into integer term, overflow", v)
+		}
+		return engine.Integer(r.Int64()), nil
 	case map[string]any:
 		keys := lo.Keys(v)
 		sort.Strings(keys)

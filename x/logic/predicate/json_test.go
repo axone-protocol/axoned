@@ -78,6 +78,28 @@ func TestJsonProlog(t *testing.T) {
 				}},
 				wantSuccess: true,
 			},
+			// ** JSON -> Prolog **
+			// Number
+			{
+				description: "convert json number into prolog",
+				query:       `json_prolog('10', Term).`,
+				wantResult: []types.TermResults{{
+					"Term": "10",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert large json number into prolog",
+				query:       `json_prolog('100000000000000000000', Term).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("json_prolog/2: could not convert number '100000000000000000000' into integer term, overflow"),
+			},
+			{
+				description: "decimal number not compatible yet",
+				query:       `json_prolog('10.4', Term).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("json_prolog/2: could not convert number '10.4' into integer term, decimal number is not handled yet"),
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
