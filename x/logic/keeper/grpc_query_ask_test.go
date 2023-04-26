@@ -6,7 +6,6 @@ import (
 	"io/fs"
 	"testing"
 
-	"cosmossdk.io/math"
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
@@ -21,33 +20,35 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestGRPCParams(t *testing.T) {
+func TestGRPCAsk(t *testing.T) {
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
-			params types.Params
+			program        string
+			query          string
+			expectedAsnwer types.Answer
 		}{
 			{
-				params: types.NewParams(
-					types.NewInterpreter(
-						types.WithBootstrap("bootstrap"),
-						types.WithPredicatesBlacklist([]string{"halt/1"}),
-						types.WithPredicatesWhitelist([]string{"source_file/1"}),
-						types.WithVirtualFilesBlacklist([]string{"file1"}),
-						types.WithVirtualFilesWhitelist([]string{"file2"}),
-					),
-					types.NewLimits(
-						types.WithMaxGas(math.NewUint(1)),
-						types.WithMaxSize(math.NewUint(2)),
-						types.WithMaxResultCount(math.NewUint(3)),
-						types.WithMaxUserOutputSize(math.NewUint(4)),
-					),
-				),
+				program: "father(bob, alice).",
+				query:   "father(bob, X).",
+				expectedAsnwer: types.Answer{
+					Success:   true,
+					HasMore:   false,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X",
+						Term: types.Term{
+							Name:      "alice",
+							Arguments: nil,
+						},
+					}}}},
+				},
 			},
 		}
 
 		for nc, tc := range cases {
 			Convey(
-				fmt.Sprintf("Given test case #%d with params: %v", nc, tc.params), func() {
+				fmt.Sprintf("Given test case #%d with program: %v and query: %v", nc, tc.program, tc.query),
+				func() {
 					encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
 					key := storetypes.NewKVStoreKey(types.StoreKey)
 					testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
@@ -69,22 +70,28 @@ func TestGRPCParams(t *testing.T) {
 							return fsProvider
 						},
 					)
+					err := logicKeeper.SetParams(testCtx.Ctx, types.DefaultParams())
 
-					Convey("and given params to the keeper", func() {
-						err := logicKeeper.SetParams(testCtx.Ctx, tc.params)
-						So(err, ShouldBeNil)
+					So(err, ShouldBeNil)
 
+					Convey("and given a query with program and query to grpc", func() {
 						queryHelper := baseapp.NewQueryServerTestHelper(testCtx.Ctx, encCfg.InterfaceRegistry)
 						types.RegisterQueryServiceServer(queryHelper, logicKeeper)
 
 						queryClient := types.NewQueryServiceClient(queryHelper)
 
-						Convey("when the grpc query params is called", func() {
-							params, err := queryClient.Params(gocontext.Background(), &types.QueryServiceParamsRequest{})
+						query := types.QueryServiceAskRequest{
+							Program: tc.program,
+							Query:   tc.query,
+						}
 
-							Convey("Then it should return the expected params set to the keeper", func() {
+						Convey("when the grpc query ask is called", func() {
+							result, err := queryClient.Ask(gocontext.Background(), &query)
+
+							Convey("Then it should return the expected answer", func() {
 								So(err, ShouldBeNil)
-								So(params.Params, ShouldResemble, tc.params)
+								So(result, ShouldNotBeNil)
+								So(*result.Answer, ShouldResemble, tc.expectedAsnwer)
 							})
 						})
 					})

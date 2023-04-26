@@ -33,7 +33,7 @@ func NewParams(interpreter Interpreter, limits Limits) Params {
 
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
-	return NewParams(NewInterpreter(), DefaultLimits())
+	return NewParams(NewInterpreter(), NewLimits())
 }
 
 // Validate validates the set of params.
@@ -89,6 +89,20 @@ func WithPredicatesBlacklist(blacklist []string) InterpreterOption {
 	}
 }
 
+// WithVirtualFilesWhitelist sets the whitelist of predicates.
+func WithVirtualFilesWhitelist(whitelist []string) InterpreterOption {
+	return func(i *Interpreter) {
+		i.VirtualFilesFilter.Whitelist = whitelist
+	}
+}
+
+// WithVirtualFilesBlacklist sets the blacklist of predicates.
+func WithVirtualFilesBlacklist(blacklist []string) InterpreterOption {
+	return func(i *Interpreter) {
+		i.VirtualFilesFilter.Blacklist = blacklist
+	}
+}
+
 // WithBootstrap sets the bootstrap program.
 func WithBootstrap(bootstrap string) InterpreterOption {
 	return func(i *Interpreter) {
@@ -116,18 +130,57 @@ func validateInterpreter(i interface{}) error {
 	return nil
 }
 
-// NewLimits creates a new Limits object.
-func NewLimits(maxGas, maxSize, maxResultCount *math.Uint) Limits {
-	return Limits{
-		MaxGas:         maxGas,
-		MaxSize:        maxSize,
-		MaxResultCount: maxResultCount,
+// LimitsOption is a functional option for configuring the Limits.
+type LimitsOption func(*Limits)
+
+// WithMaxGas sets the max gas limits for interpreter.
+func WithMaxGas(maxGas math.Uint) LimitsOption {
+	return func(i *Limits) {
+		i.MaxGas = &maxGas
 	}
 }
 
-// DefaultLimits return a Limits object with default params.
-func DefaultLimits() Limits {
-	return NewLimits(&DefaultMaxGas, &DefaultMaxSize, &DefaultMaxResultCount)
+// WithMaxSize sets the max size limits accepted for a prolog program.
+func WithMaxSize(maxSize math.Uint) LimitsOption {
+	return func(i *Limits) {
+		i.MaxSize = &maxSize
+	}
+}
+
+// WithMaxResultCount sets the maximum number of results that can be requested for a query.
+func WithMaxResultCount(maxResultCount math.Uint) LimitsOption {
+	return func(i *Limits) {
+		i.MaxResultCount = &maxResultCount
+	}
+}
+
+// WithMaxUserOutputSize specifies the maximum number of bytes to keep in the user output.
+func WithMaxUserOutputSize(maxUserOutputSize math.Uint) LimitsOption {
+	return func(i *Limits) {
+		i.MaxUserOutputSize = &maxUserOutputSize
+	}
+}
+
+// NewLimits creates a new Limits object.
+func NewLimits(opts ...LimitsOption) Limits {
+	l := Limits{}
+	for _, opt := range opts {
+		opt(&l)
+	}
+
+	if l.MaxGas == nil {
+		l.MaxGas = &DefaultMaxGas
+	}
+
+	if l.MaxSize == nil {
+		l.MaxSize = &DefaultMaxSize
+	}
+
+	if l.MaxResultCount == nil {
+		l.MaxResultCount = &DefaultMaxResultCount
+	}
+
+	return l
 }
 
 func validateLimits(i interface{}) error {

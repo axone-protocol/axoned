@@ -6,8 +6,6 @@ import (
 	"io/fs"
 	"testing"
 
-	"cosmossdk.io/math"
-	"github.com/cosmos/cosmos-sdk/baseapp"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
@@ -21,33 +19,33 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestGRPCParams(t *testing.T) {
+func TestUpdateParams(t *testing.T) {
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
-			params types.Params
+			name      string
+			request   *types.MsgUpdateParams
+			expectErr bool
 		}{
 			{
-				params: types.NewParams(
-					types.NewInterpreter(
-						types.WithBootstrap("bootstrap"),
-						types.WithPredicatesBlacklist([]string{"halt/1"}),
-						types.WithPredicatesWhitelist([]string{"source_file/1"}),
-						types.WithVirtualFilesBlacklist([]string{"file1"}),
-						types.WithVirtualFilesWhitelist([]string{"file2"}),
-					),
-					types.NewLimits(
-						types.WithMaxGas(math.NewUint(1)),
-						types.WithMaxSize(math.NewUint(2)),
-						types.WithMaxResultCount(math.NewUint(3)),
-						types.WithMaxUserOutputSize(math.NewUint(4)),
-					),
-				),
+				name: "set invalid authority",
+				request: &types.MsgUpdateParams{
+					Authority: "foo",
+				},
+				expectErr: true,
+			},
+			{
+				name: "set full valid params",
+				request: &types.MsgUpdateParams{
+					Authority: authtypes.NewModuleAddress(govtypes.ModuleName).String(),
+					Params:    types.DefaultParams(),
+				},
+				expectErr: false,
 			},
 		}
 
 		for nc, tc := range cases {
 			Convey(
-				fmt.Sprintf("Given test case #%d with params: %v", nc, tc.params), func() {
+				fmt.Sprintf("Given test case #%d: %v, with request: %v", nc, tc.name, tc.request), func() {
 					encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
 					key := storetypes.NewKVStoreKey(types.StoreKey)
 					testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
@@ -70,22 +68,19 @@ func TestGRPCParams(t *testing.T) {
 						},
 					)
 
-					Convey("and given params to the keeper", func() {
-						err := logicKeeper.SetParams(testCtx.Ctx, tc.params)
-						So(err, ShouldBeNil)
+					msgServer := keeper.NewMsgServerImpl(*logicKeeper)
 
-						queryHelper := baseapp.NewQueryServerTestHelper(testCtx.Ctx, encCfg.InterfaceRegistry)
-						types.RegisterQueryServiceServer(queryHelper, logicKeeper)
+					Convey("when call msg server to update params", func() {
+						res, err := msgServer.UpdateParams(testCtx.Ctx, tc.request)
 
-						queryClient := types.NewQueryServiceClient(queryHelper)
-
-						Convey("when the grpc query params is called", func() {
-							params, err := queryClient.Params(gocontext.Background(), &types.QueryServiceParamsRequest{})
-
-							Convey("Then it should return the expected params set to the keeper", func() {
+						Convey("then it should return the expected result", func() {
+							if tc.expectErr {
+								So(err, ShouldNotBeNil)
+								So(res, ShouldBeNil)
+							} else {
 								So(err, ShouldBeNil)
-								So(params.Params, ShouldResemble, tc.params)
-							})
+								So(res, ShouldNotBeNil)
+							}
 						})
 					})
 				})
