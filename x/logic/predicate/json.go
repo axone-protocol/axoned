@@ -3,9 +3,11 @@ package predicate
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
 
 	"github.com/ichiban/prolog/engine"
 	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/samber/lo"
 )
 
 // AtomJSON is a term which represents a json as a compound term `json([Pair])`.
@@ -46,6 +48,20 @@ func jsonToTerms(value any) (engine.Term, error) {
 	switch v := value.(type) {
 	case string:
 		return util.StringToTerm(v), nil
+	case map[string]any:
+		keys := lo.Keys(v)
+		sort.Strings(keys)
+
+		attributes := make([]engine.Term, 0, len(v))
+		for _, key := range keys {
+			attributeValue, err := jsonToTerms(v[key])
+			if err != nil {
+				return nil, err
+			}
+			attributes = append(attributes, AtomPair.Apply(engine.NewAtom(key), attributeValue))
+		}
+
+		return AtomJSON.Apply(engine.List(attributes...)), nil
 	default:
 		return nil, fmt.Errorf("could not convert %s (%T) to a prolog term", v, v)
 	}

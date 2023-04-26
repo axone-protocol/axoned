@@ -19,23 +19,62 @@ import (
 func TestJsonProlog(t *testing.T) {
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
+			description string
 			program     string
 			query       string
 			wantResult  []types.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
+			// ** JSON -> Prolog **
+			// String
 			{
-				query: `json_prolog('"foo"', Term).`,
+				description: "convert direct string (valid json) into prolog",
+				query:       `json_prolog('"foo"', Term).`,
 				wantResult: []types.TermResults{{
 					"Term": "foo",
 				}},
 				wantSuccess: true,
 			},
 			{
-				query: `json_prolog('{"foo": "bar"}', Term).`,
+				description: "convert direct string with space (valid json) into prolog",
+				query:       `json_prolog('"a string with space"', Term).`,
 				wantResult: []types.TermResults{{
-					"Term": "json([-(foo, 'bar')])",
+					"Term": "'a string with space'",
+				}},
+				wantSuccess: true,
+			},
+			// ** JSON -> Prolog **
+			// Object
+			{
+				description: "convert json object into prolog",
+				query:       `json_prolog('{"foo": "bar"}', Term).`,
+				wantResult: []types.TermResults{{
+					"Term": "json([foo-bar])",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json object with multiple attribute into prolog",
+				query:       `json_prolog('{"foo": "bar", "foobar": "bar foo"}', Term).`,
+				wantResult: []types.TermResults{{
+					"Term": "json([foo-bar,foobar-'bar foo'])",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json object with attribute with a space into prolog",
+				query:       `json_prolog('{"string with space": "bar"}', Term).`,
+				wantResult: []types.TermResults{{
+					"Term": "json(['string with space'-bar])",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "ensure determinism on object attribute key sorted alphabetically",
+				query:       `json_prolog('{"b": "a", "a": "b"}', Term).`,
+				wantResult: []types.TermResults{{
+					"Term": "json([a-b,b-a])",
 				}},
 				wantSuccess: true,
 			},
