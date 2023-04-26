@@ -75,3 +75,13 @@ func ListToBytes(terms engine.ListIterator, env *engine.Env) ([]byte, error) {
 	}
 	return bt, nil
 }
+
+func AtomBool(b bool) engine.Term {
+	var r engine.Atom
+	if b {
+		r = engine.NewAtom("true")
+	} else {
+		r = engine.NewAtom("false")
+	}
+	return engine.NewAtom("@").Apply(r)
+}

@@ -64,6 +64,8 @@ func jsonToTerms(value any) (engine.Term, error) {
 			return nil, fmt.Errorf("could not convert number '%s' into integer term, overflow", v)
 		}
 		return engine.Integer(r.Int64()), nil
+	case bool:
+		return AtomBool(v), nil
 	case map[string]any:
 		keys := lo.Keys(v)
 		sort.Strings(keys)

@@ -100,6 +100,24 @@ func TestJsonProlog(t *testing.T) {
 				wantSuccess: false,
 				wantError:   fmt.Errorf("json_prolog/2: could not convert number '10.4' into integer term, decimal number is not handled yet"),
 			},
+			// ** JSON -> Prolog **
+			// Bool
+			{
+				description: "convert json true boolean into prolog",
+				query:       `json_prolog('true', Term).`,
+				wantResult: []types.TermResults{{
+					"Term": "@(true)",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json false boolean into prolog",
+				query:       `json_prolog('false', Term).`,
+				wantResult: []types.TermResults{{
+					"Term": "@(false)",
+				}},
+				wantSuccess: true,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
