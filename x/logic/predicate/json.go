@@ -82,6 +82,16 @@ func jsonToTerms(value any) (engine.Term, error) {
 		}
 
 		return AtomJSON.Apply(engine.List(attributes...)), nil
+	case []any:
+		elements := make([]engine.Term, 0, len(v))
+		for _, element := range v {
+			term, err := jsonToTerms(element)
+			if err != nil {
+				return nil, err
+			}
+			elements = append(elements, term)
+		}
+		return engine.List(elements...), nil
 	default:
 		return nil, fmt.Errorf("could not convert %s (%T) to a prolog term", v, v)
 	}
