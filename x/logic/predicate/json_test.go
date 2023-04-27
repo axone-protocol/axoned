@@ -146,6 +146,25 @@ func TestJsonProlog(t *testing.T) {
 				}},
 				wantSuccess: true,
 			},
+
+			// ** Prolog -> JSON **
+			// String
+			{
+				description: "convert string term to json",
+				query:       `json_prolog(Json, 'foo').`,
+				wantResult: []types.TermResults{{
+					"Json": "'\"foo\"'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert string with space to json",
+				query:       `json_prolog(Json, 'foo bar').`,
+				wantResult: []types.TermResults{{
+					"Json": "'\"foo bar\"'",
+				}},
+				wantSuccess: true,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {

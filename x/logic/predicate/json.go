@@ -30,12 +30,18 @@ func JsonProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engin
 
 		return engine.Unify(vm, term, terms, cont, env)
 	default:
-		return engine.Error(fmt.Errorf("did_components/2: cannot unify json with %T", t1))
+		return engine.Error(fmt.Errorf("json_prolog/2: cannot unify json with %T", t1))
 	}
 
-	switch env.Resolve(term).(type) {
+	switch t2 := env.Resolve(term).(type) {
+	case engine.Variable:
+		return engine.Error(fmt.Errorf("json_prolog/2: could not unify two variable"))
 	default:
-		return engine.Error(fmt.Errorf("json_prolog/2: not implemented"))
+		b, err := termsToJson(t2)
+		if err != nil {
+			return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
+		}
+		return engine.Unify(vm, j, util.StringToTerm(string(b)), cont, env)
 	}
 }
 
@@ -49,6 +55,16 @@ func jsonStringToTerms(j string) (engine.Term, error) {
 	}
 
 	return jsonToTerms(values)
+}
+
+func termsToJson(term engine.Term) ([]byte, error) {
+	switch t := term.(type) {
+	case engine.Atom:
+		return json.Marshal(t.String())
+	default:
+		return nil, fmt.Errorf("could not convert %s {%T} to json", t, t)
+	}
+
 }
 
 func jsonToTerms(value any) (engine.Term, error) {
@@ -80,7 +96,6 @@ func jsonToTerms(value any) (engine.Term, error) {
 			}
 			attributes = append(attributes, AtomPair.Apply(engine.NewAtom(key), attributeValue))
 		}
-
 		return AtomJSON.Apply(engine.List(attributes...)), nil
 	case []any:
 		elements := make([]engine.Term, 0, len(v))
