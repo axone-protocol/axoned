@@ -88,7 +88,7 @@ func AtomBool(b bool) engine.Term {
 
 var AtomNull = engine.NewAtom("@").Apply(engine.NewAtom("null"))
 
-// ExtractJsonTerm is an utility function that would extract all attribute of a JSON object
+// ExtractJSONTerm is an utility function that would extract all attribute of a JSON object
 // that is represented in prolog with the `json` atom.
 //
 // This function will ensure the json atom follow our json object representation in prolog.
@@ -101,7 +101,7 @@ var AtomNull = engine.NewAtom("@").Apply(engine.NewAtom("null"))
 //
 // That give a JSON object: `{"foo": "bar"}`
 // Returns the map of all attributes with its term value.
-func ExtractJsonTerm(term engine.Compound, env *engine.Env) (map[string]engine.Term, error) {
+func ExtractJSONTerm(term engine.Compound, env *engine.Env) (map[string]engine.Term, error) {
 	if term.Functor() != AtomJSON {
 		return nil, fmt.Errorf("invalid functor %s. Expected %s", term.Functor().String(), AtomJSON.String())
 	} else if term.Arity() != 1 {

@@ -16,11 +16,11 @@ import (
 // AtomJSON is a term which represents a json as a compound term `json([Pair])`.
 var AtomJSON = engine.NewAtom("json")
 
-// JsonProlog is a predicate that will unify a JSON string into prolog terms and vice versa.
+// JSONProlog is a predicate that will unify a JSON string into prolog terms and vice versa.
 //
 // json_prolog(?Json, ?Term) is det
 // TODO:
-func JsonProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+func JSONProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	switch t1 := env.Resolve(j).(type) {
 	case engine.Variable:
 	case engine.Atom:
@@ -38,7 +38,7 @@ func JsonProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engin
 	case engine.Variable:
 		return engine.Error(fmt.Errorf("json_prolog/2: could not unify two variable"))
 	default:
-		b, err := termsToJson(t2, env)
+		b, err := termsToJSON(t2, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
 		}
@@ -63,7 +63,7 @@ func jsonStringToTerms(j string) (engine.Term, error) {
 	return jsonToTerms(values)
 }
 
-func termsToJson(term engine.Term, env *engine.Env) ([]byte, error) {
+func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 	switch t := term.(type) {
 	case engine.Atom:
 		return json.Marshal(t.String())
@@ -80,7 +80,7 @@ func termsToJson(term engine.Term, env *engine.Env) ([]byte, error) {
 
 			elements := make([]json.RawMessage, 0)
 			for iter.Next() {
-				element, err := termsToJson(env.Resolve(iter.Current()), env)
+				element, err := termsToJSON(env.Resolve(iter.Current()), env)
 				if err != nil {
 					return nil, err
 				}
@@ -89,14 +89,14 @@ func termsToJson(term engine.Term, env *engine.Env) ([]byte, error) {
 			return json.Marshal(elements)
 		case AtomJSON.String():
 			// It's a json atom
-			terms, err := ExtractJsonTerm(t, env)
+			terms, err := ExtractJSONTerm(t, env)
 			if err != nil {
 				return nil, err
 			}
 
 			attributes := make(map[string]json.RawMessage, len(terms))
 			for key, term := range terms {
-				raw, err := termsToJson(env.Resolve(term), env)
+				raw, err := termsToJSON(env.Resolve(term), env)
 				if err != nil {
 					return nil, err
 				}
@@ -105,16 +105,16 @@ func termsToJson(term engine.Term, env *engine.Env) ([]byte, error) {
 			return json.Marshal(attributes)
 		}
 
-		if AtomBool(true).Compare(t, env) == 0 {
+		switch {
+		case AtomBool(true).Compare(t, env) == 0:
 			return json.Marshal(true)
-		} else if AtomBool(false).Compare(t, env) == 0 {
+		case AtomBool(false).Compare(t, env) == 0:
 			return json.Marshal(false)
-		} else if AtomNull.Compare(t, env) == 0 {
+		case AtomNull.Compare(t, env) == 0:
 			return json.Marshal(nil)
 		}
 
 		return nil, fmt.Errorf("invalid functor %s", t.Functor())
-
 	default:
 		return nil, fmt.Errorf("could not convert %s {%T} to json", t, t)
 	}

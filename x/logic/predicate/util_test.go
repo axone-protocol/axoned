@@ -53,7 +53,7 @@ func TestExtractJsonTerm(t *testing.T) {
 			Convey(fmt.Sprintf("Given the term compound #%d: %s", nc, tc.compound), func() {
 				Convey("when extract json term", func() {
 					env := engine.Env{}
-					result, err := ExtractJsonTerm(tc.compound, &env)
+					result, err := ExtractJSONTerm(tc.compound, &env)
 
 					if tc.wantSuccess {
 						Convey("then no error should be thrown", func() {

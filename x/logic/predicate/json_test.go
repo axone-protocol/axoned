@@ -277,7 +277,7 @@ func TestJsonProlog(t *testing.T) {
 
 					Convey("and a vm", func() {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
-						interpreter.Register2(engine.NewAtom("json_prolog"), JsonProlog)
+						interpreter.Register2(engine.NewAtom("json_prolog"), JSONProlog)
 
 						err := interpreter.Compile(ctx, tc.program)
 						So(err, ShouldBeNil)
@@ -364,7 +364,7 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 
 					Convey("and a vm", func() {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
-						interpreter.Register2(engine.NewAtom("json_prolog"), JsonProlog)
+						interpreter.Register2(engine.NewAtom("json_prolog"), JSONProlog)
 
 						Convey("When the predicate `json_prolog` is called to convert json to prolog", func() {
 							sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(%s, Term).", tc.json))
