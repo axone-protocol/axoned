@@ -203,7 +203,7 @@ func TestJsonProlog(t *testing.T) {
 				description: "invalid json term compound",
 				query:       `json_prolog(Json, foo([a-b])).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("json_prolog/2: invalid functor foo. Expected json"),
+				wantError:   fmt.Errorf("json_prolog/2: invalid functor foo"),
 			},
 			// ** Prolog -> JSON **
 			// Number
@@ -236,6 +236,34 @@ func TestJsonProlog(t *testing.T) {
 				query:       `json_prolog(Json, ['string with space',bar]).`,
 				wantResult: []types.TermResults{{
 					"Json": "'[\"string with space\",\"bar\"]'",
+				}},
+				wantSuccess: true,
+			},
+			// ** Prolog -> JSON **
+			// Bool
+			{
+				description: "convert true boolean from prolog",
+				query:       `json_prolog(Json, @(true)).`,
+				wantResult: []types.TermResults{{
+					"Json": "true",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert false boolean from prolog",
+				query:       `json_prolog(Json, @(false)).`,
+				wantResult: []types.TermResults{{
+					"Json": "false",
+				}},
+				wantSuccess: true,
+			},
+			// ** Prolog -> Json **
+			// Null
+			{
+				description: "convert json null value into prolog",
+				query:       `json_prolog(Json, @(null)).`,
+				wantResult: []types.TermResults{{
+					"Json": "null",
 				}},
 				wantSuccess: true,
 			},

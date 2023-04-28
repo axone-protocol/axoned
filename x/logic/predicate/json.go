@@ -70,8 +70,12 @@ func termsToJson(term engine.Term, env *engine.Env) ([]byte, error) {
 	case engine.Integer:
 		return json.Marshal(t)
 	case engine.Compound:
-		if t.Arity() == 2 && t.Functor().String() == "." {
-			// It's engine.List
+		switch t.Functor().String() {
+		case ".": // Represent an engine.List
+			if t.Arity() != 2 {
+				return nil, fmt.Errorf("wrong term arity for array, give %d, expected %d", t.Arity(), 2)
+			}
+
 			iter := engine.ListIterator{List: t, Env: env}
 
 			elements := make([]json.RawMessage, 0)
@@ -83,7 +87,7 @@ func termsToJson(term engine.Term, env *engine.Env) ([]byte, error) {
 				elements = append(elements, element)
 			}
 			return json.Marshal(elements)
-		} else {
+		case AtomJSON.String():
 			// It's a json atom
 			terms, err := ExtractJsonTerm(t, env)
 			if err != nil {
@@ -100,6 +104,17 @@ func termsToJson(term engine.Term, env *engine.Env) ([]byte, error) {
 			}
 			return json.Marshal(attributes)
 		}
+
+		if AtomBool(true).Compare(t, env) == 0 {
+			return json.Marshal(true)
+		} else if AtomBool(false).Compare(t, env) == 0 {
+			return json.Marshal(false)
+		} else if AtomNull.Compare(t, env) == 0 {
+			return json.Marshal(nil)
+		}
+
+		return nil, fmt.Errorf("invalid functor %s", t.Functor())
+
 	default:
 		return nil, fmt.Errorf("could not convert %s {%T} to json", t, t)
 	}
