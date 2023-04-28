@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"cosmossdk.io/math"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog/engine"
 	"github.com/okp4/okp4d/x/logic/util"
 	"github.com/samber/lo"
@@ -37,7 +38,12 @@ func JsonProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engin
 	case engine.Variable:
 		return engine.Error(fmt.Errorf("json_prolog/2: could not unify two variable"))
 	default:
-		b, err := termsToJson(t2)
+		b, err := termsToJson(t2, env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
+		}
+
+		b, err = sdk.SortJSON(b)
 		if err != nil {
 			return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
 		}
@@ -57,14 +63,28 @@ func jsonStringToTerms(j string) (engine.Term, error) {
 	return jsonToTerms(values)
 }
 
-func termsToJson(term engine.Term) ([]byte, error) {
+func termsToJson(term engine.Term, env *engine.Env) ([]byte, error) {
 	switch t := term.(type) {
 	case engine.Atom:
 		return json.Marshal(t.String())
+	case engine.Compound:
+		terms, err := ExtractJsonTerm(t, env)
+		if err != nil {
+			return nil, err
+		}
+
+		attributes := make(map[string]json.RawMessage, len(terms))
+		for key, term := range terms {
+			raw, err := termsToJson(env.Resolve(term), env)
+			if err != nil {
+				return nil, err
+			}
+			attributes[key] = raw
+		}
+		return json.Marshal(attributes)
 	default:
 		return nil, fmt.Errorf("could not convert %s {%T} to json", t, t)
 	}
-
 }
 
 func jsonToTerms(value any) (engine.Term, error) {

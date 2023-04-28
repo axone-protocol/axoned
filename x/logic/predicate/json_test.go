@@ -165,6 +165,46 @@ func TestJsonProlog(t *testing.T) {
 				}},
 				wantSuccess: true,
 			},
+			// ** Prolog -> JSON **
+			// Object
+			{
+				description: "convert json object from prolog",
+				query:       `json_prolog(Json, json([foo-bar])).`,
+				wantResult: []types.TermResults{{
+					"Json": "'{\"foo\":\"bar\"}'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json object with multiple attribute from prolog",
+				query:       `json_prolog(Json, json([foo-bar,foobar-'bar foo'])).`,
+				wantResult: []types.TermResults{{
+					"Json": "'{\"foo\":\"bar\",\"foobar\":\"bar foo\"}'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json object with attribute with a space into prolog",
+				query:       `json_prolog(Json, json(['string with space'-bar])).`,
+				wantResult: []types.TermResults{{
+					"Json": "'{\"string with space\":\"bar\"}'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "ensure determinism on object attribute key sorted alphabetically",
+				query:       `json_prolog(Json, json([b-a,a-b])).`,
+				wantResult: []types.TermResults{{
+					"Json": "'{\"a\":\"b\",\"b\":\"a\"}'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "invalid json term compound",
+				query:       `json_prolog(Json, foo([a-b])).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("json_prolog/2: invalid functor foo. Expected json"),
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
