@@ -325,3 +325,125 @@ func TestJsonProlog(t *testing.T) {
 		}
 	})
 }
+
+func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
+	Convey("Given a test cases", t, func() {
+		cases := []struct {
+			json        string
+			term        string
+			wantError   error
+			wantSuccess bool
+		}{
+			{
+				json:        "'{\"foo\":\"bar\"}'",
+				term:        "json([foo-bar])",
+				wantSuccess: true,
+			},
+			{
+				json:        "'{\"employee\":{\"age\":30,\"city\":\"New York\",\"name\":\"John\"}}'",
+				term:        "json([employee-json([age-30,city-'New York',name-'John'])])",
+				wantSuccess: true,
+			},
+			{
+				json:        "'{\"cosmos\":[\"okp4\",{\"name\":\"localnet\"}]}'",
+				term:        "json([cosmos-[okp4,json([name-localnet])]])",
+				wantSuccess: true,
+			},
+			{
+				json:        "'{\"object\":{\"array\":[1,2,3],\"arrayobject\":[{\"name\":\"toto\"},{\"name\":\"tata\"}],\"bool\":true,\"boolean\":false,\"null\":null}}'",
+				term:        "json([object-json([array-[1,2,3],arrayobject-[json([name-toto]),json([name-tata])],bool- @(true),boolean- @(false),null- @(null)])])",
+				wantSuccess: true,
+			},
+		}
+		for nc, tc := range cases {
+			Convey(fmt.Sprintf("#%d : given the json: %s and the term %s", nc, tc.json, tc.term), func() {
+				Convey("and a context", func() {
+					db := tmdb.NewMemDB()
+					stateStore := store.NewCommitMultiStore(db)
+					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
+
+					Convey("and a vm", func() {
+						interpreter := testutil.NewLightInterpreterMust(ctx)
+						interpreter.Register2(engine.NewAtom("json_prolog"), JsonProlog)
+
+						Convey("When the predicate `json_prolog` is called to convert json to prolog", func() {
+							sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(%s, Term).", tc.json))
+
+							Convey("Then the error should be nil", func() {
+								So(err, ShouldBeNil)
+								So(sols, ShouldNotBeNil)
+
+								Convey("and the bindings should be as expected", func() {
+									var got []types.TermResults
+									for sols.Next() {
+										m := types.TermResults{}
+										err := sols.Scan(m)
+										So(err, ShouldBeNil)
+
+										got = append(got, m)
+									}
+									if tc.wantError != nil {
+										So(sols.Err(), ShouldNotBeNil)
+										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
+									} else {
+										So(sols.Err(), ShouldBeNil)
+
+										if tc.wantSuccess {
+											So(len(got), ShouldBeGreaterThan, 0)
+											So(len(got), ShouldEqual, 1)
+											for _, resultGot := range got {
+												for _, termGot := range resultGot {
+													So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.term)
+												}
+											}
+										} else {
+											So(len(got), ShouldEqual, 0)
+										}
+									}
+								})
+							})
+						})
+
+						Convey("When the predicate `json_prolog` is called to convert prolog to json", func() {
+							sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(Json, %s).", tc.term))
+
+							Convey("Then the error should be nil", func() {
+								So(err, ShouldBeNil)
+								So(sols, ShouldNotBeNil)
+
+								Convey("and the bindings should be as expected", func() {
+									var got []types.TermResults
+									for sols.Next() {
+										m := types.TermResults{}
+										err := sols.Scan(m)
+										So(err, ShouldBeNil)
+
+										got = append(got, m)
+									}
+									if tc.wantError != nil {
+										So(sols.Err(), ShouldNotBeNil)
+										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
+									} else {
+										So(sols.Err(), ShouldBeNil)
+
+										if tc.wantSuccess {
+											So(len(got), ShouldBeGreaterThan, 0)
+											So(len(got), ShouldEqual, 1)
+											for _, resultGot := range got {
+												for _, termGot := range resultGot {
+													So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.json)
+												}
+											}
+										} else {
+											So(len(got), ShouldEqual, 0)
+										}
+									}
+								})
+							})
+						})
+					})
+				})
+			})
+		}
+	})
+}
