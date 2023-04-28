@@ -67,21 +67,39 @@ func termsToJson(term engine.Term, env *engine.Env) ([]byte, error) {
 	switch t := term.(type) {
 	case engine.Atom:
 		return json.Marshal(t.String())
+	case engine.Integer:
+		return json.Marshal(t)
 	case engine.Compound:
-		terms, err := ExtractJsonTerm(t, env)
-		if err != nil {
-			return nil, err
-		}
+		if t.Arity() == 2 && t.Functor().String() == "." {
+			// It's engine.List
+			iter := engine.ListIterator{List: t, Env: env}
 
-		attributes := make(map[string]json.RawMessage, len(terms))
-		for key, term := range terms {
-			raw, err := termsToJson(env.Resolve(term), env)
+			elements := make([]json.RawMessage, 0)
+			for iter.Next() {
+				element, err := termsToJson(env.Resolve(iter.Current()), env)
+				if err != nil {
+					return nil, err
+				}
+				elements = append(elements, element)
+			}
+			return json.Marshal(elements)
+		} else {
+			// It's a json atom
+			terms, err := ExtractJsonTerm(t, env)
 			if err != nil {
 				return nil, err
 			}
-			attributes[key] = raw
+
+			attributes := make(map[string]json.RawMessage, len(terms))
+			for key, term := range terms {
+				raw, err := termsToJson(env.Resolve(term), env)
+				if err != nil {
+					return nil, err
+				}
+				attributes[key] = raw
+			}
+			return json.Marshal(attributes)
 		}
-		return json.Marshal(attributes)
 	default:
 		return nil, fmt.Errorf("could not convert %s {%T} to json", t, t)
 	}

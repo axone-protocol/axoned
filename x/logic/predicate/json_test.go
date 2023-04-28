@@ -205,6 +205,40 @@ func TestJsonProlog(t *testing.T) {
 				wantSuccess: false,
 				wantError:   fmt.Errorf("json_prolog/2: invalid functor foo. Expected json"),
 			},
+			// ** Prolog -> JSON **
+			// Number
+			{
+				description: "convert json number from prolog",
+				query:       `json_prolog(Json, 10).`,
+				wantResult: []types.TermResults{{
+					"Json": "'10'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "decimal number not compatible yet",
+				query:       `json_prolog(Json, 10.4).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("json_prolog/2: could not convert %%!s(engine.Float=10.4) {engine.Float} to json"),
+			},
+			// ** Prolog -> Json **
+			// Array
+			{
+				description: "convert json array from prolog",
+				query:       `json_prolog(Json, [foo,bar]).`,
+				wantResult: []types.TermResults{{
+					"Json": "'[\"foo\",\"bar\"]'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json string array from prolog",
+				query:       `json_prolog(Json, ['string with space',bar]).`,
+				wantResult: []types.TermResults{{
+					"Json": "'[\"string with space\",\"bar\"]'",
+				}},
+				wantSuccess: true,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
