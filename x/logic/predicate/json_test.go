@@ -26,6 +26,19 @@ func TestJsonProlog(t *testing.T) {
 			wantError   error
 			wantSuccess bool
 		}{
+			{
+				description: "two variable",
+				query:       `json_prolog(Json, Term).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("json_prolog/2: could not unify two variable"),
+			},
+			{
+				description: "two variable",
+				query:       `json_prolog(ooo(r), Term).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("json_prolog/2: cannot unify json with *engine.compound"),
+			},
+
 			// ** JSON -> Prolog **
 			// String
 			{
@@ -205,6 +218,18 @@ func TestJsonProlog(t *testing.T) {
 				wantSuccess: false,
 				wantError:   fmt.Errorf("json_prolog/2: invalid functor foo"),
 			},
+			{
+				description: "convert json term object from prolog with error inside",
+				query:       `json_prolog(Json, ['string with space',json('toto')]).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("json_prolog/2: json compound should contains one list, give engine.Atom"),
+			},
+			{
+				description: "convert json term object from prolog with error inside another object",
+				query:       `json_prolog(Json, ['string with space',json([key-json(error)])]).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("json_prolog/2: json compound should contains one list, give engine.Atom"),
+			},
 			// ** Prolog -> JSON **
 			// Number
 			{
@@ -238,6 +263,12 @@ func TestJsonProlog(t *testing.T) {
 					"Json": "'[\"string with space\",\"bar\"]'",
 				}},
 				wantSuccess: true,
+			},
+			{
+				description: "convert json string array from prolog with error inside",
+				query:       `json_prolog(Json, ['string with space',hey('toto')]).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("json_prolog/2: invalid functor hey"),
 			},
 			// ** Prolog -> JSON **
 			// Bool
