@@ -385,6 +385,11 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 				term:        "json([object-json([array-[1,2,3],arrayobject-[json([name-toto]),json([name-tata])],bool- @(true),boolean- @(false),null- @(null)])])",
 				wantSuccess: true,
 			},
+			{
+				json:        "'{\"foo\":\"bar\"}'",
+				term:        "json([a-b])",
+				wantSuccess: false,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("#%d : given the json: %s and the term %s", nc, tc.json, tc.term), func() {
@@ -397,46 +402,86 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("json_prolog"), JSONProlog)
 
-						Convey("When the predicate `json_prolog` is called to convert json to prolog", func() {
-							sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(%s, Term).", tc.json))
+						if tc.wantSuccess {
+							Convey("When the predicate `json_prolog` is called to convert json to prolog", func() {
+								sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(%s, Term).", tc.json))
 
-							Convey("Then the error should be nil", func() {
-								So(err, ShouldBeNil)
-								So(sols, ShouldNotBeNil)
+								Convey("Then the error should be nil", func() {
+									So(err, ShouldBeNil)
+									So(sols, ShouldNotBeNil)
 
-								Convey("and the bindings should be as expected", func() {
-									var got []types.TermResults
-									for sols.Next() {
-										m := types.TermResults{}
-										err := sols.Scan(m)
-										So(err, ShouldBeNil)
+									Convey("and the bindings should be as expected", func() {
+										var got []types.TermResults
+										for sols.Next() {
+											m := types.TermResults{}
+											err := sols.Scan(m)
+											So(err, ShouldBeNil)
 
-										got = append(got, m)
-									}
-									if tc.wantError != nil {
-										So(sols.Err(), ShouldNotBeNil)
-										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
-									} else {
-										So(sols.Err(), ShouldBeNil)
-
-										if tc.wantSuccess {
-											So(len(got), ShouldBeGreaterThan, 0)
-											So(len(got), ShouldEqual, 1)
-											for _, resultGot := range got {
-												for _, termGot := range resultGot {
-													So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.term)
-												}
-											}
-										} else {
-											So(len(got), ShouldEqual, 0)
+											got = append(got, m)
 										}
-									}
+										if tc.wantError != nil {
+											So(sols.Err(), ShouldNotBeNil)
+											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
+										} else {
+											So(sols.Err(), ShouldBeNil)
+
+											if tc.wantSuccess {
+												So(len(got), ShouldBeGreaterThan, 0)
+												So(len(got), ShouldEqual, 1)
+												for _, resultGot := range got {
+													for _, termGot := range resultGot {
+														So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.term)
+													}
+												}
+											} else {
+												So(len(got), ShouldEqual, 0)
+											}
+										}
+									})
 								})
 							})
-						})
 
-						Convey("When the predicate `json_prolog` is called to convert prolog to json", func() {
-							sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(Json, %s).", tc.term))
+							Convey("When the predicate `json_prolog` is called to convert prolog to json", func() {
+								sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(Json, %s).", tc.term))
+
+								Convey("Then the error should be nil", func() {
+									So(err, ShouldBeNil)
+									So(sols, ShouldNotBeNil)
+
+									Convey("and the bindings should be as expected", func() {
+										var got []types.TermResults
+										for sols.Next() {
+											m := types.TermResults{}
+											err := sols.Scan(m)
+											So(err, ShouldBeNil)
+
+											got = append(got, m)
+										}
+										if tc.wantError != nil {
+											So(sols.Err(), ShouldNotBeNil)
+											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
+										} else {
+											So(sols.Err(), ShouldBeNil)
+
+											if tc.wantSuccess {
+												So(len(got), ShouldBeGreaterThan, 0)
+												So(len(got), ShouldEqual, 1)
+												for _, resultGot := range got {
+													for _, termGot := range resultGot {
+														So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.json)
+													}
+												}
+											} else {
+												So(len(got), ShouldEqual, 0)
+											}
+										}
+									})
+								})
+							})
+						}
+
+						Convey("When the predicate `json_prolog` is called to check prolog matching json", func() {
+							sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(%s, %s).", tc.json, tc.term))
 
 							Convey("Then the error should be nil", func() {
 								So(err, ShouldBeNil)
@@ -454,20 +499,6 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 									if tc.wantError != nil {
 										So(sols.Err(), ShouldNotBeNil)
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
-									} else {
-										So(sols.Err(), ShouldBeNil)
-
-										if tc.wantSuccess {
-											So(len(got), ShouldBeGreaterThan, 0)
-											So(len(got), ShouldEqual, 1)
-											for _, resultGot := range got {
-												for _, termGot := range resultGot {
-													So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.json)
-												}
-											}
-										} else {
-											So(len(got), ShouldEqual, 0)
-										}
 									}
 								})
 							})
