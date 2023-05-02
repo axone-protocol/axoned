@@ -1,6 +1,7 @@
 package predicate
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -31,38 +32,40 @@ var AtomJSON = engine.NewAtom("json")
 // # JSON conversion to Prolog.
 // - json_prolog('{"foo": "bar"}', json([foo-bar])).
 func JSONProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	var result engine.Term
+	return engine.Delay(func(ctx context.Context) *engine.Promise {
+		var result engine.Term
 
-	switch t1 := env.Resolve(j).(type) {
-	case engine.Variable:
-	case engine.Atom:
-		terms, err := jsonStringToTerms(t1.String())
-		if err != nil {
-			return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
-		}
-		result = terms
-	default:
-		return engine.Error(fmt.Errorf("json_prolog/2: cannot unify json with %T", t1))
-	}
-
-	switch t2 := env.Resolve(term).(type) {
-	case engine.Variable:
-		if result == nil {
-			return engine.Error(fmt.Errorf("json_prolog/2: could not unify two variable"))
-		}
-		return engine.Unify(vm, term, result, cont, env)
-	default:
-		b, err := termsToJSON(t2, env)
-		if err != nil {
-			return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
+		switch t1 := env.Resolve(j).(type) {
+		case engine.Variable:
+		case engine.Atom:
+			terms, err := jsonStringToTerms(t1.String())
+			if err != nil {
+				return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
+			}
+			result = terms
+		default:
+			return engine.Error(fmt.Errorf("json_prolog/2: cannot unify json with %T", t1))
 		}
 
-		b, err = sdk.SortJSON(b)
-		if err != nil {
-			return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
+		switch t2 := env.Resolve(term).(type) {
+		case engine.Variable:
+			if result == nil {
+				return engine.Error(fmt.Errorf("json_prolog/2: could not unify two variable"))
+			}
+			return engine.Unify(vm, term, result, cont, env)
+		default:
+			b, err := termsToJSON(t2, env)
+			if err != nil {
+				return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
+			}
+
+			b, err = sdk.SortJSON(b)
+			if err != nil {
+				return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
+			}
+			return engine.Unify(vm, j, util.StringToTerm(string(b)), cont, env)
 		}
-		return engine.Unify(vm, j, util.StringToTerm(string(b)), cont, env)
-	}
+	})
 }
 
 func jsonStringToTerms(j string) (engine.Term, error) {
@@ -102,7 +105,6 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 			}
 			return json.Marshal(elements)
 		case AtomJSON.String():
-			// It's a json atom
 			terms, err := ExtractJSONTerm(t, env)
 			if err != nil {
 				return nil, err

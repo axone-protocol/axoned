@@ -371,6 +371,16 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
+				json:        "'{\"foo\":\"null\"}'",
+				term:        "json([foo-null])",
+				wantSuccess: true,
+			},
+			{
+				json:        "'{\"foo\":null}'",
+				term:        "json([foo- @(null)])",
+				wantSuccess: true,
+			},
+			{
 				json:        "'{\"employee\":{\"age\":30,\"city\":\"New York\",\"name\":\"John\"}}'",
 				term:        "json([employee-json([age-30,city-'New York',name-'John'])])",
 				wantSuccess: true,
