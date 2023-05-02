@@ -1,4 +1,4 @@
-//nolint:gocognit,lll
+//nolint:gocognit,lll,nestif
 package predicate
 
 import (
@@ -488,14 +488,8 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
-									var got []types.TermResults
-									for sols.Next() {
-										m := types.TermResults{}
-										err := sols.Scan(m)
-										So(err, ShouldBeNil)
+									So(sols.Next(), ShouldEqual, tc.wantSuccess)
 
-										got = append(got, m)
-									}
 									if tc.wantError != nil {
 										So(sols.Err(), ShouldNotBeNil)
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
