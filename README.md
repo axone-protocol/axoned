@@ -14,6 +14,7 @@
 [![build](https://img.shields.io/github/actions/workflow/status/okp4/okp4d/build.yml?label=build&style=for-the-badge&logo=github)](https://github.com/okp4/okp4d/actions/workflows/build.yml)
 [![test](https://img.shields.io/github/actions/workflow/status/okp4/okp4d/test.yml?label=test&style=for-the-badge&logo=github)](https://github.com/okp4/okp4d/actions/workflows/test.yml)
 [![codecov](https://img.shields.io/codecov/c/github/okp4/okp4d?style=for-the-badge&token=O3FJO5QDCA&logo=codecov)](https://codecov.io/gh/okp4/okp4d)
+[![docker-pull](https://img.shields.io/docker/pulls/okp4/okp4d?label=downloads&style=for-the-badge&logo=docker)](https://hub.docker.com/r/okp4/okp4d)
 [![discord](https://img.shields.io/discord/946759919678406696.svg?label=discord&logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/okp4)
 [![conventional commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=for-the-badge&logo=conventionalcommits)](https://conventionalcommits.org)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg?style=for-the-badge)](https://github.com/okp4/.github/blob/main/CODE_OF_CONDUCT.md)
