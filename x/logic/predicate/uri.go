@@ -45,11 +45,14 @@ func NewComponent(v string) (Component, error) {
 // escaping doesn't fit to the SWI-Prolog escaping due to RFC discrepancy between those two implementations.
 //
 // Another discrepancy is on the query component that escape the space character ' ' to a '+' (plus sign) on the
-// golang library and to '%20' escaping on the [SWI-Prolog implementation](https://www.swi-prolog.org/pldoc/doc/_SWI_/library/uri.pl?show=src#uri_encoded/3).
+// golang library and to '%20' escaping on the
+// [SWI-Prolog implementation](https://www.swi-prolog.org/pldoc/doc/_SWI_/library/uri.pl?show=src#uri_encoded/3).
 //
 // Here some reported issues on golang about the RFC non-compliance.
-// - golang.org/issue/5684.
-// - https://github.com/golang/go/issues/27559
+//   - golang.org/issue/5684.
+//   - https://github.com/golang/go/issues/27559
+//
+//nolint:gocognit
 func shouldEscape(c byte, comp Component) bool {
 	// §2.3 Unreserved characters (alphanum)
 	if 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9' {
