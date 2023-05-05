@@ -45,7 +45,7 @@ func NewComponent(v string) (Component, error) {
 // escaping doesn't fit to the SWI-Prolog escaping due to RFC discrepancy between those two implementations.
 //
 // Another discrepancy is on the query component that escape the space character ' ' to a '+' (plus sign) on the
-// golang library and to '%20' escaping on the SWI-Prolog implementation.
+// golang library and to '%20' escaping on the [SWI-Prolog implementation](https://www.swi-prolog.org/pldoc/doc/_SWI_/library/uri.pl?show=src#uri_encoded/3).
 //
 // Here some reported issues on golang about the RFC non-compliance.
 // - golang.org/issue/5684.
@@ -125,19 +125,8 @@ func (comp Component) Escape(v string) string {
 	return string(t)
 }
 
-func (comp Component) Decode(v string) (string, error) {
-	switch comp {
-	case QueryComponent:
-		return url.QueryUnescape(v)
-	case FragmentComponent:
-		return "", fmt.Errorf("fragment not implemented")
-	case PathComponent:
-		return url.PathUnescape(v)
-	case SegmentComponent:
-		return "", fmt.Errorf("segment not implemented")
-	default:
-		return "", fmt.Errorf("wrong component")
-	}
+func (comp Component) Unescape(v string) (string, error) {
+	return url.PathUnescape(v)
 }
 
 func URIEncoded(vm *engine.VM, component, decoded, encoded engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
@@ -167,13 +156,13 @@ func URIEncoded(vm *engine.VM, component, decoded, encoded engine.Term, cont eng
 		case engine.Variable:
 			return engine.Unify(vm, encoded, util.StringToTerm(dec), cont, env)
 		case engine.Atom:
-			enc, err := comp.Decode(e.String())
+			enc, err := comp.Unescape(e.String())
 			if err != nil {
 				return engine.Error(fmt.Errorf("uri_encoded/3: %w", err))
 			}
 			return engine.Unify(vm, decoded, util.StringToTerm(enc), cont, env)
 		default:
-			return engine.Error(fmt.Errorf("uri_encoded/3: invalid encpded type: %T, should be Variable or Atom", component))
+			return engine.Error(fmt.Errorf("uri_encoded/3: invalid encoded type: %T, should be Variable or Atom", component))
 		}
 	})
 }
