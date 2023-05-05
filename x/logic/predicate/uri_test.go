@@ -114,6 +114,30 @@ func TestURIEncoded(t *testing.T) {
 					"Decoded": "' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'",
 				}},
 			},
+			{
+				query:       "uri_encoded(query, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~+', '%20!%22%23$%25%26\\'()*%2B,-./0123456789%3A%3B%3C%3D%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~+').",
+				wantSuccess: true,
+				wantResult:  []types.TermResults{{}},
+			},
+			{
+				query:       "uri_encoded(path, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', '%20!%22%23$%25&\\'()*+,-./0123456789%3A;%3C=%3E%3F@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~').",
+				wantSuccess: true,
+				wantResult:  []types.TermResults{{}},
+			},
+			{
+				query:       "uri_encoded(segment, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', '%20!%22%23$%25&\\'()*+,-.%2F0123456789%3A;%3C=%3E%3F@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~').",
+				wantSuccess: true,
+				wantResult:  []types.TermResults{{}},
+			},
+			{
+				query:       "uri_encoded(fragment, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', '%20!%22%23$%25&\\'()*+,-./0123456789:;%3C=%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~').",
+				wantSuccess: true,
+				wantResult:  []types.TermResults{{}},
+			},
+			{
+				query:       "uri_encoded(fragment, 'foo bar', 'bar%20foo').",
+				wantSuccess: false,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
