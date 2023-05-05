@@ -138,6 +138,26 @@ func TestURIEncoded(t *testing.T) {
 				query:       "uri_encoded(fragment, 'foo bar', 'bar%20foo').",
 				wantSuccess: false,
 			},
+			{
+				query:       "uri_encoded(Var, 'foo bar', 'bar%20foo').",
+				wantSuccess: false,
+				wantError:   fmt.Errorf("uri_encoded/3: invalid component type: engine.Variable, should be Atom"),
+			},
+			{
+				query:       "uri_encoded(path, compound(2), 'bar%20foo').",
+				wantSuccess: false,
+				wantError:   fmt.Errorf("uri_encoded/3: invalid decoded type: *engine.compound, should be Variable or Atom"),
+			},
+			{
+				query:       "uri_encoded(path, 'foo', compound(2)).",
+				wantSuccess: false,
+				wantError:   fmt.Errorf("uri_encoded/3: invalid encoded type: *engine.compound, should be Variable or Atom"),
+			},
+			{
+				query:       "uri_encoded(path, Decoded, 'bar%%3foo').",
+				wantSuccess: false,
+				wantError:   fmt.Errorf("uri_encoded/3: invalid URL escape \"%%%%3\""),
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {

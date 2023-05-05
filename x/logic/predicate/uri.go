@@ -149,7 +149,7 @@ func URIEncoded(vm *engine.VM, component, decoded, encoded engine.Term, cont eng
 		case engine.Atom:
 			dec = comp.Escape(d.String())
 		default:
-			return engine.Error(fmt.Errorf("uri_encoded/3: invalid decoded type: %T, should be Variable or Atom", component))
+			return engine.Error(fmt.Errorf("uri_encoded/3: invalid decoded type: %T, should be Variable or Atom", d))
 		}
 
 		switch e := env.Resolve(encoded).(type) {
@@ -162,7 +162,7 @@ func URIEncoded(vm *engine.VM, component, decoded, encoded engine.Term, cont eng
 			}
 			return engine.Unify(vm, decoded, util.StringToTerm(enc), cont, env)
 		default:
-			return engine.Error(fmt.Errorf("uri_encoded/3: invalid encoded type: %T, should be Variable or Atom", component))
+			return engine.Error(fmt.Errorf("uri_encoded/3: invalid encoded type: %T, should be Variable or Atom", e))
 		}
 	})
 }
