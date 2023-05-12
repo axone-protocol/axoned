@@ -112,6 +112,7 @@ var registry = map[string]any{
 	"bech32_address/2":          predicate.Bech32Address,
 	"source_file/1":             predicate.SourceFile,
 	"json_prolog/2":             predicate.JSONProlog,
+	"uri_encoded/3":             predicate.URIEncoded,
 }
 
 // RegistryNames is the list of the predicate names in the Registry.
