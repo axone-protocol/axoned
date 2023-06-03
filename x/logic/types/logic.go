@@ -26,6 +26,7 @@ func (t TermResults) ToSubstitutions() []Substitution {
 }
 
 // ToVariables extract from a TermResults value the variable names.
+// The variable names are sorted in ascending order.
 func (t TermResults) ToVariables() []string {
 	variables := make([]string, 0, len(t))
 	for v := range t {
