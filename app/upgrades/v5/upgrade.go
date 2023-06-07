@@ -65,7 +65,7 @@ func CreateUpgradeHandler(
 		// case minttypes.ModuleName:
 		//	keyTable = minttypes.ParamKeyTable()
 		case distrtypes.ModuleName:
-			keyTable = distrtypes.ParamKeyTable()
+			keyTable = distrtypes.ParamKeyTable() //nolint:staticcheck
 		case slashingtypes.ModuleName:
 			keyTable = slashingtypes.ParamKeyTable() //nolint:staticcheck
 		case govtypes.ModuleName:
