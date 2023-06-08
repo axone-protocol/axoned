@@ -46,6 +46,23 @@ func TestGRPCAsk(t *testing.T) {
 				expectedError: false,
 			},
 			{
+				program: "father(bob, alice). father(bob, john).",
+				query:   "father(bob, X).",
+				expectedAsnwer: &types.Answer{
+					Success:   true,
+					HasMore:   true,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X",
+						Term: types.Term{
+							Name:      "alice",
+							Arguments: nil,
+						},
+					}}}},
+				},
+				expectedError: false,
+			},
+			{
 				program: "father(bob, alice).",
 				query:   "father(bob, john).",
 				expectedAsnwer: &types.Answer{
