@@ -74,8 +74,11 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 		results = append(results, types.Result{Substitutions: m.ToSubstitutions()})
 	}
 
-	if sols.Err() != nil && sdkCtx.GasMeter().IsOutOfGas() {
-		panic(sdk.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
+	if err := sols.Err(); err != nil {
+		if sdkCtx.GasMeter().IsOutOfGas() {
+			panic(sdk.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
+		}
+		return nil, err
 	}
 
 	var userOutput string
