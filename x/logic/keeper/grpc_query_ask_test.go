@@ -105,7 +105,6 @@ func TestGRPCAsk(t *testing.T) {
 									So(result, ShouldNotBeNil)
 									So(result.Answer, ShouldResemble, tc.expectedAsnwer)
 								}
-
 							})
 						})
 					})
