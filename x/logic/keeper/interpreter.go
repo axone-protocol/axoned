@@ -42,7 +42,6 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 	if err != nil {
 		return nil, sdkerrors.Wrapf(types.Internal, "error creating interpreter: %v", err.Error())
 	}
-
 	if err := i.ExecContext(ctx, program); err != nil {
 		return nil, sdkerrors.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
 	}
@@ -66,7 +65,6 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 		if err := sols.Scan(m); err != nil {
 			return nil, sdkerrors.Wrapf(types.Internal, "error scanning solution: %v", err.Error())
 		}
-
 		if nb.IsZero() {
 			variables = m.ToVariables()
 		}
@@ -74,8 +72,11 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 		results = append(results, types.Result{Substitutions: m.ToSubstitutions()})
 	}
 
-	if sols.Err() != nil && sdkCtx.GasMeter().IsOutOfGas() {
-		panic(sdk.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
+	if err := sols.Err(); err != nil {
+		if sdkCtx.GasMeter().IsOutOfGas() {
+			panic(sdk.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
+		}
+		return nil, sdkerrors.Wrapf(types.InvalidArgument, "error interpreting solutions: %v", err.Error())
 	}
 
 	var userOutput string

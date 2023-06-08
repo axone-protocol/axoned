@@ -25,12 +25,13 @@ func TestGRPCAsk(t *testing.T) {
 		cases := []struct {
 			program        string
 			query          string
-			expectedAsnwer types.Answer
+			expectedAsnwer *types.Answer
+			expectedError  bool
 		}{
 			{
 				program: "father(bob, alice).",
 				query:   "father(bob, X).",
-				expectedAsnwer: types.Answer{
+				expectedAsnwer: &types.Answer{
 					Success:   true,
 					HasMore:   false,
 					Variables: []string{"X"},
@@ -42,6 +43,41 @@ func TestGRPCAsk(t *testing.T) {
 						},
 					}}}},
 				},
+				expectedError: false,
+			},
+			{
+				program: "father(bob, alice). father(bob, john).",
+				query:   "father(bob, X).",
+				expectedAsnwer: &types.Answer{
+					Success:   true,
+					HasMore:   true,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X",
+						Term: types.Term{
+							Name:      "alice",
+							Arguments: nil,
+						},
+					}}}},
+				},
+				expectedError: false,
+			},
+			{
+				program: "father(bob, alice).",
+				query:   "father(bob, john).",
+				expectedAsnwer: &types.Answer{
+					Success:   false,
+					HasMore:   false,
+					Variables: nil,
+					Results:   nil,
+				},
+				expectedError: false,
+			},
+			{
+				program:        "father(bob, alice).",
+				query:          "father(bob, X, O).",
+				expectedAsnwer: nil,
+				expectedError:  true,
 			},
 		}
 
@@ -89,9 +125,14 @@ func TestGRPCAsk(t *testing.T) {
 							result, err := queryClient.Ask(gocontext.Background(), &query)
 
 							Convey("Then it should return the expected answer", func() {
-								So(err, ShouldBeNil)
-								So(result, ShouldNotBeNil)
-								So(*result.Answer, ShouldResemble, tc.expectedAsnwer)
+								if tc.expectedError {
+									So(err, ShouldNotBeNil)
+									So(result, ShouldBeNil)
+								} else {
+									So(err, ShouldBeNil)
+									So(result, ShouldNotBeNil)
+									So(result.Answer, ShouldResemble, tc.expectedAsnwer)
+								}
 							})
 						})
 					})
