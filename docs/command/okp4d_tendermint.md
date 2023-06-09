@@ -11,6 +11,7 @@ Tendermint subcommands
 ### SEE ALSO
 
 * [okp4d](okp4d.md)	 - OKP4 Daemon 👹
+* [okp4d tendermint bootstrap-state](okp4d_tendermint_bootstrap-state.md)	 - Bootstrap CometBFT state at an arbitrary block height using a light client
 * [okp4d tendermint reset-state](okp4d_tendermint_reset-state.md)	 - Remove all the data and WAL
 * [okp4d tendermint show-address](okp4d_tendermint_show-address.md)	 - Shows this node's tendermint validator consensus address
 * [okp4d tendermint show-node-id](okp4d_tendermint_show-node-id.md)	 - Show this node's ID
