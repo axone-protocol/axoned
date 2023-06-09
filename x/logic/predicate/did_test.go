@@ -29,16 +29,20 @@ func TestDID(t *testing.T) {
 				wantResult: []types.TermResults{{"X": "example", "Y": "'123456'"}},
 			},
 			{
+				query:      `did_components('did:example:123456',did(X,Y,Z,_,_)).`,
+				wantResult: []types.TermResults{{"X": "example", "Y": "'123456'", "Z": "''"}},
+			},
+			{
 				query:      `did_components('did:example:123456/path', X).`,
-				wantResult: []types.TermResults{{"X": "did(example,'123456',path,_1,_2)"}},
+				wantResult: []types.TermResults{{"X": "did(example,'123456',path,'','')"}},
 			},
 			{
 				query:      `did_components('did:example:123456?versionId=1', X).`,
-				wantResult: []types.TermResults{{"X": "did(example,'123456',_1,'versionId=1',_2)"}},
+				wantResult: []types.TermResults{{"X": "did(example,'123456','','versionId=1','')"}},
 			},
 			{
 				query:      `did_components('did:example:123456/path%20with/space', X).`,
-				wantResult: []types.TermResults{{"X": "did(example,'123456','path with/space',_1,_2)"}},
+				wantResult: []types.TermResults{{"X": "did(example,'123456','path with/space','','')"}},
 			},
 			{
 				query:      `did_components(X,did(example,'123456',_,'versionId=1',_)).`,

@@ -7,12 +7,7 @@ import (
 )
 
 // StringToTerm converts a string to a term.
-// If the string is empty, it returns a variable.
 func StringToTerm(s string) engine.Term {
-	if s == "" {
-		return engine.NewVariable()
-	}
-
 	return engine.NewAtom(s)
 }
 
