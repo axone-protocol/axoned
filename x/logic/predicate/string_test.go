@@ -1,4 +1,4 @@
-//nolint:gocognit,lll
+//nolint:gocognit
 package predicate
 
 import (

@@ -11,6 +11,39 @@ import (
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
+// ReadString is a predicate that will read a given Stream and unify it to String.
+// Optionally give a max length of reading, when stream reach the given length, the reading is stop.
+// If Length is unbound, Stream is read to the end and Length is unified with the number of characters read.
+//
+// read_string(+Stream, ?Length, -String) is det
+//
+// Where
+//   - `Stream`: represent a stream
+//   - `Length`: is the max length to read
+//   - `String`: represent the unified read stream as string
+//
+// Example:
+//
+// # Given a file `foo.txt` that contains `Hello World`:
+// ```
+// file_to_string(File, String, Length) :-
+//
+//	open(File, read, In),
+//	read_string(In, Length, String),
+//	close(Stream).
+//
+// ```
+//
+// Result :
+//
+// ```
+//
+//	?- file_to_string('path/file/foo.txt', String, Length).
+//
+//	String = 'Hello World'
+//	Length = 11
+//
+// ```
 func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		var s *engine.Stream
