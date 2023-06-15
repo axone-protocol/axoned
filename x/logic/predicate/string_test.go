@@ -36,6 +36,103 @@ func TestReadString(t *testing.T) {
 				}},
 				wantSuccess: true,
 			},
+			{
+				input:   "foo bar",
+				program: "read_input(String) :- current_input(Stream), read_string(Stream, _, String).",
+				query:   `read_input(String).`,
+				wantResult: []types.TermResults{{
+					"String": "'foo bar'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				input:   "foo bar",
+				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
+				query:   `read_input(String, Len).`,
+				wantResult: []types.TermResults{{
+					"String": "'foo bar'",
+					"Len":    "7",
+				}},
+				wantSuccess: true,
+			},
+			{
+				input:   "foo bar",
+				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
+				query:   `read_input(String, 3).`,
+				wantResult: []types.TermResults{{
+					"String": "foo",
+				}},
+				wantSuccess: true,
+			},
+			{
+				input:   "foo bar",
+				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
+				query:   `read_input(String, 7).`,
+				wantResult: []types.TermResults{{
+					"String": "'foo bar'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				input:   "foo bar 🧙",
+				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
+				query:   `read_input(String, _).`,
+				wantResult: []types.TermResults{{
+					"String": "'foo bar 🧙'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				input:   "foo bar 🧙",
+				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
+				query:   `read_input(String, Len).`,
+				wantResult: []types.TermResults{{
+					"String": "'foo bar 🧙'",
+					"Len":    "12",
+				}},
+				wantSuccess: true,
+			},
+			{
+				input:   "🧙",
+				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
+				query:   `read_input(String, Len).`,
+				wantResult: []types.TermResults{{
+					"String": "'🧙'",
+					"Len":    "4",
+				}},
+				wantSuccess: true,
+			},
+			{
+				input:   "🧙",
+				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
+				query:   `read_input(String, 1).`,
+				wantResult: []types.TermResults{{
+					"String": "'🧙'",
+				}},
+				wantSuccess: false,
+			},
+			{
+				input:   "Hello World!",
+				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
+				query:   `read_input(String, 15).`,
+				wantResult: []types.TermResults{{
+					"String": "'Hello World!'",
+				}},
+				wantSuccess: false,
+			},
+			{
+				input:       "Hello World!",
+				program:     "read_input(String, Len) :- current_input(Stream), read_string(foo, Len, String).",
+				query:       `read_input(String, Len).`,
+				wantError:   fmt.Errorf("read_string/3: invalid domain for given stream"),
+				wantSuccess: false,
+			},
+			{
+				input:       "Hello World!",
+				query:       `read_string(Stream, Len, data).`,
+				wantError:   fmt.Errorf("read_string/3: stream could not be a variable"),
+				wantSuccess: false,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
