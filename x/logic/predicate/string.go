@@ -43,7 +43,7 @@ import (
 //	String = 'Hello World'
 //	Length = 11
 //
-// ```
+// ```.
 func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		var s *engine.Stream
@@ -56,13 +56,13 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 			return engine.Error(fmt.Errorf("read_string/3: invalid domain for given stream"))
 		}
 
-		var maxLength uint64 = 0
+		var maxLength uint64
 		if maxLen, ok := env.Resolve(length).(engine.Integer); ok {
 			maxLength = uint64(maxLen)
 		}
 
 		var builder strings.Builder
-		var totalLen uint64 = 0
+		var totalLen uint64
 		for {
 			r, l, err := s.ReadRune()
 			if err != nil || (maxLength != 0 && totalLen >= maxLength) {
