@@ -22,17 +22,23 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 		default:
 			return engine.Error(fmt.Errorf("read_string/3: invalid domain for given stream"))
 		}
+
+		var maxLength uint64 = 0
+		if maxLen, ok := env.Resolve(length).(engine.Integer); ok {
+			maxLength = uint64(maxLen)
+		}
+
 		var builder strings.Builder
 		var totalLen uint64 = 0
 		for {
 			r, l, err := s.ReadRune()
-			totalLen += uint64(l)
-			if err != nil {
-				if errors.Is(err, io.EOF) {
+			if err != nil || (maxLength != 0 && totalLen >= maxLength) {
+				if errors.Is(err, io.EOF) || totalLen >= maxLength {
 					break
 				}
 				return engine.Error(fmt.Errorf("read_string/3: error occurs reading stream: %w", err))
 			}
+			totalLen += uint64(l)
 			_, err = builder.WriteRune(r)
 			if err != nil {
 				return engine.Error(fmt.Errorf("read_string/3: failed write string: %w", err))
