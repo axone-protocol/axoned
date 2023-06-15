@@ -2,6 +2,7 @@ package predicate
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"strings"
@@ -22,12 +23,12 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 			return engine.Error(fmt.Errorf("read_string/3: invalid domain for given stream"))
 		}
 		var builder strings.Builder
-		var len uint64 = 0
+		var totalLen uint64 = 0
 		for {
 			r, l, err := s.ReadRune()
-			len += uint64(l)
+			totalLen += uint64(l)
 			if err != nil {
-				if err == io.EOF {
+				if errors.Is(err, io.EOF) {
 					break
 				}
 				return engine.Error(fmt.Errorf("read_string/3: error occurs reading stream: %w", err))
@@ -38,6 +39,6 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 			}
 		}
 
-		return engine.Unify(vm, Tuple(result, length), Tuple(util.StringToTerm(builder.String()), engine.Integer(len)), cont, env)
+		return engine.Unify(vm, Tuple(result, length), Tuple(util.StringToTerm(builder.String()), engine.Integer(totalLen)), cont, env)
 	})
 }
