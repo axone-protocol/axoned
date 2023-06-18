@@ -1,19 +1,19 @@
 module github.com/okp4/okp4d
 
-go 1.19
+go 1.20
 
 require (
 	cosmossdk.io/api v0.3.1
 	cosmossdk.io/errors v1.0.0-beta.7
 	cosmossdk.io/math v1.0.1
-	github.com/CosmWasm/wasmd v0.40.1
+	github.com/CosmWasm/wasmd v0.40.2
 	github.com/armon/go-metrics v0.4.1
-	github.com/cometbft/cometbft v0.37.1
-	github.com/cometbft/cometbft-db v0.7.0
+	github.com/cometbft/cometbft v0.37.2
+	github.com/cometbft/cometbft-db v0.8.0
 	github.com/cosmos/cosmos-proto v1.0.0-beta.2
 	github.com/cosmos/cosmos-sdk v0.47.3
 	github.com/cosmos/gogoproto v1.4.10
-	github.com/cosmos/ibc-go/v7 v7.0.1
+	github.com/cosmos/ibc-go/v7 v7.1.0
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
@@ -77,7 +77,7 @@ require (
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/gogogateway v1.2.0 // indirect
 	github.com/cosmos/iavl v0.20.0 // indirect
-	github.com/cosmos/ics23/go v0.9.1-0.20221207100636-b1abd8678aab // indirect
+	github.com/cosmos/ics23/go v0.10.0 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.12.2 // indirect
 	github.com/cosmos/rosetta-sdk-go v0.10.0 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.2 // indirect
@@ -142,6 +142,7 @@ require (
 	github.com/lestrrat-go/option v1.0.0 // indirect
 	github.com/lib/pq v1.10.7 // indirect
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
+	github.com/linxGnu/grocksdb v1.7.16 // indirect
 	github.com/magiconair/properties v1.8.7 // indirect
 	github.com/manifoldco/promptui v0.9.0 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
@@ -155,7 +156,7 @@ require (
 	github.com/mtibben/percent v0.2.1 // indirect
 	github.com/ockam-network/did v0.1.4-0.20210103172416-02ae01ce06d8 // indirect
 	github.com/opencontainers/go-digest v1.0.0 // indirect
-	github.com/pelletier/go-toml/v2 v2.0.7 // indirect
+	github.com/pelletier/go-toml/v2 v2.0.8 // indirect
 	github.com/petermattis/goid v0.0.0-20230317030725-371a4b8eda08 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
 	github.com/pmezard/go-difflib v1.0.0 // indirect
@@ -175,7 +176,6 @@ require (
 	github.com/spf13/viper v1.15.0 // indirect
 	github.com/subosito/gotenv v1.4.2 // indirect
 	github.com/syndtr/goleveldb v1.0.1-0.20220721030215-126854af5e6d // indirect
-	github.com/tecbot/gorocksdb v0.0.0-20191217155057-f0fad39f321c // indirect
 	github.com/tendermint/go-amino v0.16.0 // indirect
 	github.com/tidwall/btree v1.6.0 // indirect
 	github.com/ulikunitz/xz v0.5.11 // indirect
@@ -183,12 +183,12 @@ require (
 	github.com/zondax/ledger-go v0.14.1 // indirect
 	go.etcd.io/bbolt v1.3.7 // indirect
 	go.opencensus.io v0.24.0 // indirect
-	golang.org/x/crypto v0.7.0 // indirect
+	golang.org/x/crypto v0.9.0 // indirect
 	golang.org/x/exp v0.0.0-20230515195305-f3d0a9c9a5cc // indirect
-	golang.org/x/net v0.9.0 // indirect
-	golang.org/x/oauth2 v0.6.0 // indirect
-	golang.org/x/sys v0.7.0 // indirect
-	golang.org/x/term v0.7.0 // indirect
+	golang.org/x/net v0.10.0 // indirect
+	golang.org/x/oauth2 v0.7.0 // indirect
+	golang.org/x/sys v0.8.0 // indirect
+	golang.org/x/term v0.8.0 // indirect
 	golang.org/x/text v0.9.0 // indirect
 	golang.org/x/xerrors v0.0.0-20220907171357-04be3eba64a2 // indirect
 	google.golang.org/api v0.110.0 // indirect
