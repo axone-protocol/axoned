@@ -4,9 +4,10 @@ import (
 	"fmt"
 	"sort"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog/engine"
 	"github.com/okp4/okp4d/x/logic/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // SortBalances by coin denomination.

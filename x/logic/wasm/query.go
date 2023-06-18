@@ -3,9 +3,10 @@ package wasm
 import (
 	"encoding/json"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/okp4/okp4d/x/logic/keeper"
 	"github.com/okp4/okp4d/x/logic/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // LogicQuerier ease the bridge between the logic module with the wasm CustomQuerier to allow wasm contracts to query

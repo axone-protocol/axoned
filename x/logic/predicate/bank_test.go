@@ -5,17 +5,20 @@ import (
 	"fmt"
 	"testing"
 
-	tmdb "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
-	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
-	"github.com/cosmos/cosmos-sdk/store"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"github.com/golang/mock/gomock"
 	"github.com/ichiban/prolog/engine"
 	"github.com/okp4/okp4d/x/logic/testutil"
 	"github.com/okp4/okp4d/x/logic/types"
+
 	. "github.com/smartystreets/goconvey/convey"
+
+	tmdb "github.com/cometbft/cometbft-db"
+	"github.com/cometbft/cometbft/libs/log"
+	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+
+	"github.com/cosmos/cosmos-sdk/store"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
 func TestBank(t *testing.T) {

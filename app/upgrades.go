@@ -3,11 +3,12 @@ package app
 import (
 	"fmt"
 
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 	v4 "github.com/okp4/okp4d/app/upgrades/v4"
 	v41 "github.com/okp4/okp4d/app/upgrades/v41"
 	v5 "github.com/okp4/okp4d/app/upgrades/v5"
+
+	storetypes "github.com/cosmos/cosmos-sdk/store/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 )
 
 func (app *App) setupUpgradeHandlers() {

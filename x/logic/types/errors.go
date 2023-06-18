@@ -1,8 +1,9 @@
 package types
 
 import (
-	sdkerrors "cosmossdk.io/errors"
 	"google.golang.org/grpc/codes"
+
+	sdkerrors "cosmossdk.io/errors"
 )
 
 var (

@@ -4,14 +4,17 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ichiban/prolog/engine"
+	"github.com/okp4/okp4d/x/logic/testutil"
+
+	. "github.com/smartystreets/goconvey/convey"
+
 	tmdb "github.com/cometbft/cometbft-db"
 	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/ichiban/prolog/engine"
-	"github.com/okp4/okp4d/x/logic/testutil"
-	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestChainID(t *testing.T) {

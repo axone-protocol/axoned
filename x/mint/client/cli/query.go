@@ -3,11 +3,11 @@ package cli
 import (
 	"fmt"
 
+	"github.com/okp4/okp4d/x/mint/types"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/okp4/okp4d/x/mint/types"
 )
 
 // GetQueryCmd returns the cli query commands for the minting module.

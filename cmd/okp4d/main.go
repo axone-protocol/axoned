@@ -4,11 +4,11 @@ import (
 	"errors"
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/server"
-	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
+	"github.com/okp4/okp4d/app"
 	"github.com/okp4/okp4d/cmd/okp4d/cmd"
 
-	"github.com/okp4/okp4d/app"
+	"github.com/cosmos/cosmos-sdk/server"
+	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 )
 
 func main() {

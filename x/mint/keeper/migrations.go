@@ -1,9 +1,10 @@
 package keeper
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/okp4/okp4d/x/mint/exported"
 	v2 "github.com/okp4/okp4d/x/mint/migrations/v2"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type Migrator struct {

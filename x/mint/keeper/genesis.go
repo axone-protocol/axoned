@@ -1,9 +1,11 @@
 package keeper
 
 import (
-	errorsmod "cosmossdk.io/errors"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/okp4/okp4d/x/mint/types"
+
+	errorsmod "cosmossdk.io/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // InitGenesis new mint genesis.

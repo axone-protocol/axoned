@@ -3,11 +3,12 @@ package simulation
 import (
 	"math/rand"
 
+	"github.com/okp4/okp4d/x/mint/types"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
-	"github.com/okp4/okp4d/x/mint/types"
 )
 
 // Simulation operation weights constants.

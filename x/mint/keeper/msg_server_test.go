@@ -1,8 +1,9 @@
 package keeper_test
 
 import (
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/okp4/okp4d/x/mint/types"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (s *IntegrationTestSuite) TestUpdateParams() {

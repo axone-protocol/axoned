@@ -4,9 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	"cosmossdk.io/math"
 	"github.com/okp4/okp4d/x/logic/types"
+
 	. "github.com/smartystreets/goconvey/convey"
+
+	"cosmossdk.io/math"
 )
 
 func TestValidateParams(t *testing.T) {
