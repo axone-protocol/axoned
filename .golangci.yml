@@ -65,7 +65,7 @@ linters-settings:
       - prefix(github.com/cosmos/cosmos-sdk) # cosmos-sdk & cosmos org libs
       - prefix(github.com/cosmos/interchain-security) # interchain-security
       - prefix(github.com/cosmos/ibc-go) # ibc
-      - prefix( github.com/okp4/okp4d) # okp4
+      - prefix(github.com/okp4/okp4d) # okp4
     custom-order: true
 
   cyclop:
