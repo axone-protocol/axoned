@@ -4,12 +4,13 @@ import (
 	"errors"
 	"time"
 
-	vestexported "github.com/okp4/okp4d/x/vesting/exported"
 	"sigs.k8s.io/yaml"
 
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
+	vestexported "github.com/okp4/okp4d/x/vesting/exported"
 )
 
 // Compile-time type assertions.

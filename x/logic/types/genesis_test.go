@@ -3,8 +3,9 @@ package types_test
 import (
 	"testing"
 
-	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/stretchr/testify/require"
+
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {

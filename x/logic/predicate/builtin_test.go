@@ -6,9 +6,6 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/ichiban/prolog/engine"
-	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
-	"github.com/okp4/okp4d/x/logic/util"
 
 	. "github.com/smartystreets/goconvey/convey"
 
@@ -18,6 +15,10 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/logic/testutil"
+	"github.com/okp4/okp4d/x/logic/types"
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 func TestWrite(t *testing.T) {

@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/armon/go-metrics"
-	"github.com/okp4/okp4d/x/vesting/types"
 
 	errorsmod "cosmossdk.io/errors"
 
@@ -13,6 +12,8 @@ import (
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
+	"github.com/okp4/okp4d/x/vesting/types"
 )
 
 type msgServer struct {

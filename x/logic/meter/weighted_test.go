@@ -6,9 +6,10 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/okp4/okp4d/x/logic/testutil"
 
 	. "github.com/smartystreets/goconvey/convey"
+
+	"github.com/okp4/okp4d/x/logic/testutil"
 )
 
 func TestMultiplyUint64Overflow(t *testing.T) {

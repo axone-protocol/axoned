@@ -3,12 +3,12 @@ package keeper
 import (
 	goctx "context"
 
-	"github.com/okp4/okp4d/x/logic/meter"
-	"github.com/okp4/okp4d/x/logic/types"
-
 	errorsmod "cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/logic/meter"
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {

@@ -3,9 +3,9 @@ package keeper
 import (
 	"context"
 
-	"github.com/okp4/okp4d/x/mint/types"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/mint/types"
 )
 
 var _ types.QueryServer = Keeper{}

@@ -4,8 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/okp4/okp4d/x/vesting"
-	"github.com/okp4/okp4d/x/vesting/types"
 	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
@@ -20,6 +18,9 @@ import (
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+
+	"github.com/okp4/okp4d/x/vesting"
+	"github.com/okp4/okp4d/x/vesting/types"
 )
 
 var (

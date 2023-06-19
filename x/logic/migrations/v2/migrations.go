@@ -1,11 +1,11 @@
 package v2
 
 import (
-	"github.com/okp4/okp4d/x/logic/exported"
-	"github.com/okp4/okp4d/x/logic/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/logic/exported"
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func MigrateStore(ctx sdk.Context, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
