@@ -6,9 +6,10 @@ import (
 	"io"
 	"io/fs"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Predicates is a map of predicate names to their execution costs.

@@ -7,6 +7,7 @@ import (
 
 	"github.com/golang/mock/gomock"
 	"github.com/okp4/okp4d/x/logic/testutil"
+
 	. "github.com/smartystreets/goconvey/convey"
 )
 

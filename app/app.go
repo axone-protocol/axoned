@@ -11,16 +11,34 @@ import (
 	"path/filepath"
 	"strings"
 
-	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
-	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	"github.com/ignite/cli/ignite/pkg/openapiconsole"
+	appparams "github.com/okp4/okp4d/app/params"
+	okp4wasm "github.com/okp4/okp4d/app/wasm"
+	"github.com/okp4/okp4d/docs"
+	logicmodule "github.com/okp4/okp4d/x/logic"
+	logicfs "github.com/okp4/okp4d/x/logic/fs"
+	logicmodulekeeper "github.com/okp4/okp4d/x/logic/keeper"
+	logicmoduletypes "github.com/okp4/okp4d/x/logic/types"
+	"github.com/okp4/okp4d/x/mint"
+	mintkeeper "github.com/okp4/okp4d/x/mint/keeper"
+	minttypes "github.com/okp4/okp4d/x/mint/types"
+	"github.com/okp4/okp4d/x/vesting"
+	vestingtypes "github.com/okp4/okp4d/x/vesting/types"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/spf13/cast"
+
 	dbm "github.com/cometbft/cometbft-db"
 	abci "github.com/cometbft/cometbft/abci/types"
 	"github.com/cometbft/cometbft/libs/log"
 	tmos "github.com/cometbft/cometbft/libs/os"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+
+	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
+	reflectionv1 "cosmossdk.io/api/cosmos/reflection/v1"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/client"
 	nodeservice "github.com/cosmos/cosmos-sdk/client/grpc/node"
@@ -91,6 +109,7 @@ import (
 	upgradeclient "github.com/cosmos/cosmos-sdk/x/upgrade/client"
 	upgradekeeper "github.com/cosmos/cosmos-sdk/x/upgrade/keeper"
 	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
+
 	ica "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts"
 	icacontroller "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller"
 	icacontrollerkeeper "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/keeper"
@@ -114,24 +133,6 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v7/modules/core/keeper"
 	solomachine "github.com/cosmos/ibc-go/v7/modules/light-clients/06-solomachine"
 	ibctm "github.com/cosmos/ibc-go/v7/modules/light-clients/07-tendermint"
-	okp4wasm "github.com/okp4/okp4d/app/wasm"
-	logicmodule "github.com/okp4/okp4d/x/logic"
-	logicfs "github.com/okp4/okp4d/x/logic/fs"
-	logicmodulekeeper "github.com/okp4/okp4d/x/logic/keeper"
-	logicmoduletypes "github.com/okp4/okp4d/x/logic/types"
-	"github.com/okp4/okp4d/x/mint"
-	mintkeeper "github.com/okp4/okp4d/x/mint/keeper"
-	minttypes "github.com/okp4/okp4d/x/mint/types"
-	"github.com/prometheus/client_golang/prometheus"
-	"github.com/spf13/cast"
-
-	"github.com/okp4/okp4d/x/vesting"
-	vestingtypes "github.com/okp4/okp4d/x/vesting/types"
-
-	"github.com/ignite/cli/ignite/pkg/openapiconsole"
-	appparams "github.com/okp4/okp4d/app/params"
-
-	"github.com/okp4/okp4d/docs"
 )
 
 const (

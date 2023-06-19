@@ -1,5 +1,6 @@
 run:
   timeout: 10m
+
 linters:
   disable-all: true
   enable:
@@ -23,6 +24,7 @@ linters:
     - exportloopref
     - funlen
     - forbidigo
+    - gci
     - gocognit
     - goconst
     - gocritic
@@ -52,6 +54,20 @@ linters:
     - whitespace
 
 linters-settings:
+  gci:
+    sections:
+      - standard # Standard section: captures all standard packages.
+      - default # Default section: contains all imports that could not be matched to another section type.
+      - blank # blank imports
+      - dot # dot imports
+      - prefix(github.com/cometbft/cometbft) # comet
+      - prefix(cosmossdk.io) # cosmossdk.io
+      - prefix(github.com/cosmos/cosmos-sdk) # cosmos-sdk & cosmos org libs
+      - prefix(github.com/cosmos/interchain-security) # interchain-security
+      - prefix(github.com/cosmos/ibc-go) # ibc
+      - prefix( github.com/okp4/okp4d) # okp4
+    custom-order: true
+
   cyclop:
     max-complexity: 20
     skip-tests: true
@@ -71,10 +87,10 @@ issues:
     - source: "^//\\s*go:generate\\s"
       linters:
         - lll
-    - source: "(noinspection|TODO)"
+    - source: '(noinspection|TODO)'
       linters:
         - godot
-    - source: "//noinspection"
+    - source: '//noinspection'
       linters:
         - gocritic
     - source: "^\\s+if _, ok := err\\.\\([^.]+\\.InternalError\\); ok {"

@@ -4,9 +4,6 @@ import (
 	goctx "context"
 	"math"
 
-	sdkerrors "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
 	"github.com/okp4/okp4d/x/logic/fs"
 	"github.com/okp4/okp4d/x/logic/interpreter"
@@ -15,6 +12,11 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
 	"github.com/samber/lo"
+
+	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 const (
@@ -40,15 +42,15 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 
 	i, userOutputBuffer, err := k.newInterpreter(ctx)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.Internal, "error creating interpreter: %v", err.Error())
+		return nil, errorsmod.Wrapf(types.Internal, "error creating interpreter: %v", err.Error())
 	}
 	if err := i.ExecContext(ctx, program); err != nil {
-		return nil, sdkerrors.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
+		return nil, errorsmod.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
 	}
 
 	sols, err := i.QueryContext(ctx, query)
 	if err != nil {
-		return nil, sdkerrors.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
+		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
 	}
 	defer func() {
 		_ = sols.Close()
@@ -63,7 +65,7 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 
 		m := types.TermResults{}
 		if err := sols.Scan(m); err != nil {
-			return nil, sdkerrors.Wrapf(types.Internal, "error scanning solution: %v", err.Error())
+			return nil, errorsmod.Wrapf(types.Internal, "error scanning solution: %v", err.Error())
 		}
 		if nb.IsZero() {
 			variables = m.ToVariables()
@@ -76,7 +78,7 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 		if sdkCtx.GasMeter().IsOutOfGas() {
 			panic(sdk.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
 		}
-		return nil, sdkerrors.Wrapf(types.InvalidArgument, "error interpreting solutions: %v", err.Error())
+		return nil, errorsmod.Wrapf(types.InvalidArgument, "error interpreting solutions: %v", err.Error())
 	}
 
 	var userOutput string
@@ -101,7 +103,7 @@ func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) err
 	size := sdkmath.NewUint(uint64(len(request.GetQuery())))
 	limit := util.DerefOrDefault(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
 	if size.GT(limit) {
-		return sdkerrors.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size, limit)
+		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size, limit)
 	}
 
 	return nil

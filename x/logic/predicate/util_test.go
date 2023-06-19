@@ -5,6 +5,7 @@ import (
 	"testing"
 
 	"github.com/ichiban/prolog/engine"
+
 	. "github.com/smartystreets/goconvey/convey"
 )
 

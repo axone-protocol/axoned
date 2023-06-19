@@ -5,10 +5,11 @@ import (
 	"strconv"
 	"strings"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
 	"github.com/okp4/okp4d/x/logic/predicate"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // registry is a map from predicate names (in the form of "atom/arity") to predicates functions.

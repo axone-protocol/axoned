@@ -7,11 +7,13 @@ import (
 	"sort"
 	"strings"
 
-	"cosmossdk.io/math"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/ichiban/prolog/engine"
 	"github.com/okp4/okp4d/x/logic/util"
 	"github.com/samber/lo"
+
+	"cosmossdk.io/math"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // AtomJSON is a term which represents a json as a compound term `json([Pair])`.

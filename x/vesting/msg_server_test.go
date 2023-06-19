@@ -4,19 +4,20 @@ import (
 	"testing"
 	"time"
 
+	"github.com/golang/mock/gomock"
+	"github.com/okp4/okp4d/x/vesting"
+	vestingtestutil "github.com/okp4/okp4d/x/vesting/testutil"
+	vestingtypes "github.com/okp4/okp4d/x/vesting/types"
+	"github.com/stretchr/testify/suite"
+
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtime "github.com/cometbft/cometbft/types/time"
-	"github.com/golang/mock/gomock"
-	"github.com/stretchr/testify/suite"
 
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/okp4/okp4d/x/vesting"
-	vestingtestutil "github.com/okp4/okp4d/x/vesting/testutil"
-	vestingtypes "github.com/okp4/okp4d/x/vesting/types"
 )
 
 var (

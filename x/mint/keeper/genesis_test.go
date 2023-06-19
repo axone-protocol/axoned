@@ -3,9 +3,14 @@ package keeper_test
 import (
 	"testing"
 
-	"cosmossdk.io/math"
 	"github.com/golang/mock/gomock"
+	"github.com/okp4/okp4d/x/mint"
+	"github.com/okp4/okp4d/x/mint/keeper"
+	minttestutil "github.com/okp4/okp4d/x/mint/testutil"
+	"github.com/okp4/okp4d/x/mint/types"
 	"github.com/stretchr/testify/suite"
+
+	"cosmossdk.io/math"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -13,10 +18,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/okp4/okp4d/x/mint"
-	"github.com/okp4/okp4d/x/mint/keeper"
-	minttestutil "github.com/okp4/okp4d/x/mint/testutil"
-	"github.com/okp4/okp4d/x/mint/types"
 )
 
 var minterAcc = authtypes.NewEmptyModuleAccount(types.ModuleName, authtypes.Minter)

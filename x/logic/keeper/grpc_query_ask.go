@@ -3,17 +3,19 @@ package keeper
 import (
 	goctx "context"
 
-	sdkerrors "cosmossdk.io/errors"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/okp4/okp4d/x/logic/meter"
 	"github.com/okp4/okp4d/x/logic/types"
+
+	errorsmod "cosmossdk.io/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
 	if req == nil {
-		return nil, sdkerrors.Wrap(types.InvalidArgument, "request is nil")
+		return nil, errorsmod.Wrap(types.InvalidArgument, "request is nil")
 	}
 
 	limits := k.limits(ctx)
@@ -25,7 +27,7 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 	defer func() {
 		if r := recover(); r != nil {
 			if gasError, ok := r.(sdk.ErrorOutOfGas); ok {
-				response, err = nil, sdkerrors.Wrapf(
+				response, err = nil, errorsmod.Wrapf(
 					types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
 					types.ModuleName, gasError.Descriptor, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
 

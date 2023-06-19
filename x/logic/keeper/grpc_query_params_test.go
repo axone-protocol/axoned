@@ -6,19 +6,22 @@ import (
 	"io/fs"
 	"testing"
 
+	"github.com/golang/mock/gomock"
+	"github.com/okp4/okp4d/x/logic"
+	"github.com/okp4/okp4d/x/logic/keeper"
+	logictestutil "github.com/okp4/okp4d/x/logic/testutil"
+	"github.com/okp4/okp4d/x/logic/types"
+
+	. "github.com/smartystreets/goconvey/convey"
+
 	"cosmossdk.io/math"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
-	"github.com/golang/mock/gomock"
-	"github.com/okp4/okp4d/x/logic"
-	"github.com/okp4/okp4d/x/logic/keeper"
-	logictestutil "github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
-	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestGRPCParams(t *testing.T) {

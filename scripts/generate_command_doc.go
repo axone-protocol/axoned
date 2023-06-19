@@ -5,10 +5,10 @@ import (
 	"log"
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/okp4/okp4d/cmd/okp4d/cmd"
 	"github.com/spf13/cobra/doc"
 
-	"github.com/okp4/okp4d/cmd/okp4d/cmd"
+	"github.com/cosmos/cosmos-sdk/server"
 )
 
 func main() {

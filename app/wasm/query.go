@@ -5,10 +5,13 @@ import (
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	logickeeper "github.com/okp4/okp4d/x/logic/keeper"
 	logicwasm "github.com/okp4/okp4d/x/logic/wasm"
+
+	errorsmod "cosmossdk.io/errors"
+
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 )
 
 // customQuery represents the wasm custom query structure, it is intended to allow wasm contracts to execute queries
@@ -31,13 +34,13 @@ func makeCustomQuerier(logicQuerier logicwasm.LogicQuerier) wasmkeeper.CustomQue
 	return func(ctx sdk.Context, request json.RawMessage) ([]byte, error) {
 		var query customQuery
 		if err := json.Unmarshal(request, &query); err != nil {
-			return nil, sdkerrors.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
+			return nil, errorsmod.Wrap(sdkerrors.ErrJSONUnmarshal, err.Error())
 		}
 
 		if query.Ask != nil {
 			return logicQuerier.Ask(ctx, *query.Ask)
 		}
 
-		return nil, sdkerrors.Wrap(wasmtypes.ErrInvalidMsg, "Unknown custom query variant")
+		return nil, errorsmod.Wrap(wasmtypes.ErrInvalidMsg, "Unknown custom query variant")
 	}
 }
