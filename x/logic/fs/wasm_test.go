@@ -9,7 +9,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/okp4/okp4d/x/logic/testutil"
 
 	. "github.com/smartystreets/goconvey/convey"
 
@@ -19,6 +18,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/logic/testutil"
 )
 
 func TestWasmHandler(t *testing.T) {

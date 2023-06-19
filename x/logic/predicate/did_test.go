@@ -6,8 +6,6 @@ import (
 	"testing"
 
 	"github.com/ichiban/prolog/engine"
-	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 
 	. "github.com/smartystreets/goconvey/convey"
 
@@ -17,6 +15,9 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/logic/testutil"
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestDID(t *testing.T) {

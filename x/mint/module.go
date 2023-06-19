@@ -6,11 +6,6 @@ import (
 	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/okp4/okp4d/x/mint/client/cli"
-	"github.com/okp4/okp4d/x/mint/exported"
-	"github.com/okp4/okp4d/x/mint/keeper"
-	"github.com/okp4/okp4d/x/mint/simulation"
-	"github.com/okp4/okp4d/x/mint/types"
 	"github.com/spf13/cobra"
 
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -21,6 +16,12 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
+
+	"github.com/okp4/okp4d/x/mint/client/cli"
+	"github.com/okp4/okp4d/x/mint/exported"
+	"github.com/okp4/okp4d/x/mint/keeper"
+	"github.com/okp4/okp4d/x/mint/simulation"
+	"github.com/okp4/okp4d/x/mint/types"
 )
 
 var (

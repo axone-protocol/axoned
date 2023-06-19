@@ -1,11 +1,11 @@
 package keeper
 
 import (
+	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	"github.com/okp4/okp4d/x/logic/exported"
 	v2 "github.com/okp4/okp4d/x/logic/migrations/v2"
 	v3 "github.com/okp4/okp4d/x/logic/migrations/v3"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 type Migrator struct {

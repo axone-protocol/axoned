@@ -6,9 +6,10 @@ import (
 	"fmt"
 
 	"github.com/ichiban/prolog/engine"
-	"github.com/okp4/okp4d/x/logic/util"
 
 	"github.com/cometbft/cometbft/crypto"
+
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 // SHAHash is a predicate that computes the Hash of the given Data. The signature is as follow:

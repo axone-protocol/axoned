@@ -1,9 +1,9 @@
 package cmd
 
 import (
-	"github.com/okp4/okp4d/app"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/app"
 )
 
 func initSDKConfig() {

@@ -5,10 +5,11 @@ import (
 	"fmt"
 
 	"github.com/ichiban/prolog/engine"
-	"github.com/okp4/okp4d/x/logic/types"
-	"github.com/okp4/okp4d/x/logic/util"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/logic/types"
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 // BankBalances is a predicate which unifies the given terms with the list of balances (coins) of the given account.

@@ -6,6 +6,7 @@ import (
 	"net/url"
 
 	"github.com/ichiban/prolog/engine"
+
 	"github.com/okp4/okp4d/x/logic/util"
 )
 

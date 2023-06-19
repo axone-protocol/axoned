@@ -6,10 +6,6 @@ import (
 	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/okp4/okp4d/x/logic/client/cli"
-	"github.com/okp4/okp4d/x/logic/exported"
-	"github.com/okp4/okp4d/x/logic/keeper"
-	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/spf13/cobra"
 
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -19,6 +15,11 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
+
+	"github.com/okp4/okp4d/x/logic/client/cli"
+	"github.com/okp4/okp4d/x/logic/exported"
+	"github.com/okp4/okp4d/x/logic/keeper"
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 var (

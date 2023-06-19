@@ -1,12 +1,12 @@
 package v2
 
 import (
-	"github.com/okp4/okp4d/x/mint/exported"
-	"github.com/okp4/okp4d/x/mint/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/mint/exported"
+	"github.com/okp4/okp4d/x/mint/types"
 )
 
 // MigrateStore migrates the x/mint module state from the consensus version 1 to

@@ -5,13 +5,14 @@ import (
 
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
-	logickeeper "github.com/okp4/okp4d/x/logic/keeper"
-	logicwasm "github.com/okp4/okp4d/x/logic/wasm"
 
 	errorsmod "cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+
+	logickeeper "github.com/okp4/okp4d/x/logic/keeper"
+	logicwasm "github.com/okp4/okp4d/x/logic/wasm"
 )
 
 // customQuery represents the wasm custom query structure, it is intended to allow wasm contracts to execute queries

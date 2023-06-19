@@ -5,9 +5,10 @@ import (
 	"fmt"
 
 	"github.com/ichiban/prolog/engine"
-	"github.com/okp4/okp4d/x/logic/util"
 
 	bech322 "github.com/cosmos/cosmos-sdk/types/bech32"
+
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 // Bech32Address is a predicate that convert a bech32 encoded string into base64 bytes and give the address prefix, or

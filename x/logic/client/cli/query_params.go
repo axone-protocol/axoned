@@ -3,11 +3,12 @@ package cli
 import (
 	"context"
 
-	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
+
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func CmdQueryParams() *cobra.Command {

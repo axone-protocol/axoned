@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/okp4/okp4d/x/vesting/client/cli"
-	"github.com/okp4/okp4d/x/vesting/types"
 	"github.com/spf13/cobra"
 
 	abci "github.com/cometbft/cometbft/abci/types"
@@ -16,6 +14,9 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
+
+	"github.com/okp4/okp4d/x/vesting/client/cli"
+	"github.com/okp4/okp4d/x/vesting/types"
 )
 
 var (

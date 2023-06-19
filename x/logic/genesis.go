@@ -1,12 +1,12 @@
 package logic
 
 import (
-	"github.com/okp4/okp4d/x/logic/keeper"
-	"github.com/okp4/okp4d/x/logic/types"
-
 	errorsmod "cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/logic/keeper"
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

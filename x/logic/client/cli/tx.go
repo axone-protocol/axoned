@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
+
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 var DefaultRelativePacketTimeoutTimestamp = uint64((time.Duration(10) * time.Minute).Nanoseconds())

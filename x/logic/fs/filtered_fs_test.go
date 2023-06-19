@@ -8,11 +8,12 @@ import (
 	"time"
 
 	"github.com/golang/mock/gomock"
-	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/util"
 	"github.com/samber/lo"
 
 	. "github.com/smartystreets/goconvey/convey"
+
+	"github.com/okp4/okp4d/x/logic/testutil"
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 func TestSourceFile(t *testing.T) {

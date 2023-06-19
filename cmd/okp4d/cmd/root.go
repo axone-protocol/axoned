@@ -7,8 +7,6 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/okp4/okp4d/app"
-	appparams "github.com/okp4/okp4d/app/params"
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
@@ -40,6 +38,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/genutil"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 	genutiltypes "github.com/cosmos/cosmos-sdk/x/genutil/types"
+
+	"github.com/okp4/okp4d/app"
+	appparams "github.com/okp4/okp4d/app/params"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application.

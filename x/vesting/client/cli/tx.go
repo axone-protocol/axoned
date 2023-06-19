@@ -6,13 +6,14 @@ import (
 	"os"
 	"strconv"
 
-	"github.com/okp4/okp4d/x/vesting/types"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/vesting/types"
 )
 
 // FlagDelayed Transaction command flags.

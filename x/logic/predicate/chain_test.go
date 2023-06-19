@@ -5,7 +5,6 @@ import (
 	"testing"
 
 	"github.com/ichiban/prolog/engine"
-	"github.com/okp4/okp4d/x/logic/testutil"
 
 	. "github.com/smartystreets/goconvey/convey"
 
@@ -15,6 +14,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/logic/testutil"
 )
 
 func TestChainID(t *testing.T) {

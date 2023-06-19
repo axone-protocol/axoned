@@ -7,10 +7,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/okp4/okp4d/x/logic"
-	"github.com/okp4/okp4d/x/logic/keeper"
-	logictestutil "github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 
 	. "github.com/smartystreets/goconvey/convey"
 
@@ -19,6 +15,11 @@ import (
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+
+	"github.com/okp4/okp4d/x/logic"
+	"github.com/okp4/okp4d/x/logic/keeper"
+	logictestutil "github.com/okp4/okp4d/x/logic/testutil"
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestUpdateParams(t *testing.T) {

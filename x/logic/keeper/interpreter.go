@@ -5,18 +5,19 @@ import (
 	"math"
 
 	"github.com/ichiban/prolog"
-	"github.com/okp4/okp4d/x/logic/fs"
-	"github.com/okp4/okp4d/x/logic/interpreter"
-	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
-	"github.com/okp4/okp4d/x/logic/meter"
-	"github.com/okp4/okp4d/x/logic/types"
-	"github.com/okp4/okp4d/x/logic/util"
 	"github.com/samber/lo"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/logic/fs"
+	"github.com/okp4/okp4d/x/logic/interpreter"
+	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
+	"github.com/okp4/okp4d/x/logic/meter"
+	"github.com/okp4/okp4d/x/logic/types"
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 const (

@@ -3,10 +3,11 @@ package cli
 import (
 	"fmt"
 
-	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/spf13/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client"
+
+	"github.com/okp4/okp4d/x/logic/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module.
