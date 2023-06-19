@@ -130,7 +130,7 @@ func TestReadString(t *testing.T) {
 			{
 				input:       "Hello World!",
 				query:       `read_string(Stream, Len, data).`,
-				wantError:   fmt.Errorf("read_string/3: stream could not be a variable"),
+				wantError:   fmt.Errorf("read_string/3: stream cannot be a variable"),
 				wantSuccess: false,
 			},
 		}

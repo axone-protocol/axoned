@@ -49,7 +49,7 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 		var s *engine.Stream
 		switch st := env.Resolve(stream).(type) {
 		case engine.Variable:
-			return engine.Error(fmt.Errorf("read_string/3: stream could not be a variable"))
+			return engine.Error(fmt.Errorf("read_string/3: stream cannot be a variable"))
 		case *engine.Stream:
 			s = st
 		default:
@@ -69,12 +69,12 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 				if errors.Is(err, io.EOF) || totalLen >= maxLength {
 					break
 				}
-				return engine.Error(fmt.Errorf("read_string/3: error occurs reading stream: %w", err))
+				return engine.Error(fmt.Errorf("read_string/3: couldn't read stream: %w", err))
 			}
 			totalLen += uint64(l)
 			_, err = builder.WriteRune(r)
 			if err != nil {
-				return engine.Error(fmt.Errorf("read_string/3: failed write string: %w", err))
+				return engine.Error(fmt.Errorf("read_string/3: couldn't write string: %w", err))
 			}
 		}
 
