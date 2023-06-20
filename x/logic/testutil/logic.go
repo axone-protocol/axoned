@@ -49,6 +49,7 @@ func NewComprehensiveInterpreterMust(ctx context.Context) (i *prolog.Interpreter
 	i.Register1(engine.NewAtom("current_output"), engine.CurrentOutput)
 	i.Register1(engine.NewAtom("current_input"), engine.CurrentInput)
 	i.Register2(engine.NewAtom("put_char"), engine.PutChar)
+	i.Register2(engine.NewAtom("get_char"), engine.GetChar)
 	i.Register3(engine.NewAtom("write_term"), engine.WriteTerm)
 
 	err := i.Compile(ctx, bootstrap.Bootstrap())
