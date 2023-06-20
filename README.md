@@ -119,7 +119,7 @@ OKP4 blockchain and hosted in the [okp4/contracts](https://github.com/okp4/contr
 
 ### Prerequisites
 
-- install [Go] `1.19+` following instructions from the [official Go documentation](https://golang.org/doc/install);
+- install [Go] `1.20+` following instructions from the [official Go documentation](https://golang.org/doc/install);
 - use [gofumpt](https://github.com/mvdan/gofumpt) as formatter. You can integrate it in your favorite IDE following these [instructions](https://github.com/mvdan/gofumpt#installation) or invoke the makefile `make format-go`;
 - verify that [Docker] is properly installed and if not, follow the [instructions](https://docs.docker.com) for your environment;
 - verify that [`make`](https://fr.wikipedia.org/wiki/Make) is properly installed if you intend to use the provided `Makefile`.
