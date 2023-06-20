@@ -4,6 +4,7 @@ package predicate
 import (
 	goctx "context"
 	"fmt"
+	fs2 "io/fs"
 	"net/url"
 	"testing"
 	"time"
@@ -157,6 +158,198 @@ func TestSourceFile(t *testing.T) {
 											got = append(got, m)
 										}
 
+										if tc.wantError != nil {
+											So(sols.Err(), ShouldNotBeNil)
+											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
+										} else {
+											So(sols.Err(), ShouldBeNil)
+
+											if tc.wantSuccess {
+												So(len(got), ShouldBeGreaterThan, 0)
+												So(len(got), ShouldEqual, len(tc.wantResult))
+												for iGot, resultGot := range got {
+													for varGot, termGot := range resultGot {
+														So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.wantResult[iGot][varGot])
+													}
+												}
+											} else {
+												So(len(got), ShouldEqual, 0)
+											}
+										}
+									})
+								})
+							})
+						})
+					})
+				})
+			})
+		}
+	})
+}
+
+func TestOpen(t *testing.T) {
+	Convey("Given a test cases", t, func() {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		cases := []struct {
+			files       map[string][]byte
+			program     string
+			query       string
+			wantResult  []types.TermResults
+			wantError   error
+			wantSuccess bool
+		}{
+			{
+				files: map[string][]byte{
+					"file": []byte("dumb(dumber)."),
+				},
+				program: "get_first_char(C) :- open(file, read, Stream, _), get_char(Stream, C).",
+				query:   `get_first_char(C).`,
+				wantResult: []types.TermResults{{
+					"C": "d",
+				}},
+				wantSuccess: true,
+			},
+			{
+				files: map[string][]byte{
+					"file": []byte("Hey"),
+				},
+				program: "get_first_char(C) :- open(file, read, Stream, []), get_char(Stream, C).",
+				query:   `get_first_char(C).`,
+				wantResult: []types.TermResults{{
+					"C": "'H'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				files: map[string][]byte{
+					"file": []byte("dumb(dumber)."),
+				},
+				program:     "get_first_char(C) :- open(File, write, Stream, _), get_char(Stream, C).",
+				query:       `get_first_char(C).`,
+				wantError:   fmt.Errorf("open/4: source cannot be a variable"),
+				wantSuccess: false,
+			},
+			{
+				files: map[string][]byte{
+					"file": []byte("dumb(dumber)."),
+				},
+				program:     "get_first_char(C) :- open(34, write, Stream, _), get_char(Stream, C).",
+				query:       `get_first_char(C).`,
+				wantError:   fmt.Errorf("open/4: invalid domain for source, should be an atom, give engine.Integer"),
+				wantSuccess: false,
+			},
+			{
+				files: map[string][]byte{
+					"file": []byte("dumb(dumber)."),
+				},
+				program:     "get_first_char(C) :- open(file, write, stream, _), get_char(Stream, C).",
+				query:       `get_first_char(C).`,
+				wantError:   fmt.Errorf("open/4: stream can only be a variable, give engine.Atom"),
+				wantSuccess: false,
+			},
+			{
+				files: map[string][]byte{
+					"file": []byte("dumb(dumber)."),
+				},
+				program:     "get_first_char(C) :- open(file, 45, Stream, _), get_char(Stream, C).",
+				query:       `get_first_char(C).`,
+				wantError:   fmt.Errorf("open/4: invalid domain for open mode, should be an atom, give engine.Integer"),
+				wantSuccess: false,
+			},
+			{
+				files: map[string][]byte{
+					"file": []byte("dumb(dumber)."),
+				},
+				program:     "get_first_char(C) :- open(file, foo, Stream, _), get_char(Stream, C).",
+				query:       `get_first_char(C).`,
+				wantError:   fmt.Errorf("open/4: invalid open mode (read | write | append)"),
+				wantSuccess: false,
+			},
+			{
+				files: map[string][]byte{
+					"file": []byte("dumb(dumber)."),
+				},
+				program:     "get_first_char(C) :- open(file, write, Stream, _), get_char(Stream, C).",
+				query:       `get_first_char(C).`,
+				wantError:   fmt.Errorf("open/4: only read mode is allowed here"),
+				wantSuccess: false,
+			},
+			{
+				files: map[string][]byte{
+					"file": []byte("dumb(dumber)."),
+				},
+				program:     "get_first_char(C) :- open(file, append, Stream, _), get_char(Stream, C).",
+				query:       `get_first_char(C).`,
+				wantError:   fmt.Errorf("open/4: only read mode is allowed here"),
+				wantSuccess: false,
+			},
+			{
+				files: map[string][]byte{
+					"file": []byte("dumb(dumber)."),
+				},
+				program:     "get_first_char(C) :- open(file2, read, Stream, _), get_char(Stream, C).",
+				query:       `get_first_char(C).`,
+				wantError:   fmt.Errorf("open/4: failed open stream: read file2: path not found"),
+				wantSuccess: false,
+			},
+			{
+				files: map[string][]byte{
+					"file": []byte("dumb(dumber)."),
+				},
+				program:     "get_first_char(C) :- open(file, read, Stream, [option1]), get_char(Stream, C).",
+				query:       `get_first_char(C).`,
+				wantError:   fmt.Errorf("open/4: options is not allowed here"),
+				wantSuccess: false,
+			},
+		}
+		for nc, tc := range cases {
+			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
+				Convey("and a mocked file system", func() {
+					uri, _ := url.Parse("file://dump.pl")
+					mockedFS := testutil.NewMockFS(ctrl)
+					mockedFS.EXPECT().Open(gomock.Any()).AnyTimes().DoAndReturn(func(name string) (fs.VirtualFile, error) {
+						for key, bytes := range tc.files {
+							if key == name {
+								return fs.NewVirtualFile(bytes, uri, time.Now()), nil
+							}
+						}
+						return fs.VirtualFile{}, &fs2.PathError{
+							Op:   "read",
+							Path: "file2",
+							Err:  fmt.Errorf("path not found"),
+						}
+					})
+					Convey("and a context", func() {
+						db := tmdb.NewMemDB()
+						stateStore := store.NewCommitMultiStore(db)
+						ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
+
+						Convey("and a vm", func() {
+							interpreter := testutil.NewComprehensiveInterpreterMust(ctx)
+							interpreter.FS = mockedFS
+							interpreter.Register4(engine.NewAtom("open"), Open)
+
+							err := interpreter.Compile(ctx, tc.program)
+							So(err, ShouldBeNil)
+
+							Convey("When the predicate is called", func() {
+								sols, err := interpreter.QueryContext(ctx, tc.query)
+
+								Convey("Then the error should be nil", func() {
+									So(err, ShouldBeNil)
+									So(sols, ShouldNotBeNil)
+
+									Convey("and the bindings should be as expected", func() {
+										var got []types.TermResults
+										for sols.Next() {
+											m := types.TermResults{}
+											err := sols.Scan(m)
+											So(err, ShouldBeNil)
+
+											got = append(got, m)
+										}
 										if tc.wantError != nil {
 											So(sols.Err(), ShouldNotBeNil)
 											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
