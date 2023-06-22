@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io/fs"
 	"net/url"
+	"strconv"
 	"strings"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -15,8 +16,9 @@ import (
 )
 
 const (
-	queryKey = "query"
-	scheme   = "cosmwasm"
+	queryKey        = "query"
+	base64DecodeKey = "base64Decode"
+	scheme          = "cosmwasm"
 )
 
 type WasmHandler struct {
@@ -57,21 +59,33 @@ func (w WasmHandler) Open(ctx context.Context, uri *url.URL) (fs.File, error) {
 	}
 	query := uri.Query().Get(queryKey)
 
+	var base64Decode = true
+	if uri.Query().Has(base64DecodeKey) {
+		if base64Decode, err = strconv.ParseBool(uri.Query().Get(base64DecodeKey)); err != nil {
+			return nil, fmt.Errorf("failed convert 'base64Decode' query value to boolean: %w", err)
+		}
+	}
+
 	data, err := w.wasmKeeper.QuerySmart(sdkCtx, contractAddr, []byte(query))
 	if err != nil {
 		return nil, fmt.Errorf("failed query wasm keeper: %w", err)
 	}
 
-	var program string
-	err = json.Unmarshal(data, &program)
-	if err != nil {
-		return nil, fmt.Errorf("failed unmarshal json wasm response to string: %w", err)
+	if base64Decode {
+		var program string
+		err = json.Unmarshal(data, &program)
+		if err != nil {
+			return nil, fmt.Errorf("failed unmarshal json wasm response to string: %w", err)
+		}
+
+		decoded, err := base64.StdEncoding.DecodeString(program)
+		if err != nil {
+			return nil, fmt.Errorf("failed decode wasm base64 respone: %w", err)
+		}
+
+		return NewVirtualFile(decoded, uri, sdkCtx.BlockTime()), nil
 	}
 
-	decoded, err := base64.StdEncoding.DecodeString(program)
-	if err != nil {
-		return nil, fmt.Errorf("failed decode wasm base64 respone: %w", err)
-	}
+	return NewVirtualFile(data, uri, sdkCtx.BlockTime()), nil
 
-	return NewVirtualFile(decoded, uri, sdkCtx.BlockTime()), nil
 }
