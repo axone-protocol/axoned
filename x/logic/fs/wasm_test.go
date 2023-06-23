@@ -96,6 +96,28 @@ func TestWasmHandler(t *testing.T) {
 				wantResult:      []byte("\"\""),
 				wantError:       fmt.Errorf("emtpy path given, should be 'cosmwasm:{contractName}:{contractAddr}?query={query}'"),
 			},
+			{
+				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("foo-bar"),
+				uri:             `cosmwasm:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false`,
+				wantResult:      []byte("foo-bar"),
+			},
+			{
+				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
+				uri:             `cosmwasm:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=true`,
+				wantResult:      []byte("calc(X) :-  X is 100 + 200."),
+			},
+			{
+				contractAddress: "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht",
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("\"hey\""),
+				uri:             `cosmwasm:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=foo`,
+				wantResult:      []byte("\"\""),
+				wantError:       fmt.Errorf("failed convert 'base64Decode' query value to boolean: strconv.ParseBool: parsing \"foo\": invalid syntax"),
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the uri #%d: %s", nc, tc.uri), func() {
