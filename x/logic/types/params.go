@@ -41,11 +41,7 @@ func (p Params) Validate() error {
 	if err := validateInterpreter(p.Interpreter); err != nil {
 		return err
 	}
-	if err := validateLimits(p.Limits); err != nil {
-		return err
-	}
-
-	return nil
+	return validateLimits(p.Limits)
 }
 
 // String implements the Stringer interface.
