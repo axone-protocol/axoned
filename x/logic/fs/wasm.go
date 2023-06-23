@@ -59,7 +59,7 @@ func (w WasmHandler) Open(ctx context.Context, uri *url.URL) (fs.File, error) {
 	}
 	query := uri.Query().Get(queryKey)
 
-	var base64Decode = true
+	base64Decode := true
 	if uri.Query().Has(base64DecodeKey) {
 		if base64Decode, err = strconv.ParseBool(uri.Query().Get(base64DecodeKey)); err != nil {
 			return nil, fmt.Errorf("failed convert 'base64Decode' query value to boolean: %w", err)
