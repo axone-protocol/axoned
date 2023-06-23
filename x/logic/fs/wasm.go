@@ -87,5 +87,4 @@ func (w WasmHandler) Open(ctx context.Context, uri *url.URL) (fs.File, error) {
 	}
 
 	return NewVirtualFile(data, uri, sdkCtx.BlockTime()), nil
-
 }

@@ -8,7 +8,7 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
-func MigrateStore(ctx sdk.Context, legacySubspace exported.Subspace, cdc codec.BinaryCodec) error {
+func MigrateStore(ctx sdk.Context, legacySubspace exported.Subspace, _ codec.BinaryCodec) error {
 	logger := ctx.Logger().
 		With("module", "logic").
 		With("migration", "v2")

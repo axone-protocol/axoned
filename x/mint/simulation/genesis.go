@@ -25,7 +25,7 @@ func GenInflation(r *rand.Rand) sdk.Dec {
 }
 
 // GenAnnualReductionFactor randomized AnnualReductionFactor.
-func GenAnnualReductionFactorMax(r *rand.Rand) sdk.Dec {
+func GenAnnualReductionFactorMax(_ *rand.Rand) sdk.Dec {
 	return sdk.NewDecWithPrec(20, 2)
 }
 
