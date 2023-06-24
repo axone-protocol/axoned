@@ -126,6 +126,8 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 			return json.Marshal(true)
 		case MakeBool(false).Compare(t, env) == 0:
 			return json.Marshal(false)
+		case MakeEmptyArray().Compare(t, env) == 0:
+			return json.Marshal([]json.RawMessage{})
 		case MakeNull().Compare(t, env) == 0:
 			return json.Marshal(nil)
 		}
@@ -168,6 +170,10 @@ func jsonToTerms(value any) (engine.Term, error) {
 		return AtomJSON.Apply(engine.List(attributes...)), nil
 	case []any:
 		elements := make([]engine.Term, 0, len(v))
+		if len(v) == 0 {
+			return MakeEmptyArray(), nil
+		}
+
 		for _, element := range v {
 			term, err := jsonToTerms(element)
 			if err != nil {

@@ -22,6 +22,9 @@ var AtomTrue = engine.NewAtom("true")
 // AtomFalse is the term false.
 var AtomFalse = engine.NewAtom("false")
 
+// AtomEmptyArray is the term [].
+var AtomEmptyArray = engine.NewAtom("[]")
+
 // AtomNull is the term null.
 var AtomNull = engine.NewAtom("null")
 
@@ -38,4 +41,10 @@ func MakeBool(b bool) engine.Term {
 	}
 
 	return AtomAt.Apply(AtomFalse)
+}
+
+// MakeEmptyArray returns is the compound term @([]).
+// It is used to represent the empty array in json objects.
+func MakeEmptyArray() engine.Term {
+	return AtomAt.Apply(AtomEmptyArray)
 }
