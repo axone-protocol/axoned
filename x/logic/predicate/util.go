@@ -78,18 +78,6 @@ func ListToBytes(terms engine.ListIterator, env *engine.Env) ([]byte, error) {
 	return bt, nil
 }
 
-func AtomBool(b bool) engine.Term {
-	var r engine.Atom
-	if b {
-		r = engine.NewAtom("true")
-	} else {
-		r = engine.NewAtom("false")
-	}
-	return engine.NewAtom("@").Apply(r)
-}
-
-var AtomNull = engine.NewAtom("@").Apply(engine.NewAtom("null"))
-
 // ExtractJSONTerm is an utility function that would extract all attribute of a JSON object
 // that is represented in prolog with the `json` atom.
 //

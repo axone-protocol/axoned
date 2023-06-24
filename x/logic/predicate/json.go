@@ -17,9 +17,6 @@ import (
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
-// AtomJSON is a term which represents a json as a compound term `json([Pair])`.
-var AtomJSON = engine.NewAtom("json")
-
 // JSONProlog is a predicate that will unify a JSON string into prolog terms and vice versa.
 //
 // json_prolog(?Json, ?Term) is det
@@ -125,11 +122,11 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 		}
 
 		switch {
-		case AtomBool(true).Compare(t, env) == 0:
+		case MakeBool(true).Compare(t, env) == 0:
 			return json.Marshal(true)
-		case AtomBool(false).Compare(t, env) == 0:
+		case MakeBool(false).Compare(t, env) == 0:
 			return json.Marshal(false)
-		case AtomNull.Compare(t, env) == 0:
+		case MakeNull().Compare(t, env) == 0:
 			return json.Marshal(nil)
 		}
 
@@ -153,9 +150,9 @@ func jsonToTerms(value any) (engine.Term, error) {
 		}
 		return engine.Integer(r.Int64()), nil
 	case bool:
-		return AtomBool(v), nil
+		return MakeBool(v), nil
 	case nil:
-		return AtomNull, nil
+		return MakeNull(), nil
 	case map[string]any:
 		keys := lo.Keys(v)
 		sort.Strings(keys)
