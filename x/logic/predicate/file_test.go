@@ -237,7 +237,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(34, write, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: invalid domain for source, should be an atom, give engine.Integer"),
+				wantError:   fmt.Errorf("open/4: invalid domain for source, should be an atom, got engine.Integer"),
 				wantSuccess: false,
 			},
 			{
@@ -246,7 +246,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(file, write, stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: stream can only be a variable, give engine.Atom"),
+				wantError:   fmt.Errorf("open/4: stream can only be a variable, got engine.Atom"),
 				wantSuccess: false,
 			},
 			{
@@ -255,7 +255,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(file, 45, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: invalid domain for open mode, should be an atom, give engine.Integer"),
+				wantError:   fmt.Errorf("open/4: invalid domain for open mode, should be an atom, got engine.Integer"),
 				wantSuccess: false,
 			},
 			{
@@ -291,7 +291,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(file2, read, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: failed open stream: read file2: path not found"),
+				wantError:   fmt.Errorf("open/4: couldn't open stream: read file2: path not found"),
 				wantSuccess: false,
 			},
 			{
