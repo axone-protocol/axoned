@@ -148,10 +148,26 @@ func TestJsonProlog(t *testing.T) {
 			// ** JSON -> Prolog **
 			// Array
 			{
+				description: "convert empty json array into prolog",
+				query:       `json_prolog('[]', Term).`,
+				wantResult: []types.TermResults{{
+					"Term": "@([])",
+				}},
+				wantSuccess: true,
+			},
+			{
 				description: "convert json array into prolog",
 				query:       `json_prolog('["foo", "bar"]', Term).`,
 				wantResult: []types.TermResults{{
 					"Term": "[foo,bar]",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json array with null element into prolog",
+				query:       `json_prolog('[null]', Term).`,
+				wantResult: []types.TermResults{{
+					"Term": "[@(null)]",
 				}},
 				wantSuccess: true,
 			},
@@ -175,10 +191,34 @@ func TestJsonProlog(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
+				description: "convert atom term to json",
+				query:       `json_prolog(Json, foo).`,
+				wantResult: []types.TermResults{{
+					"Json": "'\"foo\"'",
+				}},
+				wantSuccess: true,
+			},
+			{
 				description: "convert string with space to json",
 				query:       `json_prolog(Json, 'foo bar').`,
 				wantResult: []types.TermResults{{
 					"Json": "'\"foo bar\"'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert string with space to json",
+				query:       `json_prolog(Json, 'foo bar').`,
+				wantResult: []types.TermResults{{
+					"Json": "'\"foo bar\"'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert empty-list atom term to json",
+				query:       `json_prolog(Json, []).`,
+				wantResult: []types.TermResults{{
+					"Json": "'\"[]\"'",
 				}},
 				wantSuccess: true,
 			},
@@ -253,10 +293,26 @@ func TestJsonProlog(t *testing.T) {
 			// ** Prolog -> Json **
 			// Array
 			{
+				description: "convert empty json array from prolog",
+				query:       `json_prolog(Json, @([])).`,
+				wantResult: []types.TermResults{{
+					"Json": "[]",
+				}},
+				wantSuccess: true,
+			},
+			{
 				description: "convert json array from prolog",
 				query:       `json_prolog(Json, [foo,bar]).`,
 				wantResult: []types.TermResults{{
 					"Json": "'[\"foo\",\"bar\"]'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json array with null element from prolog",
+				query:       `json_prolog(Json, [@(null)]).`,
+				wantResult: []types.TermResults{{
+					"Json": "'[null]'",
 				}},
 				wantSuccess: true,
 			},
@@ -340,7 +396,6 @@ func TestJsonProlog(t *testing.T) {
 										So(sols.Err(), ShouldBeNil)
 
 										if tc.wantSuccess {
-											So(len(got), ShouldBeGreaterThan, 0)
 											So(len(got), ShouldEqual, len(tc.wantResult))
 											for iGot, resultGot := range got {
 												for varGot, termGot := range resultGot {
@@ -403,6 +458,11 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 				json:        "'{\"foo\":\"bar\"}'",
 				term:        "json([a-b])",
 				wantSuccess: false,
+			},
+			{
+				json:        `'{"key1":null,"key2":[],"key3":{"nestedKey1":null,"nestedKey2":[],"nestedKey3":["a",null,null]}}'`,
+				term:        `json([key1- @(null),key2- @([]),key3-json([nestedKey1- @(null),nestedKey2- @([]),nestedKey3-[a,@(null),@(null)]])])`,
+				wantSuccess: true,
 			},
 		}
 		for nc, tc := range cases {
