@@ -55,7 +55,7 @@ var registry = map[string]any{
 	"current_output/1":          engine.CurrentOutput,
 	"set_input/1":               engine.SetInput,
 	"set_output/1":              engine.SetOutput,
-	"open/4":                    engine.Open,
+	"open/4":                    predicate.Open,
 	"close/2":                   engine.Close,
 	"flush_output/1":            engine.FlushOutput,
 	"stream_property/2":         engine.StreamProperty,

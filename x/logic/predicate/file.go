@@ -3,6 +3,7 @@ package predicate
 import (
 	"context"
 	"fmt"
+	"os"
 	"reflect"
 	"sort"
 
@@ -55,6 +56,84 @@ func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.E
 	}
 
 	return engine.Delay(promises...)
+}
+
+// ioMode describes what operations you can perform on the stream.
+type ioMode int
+
+const (
+	// ioModeRead means you can read from the stream.
+	ioModeRead = ioMode(os.O_RDONLY)
+	// ioModeWrite means you can write to the stream.
+	ioModeWrite = ioMode(os.O_CREATE | os.O_WRONLY)
+	// ioModeAppend means you can append to the stream.
+	ioModeAppend = ioMode(os.O_APPEND) | ioModeWrite
+)
+
+var (
+	atomRead   = engine.NewAtom("read")
+	atomWrite  = engine.NewAtom("write")
+	atomAppend = engine.NewAtom("append")
+)
+
+func (m ioMode) Term() engine.Term {
+	return [...]engine.Term{
+		ioModeRead:   atomRead,
+		ioModeWrite:  atomWrite,
+		ioModeAppend: atomAppend,
+	}[m]
+}
+
+// Open opens SourceSink in mode and unifies with stream.
+func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
+	var name string
+	switch s := env.Resolve(sourceSink).(type) {
+	case engine.Variable:
+		return engine.Error(fmt.Errorf("open/4: source cannot be a variable"))
+	case engine.Atom:
+		name = s.String()
+	default:
+		return engine.Error(fmt.Errorf("open/4: invalid domain for source, should be an atom, got %T", s))
+	}
+
+	var streamMode ioMode
+	switch m := env.Resolve(mode).(type) {
+	case engine.Variable:
+		return engine.Error(fmt.Errorf("open/4: streamMode cannot be a variable"))
+	case engine.Atom:
+		var ok bool
+		streamMode, ok = map[engine.Atom]ioMode{
+			atomRead:   ioModeRead,
+			atomWrite:  ioModeWrite,
+			atomAppend: ioModeAppend,
+		}[m]
+		if !ok {
+			return engine.Error(fmt.Errorf("open/4: invalid open mode (read | write | append)"))
+		}
+	default:
+		return engine.Error(fmt.Errorf("open/4: invalid domain for open mode, should be an atom, got %T", m))
+	}
+
+	if _, ok := env.Resolve(stream).(engine.Variable); !ok {
+		return engine.Error(fmt.Errorf("open/4: stream can only be a variable, got %T", env.Resolve(stream)))
+	}
+
+	if streamMode != ioModeRead {
+		return engine.Error(fmt.Errorf("open/4: only read mode is allowed here"))
+	}
+
+	f, err := vm.FS.Open(name)
+	if err != nil {
+		return engine.Error(fmt.Errorf("open/4: couldn't open stream: %w", err))
+	}
+	s := engine.NewInputTextStream(f)
+
+	iter := engine.ListIterator{List: options, Env: env}
+	for iter.Next() {
+		return engine.Error(fmt.Errorf("open/4: options is not allowed here"))
+	}
+
+	return engine.Unify(vm, stream, s, k, env)
 }
 
 func getLoadedSources(vm *engine.VM) map[string]struct{} {
