@@ -93,7 +93,7 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 	case engine.Atom:
 		name = s.String()
 	default:
-		return engine.Error(fmt.Errorf("open/4: invalid domain for source, should be an atom, give %T", s))
+		return engine.Error(fmt.Errorf("open/4: invalid domain for source, should be an atom, got %T", s))
 	}
 
 	var streamMode ioMode
@@ -111,11 +111,11 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 			return engine.Error(fmt.Errorf("open/4: invalid open mode (read | write | append)"))
 		}
 	default:
-		return engine.Error(fmt.Errorf("open/4: invalid domain for open mode, should be an atom, give %T", m))
+		return engine.Error(fmt.Errorf("open/4: invalid domain for open mode, should be an atom, got %T", m))
 	}
 
 	if _, ok := env.Resolve(stream).(engine.Variable); !ok {
-		return engine.Error(fmt.Errorf("open/4: stream can only be a variable, give %T", env.Resolve(stream)))
+		return engine.Error(fmt.Errorf("open/4: stream can only be a variable, got %T", env.Resolve(stream)))
 	}
 
 	if streamMode != ioModeRead {
@@ -124,7 +124,7 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 
 	f, err := vm.FS.Open(name)
 	if err != nil {
-		return engine.Error(fmt.Errorf("open/4: failed open stream: %w", err))
+		return engine.Error(fmt.Errorf("open/4: couldn't open stream: %w", err))
 	}
 	s := engine.NewInputTextStream(f)
 
