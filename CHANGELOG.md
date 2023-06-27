@@ -1,5 +1,101 @@
 # ØKP4 protocol changelog
 
+## [5.0.0](https://github.com/okp4/okp4d/compare/v4.1.0...v5.0.0) (2023-06-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **logic:** implement our own open/4 predicate
+* **logic:** add base64Decode uri key on cosmwasm uri
+* **logic:** specify whitelist / blacklist in its own type
+* bump cosmos-sdk to 0.47.1
+* **mint:** move x/param to x/mint state
+* **logic:** allow predicates blacklisting configuration
+
+### Features
+
+* generate protobuf code ([c2bb70a](https://github.com/okp4/okp4d/commit/c2bb70ae57d702edf72e86d15a97e9aaac2671d2))
+* implement migration from v2 to v3 ([19717ce](https://github.com/okp4/okp4d/commit/19717ce4642f9b5d25d07f5e23e9db2b334a8b70))
+* **logic:** add base64Decode uri key on cosmwasm uri ([0516290](https://github.com/okp4/okp4d/commit/051629060d2d42dca736dfae91b46b6ecb672ab7))
+* **logic:** add bounded buffer utility ([0ae4d43](https://github.com/okp4/okp4d/commit/0ae4d43bccd270a3b3dc47f6d29525b02419d8d1))
+* **logic:** add convenient function to check nil pointers ([3d29c12](https://github.com/okp4/okp4d/commit/3d29c1286d5fbbee7b5724ed62472c5ca29693af))
+* **logic:** add default_predicate_cost parameter ([52eac51](https://github.com/okp4/okp4d/commit/52eac5188de21c14d1c85b265df07209ed0f96a1))
+* **logic:** add filtered virtual FS ([d35673d](https://github.com/okp4/okp4d/commit/d35673d0f2238874d9d12e85202b21140648ebb0))
+* **logic:** add functional functions ([11f1738](https://github.com/okp4/okp4d/commit/11f17381edb5a4c42cfa0e48afa0d9ee821c78ef))
+* **logic:** add gas policy parameters for the logic module ([2697fcb](https://github.com/okp4/okp4d/commit/2697fcb2230cb96bd51745d5103886f539684bc4))
+* **logic:** add option for files whitelist and backlist on interpreter params ([fec5745](https://github.com/okp4/okp4d/commit/fec574518b7d7fdeca594b41858da5c11adfc32f))
+* **logic:** add some functions to deal with urls ([5f9c8a1](https://github.com/okp4/okp4d/commit/5f9c8a16b38b0ac7546cfde9c4ef72051c329d10))
+* **logic:** add source_files/1 predicate ([b89718c](https://github.com/okp4/okp4d/commit/b89718c5d59bda8fc73b3a3045de002523452c60))
+* **logic:** add util func to extract json object attribute ([9b58497](https://github.com/okp4/okp4d/commit/9b58497948ba6d4d687fb80269bb5e03edef3550))
+* **logic:** add v2 protobuf types for migration ([e00048a](https://github.com/okp4/okp4d/commit/e00048a4260316993fc7d77934cdf13477e0198a))
+* **logic:** apply predicate costs ([9f83562](https://github.com/okp4/okp4d/commit/9f83562fc9f12e24554188e7cab963854049a350))
+* **logic:** convert basic json object into prolog ([310459a](https://github.com/okp4/okp4d/commit/310459a2e351720c6497d78fb9462a5462cff9b7))
+* **logic:** convert json string to terms ([e43010d](https://github.com/okp4/okp4d/commit/e43010d6869204e21b392ce54a7be362c359e522))
+* **logic:** implement default predicate cost ([9681681](https://github.com/okp4/okp4d/commit/968168166df065e182d6201b06900b66b8779eea))
+* **logic:** implement max length on read_string/3 predicate ([5c2a834](https://github.com/okp4/okp4d/commit/5c2a8345d3f1ec4f3d7eb1f2c7ec5397f01cc300))
+* **logic:** implement our own open/4 predicate ([ec04a14](https://github.com/okp4/okp4d/commit/ec04a14b55a2c1a7c37ba7cc12e8db1cbfbf81ed))
+* **logic:** implement preciate cost policy ([0ac899d](https://github.com/okp4/okp4d/commit/0ac899d45be8fb525ae1614b4477acc5ba882399))
+* **logic:** implement support for user output ([0a65522](https://github.com/okp4/okp4d/commit/0a65522e223d2d149f6497c439baa07229a66aca))
+* **logic:** implement virtual FS white/black list ([81c5c3e](https://github.com/okp4/okp4d/commit/81c5c3ee5b8c71d91bb70f0f2c6e063b91208f3d))
+* **logic:** improve params definition ([6aa3d49](https://github.com/okp4/okp4d/commit/6aa3d4932675964265463c05aefa9b81d75609c2))
+* **logic:** include json_prolog/2 into the registry ([5b85987](https://github.com/okp4/okp4d/commit/5b85987f102fb8efe57cf70c442d46d62fff1484))
+* **logic:** introduce weithted_meter gas meter ([f668dd1](https://github.com/okp4/okp4d/commit/f668dd14a88ce3ef4ea71e1a750f91c4a7c78f53))
+* **logic:** json_prolog/2 handle boolean ([7679f94](https://github.com/okp4/okp4d/commit/7679f94b132e251170b8c245d5d8b4bb87cd2438))
+* **logic:** json_prolog/2 handle boolean and null ([9c3b7f8](https://github.com/okp4/okp4d/commit/9c3b7f8364e0ca8e7552b821873d76e3eefcfec0))
+* **logic:** json_prolog/2 handle integer number ([a60f332](https://github.com/okp4/okp4d/commit/a60f3324c587826a5c470b6b985c527aed3474a8))
+* **logic:** json_prolog/2 handle json array ([ff1f248](https://github.com/okp4/okp4d/commit/ff1f2481941c4681cd0e98e1d197b23823520d69))
+* **logic:** json_prolog/2 handle json term to json object ([4bb3f9a](https://github.com/okp4/okp4d/commit/4bb3f9a0ad6825af1033ffed9888710efd353951))
+* **logic:** json_prolog/2 handle list term to json array ([4e2b8b6](https://github.com/okp4/okp4d/commit/4e2b8b6bf590b03c1defc930d7d6082832c0b3d5))
+* **logic:** json_prolog/2 handle null json value ([94e9c5b](https://github.com/okp4/okp4d/commit/94e9c5b85fbae0c16383d379c8e174b06be28c62))
+* **logic:** json_prolog/2 handle string term to json string ([c0b5a6c](https://github.com/okp4/okp4d/commit/c0b5a6c5290f3aedbbd0b9f7d9f7a712f8d773f7))
+* **logic:** regenerate protos ([cdfd71a](https://github.com/okp4/okp4d/commit/cdfd71abcc8b1cf63972c974a3abb489149010c6))
+* **logic:** register msg to update params ([16435d2](https://github.com/okp4/okp4d/commit/16435d27cd7bf9988b48eb4a965ebdc396648447))
+* **logic:** register our own open/4 predicate ([9af2390](https://github.com/okp4/okp4d/commit/9af23908c7a9d811b92bbd8c2870832f9b8d5b26))
+* **logic:** register uri_encoded/3 on registry ([43b4cdf](https://github.com/okp4/okp4d/commit/43b4cdfe8aa3c21fc22f3ceb1b0858722c952ebb))
+* **logic:** return rpc error when interpreter enconter an error ([2aed7e7](https://github.com/okp4/okp4d/commit/2aed7e70006569532501fba31bae534412089106))
+* **logic:** specify user output support ([6343864](https://github.com/okp4/okp4d/commit/63438641aab39b347672fd67e8da64ee442b70a3))
+* **logic:** update for sdk047 ([58c7efd](https://github.com/okp4/okp4d/commit/58c7efdd7d37840ad08b6876b3e1f5245a8455fe))
+* **logic:** uri_encoded/3 detect component used ([276bf77](https://github.com/okp4/okp4d/commit/276bf77a815da6773b48c10a793ac304607c22ce))
+* **logic:** uri_encoded/3 implement encoding component ([e02ca30](https://github.com/okp4/okp4d/commit/e02ca308f65d1b666ba37f13e3ad08d5ad236d14))
+* **logic:** uri_encoded/3 implement unescape component ([9eeb484](https://github.com/okp4/okp4d/commit/9eeb48439cee13dde81c93eedfcd0b792ef81de4))
+* **mint:** update mint module for sdk047 ([e8d4f90](https://github.com/okp4/okp4d/commit/e8d4f90555105e8cf87e8874f2a4626f1448d3ea))
+* **mint:** update mint module for sdk047 ([fdae447](https://github.com/okp4/okp4d/commit/fdae4477dce464bb033bffadde37d66eac75fd49))
+* **prolog:** implement read_string predicate ([a3601a0](https://github.com/okp4/okp4d/commit/a3601a0ca28dd3f5688022946fb90a5472ae2e3f))
+* **vesting:** update to sdk047 ([d823c27](https://github.com/okp4/okp4d/commit/d823c27914aae040e95478ca127d4deed9fef453))
+
+
+### Bug Fixes
+
+* **ci:** fix linter ([5b60b4c](https://github.com/okp4/okp4d/commit/5b60b4c3d09d91cab17c340ff273e6290aa8e692))
+* **lint:** add nolint for deprecated func in migration ([1b55d0d](https://github.com/okp4/okp4d/commit/1b55d0dc07a1f0197eabda1b036b24bf73a437ce))
+* **lint:** gci import typo ([fe19886](https://github.com/okp4/okp4d/commit/fe198865a1d3559219686ca9dd527608b36c148e))
+* **lint:** handle error ([8e28027](https://github.com/okp4/okp4d/commit/8e2802786bc6e0de566275fcf66de26c89aaec99))
+* **lint:** make read_string gci-ed ([aee8b8b](https://github.com/okp4/okp4d/commit/aee8b8b2ac595c233e14b06a060b0afc450054cf))
+* **lint:** reapply good gci import order ([765a2ed](https://github.com/okp4/okp4d/commit/765a2ed41651e93da0606603b0e8db4e56c3cde7))
+* **logic:** avoid killing querying goroutine on gas limit exceeded ([86a184a](https://github.com/okp4/okp4d/commit/86a184ad27d9948bf6248752e4f9b7e118fb3688))
+* **logic:** correct error messages ([f67c48b](https://github.com/okp4/okp4d/commit/f67c48bb3fb043ddb2ed073810326ef3ed48d82f))
+* **logic:** do not convert empty string to Variable ([5c0d0fc](https://github.com/okp4/okp4d/commit/5c0d0fcc6efc18d1b5e9b8596464d43e56001158))
+* **logic:** fix empty array management in json predicate ([054f854](https://github.com/okp4/okp4d/commit/054f85423bf4b83b39deaab7e096b615dffd491f))
+* **logic:** fix error reported on url parse failure ([715baef](https://github.com/okp4/okp4d/commit/715baef3d5423ff1e6482233470578d436943186))
+* proto linter ([79d96f0](https://github.com/okp4/okp4d/commit/79d96f09562f0b64304f6cb910708dfdfb038c43))
+* remove unused proto import ([824c912](https://github.com/okp4/okp4d/commit/824c9126dcd1aca7bb85fd1cd3b4e8195dcd7663))
+* **sdk:** solves barberry issue by updating the sdk ([25a3c6f](https://github.com/okp4/okp4d/commit/25a3c6f9ea8c45a3cc5d23c1d2c1b73800bf77d8))
+* **test:** register get_char on testutil ([a5ef9ee](https://github.com/okp4/okp4d/commit/a5ef9ee468d58d087c0eb75633b8704f8e01fd9d))
+* **test:** use good fs import on logic test ([0d6a7f4](https://github.com/okp4/okp4d/commit/0d6a7f49485c65b0f5e79076779994d8bb839c17))
+* **upgrade:** stakingKeeper instance ([0dd7980](https://github.com/okp4/okp4d/commit/0dd7980f09db6868ed260d03bd78599021360080))
+
+
+### Miscellaneous Chores
+
+* bump cosmos-sdk to 0.47.1 ([492122d](https://github.com/okp4/okp4d/commit/492122dbaf874892579d477eea40cc22c5f9a7ad))
+
+
+### Code Refactoring
+
+* **logic:** allow predicates blacklisting configuration ([ec80998](https://github.com/okp4/okp4d/commit/ec80998d448b432603908fdef77281a1dbe0d70e))
+* **logic:** specify whitelist / blacklist in its own type ([a8b2500](https://github.com/okp4/okp4d/commit/a8b2500203435e680e93c485bfc285d28140b0b8))
+* **mint:** move x/param to x/mint state ([fe7c618](https://github.com/okp4/okp4d/commit/fe7c6184d108685a0060d79c8f6c22532d005363))
+
 ## [4.1.0](https://github.com/okp4/okp4d/compare/v4.0.0...v4.1.0) (2023-03-17)
 
 
