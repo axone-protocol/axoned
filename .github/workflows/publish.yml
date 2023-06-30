@@ -90,7 +90,7 @@ jobs:
 
       - name: Push okp4 proto on buf registry
         run:
-          buf push proto ${{ github.ref_type == 'tag' && '--tag' || '--draft' }} ${{ github.ref_name }}
+          buf push proto --tag ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
 
         env:
           BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
