@@ -89,7 +89,8 @@ jobs:
         uses: bufbuild/buf-setup-action@v1.14.0
 
       - name: Push okp4 proto on buf registry
-        uses: bufbuild/buf-push-action@v1
-        with:
-          input: 'proto'
-          buf_token: ${{ secrets.BUF_TOKEN }}
+        run:
+          buf push proto ${{ github.ref_type == 'tag' && '--tag' || '--draft' }} ${{ github.ref_name }}
+
+        env:
+          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}
