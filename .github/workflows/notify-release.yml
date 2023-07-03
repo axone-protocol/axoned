@@ -58,6 +58,23 @@ jobs:
               }
             }
 
+  notify-proto:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Update modules docs repository
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://api.github.com/repos/okp4/okp4-cosmos-proto/actions/workflows/23386493/dispatches'
+          method: 'POST'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          data: |-
+            {
+              "ref": "main",
+              "inputs": {
+                "version": "${{ github.event.release.tag_name }}",
+              }
+            }
+
   update-docs-version:
     runs-on: ubuntu-22.04
     steps:
