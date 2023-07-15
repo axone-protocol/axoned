@@ -58,6 +58,7 @@ func TestUpdateParams(t *testing.T) {
 					accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
 					bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 					fsProvider := logictestutil.NewMockFS(ctrl)
+					wasmKeeper := logictestutil.NewMockWasmKeeper(ctrl)
 
 					logicKeeper := keeper.NewKeeper(
 						encCfg.Codec,
@@ -69,6 +70,7 @@ func TestUpdateParams(t *testing.T) {
 						func(ctx gocontext.Context) fs.FS {
 							return fsProvider
 						},
+						wasmKeeper,
 					)
 
 					msgServer := keeper.NewMsgServerImpl(*logicKeeper)

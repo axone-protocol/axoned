@@ -2,6 +2,7 @@ package keeper
 
 import (
 	goctx "context"
+	"encoding/json"
 	"math"
 
 	"github.com/ichiban/prolog"
@@ -15,6 +16,7 @@ import (
 	"github.com/okp4/okp4d/x/logic/fs"
 	"github.com/okp4/okp4d/x/logic/interpreter"
 	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
+	"github.com/okp4/okp4d/x/logic/predicate"
 	"github.com/okp4/okp4d/x/logic/meter"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
@@ -37,11 +39,34 @@ func (k Keeper) enhanceContext(ctx goctx.Context) goctx.Context {
 	return sdkCtx
 }
 
-func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryServiceAskResponse, error) {
+func (k Keeper) execute(ctx goctx.Context, program, query string, exts []sdk.AccAddress) (*types.QueryServiceAskResponse, error) {
 	ctx = k.enhanceContext(ctx)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
-	i, userOutputBuffer, err := k.newInterpreter(ctx)
+
+	manifests := make([]types.ExtensionManifest, 0)
+	manifestMsg := types.PrologQueryMsg {
+		PrologExtensionManifest: &types.PrologExtensionManifest {},
+	}
+	manifestMsgBz, err := json.Marshal(manifestMsg)
+	if err != nil {
+		return nil, errorsmod.Wrapf(types.Internal, "error marshalling manifest request: %v", err.Error())
+	}
+	for _, ext := range exts {
+		resbz, err := k.wasmKeeper.QuerySmart(sdkCtx, ext, manifestMsgBz)
+		if err != nil {
+			return nil, errorsmod.Wrapf(types.InvalidArgument, "error querying extension manifest: %v", err.Error())
+		}
+
+		var manifestRes types.PrologQueryResponse
+		if err := json.Unmarshal(resbz, &manifestRes); err != nil {
+			return nil, errorsmod.Wrapf(types.Internal, "error unmarshalling manifest response: %v", err.Error())
+		}
+
+		manifests = append(manifests, *manifestRes.PrologExtensionManifest.Manifests...)
+	}
+
+	i, userOutputBuffer, err := k.newInterpreter(ctx, manifests)
 	if err != nil {
 		return nil, errorsmod.Wrapf(types.Internal, "error creating interpreter: %v", err.Error())
 	}
@@ -111,7 +136,7 @@ func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) err
 }
 
 // newInterpreter creates a new interpreter properly configured.
-func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.BoundedBuffer, error) {
+func (k Keeper) newInterpreter(ctx goctx.Context, manifests []ExtensionManifest) (*prolog.Interpreter, *util.BoundedBuffer, error) {
 	sdkctx := sdk.UnwrapSDKContext(ctx)
 	params := k.GetParams(sdkctx)
 
@@ -136,6 +161,13 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.Bo
 		},
 		interpreter.Predicates{})
 
+	extendedRegistry := interpreter.NewRegistry()
+
+	for _, manifest := range manifests {
+		predicates[manifest.Name] = manifest.Cost
+		extendedRegistry[manifest.Name] = predicate.NewWasmExtension(manifest.ContractAddress, manifest.Name)
+	}
+
 	whitelistUrls := lo.Map(
 		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
 		util.Indexed(util.ParseURLMust))
@@ -144,7 +176,7 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.Bo
 		util.Indexed(util.ParseURLMust))
 
 	options := []interpreter.Option{
-		interpreter.WithPredicates(ctx, predicates, gasMeter),
+		interpreter.WithPredicates(ctx, extendedRegistry, predicates, gasMeter),
 		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
 		interpreter.WithFS(fs.NewFilteredFS(whitelistUrls, blacklistUrls, k.fsProvider(ctx))),
 	}

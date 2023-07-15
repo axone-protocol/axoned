@@ -8,4 +8,6 @@ const (
 	AuthKeeperContextKey = ContextKey("authKeeper")
 	// BankKeeperContextKey is the context key for the bank keeper.
 	BankKeeperContextKey = ContextKey("bankKeeper")
+	
+	CosmWasmKeeperContextKey = ContextKey("cosmWasmKeeper")
 )

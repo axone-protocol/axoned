@@ -20,7 +20,7 @@ type Option func(*prolog.Interpreter) error
 
 // WithPredicates configures the interpreter to register the specified predicates.
 // The predicates names must be present in the registry, otherwise the function will return an error.
-func WithPredicates(_ goctx.Context, predicates Predicates, meter sdk.GasMeter) Option {
+func WithPredicates(_ goctx.Context, registry map[string]any, predicates Predicates, meter sdk.GasMeter) Option {
 	return func(i *prolog.Interpreter) error {
 		for predicate, cost := range predicates {
 			if err := Register(i, predicate, cost, meter); err != nil {

@@ -61,6 +61,7 @@ func TestGRPCParams(t *testing.T) {
 					accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
 					bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 					fsProvider := logictestutil.NewMockFS(ctrl)
+					wasmKeeper := logictestutil.NewMockWasmKeeper(ctrl)
 
 					logicKeeper := keeper.NewKeeper(
 						encCfg.Codec,
@@ -72,6 +73,7 @@ func TestGRPCParams(t *testing.T) {
 						func(ctx gocontext.Context) fs.FS {
 							return fsProvider
 						},
+						wasmKeeper,
 					)
 
 					Convey("and given params to the keeper", func() {

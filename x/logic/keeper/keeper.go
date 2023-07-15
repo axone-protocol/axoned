@@ -27,6 +27,7 @@ type (
 		authKeeper types.AccountKeeper
 		bankKeeper types.BankKeeper
 		fsProvider FSProvider
+		wasmKeeper types.WasmKeeper
 	}
 )
 
@@ -38,6 +39,7 @@ func NewKeeper(
 	authKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
 	fsProvider FSProvider,
+	wasmKeeper types.WasmKeeper,
 ) *Keeper {
 	// ensure gov module account is set and is not nil
 	if err := sdk.VerifyAddressFormat(authority); err != nil {
@@ -52,6 +54,7 @@ func NewKeeper(
 		authKeeper: authKeeper,
 		bankKeeper: bankKeeper,
 		fsProvider: fsProvider,
+		wasmKeeper: wasmKeeper,
 	}
 }
 

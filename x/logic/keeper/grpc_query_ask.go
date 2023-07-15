@@ -43,7 +43,9 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 	return k.execute(
 		sdkCtx,
 		req.Program,
-		req.Query)
+		req.Query,
+		req.Extensions,
+	)
 }
 
 // withGasMeter returns a new context with a gas meter that has the given limit.

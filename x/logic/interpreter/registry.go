@@ -118,6 +118,15 @@ var registry = map[string]any{
 	"read_string/3":             predicate.ReadString,
 }
 
+func NewRegistry() map[string]any {
+	r := make(map[string]any)
+	for k, v := range registry {
+		r[k] = v
+	}
+
+	return r
+}
+
 // RegistryNames is the list of the predicate names in the Registry.
 var RegistryNames = func() []string {
 	names := make([]string, 0, len(registry))
