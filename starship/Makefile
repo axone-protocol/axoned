@@ -11,7 +11,7 @@ HELM_VERSION = v0.1.38
 
 .PHONY: test
 test:
-	cd tests/ go test ./...
+	cd tests/ && go test -v ./...
 
 ###############################################################################
 ###                              All commands                               ###
