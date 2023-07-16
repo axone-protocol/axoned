@@ -114,4 +114,6 @@ func (s *TestSuite) IBCTransferTokens(chain1, chain2 *starship.ChainClient, chai
 	res, err := chain1.Client.SendMsg(context.Background(), req, "")
 	s.Require().NoError(err)
 	s.Require().NotEmpty(res)
+
+	time.Sleep(5 * time.Second)
 }

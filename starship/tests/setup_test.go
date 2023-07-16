@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	"testing"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -60,14 +61,13 @@ func (s *TestSuite) TestChainIBCTransfer() {
 	s.IBCTransferTokens(chain2, chain1, address, 12345000)
 
 	// Verify the address recived the token
-	balance, err := chain1.Client.QueryBalanceWithDenomTraces(context.Background(), sdk.AccAddress(address), nil)
-	s.Require().NoError(err)
-
-	chain2Denom, err := chain2.GetChainDenom()
+	balances, err := banktypes.NewQueryClient(chain1.Client).AllBalances(context.Background(), &banktypes.QueryAllBalancesRequest{
+		Address: address,
+	})
 	s.Require().NoError(err)
 
 	// Assert correct transfers
-	s.Assert().Len(balance, 1)
-	s.Assert().Equal(balance.Denoms(), []string{chain2Denom})
-	s.Assert().Equal(balance[0].Amount, sdk.NewInt(12345000))
+	s.Assert().Len(balances.Balances.Denoms(), 1)
+	s.Assert().Equal(balances.Balances[0].Amount.Uint64(), uint64(12345000))
+	s.Assert().Contains(balances.Balances.Denoms()[0], "ibc/")
 }

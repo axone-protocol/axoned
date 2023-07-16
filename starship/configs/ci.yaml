@@ -52,3 +52,8 @@ exposer:
   resources:
     cpu: "0.1"
     memory: "100M"
+
+faucet:
+  resources:
+    cpu: "0.2"
+    memory: "400M"
