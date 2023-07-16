@@ -16,8 +16,8 @@ chains:
       rpc: 26657
       faucet: 8007
     resources:
-      cpu: "0.3"
-      memory: "300M"
+      cpu: "0.2"
+      memory: "200M"
   - name: gaia-1
     type: cosmos
     numValidators: 1
@@ -26,8 +26,8 @@ chains:
       rpc: 26653
       faucet: 8003
     resources:
-      cpu: "0.3"
-      memory: "300M"
+      cpu: "0.2"
+      memory: "200M"
 
 relayers:
   - name: okp4-gaia
@@ -55,5 +55,5 @@ exposer:
 
 faucet:
   resources:
-    cpu: "0.2"
-    memory: "400M"
+    cpu: "0.1"
+    memory: "100M"
