@@ -3,11 +3,12 @@ package main
 import (
 	"context"
 	"fmt"
-	"github.com/cosmos/cosmos-sdk/types/module"
 	"io"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/cosmos/cosmos-sdk/types/module"
 
 	starship "github.com/cosmology-tech/starship/clients/go/client"
 	sdk "github.com/cosmos/cosmos-sdk/types"
