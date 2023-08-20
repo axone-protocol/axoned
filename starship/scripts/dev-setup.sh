@@ -35,19 +35,19 @@ install_linux() {
 # Define a function to install a binary
 install_binary() {
     if [[ $(uname -s) == "Darwin" ]]; then
-        install_macos $1
+        install_macos "$1"
     else
-        install_linux $1
+        install_linux "$1"
     fi
 }
 
 # Define a function to check for the presence of a binary
 check_binary() {
-    if ! command -v $1 &> /dev/null
+    if ! command -v "$1" &> /dev/null
     then
         echo "$1 is not installed"
-        install_binary $1
-        if ! command -v $1 &> /dev/null
+        install_binary "$1"
+        if ! command -v "$1" &> /dev/null
         then
             color red "Installation of $1 failed, exiting..."
             color red "Please install $1 manually, then run me again to verify the installation"
