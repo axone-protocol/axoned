@@ -35,14 +35,14 @@ jobs:
       - name: Lint regular markdown files
         uses: avto-dev/markdown-lint@v1.5.0
         with:
-          args: '**/*.md'
-          ignore: 'CHANGELOG.md docs/**/*.md'
+          args: "**/*.md"
+          ignore: "CHANGELOG.md docs/**/*.md"
 
       - name: Lint generated markdown files
         uses: avto-dev/markdown-lint@v1.5.0
         with:
-          args: 'docs/**/*.md'
-          config: 'docs/.markdownlint.yaml'
+          args: "docs/**/*.md"
+          config: "docs/.markdownlint.yaml"
 
   lint-yaml:
     runs-on: ubuntu-22.04
@@ -99,7 +99,7 @@ jobs:
         uses: actions/setup-go@v4.0.1
         if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
-          go-version: '1.20'
+          go-version: "1.20"
           cache: false
 
       - name: Lint go code (golangci-lint)
@@ -117,6 +117,45 @@ jobs:
             exit 1
           fi
           echo "✅ Code is gofumpt!"
+
+  analyze-go:
+    runs-on: ubuntu-22.04
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Find changed go files
+        id: changed-go-files
+        uses: tj-actions/changed-files@v35.9.2
+        with:
+          files: |
+            **/*.go
+            go.mod
+            go.sum
+
+      - name: Setup Go environment
+        uses: actions/setup-go@v4.0.1
+        with:
+          go-version: "1.20"
+          cache: false
+
+      - name: Initialize CodeQL
+        uses: github/codeql-action/init@v2
+        with:
+          languages: "go"
+
+      - name: Autobuild project
+        uses: github/codeql-action/autobuild@v2
+
+      - name: Perform CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
 
   lint-dockerfile:
     runs-on: ubuntu-22.04
@@ -159,7 +198,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v4.0.1
         with:
-          go-version: '1.20'
+          go-version: "1.20"
 
       - name: Generate command documentation
         run: |
