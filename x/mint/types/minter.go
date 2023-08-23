@@ -44,8 +44,9 @@ func ValidateMinter(minter Minter) error {
 
 // NextInflation return the new inflation rate for the next year
 // Get the current inflation and multiply by (1 - annual reduction factor).
-func (m Minter) NextInflation(params Params) sdk.Dec {
-	return m.Inflation
+func (m Minter) NextInflation(params Params, boundedRatio sdk.Dec) sdk.Dec {
+	bounded := params.BoundingAdjustment.Sub(boundedRatio.Quo(params.TargetBoundingRatio))
+	return params.InflationCoef.Mul(bounded).Mul(sdk.NewDec(100))
 }
 
 // NextAnnualProvisions returns the annual provisions based on current total
