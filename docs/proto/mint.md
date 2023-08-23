@@ -70,7 +70,6 @@ and `target_supply` 230M.
 | ----- | ---- | ----- | ----------- |
 | `inflation` | [string](#string) |  | current annual inflation rate |
 | `annual_provisions` | [string](#string) |  | current annual expected provisions |
-| `target_supply` | [string](#string) |  | target supply at end of period |
 
 <a name="mint.v1beta1.Params"></a>
 
@@ -86,8 +85,10 @@ new inflation will be 12%.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `mint_denom` | [string](#string) |  | type of coin to mint |
-| `annual_reduction_factor` | [string](#string) |  | annual reduction factor inflation rate change |
-| `blocks_per_year` | [uint64](#uint64) |  | expected blocks per year |
+| `inflation_coef` | [string](#string) |  | annual inflation coefficient |
+| `bounding_adjustment` | [string](#string) |  | bounding adjustment |
+| `target_bounding_ratio` | [string](#string) |  | target boudning ratio |
+| `blocks_per_year` | [uint64](#uint64) |  | expected blocks per yearmake p |
 
  [//]: # (end messages)
 

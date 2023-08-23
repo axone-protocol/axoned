@@ -26,11 +26,6 @@ message Minter {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // target supply at end of period
-  string target_supply = 3 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
 }
 
 // Params holds parameters for the mint module.
@@ -44,12 +39,24 @@ message Params {
 
   // type of coin to mint
   string mint_denom = 1;
-  // annual reduction factor inflation rate change
-  string annual_reduction_factor = 2 [
+  // annual inflation coefficient
+  string inflation_coef = 2 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // expected blocks per year
-  uint64 blocks_per_year = 3;
+  // bounding adjustment
+  string bounding_adjustment = 3 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  // target boudning ratio
+  string target_bounding_ratio = 4 [
+    (cosmos_proto.scalar) = "cosmos.Dec",
+    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
+    (gogoproto.nullable) = false
+  ];
+  // expected blocks per yearmake p
+  uint64 blocks_per_year = 5;
 }
