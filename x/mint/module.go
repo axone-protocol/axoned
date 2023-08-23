@@ -121,7 +121,7 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 		fromVersion uint64
 		migrator    func(ctx sdk.Context) error
 	}{
-		{1, migrator.Migrate1to2},
+		{2, migrator.Migrate2to3},
 	}
 
 	for _, migration := range migrations {
@@ -150,7 +150,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // ConsensusVersion implements AppModule/ConsensusVersion.
-func (AppModule) ConsensusVersion() uint64 { return 2 }
+func (AppModule) ConsensusVersion() uint64 { return 3 }
 
 // BeginBlock returns the begin blocker for the mint module.
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {
