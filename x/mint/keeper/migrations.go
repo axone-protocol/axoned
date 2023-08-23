@@ -4,7 +4,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/mint/exported"
-	v2 "github.com/okp4/okp4d/x/mint/migrations/v2"
+	v3 "github.com/okp4/okp4d/x/mint/migrations/v3"
 )
 
 type Migrator struct {
@@ -19,6 +19,6 @@ func NewMigrator(keeper Keeper, legacySubspace exported.Subspace) Migrator {
 	}
 }
 
-func (m Migrator) Migrate1to2(ctx sdk.Context) error {
-	return v2.MigrateStore(ctx, m.keeper.storeKey, m.keeper.cdc, m.legacySubspace)
+func (m Migrator) Migrate2to3(ctx sdk.Context) error {
+	return v3.MigrateStore(ctx, m.keeper.storeKey, m.keeper.cdc, m.legacySubspace)
 }
