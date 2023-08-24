@@ -20,7 +20,7 @@ func MigrateStore(ctx sdk.Context,
 
 	logger.Debug("starting module migration")
 
-	logger.Debug("migrate mint params")
+	logger.Debug("migrate old mint params with new params")
 
 	var oldParams oldTypes.Params
 	d := store.Get(types.ParamsKey)
@@ -37,6 +37,22 @@ func MigrateStore(ctx sdk.Context,
 		return err
 	}
 	store.Set(types.ParamsKey, bz)
+
+	logger.Debug("migrate minter store")
+
+	var oldMinter oldTypes.Minter
+	d = store.Get(types.MinterKey)
+	err = cdc.Unmarshal(d, &oldMinter)
+	if err != nil {
+		return err
+	}
+
+	newMinter := types.NewMinter(oldMinter.Inflation, oldMinter.AnnualProvisions)
+	bz, err = cdc.Marshal(&newMinter)
+	if err != nil {
+		return err
+	}
+	store.Set(types.MinterKey, bz)
 
 	logger.Debug("module migration done")
 
