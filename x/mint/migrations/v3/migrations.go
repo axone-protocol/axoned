@@ -3,6 +3,7 @@ package v3
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
 	oldTypes "github.com/okp4/okp4d/x/mint/migrations/v3/types"
 	"github.com/okp4/okp4d/x/mint/types"
 )
