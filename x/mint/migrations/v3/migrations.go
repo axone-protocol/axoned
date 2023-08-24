@@ -2,18 +2,16 @@ package v3
 
 import (
 	"github.com/cosmos/cosmos-sdk/codec"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-
-	"github.com/okp4/okp4d/x/mint/exported"
+	"github.com/okp4/okp4d/x/mint/types"
 )
 
 // MigrateStore migrates the x/mint module state from the consensus version 2 to
 // version 3.
+// This version include new/deleted parameters in store.
 func MigrateStore(ctx sdk.Context,
-	storeKey storetypes.StoreKey,
+	store sdk.KVStore,
 	cdc codec.BinaryCodec,
-	legacySubspace exported.Subspace,
 ) error {
 	logger := ctx.Logger().
 		With("module", "mint").
@@ -23,7 +21,13 @@ func MigrateStore(ctx sdk.Context,
 
 	logger.Debug("migrate mint params")
 
-	// TODO:
+	newParams := types.DefaultParams()
+
+	bz, err := cdc.Marshal(&newParams)
+	if err != nil {
+		return err
+	}
+	store.Set(types.ParamsKey, bz)
 
 	logger.Debug("module migration done")
 
