@@ -18,11 +18,11 @@ func TestNextInflation(t *testing.T) {
 		boundedRatio, expInflation sdk.Dec
 	}{
 		// With a bounded ratio of 66 %, next inflation should be 10.95%
-		{sdk.NewDecWithPrec(66, 2), sdk.NewDecWithPrec(1095, 2)},
+		{sdk.NewDecWithPrec(66, 2), sdk.NewDecWithPrec(1095, 4)},
 		// With a bounded ratio of 0 %, next inflation should be 18.25%
-		{sdk.NewDecWithPrec(0, 2), sdk.NewDecWithPrec(1825, 2)},
-		// With a bounded ratio of 100 %, next inflation should be 18.25%
-		{sdk.NewDecWithPrec(1, 0), sdk.NewDecWithPrec(7189393939393939400, 18)},
+		{sdk.NewDecWithPrec(0, 2), sdk.NewDecWithPrec(1825, 4)},
+		// With a bounded ratio of 100 %, next inflation should be 7.18%
+		{sdk.NewDecWithPrec(1, 0), sdk.NewDecWithPrec(71893939393939394, 18)},
 	}
 	for i, tc := range tests {
 		inflation := minter.NextInflation(params, tc.boundedRatio)
@@ -33,44 +33,35 @@ func TestNextInflation(t *testing.T) {
 }
 
 //nolint:lll
-//func TestBlockProvision(t *testing.T) {
-//	minter := InitialMinter(sdk.NewDecWithPrec(1, 1), math.NewInt(1))
-//	params := DefaultParams()
-//
-//	secondsPerYear := int64(60 * 60 * 8766)
-//	blockInterval := int64(5) // there is 1 block each 5 second approximately
-//
-//	tests := []struct {
-//		annualProvisions sdk.Dec
-//		expProvisions    int64
-//		targetSupply     math.Int
-//		totalSupply      math.Int
-//	}{
-//		{sdk.NewDec(secondsPerYear / blockInterval), 1, sdk.NewInt(secondsPerYear / blockInterval), sdk.NewInt(1)},
-//		{sdk.NewDec(secondsPerYear/blockInterval + 1), 1, sdk.NewInt(secondsPerYear/blockInterval + 1), math.NewInt(1)},
-//		{sdk.NewDec((secondsPerYear / blockInterval) * 2), 2, sdk.NewInt((secondsPerYear / 5) * 2), math.NewInt(1)},
-//		{sdk.NewDec((secondsPerYear / blockInterval) / 2), 0, sdk.NewInt(1), math.NewInt(1)},
-//		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 20, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), math.NewInt(1)},
-//		// Only two token should be minted to reach the target supply
-//		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 2, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), sdk.NewInt(((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)) - 2)},
-//		// Zero token should be minted since the target supply is already reached, the new inflation should be calculated
-//		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 0, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval))},
-//		// Zero token should be minted since target supply are exceeded (avoid negative coin)
-//		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 0, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), sdk.NewInt(((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)) + 2)},
-//	}
-//	for i, tc := range tests {
-//		minter.AnnualProvisions = tc.annualProvisions
-//		minter.TargetSupply = tc.targetSupply
-//		provisions := minter.BlockProvision(params, tc.totalSupply)
-//
-//		expProvisions := sdk.NewCoin(params.MintDenom,
-//			sdk.NewInt(tc.expProvisions))
-//
-//		require.True(t, expProvisions.IsEqual(provisions),
-//			"test: %v\n\tExp: %v\n\tGot: %v\n",
-//			i, tc.expProvisions, provisions)
-//	}
-//}
+func TestBlockProvision(t *testing.T) {
+	minter := InitialMinter(sdk.NewDecWithPrec(1, 1))
+	params := DefaultParams()
+
+	secondsPerYear := int64(60 * 60 * 8766)
+	blockInterval := int64(5) // there is 1 block each 5 second approximately
+
+	tests := []struct {
+		annualProvisions sdk.Dec
+		expProvisions    int64
+	}{
+		{sdk.NewDec(secondsPerYear / blockInterval), 1},
+		{sdk.NewDec(secondsPerYear/blockInterval + 1), 1},
+		{sdk.NewDec((secondsPerYear / blockInterval) * 2), 2},
+		{sdk.NewDec((secondsPerYear / blockInterval) / 2), 0},
+		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 20},
+	}
+	for i, tc := range tests {
+		minter.AnnualProvisions = tc.annualProvisions
+		provisions := minter.BlockProvision(params)
+
+		expProvisions := sdk.NewCoin(params.MintDenom,
+			sdk.NewInt(tc.expProvisions))
+
+		require.True(t, expProvisions.IsEqual(provisions),
+			"test: %v\n\tExp: %v\n\tGot: %v\n",
+			i, tc.expProvisions, provisions)
+	}
+}
 
 // Benchmarking :)
 // previously using math.Int operations:

@@ -46,15 +46,17 @@ func TestGetCmdQueryParams(t *testing.T) {
 			"json output",
 			[]string{fmt.Sprintf("--%s=1", flags.FlagHeight), fmt.Sprintf("--%s=json", flags.FlagOutput)},
 			`[--height=1 --output=json]`,
-			`{"mint_denom":"","annual_reduction_factor":"0","blocks_per_year":"0"}`,
+			`{"mint_denom":"","inflation_coef":"0","bounding_adjustment":"0","target_bounding_ratio":"0","blocks_per_year":"0"}`,
 		},
 		{
 			"text output",
 			[]string{fmt.Sprintf("--%s=1", flags.FlagHeight), fmt.Sprintf("--%s=text", flags.FlagOutput)},
 			`[--height=1 --output=text]`,
-			`annual_reduction_factor: "0"
-blocks_per_year: "0"
-mint_denom: ""`,
+			`blocks_per_year: "0"
+bounding_adjustment: "0"
+inflation_coef: "0"
+mint_denom: ""
+target_bounding_ratio: "0"`,
 		},
 	}
 
