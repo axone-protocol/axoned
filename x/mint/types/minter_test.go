@@ -32,7 +32,6 @@ func TestNextInflation(t *testing.T) {
 	}
 }
 
-//nolint:lll
 func TestBlockProvision(t *testing.T) {
 	minter := InitialMinter(sdk.NewDecWithPrec(1, 1))
 	params := DefaultParams()
