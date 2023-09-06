@@ -7,20 +7,22 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/okp4/okp4d/x/mint/types";
 
-// Minter represents the minting state.
+// Minter represents the minting state within the blockchain, tasked with the continuous calculation and distribution
+// of tokens to validators.
 //
-// At the beginning of the chain (first block) the mint module will recalculate the `annual_provisions` and
-// `target_supply` based on the genesis total token supply and the inflation configured.
-// By default inflation is set to 15%. If the genesis total token supply is 200M token, the `annual_provision` will be 30M
-// and `target_supply` 230M.
+// This calculation occurs with each block, where the minting module dynamically recalculates the annual `inflation` rate.
+// Using the resulting inflation rate, it deduces the quantity of tokens to be provisioned for the upcoming year.
+//
+// Furthermore, based on the current block's position within the year, it computes the exact number of tokens to be
+// minted for that specific block.
 message Minter {
-  // current annual inflation rate
+  // Represents the current annual inflation rate.
   string inflation = 1 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // current annual expected provisions
+  // Represents the current annual expected provisions.
   string annual_provisions = 2 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
@@ -29,34 +31,29 @@ message Minter {
 }
 
 // Params holds parameters for the mint module.
-//
-// Configure the annual reduction factor will update at the each end of year the new token distribution rate by reducing
-// the actual inflation by the `annual_reduction_factor` configured.
-// By default, `annual_reduction_factor` is 20%. For example, with an initial inflation of 15%, at the end of the year,
-// new inflation will be 12%.
 message Params {
   option (gogoproto.goproto_stringer) = false;
 
-  // type of coin to mint
+  // Type of coin to mint
   string mint_denom = 1;
-  // annual inflation coefficient
+  // Annual inflation coefficient
   string inflation_coef = 2 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // bounding adjustment
+  // Bounding adjustment
   string bounding_adjustment = 3 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // target boudning ratio
+  // Represent the target bounding ratio to reach
   string target_bounding_ratio = 4 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // expected blocks per yearmake p
+  // Estimated blocks per year
   uint64 blocks_per_year = 5;
 }

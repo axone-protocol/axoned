@@ -25,16 +25,18 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Minter represents the minting state.
+// Minter represents the minting state within the blockchain, tasked with the continuous calculation and distribution
+// of tokens to validators.
 //
-// At the beginning of the chain (first block) the mint module will recalculate the `annual_provisions` and
-// `target_supply` based on the genesis total token supply and the inflation configured.
-// By default inflation is set to 15%. If the genesis total token supply is 200M token, the `annual_provision` will be 30M
-// and `target_supply` 230M.
+// This calculation occurs with each block, where the minting module dynamically recalculates the annual `inflation` rate.
+// Using the resulting inflation rate, it deduces the quantity of tokens to be provisioned for the upcoming year.
+//
+// Furthermore, based on the current block's position within the year, it computes the exact number of tokens to be
+// minted for that specific block.
 type Minter struct {
-	// current annual inflation rate
+	// Represents the current annual inflation rate.
 	Inflation github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,1,opt,name=inflation,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"inflation"`
-	// current annual expected provisions
+	// Represents the current annual expected provisions.
 	AnnualProvisions github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=annual_provisions,json=annualProvisions,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"annual_provisions"`
 }
 
@@ -72,21 +74,16 @@ func (m *Minter) XXX_DiscardUnknown() {
 var xxx_messageInfo_Minter proto.InternalMessageInfo
 
 // Params holds parameters for the mint module.
-//
-// Configure the annual reduction factor will update at the each end of year the new token distribution rate by reducing
-// the actual inflation by the `annual_reduction_factor` configured.
-// By default, `annual_reduction_factor` is 20%. For example, with an initial inflation of 15%, at the end of the year,
-// new inflation will be 12%.
 type Params struct {
-	// type of coin to mint
+	// Type of coin to mint
 	MintDenom string `protobuf:"bytes,1,opt,name=mint_denom,json=mintDenom,proto3" json:"mint_denom,omitempty"`
-	// annual inflation coefficient
+	// Annual inflation coefficient
 	InflationCoef github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=inflation_coef,json=inflationCoef,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"inflation_coef"`
-	// bounding adjustment
+	// Bounding adjustment
 	BoundingAdjustment github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,3,opt,name=bounding_adjustment,json=boundingAdjustment,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"bounding_adjustment"`
-	// target boudning ratio
+	// Represent the target bounding ratio to reach
 	TargetBoundingRatio github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,4,opt,name=target_bounding_ratio,json=targetBoundingRatio,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"target_bounding_ratio"`
-	// expected blocks per yearmake p
+	// Estimated blocks per year
 	BlocksPerYear uint64 `protobuf:"varint,5,opt,name=blocks_per_year,json=blocksPerYear,proto3" json:"blocks_per_year,omitempty"`
 }
 

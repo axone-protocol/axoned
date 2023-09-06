@@ -59,17 +59,19 @@ then the new `annual_provisions` and `target_supply` is deducted based on the cu
 
 ### Minter
 
-Minter represents the minting state.
+Minter represents the minting state within the blockchain, tasked with the continuous calculation and distribution
+of tokens to validators.
 
-At the beginning of the chain (first block) the mint module will recalculate the `annual_provisions` and
-`target_supply` based on the genesis total token supply and the inflation configured.
-By default inflation is set to 15%. If the genesis total token supply is 200M token, the `annual_provision` will be 30M
-and `target_supply` 230M.
+This calculation occurs with each block, where the minting module dynamically recalculates the annual `inflation` rate.
+Using the resulting inflation rate, it deduces the quantity of tokens to be provisioned for the upcoming year.
+
+Furthermore, based on the current block's position within the year, it computes the exact number of tokens to be
+minted for that specific block.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `inflation` | [string](#string) |  | current annual inflation rate |
-| `annual_provisions` | [string](#string) |  | current annual expected provisions |
+| `inflation` | [string](#string) |  | Represents the current annual inflation rate. |
+| `annual_provisions` | [string](#string) |  | Represents the current annual expected provisions. |
 
 <a name="mint.v1beta1.Params"></a>
 
@@ -77,18 +79,13 @@ and `target_supply` 230M.
 
 Params holds parameters for the mint module.
 
-Configure the annual reduction factor will update at the each end of year the new token distribution rate by reducing
-the actual inflation by the `annual_reduction_factor` configured.
-By default, `annual_reduction_factor` is 20%. For example, with an initial inflation of 15%, at the end of the year,
-new inflation will be 12%.
-
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `mint_denom` | [string](#string) |  | type of coin to mint |
-| `inflation_coef` | [string](#string) |  | annual inflation coefficient |
-| `bounding_adjustment` | [string](#string) |  | bounding adjustment |
-| `target_bounding_ratio` | [string](#string) |  | target boudning ratio |
-| `blocks_per_year` | [uint64](#uint64) |  | expected blocks per yearmake p |
+| `mint_denom` | [string](#string) |  | Type of coin to mint |
+| `inflation_coef` | [string](#string) |  | Annual inflation coefficient |
+| `bounding_adjustment` | [string](#string) |  | Bounding adjustment |
+| `target_bounding_ratio` | [string](#string) |  | Represent the target bounding ratio to reach |
+| `blocks_per_year` | [uint64](#uint64) |  | Estimated blocks per year |
 
  [//]: # (end messages)
 
