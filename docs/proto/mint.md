@@ -6,22 +6,41 @@
 
 ## Purpose
 
-This module is designed to calculate an inflation rewards each years based on static params. Each block rewards is
-the same over the year.
+The Minting Module is a fundamental component within the blockchain ecosystem, responsible for managing the dynamic
+issuance of tokens to validators, thereby ensuring the stability and sustainability of the network.
+This module operates on a continuous basis, recalculating parameters with each new block to maintain an optimal
+token supply.
 
-### 🧮 Calculation
+## 🧮 Calculation
 
-The initial inflation is set to 15%, `annual_provisions` and `target_supply` will set at the beginning of the chain (on the first block).
-It's based on the initial total supply. For example, with a total supply of 200M token, annual_provisions will be configured to 30M and target_supply 230M.
+The formula for calculating the yearly staking reward target (srty) is as follows:
 
-At the end of the year (the last block of the year, to be more precise), due to rounding imprecision, if the distributed
-tokens for the last block of the year added with the actual tokens total supply is bigger than the `target_supply`,
-only the difference to reach the `target_supply` will be minted. Conversely, in some case, due to rounding also,
-the `target_supply` is not reached at the last block, but at the next block.
+```
+srty = a • i • c - b / bt
+```
 
-The new inflation, `annual_provisions` and `target_supply` is recalculated at the next block after the block that
-reach the `target_supply`. To calculate the new inflation, get the current inflation multiplied by (`1 - annual_reduction_factor`),
-then the new `annual_provisions` and `target_supply` is deducted based on the current total supply (that is the old `target_supply`)
+- `srty`: Represents the yearly staking reward target.
+- `a`: Denotes the total token supply within the blockchain.
+- `i`: Refers to the inflation coefficient, a configurable parameter set at 0.073 by default.
+- `c`: Signifies the bonding ratio adjustment coefficient.
+- `b`: A dynamic variable ranging from 0 to 1, symbolizing the current bonding ratio at the current block.
+- `bt`: Represents the target bonding ratio, conventionally set to 0.66.
+
+### Yearly Inflation Rate
+
+Upon the determination of srty, the Minting Module proceeds to convert it into a yearly inflation rate
+expressed as a percentage (Iy):
+
+```
+Iy = (srty • 100) / a = (a • i • c - (b / bt) • 100) / a = i • c - (b / bt) • 100
+```
+
+- `Iy` (in percentage): Represents the yearly inflation rate.
+
+### Block-Level Token Minting
+
+With the yearly inflation rate in hand, the Minting Module can calculate the number of tokens to be minted for
+each individual block by knowing the number of block in one years.
 
 ## Table of Contents
 
