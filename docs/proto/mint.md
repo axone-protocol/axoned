@@ -16,7 +16,7 @@ token supply.
 The formula for calculating the yearly staking reward target (srty) is as follows:
 
 ```
-srty = a • i • c - b / bt
+srty = a • i • (c - b / bt)
 ```
 
 - `srty`: Represents the yearly staking reward target.
@@ -32,7 +32,7 @@ Upon the determination of srty, the Minting Module proceeds to convert it into a
 expressed as a percentage (Iy):
 
 ```
-Iy = (srty • 100) / a = (a • i • c - (b / bt) • 100) / a = i • c - (b / bt) • 100
+Iy = (srty • 100) / a = (a • i • (c - b / bt) • 100) / a = i • (c - b / bt) • 100
 ```
 
 - `Iy` (in percentage): Represents the yearly inflation rate.
