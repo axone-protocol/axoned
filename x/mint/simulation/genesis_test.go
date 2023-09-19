@@ -50,8 +50,8 @@ func TestRandomizedGenState(t *testing.T) {
 
 	require.Equal(t, uint64(6311520), mintGenesis.Params.BlocksPerYear)
 	require.Equal(t, dec1, mintGenesis.Params.InflationCoef)
-	require.Equal(t, dec2, mintGenesis.Params.BoundingAdjustment)
-	require.Equal(t, dec3, mintGenesis.Params.TargetBoundingRatio)
+	require.Equal(t, dec2, mintGenesis.Params.BondingAdjustment)
+	require.Equal(t, dec3, mintGenesis.Params.TargetBondingRatio)
 	require.Equal(t, "stake", mintGenesis.Params.MintDenom)
 	require.Equal(t, "0stake",
 		mintGenesis.Minter.BlockProvision(mintGenesis.Params).String())

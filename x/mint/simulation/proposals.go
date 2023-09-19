@@ -37,8 +37,8 @@ func SimulateMsgUpdateParams(r *rand.Rand, _ sdk.Context, _ []simtypes.Account) 
 	params := types.DefaultParams()
 	params.BlocksPerYear = uint64(simtypes.RandIntBetween(r, 1, 1000000))
 	params.InflationCoef = sdk.NewDecWithPrec(int64(simtypes.RandIntBetween(r, 1, 100)), 2)
-	params.TargetBoundingRatio = sdk.NewDecWithPrec(int64(simtypes.RandIntBetween(r, 1, 100)), 2)
-	params.BoundingAdjustment = sdk.NewDecWithPrec(int64(simtypes.RandIntBetween(r, 1, 100)), 2)
+	params.TargetBondingRatio = sdk.NewDecWithPrec(int64(simtypes.RandIntBetween(r, 1, 100)), 2)
+	params.BondingAdjustment = sdk.NewDecWithPrec(int64(simtypes.RandIntBetween(r, 1, 100)), 2)
 	params.MintDenom = simtypes.RandStringOfLength(r, 10)
 
 	return &types.MsgUpdateParams{

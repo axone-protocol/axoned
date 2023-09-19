@@ -43,9 +43,9 @@ func ValidateMinter(minter Minter) error {
 }
 
 // NextInflation return estimated yearly inflation rate for the current block.
-func (m Minter) NextInflation(params Params, boundedRatio sdk.Dec) sdk.Dec {
-	bounded := params.BoundingAdjustment.Sub(boundedRatio.Quo(params.TargetBoundingRatio))
-	return params.InflationCoef.Mul(bounded)
+func (m Minter) NextInflation(params Params, bondedRatio sdk.Dec) sdk.Dec {
+	bonded := params.BondingAdjustment.Sub(bondedRatio.Quo(params.TargetBondingRatio))
+	return params.InflationCoef.Mul(bonded)
 }
 
 // NextAnnualProvisions returns the annual provisions based on current total

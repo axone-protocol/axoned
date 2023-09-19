@@ -11,25 +11,25 @@ import (
 )
 
 func NewParams(
-	mintDenom string, inflationCoef, boundingAdjustment, targetBoundingRatio sdk.Dec, blocksPerYear uint64,
+	mintDenom string, inflationCoef, bondingAdjustment, targetBondingRatio sdk.Dec, blocksPerYear uint64,
 ) Params {
 	return Params{
-		MintDenom:           mintDenom,
-		InflationCoef:       inflationCoef,
-		BoundingAdjustment:  boundingAdjustment,
-		TargetBoundingRatio: targetBoundingRatio,
-		BlocksPerYear:       blocksPerYear,
+		MintDenom:          mintDenom,
+		InflationCoef:      inflationCoef,
+		BondingAdjustment:  bondingAdjustment,
+		TargetBondingRatio: targetBondingRatio,
+		BlocksPerYear:      blocksPerYear,
 	}
 }
 
 // default minting module parameters.
 func DefaultParams() Params {
 	return Params{
-		MintDenom:           sdk.DefaultBondDenom,
-		InflationCoef:       sdk.NewDecWithPrec(73, 3),
-		BoundingAdjustment:  sdk.NewDecWithPrec(25, 1),
-		TargetBoundingRatio: sdk.NewDecWithPrec(66, 2),
-		BlocksPerYear:       uint64(60 * 60 * 8766 / 5), // assuming 5-second block times
+		MintDenom:          sdk.DefaultBondDenom,
+		InflationCoef:      sdk.NewDecWithPrec(73, 3),
+		BondingAdjustment:  sdk.NewDecWithPrec(25, 1),
+		TargetBondingRatio: sdk.NewDecWithPrec(66, 2),
+		BlocksPerYear:      uint64(60 * 60 * 8766 / 5), // assuming 5-second block times
 	}
 }
 
@@ -41,10 +41,10 @@ func (p Params) Validate() error {
 	if err := validateInflationCoef(p.InflationCoef); err != nil {
 		return err
 	}
-	if err := validateBoundingAdjustment(p.BoundingAdjustment); err != nil {
+	if err := validateBondingAdjustment(p.BondingAdjustment); err != nil {
 		return err
 	}
-	if err := validateTargetBoundingRatio(p.TargetBoundingRatio); err != nil {
+	if err := validateTargetBondingRatio(p.TargetBondingRatio); err != nil {
 		return err
 	}
 
@@ -86,7 +86,7 @@ func validateInflationCoef(i interface{}) error {
 	return nil
 }
 
-func validateBoundingAdjustment(i interface{}) error {
+func validateBondingAdjustment(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
@@ -99,17 +99,17 @@ func validateBoundingAdjustment(i interface{}) error {
 	return nil
 }
 
-func validateTargetBoundingRatio(i interface{}) error {
+func validateTargetBondingRatio(i interface{}) error {
 	v, ok := i.(sdk.Dec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
 
 	if v.IsNegative() {
-		return fmt.Errorf("target bounding ratio cannot be negative: %s", v)
+		return fmt.Errorf("target bonding ratio cannot be negative: %s", v)
 	}
 	if v.GT(sdk.OneDec()) {
-		return fmt.Errorf("target bounding ratio too large: %s", v)
+		return fmt.Errorf("target bonding ratio too large: %s", v)
 	}
 
 	return nil

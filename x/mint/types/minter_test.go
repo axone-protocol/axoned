@@ -15,17 +15,17 @@ func TestNextInflation(t *testing.T) {
 	params := DefaultParams()
 
 	tests := []struct {
-		boundedRatio, expInflation sdk.Dec
+		bondedRatio, expInflation sdk.Dec
 	}{
-		// With a bounded ratio of 66 %, next inflation should be 10.95%
+		// With a bonded ratio of 66 %, next inflation should be 10.95%
 		{sdk.NewDecWithPrec(66, 2), sdk.NewDecWithPrec(1095, 4)},
-		// With a bounded ratio of 0 %, next inflation should be 18.25%
+		// With a bonded ratio of 0 %, next inflation should be 18.25%
 		{sdk.NewDecWithPrec(0, 2), sdk.NewDecWithPrec(1825, 4)},
-		// With a bounded ratio of 100 %, next inflation should be 7.18%
+		// With a bonded ratio of 100 %, next inflation should be 7.18%
 		{sdk.NewDecWithPrec(1, 0), sdk.NewDecWithPrec(71893939393939394, 18)},
 	}
 	for i, tc := range tests {
-		inflation := minter.NextInflation(params, tc.boundedRatio)
+		inflation := minter.NextInflation(params, tc.bondedRatio)
 
 		require.True(t, inflation.Equal(tc.expInflation),
 			"Test Index: %v\nInflation:  %v\nExpected: %v\n", i, inflation, tc.expInflation)

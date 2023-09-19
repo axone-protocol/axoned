@@ -102,8 +102,8 @@ Params holds parameters for the mint module.
 | ----- | ---- | ----- | ----------- |
 | `mint_denom` | [string](#string) |  | Type of coin to mint |
 | `inflation_coef` | [string](#string) |  | Annual inflation coefficient |
-| `bounding_adjustment` | [string](#string) |  | Bounding adjustment |
-| `target_bounding_ratio` | [string](#string) |  | Represent the target bounding ratio to reach |
+| `bonding_adjustment` | [string](#string) |  | Bonding adjustment |
+| `target_bonding_ratio` | [string](#string) |  | Represent the target bonding ratio to reach |
 | `blocks_per_year` | [uint64](#uint64) |  | Estimated blocks per year |
 
  [//]: # (end messages)

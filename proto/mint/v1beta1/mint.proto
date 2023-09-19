@@ -42,14 +42,14 @@ message Params {
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // Bounding adjustment
-  string bounding_adjustment = 3 [
+  // Bonding adjustment
+  string bonding_adjustment = 3 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // Represent the target bounding ratio to reach
-  string target_bounding_ratio = 4 [
+  // Represent the target bonding ratio to reach
+  string target_bonding_ratio = 4 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false

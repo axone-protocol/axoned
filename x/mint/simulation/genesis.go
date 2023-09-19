@@ -15,10 +15,10 @@ import (
 
 // Simulation parameter constants.
 const (
-	Inflation           = "inflation"
-	InflationCoef       = "inflation_coef"
-	BoundingAdjustment  = "bounding_adjustment"
-	TargetBoundingRatio = "target_bounding_ratio"
+	Inflation          = "inflation"
+	InflationCoef      = "inflation_coef"
+	BondingAdjustment  = "bonding_adjustment"
+	TargetBondingRatio = "target_bonding_ratio"
 )
 
 // GenInflation randomized Inflation.
@@ -31,13 +31,13 @@ func GenInflationCoefMax(_ *rand.Rand) sdk.Dec {
 	return sdk.NewDecWithPrec(73, 3)
 }
 
-// GenBoundingAdjustmentMax randomized AnnualReductionFactor.
-func GenBoundingAdjustmentMax(_ *rand.Rand) sdk.Dec {
+// GenBondingAdjustmentMax randomized AnnualReductionFactor.
+func GenBondingAdjustmentMax(_ *rand.Rand) sdk.Dec {
 	return sdk.NewDecWithPrec(25, 1)
 }
 
-// GenTargetBoundingRatioMax randomized AnnualReductionFactor.
-func GenTargetBoundingRatioMax(_ *rand.Rand) sdk.Dec {
+// GenTargetBondingRatioMax randomized AnnualReductionFactor.
+func GenTargetBondingRatioMax(_ *rand.Rand) sdk.Dec {
 	return sdk.NewDecWithPrec(66, 2)
 }
 
@@ -59,21 +59,21 @@ func RandomizedGenState(simState *module.SimulationState) {
 		simState.Cdc, InflationCoef, &inflationCoef, simState.Rand,
 		func(r *rand.Rand) { inflationCoef = GenInflationCoefMax(r) },
 	)
-	var targetBoundingRatio sdk.Dec
+	var targetBondingRatio sdk.Dec
 	simState.AppParams.GetOrGenerate(
-		simState.Cdc, TargetBoundingRatio, &targetBoundingRatio, simState.Rand,
-		func(r *rand.Rand) { targetBoundingRatio = GenTargetBoundingRatioMax(r) },
+		simState.Cdc, TargetBondingRatio, &targetBondingRatio, simState.Rand,
+		func(r *rand.Rand) { targetBondingRatio = GenTargetBondingRatioMax(r) },
 	)
 
-	var boundingAdjustment sdk.Dec
+	var bondingAdjustment sdk.Dec
 	simState.AppParams.GetOrGenerate(
-		simState.Cdc, BoundingAdjustment, &boundingAdjustment, simState.Rand,
-		func(r *rand.Rand) { boundingAdjustment = GenBoundingAdjustmentMax(r) },
+		simState.Cdc, BondingAdjustment, &bondingAdjustment, simState.Rand,
+		func(r *rand.Rand) { bondingAdjustment = GenBondingAdjustmentMax(r) },
 	)
 
 	mintDenom := sdk.DefaultBondDenom
 	blocksPerYear := uint64(60 * 60 * 8766 / 5)
-	params := types.NewParams(mintDenom, inflationCoef, boundingAdjustment, targetBoundingRatio, blocksPerYear)
+	params := types.NewParams(mintDenom, inflationCoef, bondingAdjustment, targetBondingRatio, blocksPerYear)
 	annualProvision := inflation.MulInt(simState.InitialStake)
 
 	minter := types.InitialMinter(inflation)
