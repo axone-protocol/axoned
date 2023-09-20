@@ -20,7 +20,7 @@ func (s *IntegrationTestSuite) TestUpdateParams() {
 			expectErr: true,
 		},
 		{
-			name: "set invalid params",
+			name: "set invalid params for bonding adjustment (negative value)",
 			request: &types.MsgUpdateParams{
 				Authority: s.mintKeeper.GetAuthority(),
 				Params: types.Params{
@@ -34,7 +34,7 @@ func (s *IntegrationTestSuite) TestUpdateParams() {
 			expectErr: true,
 		},
 		{
-			name: "set invalid params",
+			name: "set invalid params for target bonding ratio (negative value)",
 			request: &types.MsgUpdateParams{
 				Authority: s.mintKeeper.GetAuthority(),
 				Params: types.Params{
@@ -48,7 +48,7 @@ func (s *IntegrationTestSuite) TestUpdateParams() {
 			expectErr: true,
 		},
 		{
-			name: "set invalid params",
+			name: "set invalid params for inflation coef (negative value)",
 			request: &types.MsgUpdateParams{
 				Authority: s.mintKeeper.GetAuthority(),
 				Params: types.Params{
