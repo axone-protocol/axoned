@@ -2,12 +2,14 @@ package predicate
 
 import (
 	"context"
+	"crypto"
+	"crypto/ed25519"
 	"encoding/hex"
 	"fmt"
 
+	"github.com/cometbft/cometbft/crypto/secp256k1"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256r1"
 	"github.com/ichiban/prolog/engine"
-
-	"github.com/cometbft/cometbft/crypto"
 
 	"github.com/okp4/okp4d/x/logic/util"
 )
@@ -96,4 +98,34 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 			return engine.Error(fmt.Errorf("hex_bytes/2: invalid hex type: %T, should be Variable or List", b))
 		}
 	})
+}
+
+type Alg string
+
+const (
+	Secp256k1 Alg = "secp256k1"
+	Secp256r1 Alg = "secp256r1"
+	Ed25519   Alg = "ed25519"
+)
+
+func verifySignature(alg Alg, pubKey crypto.PublicKey, msg, sig []byte) (bool, error) {
+	switch alg {
+	case Ed25519:
+		if key, ok := pubKey.(ed25519.PublicKey); ok {
+			return ed25519.Verify(key, msg, sig), nil
+		}
+		return false, fmt.Errorf("public key is not ed25519 compatible")
+	case Secp256r1:
+		if key, ok := pubKey.(secp256r1.PubKey); ok {
+			return key.VerifySignature(msg, sig), nil
+		}
+		return false, fmt.Errorf("public key is not secp256r1 compatible")
+	case Secp256k1:
+		if key, ok := pubKey.(secp256k1.PubKey); ok {
+			return key.VerifySignature(msg, sig), nil
+		}
+		return false, fmt.Errorf("public key is not secp256k1 compatible")
+	default:
+		return false, fmt.Errorf("pub key format not implemented")
+	}
 }
