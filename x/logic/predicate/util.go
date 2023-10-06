@@ -64,6 +64,20 @@ func BytesToList(bt []byte) engine.Term {
 	return engine.List(terms...)
 }
 
+func TermToBytes(term engine.Term, env *engine.Env) ([]byte, error) {
+	switch b := env.Resolve(term).(type) {
+	case engine.Compound:
+		if b.Arity() != 2 || b.Functor().String() != "." {
+			return nil, fmt.Errorf("term should be a List, give %T", b)
+		}
+		iter := engine.ListIterator{List: b, Env: env}
+
+		return ListToBytes(iter, env)
+	default:
+		return nil, fmt.Errorf("invalid term type: %T, should be Atom or List", term)
+	}
+}
+
 func ListToBytes(terms engine.ListIterator, env *engine.Env) ([]byte, error) {
 	bt := make([]byte, 0)
 	for terms.Next() {

@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"fmt"
 
+	cometcrypto "github.com/cometbft/cometbft/crypto"
 	"github.com/cometbft/cometbft/crypto/secp256k1"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256r1"
 	"github.com/ichiban/prolog/engine"
@@ -37,7 +38,7 @@ func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engin
 		var result []byte
 		switch d := env.Resolve(data).(type) {
 		case engine.Atom:
-			result = crypto.Sha256([]byte(d.String()))
+			result = cometcrypto.Sha256([]byte(d.String()))
 			return engine.Unify(vm, hash, BytesToList(result), cont, env)
 		default:
 			return engine.Error(fmt.Errorf("sha_hash/2: invalid data type: %T, should be Atom", d))
@@ -107,6 +108,32 @@ const (
 	Secp256r1 Alg = "secp256r1"
 	Ed25519   Alg = "ed25519"
 )
+
+func EDDSAVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return engine.Delay(func(ctx context.Context) *engine.Promise {
+		pubKey, err := TermToBytes(key, env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("eddsa_verify/4: decoding public key: %w", err))
+		}
+
+		msg, err := TermToBytes(data, env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("eddsa_verify/4: decoding data: %w", err))
+		}
+
+		signature, err := TermToBytes(sig, env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("eddsa_verify/4: decoding signature: %w", err))
+		}
+
+		// TODO: Create function hasDecoding option
+		r, err := verifySignature(Ed25519, pubKey, msg, signature)
+		if err != nil {
+			return engine.Error(fmt.Errorf("eddsa_verify/4: failed verify signature: %w", err))
+		}
+		return engine.Bool(r)
+	})
+}
 
 func verifySignature(alg Alg, pubKey crypto.PublicKey, msg, sig []byte) (bool, error) {
 	switch alg {
