@@ -171,3 +171,110 @@ H == [2252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,
 		}
 	})
 }
+
+func TestEDDSAVerify(t *testing.T) {
+	Convey("Given a test cases", t, func() {
+		cases := []struct {
+			program     string
+			query       string
+			wantResult  []types.TermResults
+			wantError   error
+			wantSuccess bool
+		}{
+			{ // All good
+				program: `verify :-
+hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
+hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
+hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
+ecdsa_verify(PubKey, Msg, Sig, _).`,
+				query:       `verify.`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: true,
+			},
+			{ // Wrong Msg
+				program: `verify :-
+hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
+hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9e', Msg),
+hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
+ecdsa_verify(PubKey, Msg, Sig, _).`,
+				query:       `verify.`,
+				wantSuccess: false,
+			},
+			{ // Wrong public key
+				program: `verify :-
+hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5b5b', PubKey),
+hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
+hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
+ecdsa_verify(PubKey, Msg, Sig, _).`,
+				query:       `verify.`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("ecdsa_verify/4: failed verify signature: ed25519: bad public key length: 33"),
+			},
+			{ // Wrong signature
+				program: `verify :-
+hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
+hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
+hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff', Sig),
+ecdsa_verify(PubKey, Msg, Sig, _).`,
+				query:       `verify.`,
+				wantSuccess: false,
+			},
+		}
+		for nc, tc := range cases {
+			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
+				Convey("and a context", func() {
+					db := tmdb.NewMemDB()
+					stateStore := store.NewCommitMultiStore(db)
+					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
+
+					Convey("and a vm", func() {
+						interpreter := testutil.NewLightInterpreterMust(ctx)
+						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
+						interpreter.Register4(engine.NewAtom("ecdsa_verify"), ECDSAVerify)
+
+						err := interpreter.Compile(ctx, tc.program)
+						So(err, ShouldBeNil)
+
+						Convey("When the predicate is called", func() {
+							sols, err := interpreter.QueryContext(ctx, tc.query)
+
+							Convey("Then the error should be nil", func() {
+								So(err, ShouldBeNil)
+								So(sols, ShouldNotBeNil)
+
+								Convey("and the bindings should be as expected", func() {
+									var got []types.TermResults
+									for sols.Next() {
+										m := types.TermResults{}
+										err := sols.Scan(m)
+										So(err, ShouldBeNil)
+
+										got = append(got, m)
+									}
+									if tc.wantError != nil {
+										So(sols.Err(), ShouldNotBeNil)
+										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
+									} else {
+										So(sols.Err(), ShouldBeNil)
+
+										if tc.wantSuccess {
+											So(len(got), ShouldBeGreaterThan, 0)
+											So(len(got), ShouldEqual, len(tc.wantResult))
+											for iGot, resultGot := range got {
+												for varGot, termGot := range resultGot {
+													So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.wantResult[iGot][varGot])
+												}
+											}
+										} else {
+											So(len(got), ShouldEqual, 0)
+										}
+									}
+								})
+							})
+						})
+					})
+				})
+			})
+		}
+	})
+}

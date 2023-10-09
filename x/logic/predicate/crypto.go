@@ -2,14 +2,14 @@ package predicate
 
 import (
 	"context"
-	"crypto"
+	"crypto/ecdsa"
 	"crypto/ed25519"
+	"crypto/elliptic"
 	"encoding/hex"
 	"fmt"
+	"math/big"
 
 	cometcrypto "github.com/cometbft/cometbft/crypto"
-	"github.com/cometbft/cometbft/crypto/secp256k1"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256r1"
 	"github.com/ichiban/prolog/engine"
 
 	"github.com/okp4/okp4d/x/logic/util"
@@ -109,50 +109,87 @@ const (
 	Ed25519   Alg = "ed25519"
 )
 
-func EDDSAVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+func ECDSAVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		pubKey, err := TermToBytes(key, env)
 		if err != nil {
-			return engine.Error(fmt.Errorf("eddsa_verify/4: decoding public key: %w", err))
+			return engine.Error(fmt.Errorf("ecdsa_verify/4: decoding public key: %w", err))
 		}
 
 		msg, err := TermToBytes(data, env)
 		if err != nil {
-			return engine.Error(fmt.Errorf("eddsa_verify/4: decoding data: %w", err))
+			return engine.Error(fmt.Errorf("ecdsa_verify/4: decoding data: %w", err))
 		}
 
 		signature, err := TermToBytes(sig, env)
 		if err != nil {
-			return engine.Error(fmt.Errorf("eddsa_verify/4: decoding signature: %w", err))
+			return engine.Error(fmt.Errorf("ecdsa_verify/4: decoding signature: %w", err))
 		}
 
 		// TODO: Create function hasDecoding option
 		r, err := verifySignature(Ed25519, pubKey, msg, signature)
 		if err != nil {
-			return engine.Error(fmt.Errorf("eddsa_verify/4: failed verify signature: %w", err))
+			return engine.Error(fmt.Errorf("ecdsa_verify/4: failed verify signature: %w", err))
 		}
-		return engine.Bool(r)
+
+		if !r {
+			return engine.Bool(false)
+		}
+		return cont(env)
 	})
 }
 
-func verifySignature(alg Alg, pubKey crypto.PublicKey, msg, sig []byte) (bool, error) {
+func verifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error) {
+	defer func() {
+		if recoveredErr := recover(); recoveredErr != nil {
+			err = fmt.Errorf("%s", recoveredErr)
+		}
+	}()
+
 	switch alg {
 	case Ed25519:
-		if key, ok := pubKey.(ed25519.PublicKey); ok {
-			return ed25519.Verify(key, msg, sig), nil
-		}
-		return false, fmt.Errorf("public key is not ed25519 compatible")
+		r = ed25519.Verify(pubKey, msg, sig)
 	case Secp256r1:
-		if key, ok := pubKey.(secp256r1.PubKey); ok {
-			return key.VerifySignature(msg, sig), nil
-		}
-		return false, fmt.Errorf("public key is not secp256r1 compatible")
+		//pub, err := secp256r1BytesToPublicKey(pubKey)
+		//
+		//var pub secp256r1.PubKey
+		//pub = pubKey
+		//secp256r1.PubKey{Key: pubKey}
+		//if key, ok :=  pubKey.(); ok {
+		//	return key.VerifySignature(msg, sig), nil
+		//}
+		err = fmt.Errorf("public key is not secp256r1 compatible")
 	case Secp256k1:
-		if key, ok := pubKey.(secp256k1.PubKey); ok {
-			return key.VerifySignature(msg, sig), nil
-		}
-		return false, fmt.Errorf("public key is not secp256k1 compatible")
+		//if key, ok := pubKey.(secp256k1.PubKey); ok {
+		//	return key.VerifySignature(msg, sig), nil
+		//}
+		err = fmt.Errorf("public key is not secp256k1 compatible")
 	default:
-		return false, fmt.Errorf("pub key format not implemented")
+		err = fmt.Errorf("pub key format not implemented")
 	}
+
+	return r, err
+}
+
+func secp256r1BytesToPublicKey(pubKeyBytes []byte) (*ecdsa.PublicKey, error) {
+	curve := elliptic.P256()
+
+	// La longueur de la séquence de bytes doit être 2 * la longueur des points de la courbe elliptique + 1 (pour le byte de préfixe non compressé)
+	if len(pubKeyBytes) != 2*curve.Params().BitSize/8+1 {
+		return nil, fmt.Errorf("public key size is not good: %d expected, got %d", 2*curve.Params().BitSize/8+1, len(pubKeyBytes))
+	}
+
+	xBytes := pubKeyBytes[1 : curve.Params().BitSize/8+1]
+	yBytes := pubKeyBytes[curve.Params().BitSize/8+1:]
+
+	x := new(big.Int).SetBytes(xBytes)
+	y := new(big.Int).SetBytes(yBytes)
+
+	publicKey := &ecdsa.PublicKey{
+		Curve: curve,
+		X:     x,
+		Y:     y,
+	}
+
+	return publicKey, nil
 }
