@@ -4,14 +4,13 @@ import (
 	"context"
 	"crypto/ecdsa"
 	"crypto/ed25519"
-	"crypto/elliptic"
+	"crypto/x509"
 	"encoding/hex"
+	"encoding/pem"
 	"fmt"
-	"math/big"
 
 	cometcrypto "github.com/cometbft/cometbft/crypto"
 	"github.com/ichiban/prolog/engine"
-
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
@@ -139,6 +138,36 @@ func ECDSAVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine
 	})
 }
 
+func SecpVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return engine.Delay(func(ctx context.Context) *engine.Promise {
+		pubKey, err := TermToBytes(key, env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("secp_verify/4: decoding public key: %w", err))
+		}
+
+		msg, err := TermToBytes(data, env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("secp_verify/4: decoding data: %w", err))
+		}
+
+		signature, err := TermToBytes(sig, env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("secp_verify/4: decoding signature: %w", err))
+		}
+
+		// TODO: Create function hasDecoding option
+		r, err := verifySignature(Secp256r1, pubKey, msg, signature)
+		if err != nil {
+			return engine.Error(fmt.Errorf("secp_verify/4: failed verify signature: %w", err))
+		}
+
+		if !r {
+			return engine.Bool(false)
+		}
+		return cont(env)
+	})
+}
+
 func verifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error) {
 	defer func() {
 		if recoveredErr := recover(); recoveredErr != nil {
@@ -150,15 +179,17 @@ func verifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error
 	case Ed25519:
 		r = ed25519.Verify(pubKey, msg, sig)
 	case Secp256r1:
-		//pub, err := secp256r1BytesToPublicKey(pubKey)
-		//
-		//var pub secp256r1.PubKey
-		//pub = pubKey
-		//secp256r1.PubKey{Key: pubKey}
-		//if key, ok :=  pubKey.(); ok {
-		//	return key.VerifySignature(msg, sig), nil
-		//}
-		err = fmt.Errorf("public key is not secp256r1 compatible")
+		block, _ := pem.Decode(pubKey)
+		if block == nil {
+			err = fmt.Errorf("failed decode PEM public key")
+			break
+		}
+		genericPublicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+		if err != nil {
+			break
+		}
+		pk := genericPublicKey.(*ecdsa.PublicKey)
+		r = ecdsa.VerifyASN1(pk, msg, sig)
 	case Secp256k1:
 		//if key, ok := pubKey.(secp256k1.PubKey); ok {
 		//	return key.VerifySignature(msg, sig), nil
@@ -169,27 +200,4 @@ func verifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error
 	}
 
 	return r, err
-}
-
-func secp256r1BytesToPublicKey(pubKeyBytes []byte) (*ecdsa.PublicKey, error) {
-	curve := elliptic.P256()
-
-	// La longueur de la séquence de bytes doit être 2 * la longueur des points de la courbe elliptique + 1 (pour le byte de préfixe non compressé)
-	if len(pubKeyBytes) != 2*curve.Params().BitSize/8+1 {
-		return nil, fmt.Errorf("public key size is not good: %d expected, got %d", 2*curve.Params().BitSize/8+1, len(pubKeyBytes))
-	}
-
-	xBytes := pubKeyBytes[1 : curve.Params().BitSize/8+1]
-	yBytes := pubKeyBytes[curve.Params().BitSize/8+1:]
-
-	x := new(big.Int).SetBytes(xBytes)
-	y := new(big.Int).SetBytes(yBytes)
-
-	publicKey := &ecdsa.PublicKey{
-		Curve: curve,
-		X:     x,
-		Y:     y,
-	}
-
-	return publicKey, nil
 }

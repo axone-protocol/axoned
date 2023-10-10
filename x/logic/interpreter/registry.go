@@ -117,6 +117,7 @@ var registry = map[string]any{
 	"uri_encoded/3":             predicate.URIEncoded,
 	"read_string/3":             predicate.ReadString,
 	"eddsa_verify/4":            predicate.ECDSAVerify,
+	"secp_verify/4":             predicate.SecpVerify,
 }
 
 // RegistryNames is the list of the predicate names in the Registry.

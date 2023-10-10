@@ -219,6 +219,49 @@ ecdsa_verify(PubKey, Msg, Sig, _).`,
 				query:       `verify.`,
 				wantSuccess: false,
 			},
+			{
+				// All good
+				program: `verify :-
+hex_bytes('2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a3044415163445167414545386843612b527835565547393835506666565870433478446643660d0a6b75747a4c4b4d49586e6c383735734543525036654b4b79704c70514564564752526b3551396f687a64766b49392b583850756d666766356d673d3d0d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d', PubKey),
+hex_bytes('e50c26e89f734b2ee12041ff27874c901891f74a0f0cf470333312a3034ce3be', Msg),
+hex_bytes('30450220099e6f9dd218e0e304efa7a4224b0058a8e3aec73367ec239bee4ed8ed7d85db022100b504d3d0d2e879b04705c0e5a2b40b0521a5ab647ea207bd81134e1a4eb79e47', Sig),
+secp_verify(PubKey, Msg, Sig, _).`,
+				query:       `verify.`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: true,
+			},
+			{ // Invalid secp signature
+				program: `verify :-
+hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
+hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
+hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
+secp_verify(PubKey, Msg, Sig, _).`,
+				query:       `verify.`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("secp_verify/4: failed verify signature: failed decode PEM public key"),
+			},
+			{
+				// Wrong msg
+				program: `verify :-
+hex_bytes('2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a3044415163445167414545386843612b527835565547393835506666565870433478446643660d0a6b75747a4c4b4d49586e6c383735734543525036654b4b79704c70514564564752526b3551396f687a64766b49392b583850756d666766356d673d3d0d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d', PubKey),
+hex_bytes('e50c26e89f734b2ee12041ff27874c901891f74a0f0cf470333312a3034ce3bf', Msg),
+hex_bytes('30450220099e6f9dd218e0e304efa7a4224b0058a8e3aec73367ec239bee4ed8ed7d85db022100b504d3d0d2e879b04705c0e5a2b40b0521a5ab647ea207bd81134e1a4eb79e47', Sig),
+secp_verify(PubKey, Msg, Sig, _).`,
+				query:       `verify.`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: false,
+			},
+			{
+				// Wrong signature
+				program: `verify :-
+hex_bytes('2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a3044415163445167414545386843612b527835565547393835506666565870433478446643660d0a6b75747a4c4b4d49586e6c383735734543525036654b4b79704c70514564564752526b3551396f687a64766b49392b583850756d666766356d673d3d0d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d', PubKey),
+hex_bytes('e50c26e89f734b2ee12041ff27874c901891f74a0f0cf470333312a3034ce3be', Msg),
+hex_bytes('30450220099e6f9dd218e0e304efa7a4224b0058a8e3aec73367ec239bee4ed8ed7d85db022100b504d3d0d2e879b04705c0e5a2b40b0521a5ab647ea207bd81134e1a4eb79e48', Sig),
+secp_verify(PubKey, Msg, Sig, _).`,
+				query:       `verify.`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: false,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
@@ -231,6 +274,7 @@ ecdsa_verify(PubKey, Msg, Sig, _).`,
 						interpreter := testutil.NewLightInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
 						interpreter.Register4(engine.NewAtom("ecdsa_verify"), ECDSAVerify)
+						interpreter.Register4(engine.NewAtom("secp_verify"), SecpVerify)
 
 						err := interpreter.Compile(ctx, tc.program)
 						So(err, ShouldBeNil)
