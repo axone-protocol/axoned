@@ -28,6 +28,9 @@ var AtomEmptyArray = engine.NewAtom("[]")
 // AtomNull is the term null.
 var AtomNull = engine.NewAtom("null")
 
+// AtomEncoding is the term used to indicate the encoding type option.
+var AtomEncoding = engine.NewAtom("encoding")
+
 // MakeNull returns the compound term @(null).
 // It is used to represent the null value in json objects.
 func MakeNull() engine.Term {

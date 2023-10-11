@@ -110,17 +110,17 @@ const (
 
 func ECDSAVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		pubKey, err := TermToBytes(key, env)
+		pubKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("octet")), env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("ecdsa_verify/4: decoding public key: %w", err))
 		}
 
-		msg, err := TermToBytes(data, env)
+		msg, err := TermToBytes(data, options, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("ecdsa_verify/4: decoding data: %w", err))
 		}
 
-		signature, err := TermToBytes(sig, env)
+		signature, err := TermToBytes(sig, AtomEncoding.Apply(engine.NewAtom("octet")), env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("ecdsa_verify/4: decoding signature: %w", err))
 		}
@@ -140,17 +140,17 @@ func ECDSAVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine
 
 func SecpVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		pubKey, err := TermToBytes(key, env)
+		pubKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("octet")), env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("secp_verify/4: decoding public key: %w", err))
 		}
 
-		msg, err := TermToBytes(data, env)
+		msg, err := TermToBytes(data, options, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("secp_verify/4: decoding data: %w", err))
 		}
 
-		signature, err := TermToBytes(sig, env)
+		signature, err := TermToBytes(sig, AtomEncoding.Apply(engine.NewAtom("octet")), env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("secp_verify/4: decoding signature: %w", err))
 		}
