@@ -103,7 +103,7 @@ func TermToBytes(term, options engine.Term, env *engine.Env) ([]byte, error) {
 	}
 
 	if encoding == nil {
-		encoding = env.Resolve(AtomEncoding.Apply(engine.NewAtom("hex"))).(engine.Compound)
+		encoding = AtomEncoding.Apply(engine.NewAtom("hex")).(engine.Compound)
 	}
 
 	if encoding.Arity() != 1 {
