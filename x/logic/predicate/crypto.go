@@ -9,8 +9,10 @@ import (
 	"encoding/pem"
 	"fmt"
 
-	cometcrypto "github.com/cometbft/cometbft/crypto"
 	"github.com/ichiban/prolog/engine"
+
+	cometcrypto "github.com/cometbft/cometbft/crypto"
+
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
@@ -108,6 +110,25 @@ const (
 	Ed25519   Alg = "ed25519"
 )
 
+// ED25519Verify return `true` if the Signature can be verified as the ED25519 signature for Data, using the given PubKey
+// as bytes.
+//
+// ed25519_verify(+PubKey, +Data, +Signature, +Options) is semidet
+//
+// Where:
+// - PubKey is a list of bytes representing the public key.
+// - Data is the hash of the signed message could be an Atom or List of bytes.
+// - Signature is the signature of the Data, as list of bytes.
+// - Options allow to give option to the predicates, available options are:
+//   - encoding(+Encoding): Encoding to use for the given Data. Default is `hex`. Can be `hex` or `octet`.
+//
+// Examples:
+//
+// # Verify the signature of given hexadecimal data.
+// - ed25519_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', [23, 56, ...], encoding(hex)).
+//
+// # Verify the signature of given binary data.
+// - ed25519_verify([127, ...], [56, 90, ..], [23, 56, ...], encoding(octet)).
 func ED25519Verify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		pubKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("octet")), env)
@@ -137,6 +158,26 @@ func ED25519Verify(vm *engine.VM, key, data, sig, options engine.Term, cont engi
 	})
 }
 
+// ECDSAVerify return `true` if the Signature can be verified as the ECDSA signature for Data, using the given PubKey
+// as bytes.
+//
+// ecdsa_verify(+PubKey, +Data, +Signature, +Options) is semidet
+//
+// Where:
+// - PubKey is a list of bytes representing the public key.
+// - Data is the hash of the signed message could be an Atom or List of bytes.
+// - Signature is the signature of the Data, as list of bytes.
+// - Options allow to give option to the predicates, available options are:
+//   - encoding(+Encoding): Encoding to use for the given Data. Default is `hex`. Can be `hex` or `octet`.
+//   - type(+Alg): Alg to use for verify the signature. Default is `secp256r1`. Can be `secp256r1` or `secp256k1`.
+//
+// Examples:
+//
+// # Verify the signature of given hexadecimal data as ECDSA secp256r1 algorithm.
+// - ecdsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', [23, 56, ...], encoding(hex)).
+//
+// # Verify the signature of given binary data as ECDSA secp256k1 algorithm.
+// - ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(secp256k1)]).
 func ECDSAVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		pubKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("octet")), env)

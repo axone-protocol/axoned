@@ -71,7 +71,6 @@ func OptionsContains(atom engine.Atom, options engine.Term, env *engine.Env) (en
 		if opts.Functor() == atom {
 			return opts, nil
 		} else if opts.Arity() == 2 && opts.Functor().String() == "." {
-
 			iter := engine.ListIterator{List: opts, Env: env}
 
 			for iter.Next() {
