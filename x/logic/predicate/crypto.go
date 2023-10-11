@@ -108,6 +108,35 @@ const (
 	Ed25519   Alg = "ed25519"
 )
 
+func ED25519Verify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return engine.Delay(func(ctx context.Context) *engine.Promise {
+		pubKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("octet")), env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("ed25519_verify/4: decoding public key: %w", err))
+		}
+
+		msg, err := TermToBytes(data, options, env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("ed25519_verify/4: decoding data: %w", err))
+		}
+
+		signature, err := TermToBytes(sig, AtomEncoding.Apply(engine.NewAtom("octet")), env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("ed25519_verify/4: decoding signature: %w", err))
+		}
+
+		r, err := verifySignature(Ed25519, pubKey, msg, signature)
+		if err != nil {
+			return engine.Error(fmt.Errorf("ed25519_verify/4: failed verify signature: %w", err))
+		}
+
+		if !r {
+			return engine.Bool(false)
+		}
+		return cont(env)
+	})
+}
+
 func ECDSAVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		pubKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("octet")), env)
@@ -125,40 +154,9 @@ func ECDSAVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine
 			return engine.Error(fmt.Errorf("ecdsa_verify/4: decoding signature: %w", err))
 		}
 
-		// TODO: Create function hasDecoding option
-		r, err := verifySignature(Ed25519, pubKey, msg, signature)
-		if err != nil {
-			return engine.Error(fmt.Errorf("ecdsa_verify/4: failed verify signature: %w", err))
-		}
-
-		if !r {
-			return engine.Bool(false)
-		}
-		return cont(env)
-	})
-}
-
-func SecpVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		pubKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("octet")), env)
-		if err != nil {
-			return engine.Error(fmt.Errorf("secp_verify/4: decoding public key: %w", err))
-		}
-
-		msg, err := TermToBytes(data, options, env)
-		if err != nil {
-			return engine.Error(fmt.Errorf("secp_verify/4: decoding data: %w", err))
-		}
-
-		signature, err := TermToBytes(sig, AtomEncoding.Apply(engine.NewAtom("octet")), env)
-		if err != nil {
-			return engine.Error(fmt.Errorf("secp_verify/4: decoding signature: %w", err))
-		}
-
-		// TODO: Create function hasDecoding option
 		r, err := verifySignature(Secp256r1, pubKey, msg, signature)
 		if err != nil {
-			return engine.Error(fmt.Errorf("secp_verify/4: failed verify signature: %w", err))
+			return engine.Error(fmt.Errorf("ecdsa_verify/4: failed verify signature: %w", err))
 		}
 
 		if !r {
@@ -191,10 +189,7 @@ func verifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error
 		pk := genericPublicKey.(*ecdsa.PublicKey)
 		r = ecdsa.VerifyASN1(pk, msg, sig)
 	case Secp256k1:
-		//if key, ok := pubKey.(secp256k1.PubKey); ok {
-		//	return key.VerifySignature(msg, sig), nil
-		//}
-		err = fmt.Errorf("public key is not secp256k1 compatible")
+		err = fmt.Errorf("secp256k1 public key not implemented yet")
 	default:
 		err = fmt.Errorf("pub key format not implemented")
 	}
