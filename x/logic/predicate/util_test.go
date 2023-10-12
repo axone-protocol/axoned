@@ -1,3 +1,4 @@
+//nolint:lll
 package predicate
 
 import (
@@ -152,6 +153,112 @@ func TestOptionsContains(t *testing.T) {
 				Convey("when check contains", func() {
 					env := engine.Env{}
 					result, err := OptionsContains(tc.atom, tc.options, &env)
+
+					if tc.wantSuccess {
+						Convey("then no error should be thrown", func() {
+							So(err, ShouldBeNil)
+
+							Convey("and result should be as expected", func() {
+								So(result, ShouldResemble, tc.result)
+							})
+						})
+					} else {
+						Convey("then error should occurs", func() {
+							So(err, ShouldNotBeNil)
+
+							Convey("and should be as expected", func() {
+								So(err, ShouldResemble, tc.wantError)
+							})
+						})
+					}
+				})
+			})
+		}
+	})
+}
+
+func TestTermToBytes(t *testing.T) {
+	Convey("Given a test cases", t, func() {
+		cases := []struct {
+			term        engine.Term
+			options     engine.Term
+			result      []byte
+			wantSuccess bool
+			wantError   error
+		}{
+			{ // If no option, by default, given term is in hexadecimal format.
+				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
+				options:     nil,
+				result:      []byte{72, 101, 121, 32, 33, 32, 89, 111, 117, 32, 119, 97, 110, 116, 32, 116, 111, 32, 115, 101, 101, 32, 116, 104, 105, 115, 32, 116, 101, 120, 116, 44, 32, 119, 111, 110, 100, 101, 114, 102, 117, 108, 33},
+				wantSuccess: true,
+			},
+			{
+				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("hex")),
+				result:      []byte{72, 101, 121, 32, 33, 32, 89, 111, 117, 32, 119, 97, 110, 116, 32, 116, 111, 32, 115, 101, 101, 32, 116, 104, 105, 115, 32, 116, 101, 120, 116, 44, 32, 119, 111, 110, 100, 101, 114, 102, 117, 108, 33},
+				wantSuccess: true,
+			},
+			{
+				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("octet")),
+				result:      nil,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("invalid term type: engine.Atom, should be a List"),
+			},
+			{
+				term:        engine.List(engine.Integer(72), engine.Integer(101), engine.Integer(121), engine.Integer(32), engine.Integer(33), engine.Integer(32), engine.Integer(89), engine.Integer(111), engine.Integer(117), engine.Integer(32), engine.Integer(119), engine.Integer(97), engine.Integer(110), engine.Integer(116), engine.Integer(32), engine.Integer(116), engine.Integer(111), engine.Integer(32), engine.Integer(115), engine.Integer(101), engine.Integer(101), engine.Integer(32), engine.Integer(116), engine.Integer(104), engine.Integer(105), engine.Integer(115), engine.Integer(32), engine.Integer(116), engine.Integer(101), engine.Integer(120), engine.Integer(116), engine.Integer(44), engine.Integer(32), engine.Integer(119), engine.Integer(111), engine.Integer(110), engine.Integer(100), engine.Integer(101), engine.Integer(114), engine.Integer(102), engine.Integer(117), engine.Integer(108), engine.Integer(33)),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("octet")),
+				result:      []byte{72, 101, 121, 32, 33, 32, 89, 111, 117, 32, 119, 97, 110, 116, 32, 116, 111, 32, 115, 101, 101, 32, 116, 104, 105, 115, 32, 116, 101, 120, 116, 44, 32, 119, 111, 110, 100, 101, 114, 102, 117, 108, 33},
+				wantSuccess: true,
+			},
+			{
+				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("foo")),
+				result:      nil,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("invalid encoding option: foo, valid value are 'hex' or 'octet'"),
+			},
+			{
+				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("foo"), engine.NewAtom("bar")),
+				result:      nil,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("invalid arity for encoding option, should be 1"),
+			},
+			{
+				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
+				options:     engine.NewAtom("encoding").Apply(engine.NewVariable()),
+				result:      nil,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("invalid given options"),
+			},
+			{
+				term:        engine.NewAtom("foo").Apply(engine.NewAtom("bar")),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("octet")),
+				result:      nil,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("term should be a List, give *engine.compound"),
+			},
+			{
+				term:        engine.NewAtom("foo").Apply(engine.NewAtom("bar")),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("hex")),
+				result:      nil,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("invalid term type: *engine.compound, should be String"),
+			},
+			{
+				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
+				options:     engine.NewAtom("foo"),
+				result:      nil,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("invalid options term, should be compound, give engine.Atom"),
+			},
+		}
+		for nc, tc := range cases {
+			Convey(fmt.Sprintf("Given the term #%d: %s", nc, tc.term), func() {
+				Convey("when check try convert", func() {
+					env := engine.Env{}
+					result, err := TermToBytes(tc.term, tc.options, &env)
 
 					if tc.wantSuccess {
 						Convey("then no error should be thrown", func() {
