@@ -94,7 +94,7 @@ func OptionsContains(atom engine.Atom, options engine.Term, env *engine.Env) (en
 
 // TermToBytes try to convert a term to native golang []byte.
 // By default, if no encoding options is given the term is considered as hexadecimal value.
-// Available encoding option is `text`, `octet` and `hex` (default value)
+// Available encoding option is `text`, `octet` and `hex` (default value).
 func TermToBytes(term, options engine.Term, env *engine.Env) ([]byte, error) {
 	encoding, err := OptionsContains(AtomEncoding, options, env)
 	if err != nil {
