@@ -129,7 +129,7 @@ const (
 //
 // # Verify the signature of given binary data.
 // - ed25519_verify([127, ...], [56, 90, ..], [23, 56, ...], encoding(octet)).
-func ED25519Verify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+func ED25519Verify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		r, err := cryptoVerify(Ed25519, key, data, sig, options, env)
 		if err != nil {

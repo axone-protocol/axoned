@@ -10,6 +10,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/types"
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 // SortBalances by coin denomination.
@@ -65,38 +66,11 @@ func BytesToList(bt []byte) engine.Term {
 	return engine.List(terms...)
 }
 
-func OptionsContains(atom engine.Atom, options engine.Term, env *engine.Env) (engine.Compound, error) {
-	switch opts := env.Resolve(options).(type) {
-	case engine.Compound:
-		if opts.Functor() == atom {
-			return opts, nil
-		} else if opts.Arity() == 2 && opts.Functor().String() == "." {
-			iter := engine.ListIterator{List: opts, Env: env}
-
-			for iter.Next() {
-				opt := env.Resolve(iter.Current())
-				term, err := OptionsContains(atom, opt, env)
-				if err != nil {
-					return nil, err
-				}
-				if term != nil {
-					return term, nil
-				}
-			}
-		}
-		return nil, nil
-	case nil:
-		return nil, nil
-	default:
-		return nil, fmt.Errorf("invalid options term, should be compound, give %T", opts)
-	}
-}
-
 // TermToBytes try to convert a term to native golang []byte.
 // By default, if no encoding options is given the term is considered as hexadecimal value.
 // Available encoding option is `text`, `octet` and `hex` (default value).
 func TermToBytes(term, options engine.Term, env *engine.Env) ([]byte, error) {
-	encoding, err := OptionsContains(AtomEncoding, options, env)
+	encoding, err := util.GetOption(AtomEncoding, options, env)
 	if err != nil {
 		return nil, err
 	}
@@ -105,11 +79,7 @@ func TermToBytes(term, options engine.Term, env *engine.Env) ([]byte, error) {
 		encoding = AtomEncoding.Apply(engine.NewAtom("hex")).(engine.Compound)
 	}
 
-	if encoding.Arity() != 1 {
-		return nil, fmt.Errorf("invalid arity for encoding option, should be 1")
-	}
-
-	switch enc := env.Resolve(encoding.Arg(0)).(type) {
+	switch enc := env.Resolve(encoding).(type) {
 	case engine.Atom:
 		switch enc.String() {
 		case "octet":

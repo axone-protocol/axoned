@@ -4,32 +4,34 @@ import (
 	"github.com/ichiban/prolog/engine"
 )
 
-// AtomPair are terms with principal functor (-)/2.
-// For example, the term -(A, B) denotes the pair of elements A and B.
-var AtomPair = engine.NewAtom("-")
+var (
+	// AtomPair are terms with principal functor (-)/2.
+	// For example, the term -(A, B) denotes the pair of elements A and B.
+	AtomPair = engine.NewAtom("-")
 
-// AtomJSON are terms with principal functor json/1.
-// It is used to represent json objects.
-var AtomJSON = engine.NewAtom("json")
+	// AtomJSON are terms with principal functor json/1.
+	// It is used to represent json objects.
+	AtomJSON = engine.NewAtom("json")
 
-// AtomAt are terms with principal functor (@)/1.
-// It is used to represent special values in json objects.
-var AtomAt = engine.NewAtom("@")
+	// AtomAt are terms with principal functor (@)/1.
+	// It is used to represent special values in json objects.
+	AtomAt = engine.NewAtom("@")
 
-// AtomTrue is the term true.
-var AtomTrue = engine.NewAtom("true")
+	// AtomTrue is the term true.
+	AtomTrue = engine.NewAtom("true")
 
-// AtomFalse is the term false.
-var AtomFalse = engine.NewAtom("false")
+	// AtomFalse is the term false.
+	AtomFalse = engine.NewAtom("false")
 
-// AtomEmptyArray is the term [].
-var AtomEmptyArray = engine.NewAtom("[]")
+	// AtomEmptyArray is the term [].
+	AtomEmptyArray = engine.NewAtom("[]")
 
-// AtomNull is the term null.
-var AtomNull = engine.NewAtom("null")
+	// AtomNull is the term null.
+	AtomNull = engine.NewAtom("null")
 
-// AtomEncoding is the term used to indicate the encoding type option.
-var AtomEncoding = engine.NewAtom("encoding")
+	// AtomEncoding is the term used to indicate the encoding type option.
+	AtomEncoding = engine.NewAtom("encoding")
+)
 
 // MakeNull returns the compound term @(null).
 // It is used to represent the null value in json objects.
