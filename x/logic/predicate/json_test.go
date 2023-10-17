@@ -504,7 +504,8 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 												So(len(got), ShouldEqual, 1)
 												for _, resultGot := range got {
 													for _, termGot := range resultGot {
-														So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.term)
+														reindexedTerm := fmt.Sprintf("%v", testutil.ReindexUnknownVariables(termGot))
+														So(reindexedTerm, ShouldEqual, tc.term)
 													}
 												}
 											} else {
@@ -542,7 +543,8 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 												So(len(got), ShouldEqual, 1)
 												for _, resultGot := range got {
 													for _, termGot := range resultGot {
-														So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.json)
+														reindexedTerm := fmt.Sprintf("%v", testutil.ReindexUnknownVariables(termGot))
+														So(reindexedTerm, ShouldEqual, tc.json)
 													}
 												}
 											} else {
