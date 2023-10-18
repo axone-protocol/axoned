@@ -96,3 +96,14 @@ func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.T
 	}
 	return extractOption(resolvedTerm)
 }
+
+// GetOptionWithDefault returns the value of the first option with the given name in the given options, or the given
+// default value if no option is found.
+func GetOptionWithDefault(name engine.Atom, options engine.Term, defaultValue engine.Term, env *engine.Env) (engine.Term, error) {
+	if term, err := GetOption(name, options, env); err != nil {
+		return nil, err
+	} else if term != nil {
+		return term, nil
+	}
+	return defaultValue, nil
+}
