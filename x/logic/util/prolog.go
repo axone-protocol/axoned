@@ -7,21 +7,28 @@ import (
 	"github.com/ichiban/prolog/engine"
 )
 
-// AtomDot is the term used to represent the dot in a list.
-var AtomDot = engine.NewAtom(".")
+var (
+	// AtomDot is the term used to represent the dot in a list.
+	AtomDot = engine.NewAtom(".")
+
+	// AtomEmpty is the term used to represent empty.
+	AtomEmpty = engine.NewAtom("")
+)
 
 // StringToTerm converts a string to a term.
 func StringToTerm(s string) engine.Term {
 	return engine.NewAtom(s)
 }
 
-// Resolve resolves a term and returns the resolved term and a boolean indicating whether the term is instantiated.
-func Resolve(env *engine.Env, t engine.Term) (engine.Atom, bool) {
+// ResolveToAtom resolves a term and attempts to convert it into an engine.Atom if possible.
+// If conversion fails, the function returns the empty atom and the error.
+func ResolveToAtom(env *engine.Env, t engine.Term) (engine.Atom, error) {
 	switch t := env.Resolve(t).(type) {
 	case engine.Atom:
-		return t, true
+		return t, nil
 	default:
-		return engine.NewAtom(""), false
+		return AtomEmpty,
+			fmt.Errorf("invalid term '%s' - expected engine.Atom but got %T", t, t)
 	}
 }
 

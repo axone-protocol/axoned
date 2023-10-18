@@ -70,24 +70,24 @@ func DIDComponents(vm *engine.VM, did, components engine.Term, cont engine.Cont,
 
 		buf := strings.Builder{}
 		buf.WriteString("did:")
-		if segment, ok := util.Resolve(env, t2.Arg(0)); ok {
+		if segment, err := util.ResolveToAtom(env, t2.Arg(0)); err == nil {
 			buf.WriteString(url.PathEscape(segment.String()))
 		}
-		if segment, ok := util.Resolve(env, t2.Arg(1)); ok {
+		if segment, err := util.ResolveToAtom(env, t2.Arg(1)); err == nil {
 			buf.WriteString(":")
 			buf.WriteString(url.PathEscape(segment.String()))
 		}
-		if segment, ok := util.Resolve(env, t2.Arg(2)); ok {
+		if segment, err := util.ResolveToAtom(env, t2.Arg(2)); err == nil {
 			for _, s := range strings.FieldsFunc(segment.String(), func(c rune) bool { return c == '/' }) {
 				buf.WriteString("/")
 				buf.WriteString(url.PathEscape(s))
 			}
 		}
-		if segment, ok := util.Resolve(env, t2.Arg(3)); ok {
+		if segment, err := util.ResolveToAtom(env, t2.Arg(3)); err == nil {
 			buf.WriteString("?")
 			buf.WriteString(url.PathEscape(segment.String()))
 		}
-		if segment, ok := util.Resolve(env, t2.Arg(4)); ok {
+		if segment, err := util.ResolveToAtom(env, t2.Arg(4)); err == nil {
 			buf.WriteString("#")
 			buf.WriteString(url.PathEscape(segment.String()))
 		}

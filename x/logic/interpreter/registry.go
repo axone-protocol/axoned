@@ -116,7 +116,7 @@ var registry = map[string]any{
 	"json_prolog/2":             predicate.JSONProlog,
 	"uri_encoded/3":             predicate.URIEncoded,
 	"read_string/3":             predicate.ReadString,
-	"ed25519_verify/4":          predicate.ED25519Verify,
+	"eddsa_verify/4":            predicate.EdDSAVerify,
 	"ecdsa_verify/4":            predicate.ECDSAVerify,
 }
 
