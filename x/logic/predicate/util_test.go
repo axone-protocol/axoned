@@ -134,7 +134,7 @@ func TestTermToBytes(t *testing.T) {
 				options:     engine.NewAtom("encoding").Apply(engine.NewVariable()),
 				result:      nil,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("invalid term '%%!s(engine.Variable=8)' - expected engine.Atom but got engine.Variable"),
+				wantError:   fmt.Errorf("invalid term '%%!s(engine.Variable=3861)' - expected engine.Atom but got engine.Variable"),
 			},
 			{
 				term:        engine.NewAtom("foo").Apply(engine.NewAtom("bar")),

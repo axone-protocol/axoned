@@ -8,6 +8,8 @@ import (
 	"encoding/hex"
 	"encoding/pem"
 	"fmt"
+	"slices"
+	"strings"
 
 	"github.com/ichiban/prolog/engine"
 
@@ -104,43 +106,41 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 
 type Alg string
 
+func (a Alg) String() string {
+	return string(a)
+}
+
 const (
 	Secp256k1 Alg = "secp256k1"
 	Secp256r1 Alg = "secp256r1"
 	Ed25519   Alg = "ed25519"
 )
 
-// ED25519Verify return `true` if the Signature can be verified as the ED25519 signature for Data, using the given PubKey
+// EdDSAVerify return `true` if the Signature can be verified as the EdDSA signature for Data, using the given PubKey
 // as bytes.
 //
-// ed25519_verify(+PubKey, +Data, +Signature, +Options) is semidet
+// eddsa_verify(+PubKey, +Data, +Signature, +Options) is semidet
 //
 // Where:
 // - PubKey is a list of bytes representing the public key.
 // - Data is the hash of the signed message could be an Atom or List of bytes.
 // - Signature is the signature of the Data, as list of bytes.
 // - Options allow to give option to the predicates, available options are:
-//   - encoding(+Encoding): Encoding to use for the given Data. Default is `hex`. Can be `hex` or `octet`.
+//   - encoding(+Encoding): Encoding to use for the given Data. Possible values are:
+//     -- `hex` (default): hexadecimal encoding.
+//     -- `byte`: plain bytes encoding.
+//   - type(+Alg): Algorithm to use in the EdDSA family. Supported algorithms are:
+//     -- `ed25519` (default): the EdDSA signature scheme using SHA-512 (SHA-2) and Curve25519.
 //
 // Examples:
 //
 // # Verify the signature of given hexadecimal data.
-// - ed25519_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', [23, 56, ...], encoding(hex)).
+// - eddsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', [23, 56, ...], [encoding(hex), type(ed25519)]).
 //
 // # Verify the signature of given binary data.
-// - ed25519_verify([127, ...], [56, 90, ..], [23, 56, ...], encoding(octet)).
-func ED25519Verify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		r, err := cryptoVerify(Ed25519, key, data, sig, options, env)
-		if err != nil {
-			return engine.Error(fmt.Errorf("ed25519_verify/4: %w", err))
-		}
-
-		if !r {
-			return engine.Bool(false)
-		}
-		return cont(env)
-	})
+// - eddsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(byte), type(ed25519)]).
+func EdDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return xVerify("eddsa_verify/4", key, data, sig, options, Ed25519, []Alg{Ed25519}, cont, env)
 }
 
 // ECDSAVerify return `true` if the Signature can be verified as the ECDSA signature for Data, using the given PubKey
@@ -153,8 +153,12 @@ func ED25519Verify(_ *engine.VM, key, data, sig, options engine.Term, cont engin
 // - Data is the hash of the signed message could be an Atom or List of bytes.
 // - Signature is the signature of the Data, as list of bytes.
 // - Options allow to give option to the predicates, available options are:
-//   - encoding(+Encoding): Encoding to use for the given Data. Default is `hex`. Can be `hex` or `octet`.
-//   - type(+Alg): Alg to use for verify the signature. Default is `secp256r1`. Can be `secp256r1` or `secp256k1`.
+//   - encoding(+Encoding): Encoding to use for the given Data. Possible values are:
+//     -- `hex`: hexadecimal encoding. Default value
+//     -- `byte`: plain bytes encoding.
+//   - type(+Alg): Algorithm to use in the EdDSA family. Supported algorithms are:
+//     -- `secp256r1` (default):
+//     -- `secp256k1`:
 //
 // Examples:
 //
@@ -162,45 +166,62 @@ func ED25519Verify(_ *engine.VM, key, data, sig, options engine.Term, cont engin
 // - ecdsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', [23, 56, ...], encoding(hex)).
 //
 // # Verify the signature of given binary data as ECDSA secp256k1 algorithm.
-// - ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(secp256k1)]).
-func ECDSAVerify(vm *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+// - ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(byte), type(secp256k1)]).
+func ECDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return xVerify("ecdsa_verify/4", key, data, sig, options, Secp256r1, []Alg{Secp256r1, Secp256k1}, cont, env)
+}
+
+// xVerify return `true` if the Signature can be verified as the signature for Data, using the given PubKey for a
+// considered algorithm.
+// This is a generic predicate implementation that can be used to verify any signature.
+func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo Alg, algos []Alg, cont engine.Cont, env *engine.Env) *engine.Promise {
+	typeOpt := engine.NewAtom("type")
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		// TODO: Get good algo in options
-		r, err := cryptoVerify(Secp256r1, key, data, sig, options, env)
+		typeTerm, err := util.GetOptionWithDefault(typeOpt, options, engine.NewAtom(defaultAlgo.String()), env)
 		if err != nil {
-			return engine.Error(fmt.Errorf("ecdsa_verify/4: %w", err))
+			return engine.Error(fmt.Errorf("%s: %w", functor, err))
+		}
+		typeAtom, err := util.ResolveToAtom(env, typeTerm)
+		if err != nil {
+			return engine.Error(fmt.Errorf("%s: %w", functor, err))
+		}
+
+		if idx := slices.IndexFunc(algos, func(a Alg) bool { return a.String() == typeAtom.String() }); idx == -1 {
+			return engine.Error(fmt.Errorf("%s: invalid type: %s. Possible values: %s",
+				functor,
+				typeAtom.String(),
+				strings.Join(util.Map(algos, func(a Alg) string { return a.String() }), ", ")))
+		}
+
+		decodedKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("byte")), env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("%s: failed to decode public key: %w", functor, err))
+		}
+
+		decodedData, err := TermToBytes(data, options, env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
+		}
+
+		decodedSignature, err := TermToBytes(sig, AtomEncoding.Apply(engine.NewAtom("byte")), env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("%s: failed to decode signature: %w", functor, err))
+		}
+
+		r, err := verifySignature(Alg(typeAtom.String()), decodedKey, decodedData, decodedSignature)
+		if err != nil {
+			return engine.Error(fmt.Errorf("%s: failed to verify signature: %w", functor, err))
 		}
 
 		if !r {
 			return engine.Bool(false)
 		}
+
 		return cont(env)
 	})
 }
 
-func cryptoVerify(alg Alg, key, data, sig, options engine.Term, env *engine.Env) (bool, error) {
-	pubKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("octet")), env)
-	if err != nil {
-		return false, fmt.Errorf("decoding public key: %w", err)
-	}
-
-	msg, err := TermToBytes(data, options, env)
-	if err != nil {
-		return false, fmt.Errorf("decoding data: %w", err)
-	}
-
-	signature, err := TermToBytes(sig, AtomEncoding.Apply(engine.NewAtom("octet")), env)
-	if err != nil {
-		return false, fmt.Errorf("decoding signature: %w", err)
-	}
-
-	r, err := verifySignature(alg, pubKey, msg, signature)
-	if err != nil {
-		return false, fmt.Errorf("failed verify signature: %w", err)
-	}
-	return r, nil
-}
-
+// verifySignature verifies the signature of the given message with the given public key using the given algorithm.
 func verifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error) {
 	defer func() {
 		if recoveredErr := recover(); recoveredErr != nil {
@@ -226,7 +247,7 @@ func verifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error
 	case Secp256k1:
 		err = fmt.Errorf("secp256k1 public key not implemented yet")
 	default:
-		err = fmt.Errorf("pub key format not implemented")
+		err = fmt.Errorf("algo %s not supported", alg)
 	}
 
 	return r, err
