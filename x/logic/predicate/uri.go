@@ -52,8 +52,6 @@ func NewComponent(v string) (Component, error) {
 // Here some reported issues on golang about the RFC non-compliance.
 //   - golang.org/issue/5684.
 //   - https://github.com/golang/go/issues/27559
-//
-//nolint:gocognit
 func shouldEscape(c byte, comp Component) bool {
 	// §2.3 Unreserved characters (alphanum)
 	if 'a' <= c && c <= 'z' || 'A' <= c && c <= 'Z' || '0' <= c && c <= '9' {
