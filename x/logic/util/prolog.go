@@ -75,7 +75,7 @@ func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.T
 
 	resolvedTerm := env.Resolve(options)
 
-	if v, ok := resolvedTerm.(engine.Compound); ok {
+	if v, ok := resolvedTerm.(engine.Compound); ok { //nolint:nestif
 		if IsList(v) {
 			iter := engine.ListIterator{List: v, Env: env}
 

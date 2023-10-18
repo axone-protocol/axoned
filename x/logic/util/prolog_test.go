@@ -138,7 +138,7 @@ func TestGetOption(t *testing.T) {
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the term option #%d: %s", nc, tc.option), func() {
-				Convey("when check contains", func() {
+				Convey("when getting option", func() {
 					env := engine.Env{}
 					result, err := GetOption(tc.option, tc.options, &env)
 

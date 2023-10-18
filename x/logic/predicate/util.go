@@ -68,61 +68,67 @@ func BytesToList(bt []byte) engine.Term {
 
 // TermToBytes try to convert a term to native golang []byte.
 // By default, if no encoding options is given the term is considered as hexadecimal value.
-// Available encoding option is `text`, `octet` and `hex` (default value).
+//
+// Options are:
+//   - encoding(format).
+//     where format is the encoding format to use. Possible values are:
+//     `byte` and `hex`.
 func TermToBytes(term, options engine.Term, env *engine.Env) ([]byte, error) {
-	encoding, err := util.GetOption(AtomEncoding, options, env)
+	byteOpt := engine.NewAtom("byte")
+	hexOpt := engine.NewAtom("hex")
+
+	encoding, err := util.GetOptionWithDefault(AtomEncoding, options, hexOpt, env)
 	if err != nil {
 		return nil, err
 	}
 
-	if encoding == nil {
-		encoding = AtomEncoding.Apply(engine.NewAtom("hex")).(engine.Compound)
-	}
-
 	switch enc := env.Resolve(encoding).(type) {
 	case engine.Atom:
-		switch enc.String() {
-		case "octet":
-			switch b := env.Resolve(term).(type) {
-			case engine.Compound:
-				if b.Arity() != 2 || b.Functor().String() != "." {
-					return nil, fmt.Errorf("term should be a List, give %T", b)
-				}
-				iter := engine.ListIterator{List: b, Env: env}
-
+		switch enc {
+		case byteOpt:
+			v := env.Resolve(term)
+			if c, ok := v.(engine.Compound); ok && util.IsList(c) {
+				iter := engine.ListIterator{List: v, Env: env}
 				return ListToBytes(iter, env)
-			default:
-				return nil, fmt.Errorf("invalid term type: %T, should be a List", term)
 			}
-		case "hex":
-			switch b := env.Resolve(term).(type) {
-			case engine.Atom:
-				src := []byte(b.String())
+			return nil, fmt.Errorf("term should be a List, given %T", term)
+		case hexOpt:
+			v := env.Resolve(term)
+			if atom, ok := v.(engine.Atom); ok {
+				src := []byte(atom.String())
 				result := make([]byte, hex.DecodedLen(len(src)))
 				_, err := hex.Decode(result, src)
 				return result, err
-			default:
-				return nil, fmt.Errorf("invalid term type: %T, should be String", term)
 			}
+			return nil, fmt.Errorf("invalid term type: %T, should be an atom", term)
 		default:
-			return nil, fmt.Errorf("invalid encoding option: %s, valid value are 'hex' or 'octet'", enc.String())
+			return nil, fmt.Errorf("invalid encoding option: %s, valid values are '%s' or '%s'", enc, hexOpt, byteOpt)
 		}
 	default:
-		return nil, fmt.Errorf("invalid given options")
+		return nil, fmt.Errorf("invalid term '%s' - expected engine.Atom but got %T", encoding, encoding)
 	}
 }
 
 func ListToBytes(terms engine.ListIterator, env *engine.Env) ([]byte, error) {
 	bt := make([]byte, 0)
+	index := 0
+
 	for terms.Next() {
 		term := env.Resolve(terms.Current())
+		index++
+
 		switch t := term.(type) {
 		case engine.Integer:
-			bt = append(bt, byte(t))
+			if t >= 0 && t <= 255 {
+				bt = append(bt, byte(t))
+			} else {
+				return nil, fmt.Errorf("invalid integer value in list at position %d: %d is out of byte range (0-255)", index, t)
+			}
 		default:
-			return nil, fmt.Errorf("invalid term type in list %T, only integer allowed", term)
+			return nil, fmt.Errorf("invalid term type in list at position %d: %T, only engine.Integer allowed", index, term)
 		}
 	}
+
 	return bt, nil
 }
 
