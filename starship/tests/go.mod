@@ -1,6 +1,6 @@
 module github.com/okp4/okp4d/starship/tests
 
-go 1.20
+go 1.21
 
 replace github.com/strangelove-ventures/lens => github.com/Anmol1696/lens v0.1.1-0.20230705212610-c00628a886a0
 
