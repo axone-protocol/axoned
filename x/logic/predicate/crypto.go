@@ -119,7 +119,7 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 // Examples:
 //
 // # Verify the signature of given hexadecimal data.
-// - eddsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', [23, 56, ...], [encoding(hex), type(ed25519)]).
+// - eddsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56b...', [23, 56, ...], [encoding(hex), type(ed25519)]).
 //
 // # Verify the signature of given binary data.
 // - eddsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(ed25519)]).
@@ -158,7 +158,9 @@ func ECDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.
 // xVerify return `true` if the Signature can be verified as the signature for Data, using the given PubKey for a
 // considered algorithm.
 // This is a generic predicate implementation that can be used to verify any signature.
-func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo util.Alg, algos []util.Alg, cont engine.Cont, env *engine.Env) *engine.Promise {
+func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo util.Alg,
+	algos []util.Alg, cont engine.Cont, env *engine.Env,
+) *engine.Promise {
 	typeOpt := engine.NewAtom("type")
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		typeTerm, err := util.GetOptionWithDefault(typeOpt, options, engine.NewAtom(defaultAlgo.String()), env)

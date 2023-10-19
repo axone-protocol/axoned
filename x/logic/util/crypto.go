@@ -4,8 +4,6 @@ import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/elliptic"
-	"crypto/x509"
-	"encoding/pem"
 	"fmt"
 
 	"github.com/dustinxie/ecc"
@@ -38,32 +36,34 @@ func VerifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error
 		r = ed25519.Verify(pubKey, msg, sig)
 	case Secp256r1:
 		curve := elliptic.P256()
-		x, y := elliptic.UnmarshalCompressed(curve, pubKey)
+		x, y := ecc.UnmarshalCompressed(curve, pubKey)
 		if x == nil || y == nil {
 			err = fmt.Errorf("failed to parse compressed public key")
 			break
 		}
+
 		pk := &ecdsa.PublicKey{
 			Curve: curve,
 			X:     x,
 			Y:     y,
 		}
 
-		r = ecdsa.VerifyASN1(pk, msg, sig)
+		r = ecc.VerifyASN1(pk, msg, sig)
 	case Secp256k1:
-		block, _ := pem.Decode(pubKey)
-		if block == nil {
-			err = fmt.Errorf("failed decode PEM public key")
+		curve := ecc.P256k1()
+		x, y := ecc.UnmarshalCompressed(curve, pubKey)
+		if x == nil || y == nil {
+			err = fmt.Errorf("failed to parse compressed public key")
 			break
 		}
-		genericPublicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
-		if err != nil {
-			break
+
+		pk := &ecdsa.PublicKey{
+			Curve: curve,
+			X:     x,
+			Y:     y,
 		}
-		pk := genericPublicKey.(*ecdsa.PublicKey)
-		if !ecc.VerifyBytes(pk, msg, sig, ecc.Normal) {
-			return false, nil
-		}
+
+		r = ecc.VerifyASN1(pk, msg, sig)
 	default:
 		err = fmt.Errorf("algo %s not supported", alg)
 	}
