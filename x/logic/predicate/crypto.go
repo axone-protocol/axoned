@@ -100,57 +100,59 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 	})
 }
 
-// EdDSAVerify return `true` if the Signature can be verified as the EdDSA signature for Data, using the given PubKey
-// as bytes.
+// EdDSAVerify determines if a given signature is valid as per the EdDSA algorithm for the provided data, using the
+// specified public key. The signature is as follows:
 //
-// eddsa_verify(+PubKey, +Data, +Signature, +Options) is semidet
+// eddsa_verify(+PubKey, +Data, +Signature, +Options) which is semi-deterministic.
 //
 // Where:
-// - PubKey is a list of bytes representing the public key.
-// - Data is the hash of the signed message could be an Atom or List of bytes.
-// - Signature is the signature of the Data, as list of bytes.
-// - Options allow to give option to the predicates, available options are:
-//   - encoding(+Format): Encoding to use for the given Data. Possible values are:
-//     -- `hex` (default): hexadecimal encoding represented as an atom.
-//     -- `octet`: plain bytes encoding represented as a list of integers between 0 and 255.
-//   - type(+Alg): Algorithm to use in the EdDSA family. Supported algorithms are:
-//     -- `ed25519` (default): the EdDSA signature scheme using SHA-512 (SHA-2) and Curve25519.
+//   - PubKey: Encoded public key as a list of bytes.
+//   - Data: Message to verify, represented as either a hexadecimal atom or a list of bytes.
+//     It's important that the message isn't pre-hashed since the Ed25519 algorithm processes
+//     messages in two passes when signing.
+//   - Signature: Signature corresponding to the data, provided as a list of bytes.
+//   - Options: Additional configurations for the verification. Supported options include:
+//     -- encoding(+Format): Determines the encoding for the data. Valid formats are:
+//     . `hex` (default): Hexadecimal encoding represented as an atom.
+//     . `octet`: Plain byte encoding depicted as a list of integers ranging from 0 to 255.
+//     -- type(+Alg): Specifies the EdDSA family algorithm. Currently supported algorithms are:
+//     . `ed25519` (default): The EdDSA signature scheme using SHA-512 (SHA-2) and Curve25519.
 //
 // Examples:
 //
-// # Verify the signature of given hexadecimal data.
-// - eddsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56b...', [23, 56, ...], [encoding(hex), type(ed25519)]).
+//   - Verifying a signature for a given hexadecimal data:
+//     eddsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56b...', [23, 56, ...], [encoding(hex), type(ed25519)])
 //
-// # Verify the signature of given binary data.
-// - eddsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(ed25519)]).
+//   - Verifying a signature for binary data:
+//     eddsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(ed25519)])
 func EdDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return xVerify("eddsa_verify/4", key, data, sig, options, util.Ed25519, []util.Alg{util.Ed25519}, cont, env)
 }
 
-// ECDSAVerify return `true` if the Signature can be verified as the ECDSA signature for Data, using the given PubKey
-// as bytes.
+// ECDSAVerify determines if a given signature is valid as per the ECDSA algorithm for the provided data, using the
+// specified public key. The signature is as follows:
 //
-// ecdsa_verify(+PubKey, +Data, +Signature, +Options) is semidet
+// ecdsa_verify(+PubKey, +Data, +Signature, +Options), which is semi-deterministic.
 //
 // Where:
-// - PubKey is a list of bytes representing the public key.
-// - Data is the hash of the signed message could be an Atom or List of bytes.
-// - Signature is the signature of the Data, as list of bytes.
-// - Options allow to give option to the predicates, available options are:
-//   - encoding(+Format): Encoding to use for the given Data. Possible values are:
-//     -- `hex` (default): hexadecimal encoding represented as an atom.
-//     -- `octet`: plain bytes encoding represented as a list of integers between 0 and 255.
-//   - type(+Alg): Algorithm to use in the EdDSA family. Supported algorithms are:
-//     -- `secp256r1` (default):
-//     -- `secp256k1`:
+//   - PubKey: 33-byte compressed public key, as specified in section 4.3.6 of ANSI X9.62.
+//   - Data: Hash of the signed message, which can be either an atom or a list of bytes.
+//   - Signature: ASN.1 encoded signature corresponding to the data.
+//   - Options: Additional configurations for the verification process. Supported options include:
+//     -- encoding(+Format): Specifies the encoding used for the data. Acceptable formats are:
+//     . `hex` (default): Hexadecimal encoding depicted as an atom.
+//     . `octet`: Plain byte encoding represented as a list of integers between 0 and 255.
+//     -- type(+Alg): Chooses the algorithm within the ECDSA family. The available algorithms are:
+//     . `secp256r1` (default): Also known as P-256 and prime256v1
+//     . `secp256k1`: The Koblitz elliptic curve used in Bitcoin's public-key cryptography
 //
 // Examples:
 //
-// # Verify the signature of given hexadecimal data as ECDSA secp256r1 algorithm.
-// - ecdsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', [23, 56, ...], encoding(hex)).
+//   - Verifying a signature for hexadecimal data using the ECDSA secp256r1 algorithm:
+//     ecdsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56b...', [23, 56, ...], encoding(hex))
 //
-// # Verify the signature of given binary data as ECDSA secp256k1 algorithm.
-// - ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(secp256k1)]).
+//   - Verifying a signature for binary data using the ECDSA secp256k1 algorithm:
+//     ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(secp256k1)])
 func ECDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return xVerify("ecdsa_verify/4", key, data, sig, options, util.Secp256r1, []util.Alg{util.Secp256r1, util.Secp256k1}, cont, env)
 }
