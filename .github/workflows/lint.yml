@@ -99,14 +99,14 @@ jobs:
         uses: actions/setup-go@v4.1.0
         if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
-          go-version: "1.20"
+          go-version: "1.21"
           cache: false
 
       - name: Lint go code (golangci-lint)
         uses: golangci/golangci-lint-action@v3
         if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
-          version: v1.53
+          version: v1.54
 
       - name: Lint go code (gofumpt)
         if: steps.changed-go-files.outputs.any_changed == 'true'
@@ -143,7 +143,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v4.1.0
         with:
-          go-version: "1.20"
+          go-version: "1.21"
           cache: false
 
       - name: Initialize CodeQL
@@ -198,7 +198,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v4.1.0
         with:
-          go-version: "1.20"
+          go-version: "1.21"
 
       - name: Generate command documentation
         run: |
