@@ -6,6 +6,8 @@ import (
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
+
+	"github.com/dustinxie/ecc"
 )
 
 // Alg is the type of algorithm supported by the crypto util functions.
@@ -46,7 +48,19 @@ func VerifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error
 		pk := genericPublicKey.(*ecdsa.PublicKey)
 		r = ecdsa.VerifyASN1(pk, msg, sig)
 	case Secp256k1:
-		err = fmt.Errorf("secp256k1 public key not implemented yet")
+		block, _ := pem.Decode(pubKey)
+		if block == nil {
+			err = fmt.Errorf("failed decode PEM public key")
+			break
+		}
+		genericPublicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
+		if err != nil {
+			break
+		}
+		pk := genericPublicKey.(*ecdsa.PublicKey)
+		if !ecc.VerifyBytes(pk, msg, sig, ecc.Normal) {
+			return false, nil
+		}
 	default:
 		err = fmt.Errorf("algo %s not supported", alg)
 	}
