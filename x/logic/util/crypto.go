@@ -3,6 +3,7 @@ package util
 import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
+	"crypto/elliptic"
 	"crypto/x509"
 	"encoding/pem"
 	"fmt"
@@ -36,16 +37,18 @@ func VerifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error
 	case Ed25519:
 		r = ed25519.Verify(pubKey, msg, sig)
 	case Secp256r1:
-		block, _ := pem.Decode(pubKey)
-		if block == nil {
-			err = fmt.Errorf("failed decode PEM public key")
+		curve := elliptic.P256()
+		x, y := elliptic.UnmarshalCompressed(curve, pubKey)
+		if x == nil || y == nil {
+			err = fmt.Errorf("failed to parse compressed public key")
 			break
 		}
-		genericPublicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
-		if err != nil {
-			break
+		pk := &ecdsa.PublicKey{
+			Curve: curve,
+			X:     x,
+			Y:     y,
 		}
-		pk := genericPublicKey.(*ecdsa.PublicKey)
+
 		r = ecdsa.VerifyASN1(pk, msg, sig)
 	case Secp256k1:
 		block, _ := pem.Decode(pubKey)

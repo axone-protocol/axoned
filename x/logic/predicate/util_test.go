@@ -104,14 +104,14 @@ func TestTermToBytes(t *testing.T) {
 			},
 			{
 				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
-				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("byte")),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("octet")),
 				result:      nil,
 				wantSuccess: false,
 				wantError:   fmt.Errorf("term should be a List, given engine.Atom"),
 			},
 			{
 				term:        engine.List(engine.Integer(72), engine.Integer(101), engine.Integer(121), engine.Integer(32), engine.Integer(33), engine.Integer(32), engine.Integer(89), engine.Integer(111), engine.Integer(117), engine.Integer(32), engine.Integer(119), engine.Integer(97), engine.Integer(110), engine.Integer(116), engine.Integer(32), engine.Integer(116), engine.Integer(111), engine.Integer(32), engine.Integer(115), engine.Integer(101), engine.Integer(101), engine.Integer(32), engine.Integer(116), engine.Integer(104), engine.Integer(105), engine.Integer(115), engine.Integer(32), engine.Integer(116), engine.Integer(101), engine.Integer(120), engine.Integer(116), engine.Integer(44), engine.Integer(32), engine.Integer(119), engine.Integer(111), engine.Integer(110), engine.Integer(100), engine.Integer(101), engine.Integer(114), engine.Integer(102), engine.Integer(117), engine.Integer(108), engine.Integer(33)),
-				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("byte")),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("octet")),
 				result:      []byte{72, 101, 121, 32, 33, 32, 89, 111, 117, 32, 119, 97, 110, 116, 32, 116, 111, 32, 115, 101, 101, 32, 116, 104, 105, 115, 32, 116, 101, 120, 116, 44, 32, 119, 111, 110, 100, 101, 114, 102, 117, 108, 33},
 				wantSuccess: true,
 			},
@@ -120,7 +120,7 @@ func TestTermToBytes(t *testing.T) {
 				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("foo")),
 				result:      nil,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("invalid encoding option: foo, valid values are 'hex' or 'byte'"),
+				wantError:   fmt.Errorf("invalid encoding option: foo, valid values are 'hex' or 'octet'"),
 			},
 			{
 				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
@@ -138,7 +138,7 @@ func TestTermToBytes(t *testing.T) {
 			},
 			{
 				term:        engine.NewAtom("foo").Apply(engine.NewAtom("bar")),
-				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("byte")),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("octet")),
 				result:      nil,
 				wantSuccess: false,
 				wantError:   fmt.Errorf("term should be a List, given *engine.compound"),

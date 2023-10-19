@@ -172,7 +172,7 @@ H == [2252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,
 	})
 }
 
-func TestEDDSAVerify(t *testing.T) {
+func TestXVerify(t *testing.T) {
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			program     string
@@ -181,12 +181,13 @@ func TestEDDSAVerify(t *testing.T) {
 			wantError   error
 			wantSuccess bool
 		}{
+			// ed25519
 			{ // All good
 				program: `verify :-
-hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
-hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
-hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
-ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
+			hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
+			hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
+			hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
+			eddsa_verify(PubKey, Msg, Sig, [encoding(octet), type(ed25519)]).`,
 				query:       `verify.`,
 				wantResult:  []types.TermResults{{}},
 				wantSuccess: true,
@@ -195,7 +196,7 @@ ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
 				program: `verify :-
 			hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
 			hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
-			ed25519_verify(PubKey, '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Sig, encoding(hex)).`,
+			eddsa_verify(PubKey, '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Sig, encoding(hex)).`,
 				query:       `verify.`,
 				wantResult:  []types.TermResults{{}},
 				wantSuccess: true,
@@ -205,7 +206,7 @@ ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
 			hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
 			hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9e', Msg),
 			hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
-			ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
+			eddsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
 			},
@@ -214,7 +215,7 @@ ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
 			hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5b5b', PubKey),
 			hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
 			hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
-			ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
+			eddsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
 				wantError:   fmt.Errorf("eddsa_verify/4: failed to verify signature: ed25519: bad public key length: 33"),
@@ -224,38 +225,59 @@ ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
 			hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
 			hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
 			hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff', Sig),
-			ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
+			eddsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
 			},
+			{ // Unsupported algo
+				program: `verify :-
+			hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
+			hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
+			hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
+			eddsa_verify(PubKey, Msg, Sig, [encoding(octet), type(foo)]).`,
+				query:       `verify.`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("eddsa_verify/4: invalid type: foo. Possible values: ed25519"),
+			},
+			// ECDSA - secp256r1
 			{
 				// All good
 				program: `verify :-
-			hex_bytes('2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a3044415163445167414545386843612b527835565547393835506666565870433478446643660d0a6b75747a4c4b4d49586e6c383735734543525036654b4b79704c70514564564752526b3551396f687a64766b49392b583850756d666766356d673d3d0d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d', PubKey),
+			hex_bytes('0213c8426be471e55506f7ce4f7df557a42e310df09f92eb732ca3085e797cef9b', PubKey),
 			hex_bytes('e50c26e89f734b2ee12041ff27874c901891f74a0f0cf470333312a3034ce3be', Msg),
 			hex_bytes('30450220099e6f9dd218e0e304efa7a4224b0058a8e3aec73367ec239bee4ed8ed7d85db022100b504d3d0d2e879b04705c0e5a2b40b0521a5ab647ea207bd81134e1a4eb79e47', Sig),
-			ecdsa_verify(PubKey, Msg, Sig, encoding(byte)).`,
+			ecdsa_verify(PubKey, Msg, Sig, [encoding(octet), type(secp256r1)]).`,
 				query:       `verify.`,
 				wantResult:  []types.TermResults{{}},
 				wantSuccess: true,
 			},
 			{ // Invalid secp signature
 				program: `verify :-
-			hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
+			hex_bytes('0213c8426be471e55506f7ce4f7df557', PubKey),
 			hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
 			hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
-			ecdsa_verify(PubKey, Msg, Sig, encoding(byte)).`,
+			ecdsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("ecdsa_verify/4: failed to verify signature: failed decode PEM public key"),
+				wantError:   fmt.Errorf("ecdsa_verify/4: failed to verify signature: failed to parse compressed public key"),
+			},
+			{ // Unsupported algo
+				program: `verify :-
+			hex_bytes('0213c8426be471e55506f7ce4f7df557a42e310df09f92eb732ca3085e797cef9b', PubKey),
+			hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
+			hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
+			ecdsa_verify(PubKey, Msg, Sig, [encoding(octet), type(foo)]).`,
+				query:       `verify.`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("ecdsa_verify/4: invalid type: foo. Possible values: secp256r1, secp256k1"),
 			},
 			{
 				// Wrong msg
 				program: `verify :-
-			hex_bytes('2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a3044415163445167414545386843612b527835565547393835506666565870433478446643660d0a6b75747a4c4b4d49586e6c383735734543525036654b4b79704c70514564564752526b3551396f687a64766b49392b583850756d666766356d673d3d0d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d', PubKey),
+			hex_bytes('0213c8426be471e55506f7ce4f7df557a42e310df09f92eb732ca3085e797cef9b', PubKey),
 			hex_bytes('e50c26e89f734b2ee12041ff27874c901891f74a0f0cf470333312a3034ce3bf', Msg),
 			hex_bytes('30450220099e6f9dd218e0e304efa7a4224b0058a8e3aec73367ec239bee4ed8ed7d85db022100b504d3d0d2e879b04705c0e5a2b40b0521a5ab647ea207bd81134e1a4eb79e47', Sig),
-			ecdsa_verify(PubKey, Msg, Sig, encoding(byte)).`,
+			ecdsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantResult:  []types.TermResults{{}},
 				wantSuccess: false,
@@ -263,14 +285,27 @@ ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
 			{
 				// Wrong signature
 				program: `verify :-
-			hex_bytes('2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a3044415163445167414545386843612b527835565547393835506666565870433478446643660d0a6b75747a4c4b4d49586e6c383735734543525036654b4b79704c70514564564752526b3551396f687a64766b49392b583850756d666766356d673d3d0d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d', PubKey),
+			hex_bytes('0213c8426be471e55506f7ce4f7df557a42e310df09f92eb732ca3085e797cef9b', PubKey),
 			hex_bytes('e50c26e89f734b2ee12041ff27874c901891f74a0f0cf470333312a3034ce3be', Msg),
 			hex_bytes('30450220099e6f9dd218e0e304efa7a4224b0058a8e3aec73367ec239bee4ed8ed7d85db022100b504d3d0d2e879b04705c0e5a2b40b0521a5ab647ea207bd81134e1a4eb79e48', Sig),
-			ecdsa_verify(PubKey, Msg, Sig, encoding(byte)).`,
+			ecdsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantResult:  []types.TermResults{{}},
 				wantSuccess: false,
 			},
+			// ECDSA - secp256k1
+			/*
+				{
+					// All good
+					program: `verify :-
+				hex_bytes('2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a3044415163445167414545386843612b527835565547393835506666565870433478446643660d0a6b75747a4c4b4d49586e6c383735734543525036654b4b79704c70514564564752526b3551396f687a64766b49392b583850756d666766356d673d3d0d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d', PubKey),
+				hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
+				hex_bytes('79ca2e9d19418ad6ed1dd1bc2fd0859458da001b7dfbe1ab4a578b17aeb4bd77ab14228070a57f11a98230c3a49890148c9f0f1c0e88de6d83227e99ab62b0dc', Sig),
+				ecdsa_verify(PubKey, Msg, Sig, [encoding(octet), type(secp256k1)]).`,
+					query:       `verify.`,
+					wantResult:  []types.TermResults{{}},
+					wantSuccess: true,
+				},*/
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
@@ -282,7 +317,7 @@ ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
 					Convey("and a vm", func() {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
-						interpreter.Register4(engine.NewAtom("ed25519_verify"), EdDSAVerify)
+						interpreter.Register4(engine.NewAtom("eddsa_verify"), EdDSAVerify)
 						interpreter.Register4(engine.NewAtom("ecdsa_verify"), ECDSAVerify)
 
 						err := interpreter.Compile(ctx, tc.program)
@@ -305,8 +340,7 @@ ed25519_verify(PubKey, Msg, Sig, encoding(byte)).`,
 										got = append(got, m)
 									}
 									if tc.wantError != nil {
-										So(sols.Err(), ShouldNotBeNil)
-										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
+										So(sols.Err(), ShouldBeError, tc.wantError.Error())
 									} else {
 										So(sols.Err(), ShouldBeNil)
 
