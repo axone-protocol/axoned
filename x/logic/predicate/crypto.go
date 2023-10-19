@@ -2,11 +2,7 @@ package predicate
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"crypto/ed25519"
-	"crypto/x509"
 	"encoding/hex"
-	"encoding/pem"
 	"fmt"
 	"slices"
 	"strings"
@@ -104,18 +100,6 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 	})
 }
 
-type Alg string
-
-func (a Alg) String() string {
-	return string(a)
-}
-
-const (
-	Secp256k1 Alg = "secp256k1"
-	Secp256r1 Alg = "secp256r1"
-	Ed25519   Alg = "ed25519"
-)
-
 // EdDSAVerify return `true` if the Signature can be verified as the EdDSA signature for Data, using the given PubKey
 // as bytes.
 //
@@ -140,7 +124,7 @@ const (
 // # Verify the signature of given binary data.
 // - eddsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(byte), type(ed25519)]).
 func EdDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return xVerify("eddsa_verify/4", key, data, sig, options, Ed25519, []Alg{Ed25519}, cont, env)
+	return xVerify("eddsa_verify/4", key, data, sig, options, util.Ed25519, []util.Alg{util.Ed25519}, cont, env)
 }
 
 // ECDSAVerify return `true` if the Signature can be verified as the ECDSA signature for Data, using the given PubKey
@@ -168,13 +152,13 @@ func EdDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.
 // # Verify the signature of given binary data as ECDSA secp256k1 algorithm.
 // - ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(byte), type(secp256k1)]).
 func ECDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return xVerify("ecdsa_verify/4", key, data, sig, options, Secp256r1, []Alg{Secp256r1, Secp256k1}, cont, env)
+	return xVerify("ecdsa_verify/4", key, data, sig, options, util.Secp256r1, []util.Alg{util.Secp256r1, util.Secp256k1}, cont, env)
 }
 
 // xVerify return `true` if the Signature can be verified as the signature for Data, using the given PubKey for a
 // considered algorithm.
 // This is a generic predicate implementation that can be used to verify any signature.
-func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo Alg, algos []Alg, cont engine.Cont, env *engine.Env) *engine.Promise {
+func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo util.Alg, algos []util.Alg, cont engine.Cont, env *engine.Env) *engine.Promise {
 	typeOpt := engine.NewAtom("type")
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		typeTerm, err := util.GetOptionWithDefault(typeOpt, options, engine.NewAtom(defaultAlgo.String()), env)
@@ -186,11 +170,11 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo Al
 			return engine.Error(fmt.Errorf("%s: %w", functor, err))
 		}
 
-		if idx := slices.IndexFunc(algos, func(a Alg) bool { return a.String() == typeAtom.String() }); idx == -1 {
+		if idx := slices.IndexFunc(algos, func(a util.Alg) bool { return a.String() == typeAtom.String() }); idx == -1 {
 			return engine.Error(fmt.Errorf("%s: invalid type: %s. Possible values: %s",
 				functor,
 				typeAtom.String(),
-				strings.Join(util.Map(algos, func(a Alg) string { return a.String() }), ", ")))
+				strings.Join(util.Map(algos, func(a util.Alg) string { return a.String() }), ", ")))
 		}
 
 		decodedKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("byte")), env)
@@ -208,7 +192,7 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo Al
 			return engine.Error(fmt.Errorf("%s: failed to decode signature: %w", functor, err))
 		}
 
-		r, err := verifySignature(Alg(typeAtom.String()), decodedKey, decodedData, decodedSignature)
+		r, err := util.VerifySignature(util.Alg(typeAtom.String()), decodedKey, decodedData, decodedSignature)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to verify signature: %w", functor, err))
 		}
@@ -219,36 +203,4 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo Al
 
 		return cont(env)
 	})
-}
-
-// verifySignature verifies the signature of the given message with the given public key using the given algorithm.
-func verifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error) {
-	defer func() {
-		if recoveredErr := recover(); recoveredErr != nil {
-			err = fmt.Errorf("%s", recoveredErr)
-		}
-	}()
-
-	switch alg {
-	case Ed25519:
-		r = ed25519.Verify(pubKey, msg, sig)
-	case Secp256r1:
-		block, _ := pem.Decode(pubKey)
-		if block == nil {
-			err = fmt.Errorf("failed decode PEM public key")
-			break
-		}
-		genericPublicKey, err := x509.ParsePKIXPublicKey(block.Bytes)
-		if err != nil {
-			break
-		}
-		pk := genericPublicKey.(*ecdsa.PublicKey)
-		r = ecdsa.VerifyASN1(pk, msg, sig)
-	case Secp256k1:
-		err = fmt.Errorf("secp256k1 public key not implemented yet")
-	default:
-		err = fmt.Errorf("algo %s not supported", alg)
-	}
-
-	return r, err
 }
