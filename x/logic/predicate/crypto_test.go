@@ -294,18 +294,28 @@ func TestXVerify(t *testing.T) {
 				wantSuccess: false,
 			},
 			// ECDSA - secp256k1
-			/*
-				{
-					// All good
-					program: `verify :-
-				hex_bytes('2d2d2d2d2d424547494e205055424c4943204b45592d2d2d2d2d0d0a4d466b77457759484b6f5a497a6a3043415159494b6f5a497a6a3044415163445167414545386843612b527835565547393835506666565870433478446643660d0a6b75747a4c4b4d49586e6c383735734543525036654b4b79704c70514564564752526b3551396f687a64766b49392b583850756d666766356d673d3d0d0a2d2d2d2d2d454e44205055424c4943204b45592d2d2d2d2d', PubKey),
-				hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
-				hex_bytes('79ca2e9d19418ad6ed1dd1bc2fd0859458da001b7dfbe1ab4a578b17aeb4bd77ab14228070a57f11a98230c3a49890148c9f0f1c0e88de6d83227e99ab62b0dc', Sig),
-				ecdsa_verify(PubKey, Msg, Sig, [encoding(octet), type(secp256k1)]).`,
-					query:       `verify.`,
-					wantResult:  []types.TermResults{{}},
-					wantSuccess: true,
-				},*/
+			{
+				// All good
+				program: `verify :-
+			hex_bytes('026b5450187ee9c63ba9e42cb6018d8469c903aca116178e223de76e49fe63b71c', PubKey),
+			hex_bytes('dece063885d3648078f903b6a3e8989f649dc3368cd9c8d69755ed9dcb6a0995', Msg),
+			hex_bytes('304402201448201bb4408549b0997f4b9ad9ed36f3cf8bb9c433fc7f3ba48c6b6e39476e022053f7d056f7ffeab9a79f3a36bc2ba969ddd530a3a1495d1ed7bba00039820223', Sig),
+			ecdsa_verify(PubKey, Msg, Sig, [encoding(octet), type(secp256k1)]).`,
+				query:       `verify.`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: true,
+			},
+			{
+				// Wrong signature
+				program: `verify :-
+			hex_bytes('026b5450187ee9c63ba9e42cb6018d8469c903aca116178e223de76e49fe63b71c', PubKey),
+			hex_bytes('dece063885d3648078f903b6a3e8989f649dc3368cd9c8d69755ed9dcb6a0996', Msg),
+			hex_bytes('304402201448201bb4408549b0997f4b9ad9ed36f3cf8bb9c433fc7f3ba48c6b6e39476e022053f7d056f7ffeab9a79f3a36bc2ba969ddd530a3a1495d1ed7bba00039820223', Sig),
+			ecdsa_verify(PubKey, Msg, Sig, [encoding(octet), type(secp256k1)]).`,
+				query:       `verify.`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: false,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
