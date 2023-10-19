@@ -110,9 +110,9 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 // - Data is the hash of the signed message could be an Atom or List of bytes.
 // - Signature is the signature of the Data, as list of bytes.
 // - Options allow to give option to the predicates, available options are:
-//   - encoding(+Encoding): Encoding to use for the given Data. Possible values are:
-//     -- `hex` (default): hexadecimal encoding.
-//     -- `byte`: plain bytes encoding.
+//   - encoding(+Format): Encoding to use for the given Data. Possible values are:
+//     -- `hex` (default): hexadecimal encoding represented as an atom.
+//     -- `octet`: plain bytes encoding represented as a list of integers between 0 and 255.
 //   - type(+Alg): Algorithm to use in the EdDSA family. Supported algorithms are:
 //     -- `ed25519` (default): the EdDSA signature scheme using SHA-512 (SHA-2) and Curve25519.
 //
@@ -122,7 +122,7 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 // - eddsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', [23, 56, ...], [encoding(hex), type(ed25519)]).
 //
 // # Verify the signature of given binary data.
-// - eddsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(byte), type(ed25519)]).
+// - eddsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(ed25519)]).
 func EdDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return xVerify("eddsa_verify/4", key, data, sig, options, util.Ed25519, []util.Alg{util.Ed25519}, cont, env)
 }
@@ -137,9 +137,9 @@ func EdDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.
 // - Data is the hash of the signed message could be an Atom or List of bytes.
 // - Signature is the signature of the Data, as list of bytes.
 // - Options allow to give option to the predicates, available options are:
-//   - encoding(+Encoding): Encoding to use for the given Data. Possible values are:
-//     -- `hex`: hexadecimal encoding. Default value
-//     -- `byte`: plain bytes encoding.
+//   - encoding(+Format): Encoding to use for the given Data. Possible values are:
+//     -- `hex` (default): hexadecimal encoding represented as an atom.
+//     -- `octet`: plain bytes encoding represented as a list of integers between 0 and 255.
 //   - type(+Alg): Algorithm to use in the EdDSA family. Supported algorithms are:
 //     -- `secp256r1` (default):
 //     -- `secp256k1`:
@@ -150,7 +150,7 @@ func EdDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.
 // - ecdsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', [23, 56, ...], encoding(hex)).
 //
 // # Verify the signature of given binary data as ECDSA secp256k1 algorithm.
-// - ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(byte), type(secp256k1)]).
+// - ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(secp256k1)]).
 func ECDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return xVerify("ecdsa_verify/4", key, data, sig, options, util.Secp256r1, []util.Alg{util.Secp256r1, util.Secp256k1}, cont, env)
 }
@@ -177,7 +177,7 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 				strings.Join(util.Map(algos, func(a util.Alg) string { return a.String() }), ", ")))
 		}
 
-		decodedKey, err := TermToBytes(key, AtomEncoding.Apply(engine.NewAtom("byte")), env)
+		decodedKey, err := TermToBytes(key, AtomEncoding.Apply(AtomOctet), env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode public key: %w", functor, err))
 		}
@@ -187,7 +187,7 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
 		}
 
-		decodedSignature, err := TermToBytes(sig, AtomEncoding.Apply(engine.NewAtom("byte")), env)
+		decodedSignature, err := TermToBytes(sig, AtomEncoding.Apply(AtomOctet), env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode signature: %w", functor, err))
 		}

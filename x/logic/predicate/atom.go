@@ -28,9 +28,6 @@ var (
 
 	// AtomNull is the term null.
 	AtomNull = engine.NewAtom("null")
-
-	// AtomEncoding is the term used to indicate the encoding type option.
-	AtomEncoding = engine.NewAtom("encoding")
 )
 
 // MakeNull returns the compound term @(null).
