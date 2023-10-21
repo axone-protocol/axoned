@@ -24,7 +24,7 @@ const (
 )
 
 // VerifySignature verifies the signature of the given message with the given public key using the given algorithm.
-func VerifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error) {
+func VerifySignature(alg Alg, pubKey []byte, msg, sig []byte) (_ bool, err error) {
 	defer func() {
 		if recoveredErr := recover(); recoveredErr != nil {
 			err = fmt.Errorf("%s", recoveredErr)
@@ -33,40 +33,30 @@ func VerifySignature(alg Alg, pubKey []byte, msg, sig []byte) (r bool, err error
 
 	switch alg {
 	case Ed25519:
-		r = ed25519.Verify(pubKey, msg, sig)
+		return ed25519.Verify(pubKey, msg, sig), nil
 	case Secp256r1:
-		curve := elliptic.P256()
-		x, y := ecc.UnmarshalCompressed(curve, pubKey)
-		if x == nil || y == nil {
-			err = fmt.Errorf("failed to parse compressed public key")
-			break
-		}
-
-		pk := &ecdsa.PublicKey{
-			Curve: curve,
-			X:     x,
-			Y:     y,
-		}
-
-		r = ecc.VerifyASN1(pk, msg, sig)
+		return verifySignatureWithCurve(elliptic.P256(), pubKey, msg, sig)
 	case Secp256k1:
-		curve := ecc.P256k1()
-		x, y := ecc.UnmarshalCompressed(curve, pubKey)
-		if x == nil || y == nil {
-			err = fmt.Errorf("failed to parse compressed public key")
-			break
-		}
-
-		pk := &ecdsa.PublicKey{
-			Curve: curve,
-			X:     x,
-			Y:     y,
-		}
-
-		r = ecc.VerifyASN1(pk, msg, sig)
+		return verifySignatureWithCurve(ecc.P256k1(), pubKey, msg, sig)
 	default:
-		err = fmt.Errorf("algo %s not supported", alg)
+		return false, fmt.Errorf("algo %s not supported", alg)
+	}
+}
+
+// verifySignatureWithCurve verifies the ASN1 signature of the given message with the given
+// public key (in compressed form specified in section 4.3.6 of ANSI X9.62.) using the given
+// elliptic curve.
+func verifySignatureWithCurve(curve elliptic.Curve, pubKey, msg, sig []byte) (bool, error) {
+	x, y := ecc.UnmarshalCompressed(curve, pubKey)
+	if x == nil || y == nil {
+		return false, fmt.Errorf("failed to parse compressed public key")
 	}
 
-	return r, err
+	pk := &ecdsa.PublicKey{
+		Curve: curve,
+		X:     x,
+		Y:     y,
+	}
+
+	return ecc.VerifyASN1(pk, msg, sig), nil
 }
