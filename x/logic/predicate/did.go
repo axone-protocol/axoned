@@ -14,6 +14,9 @@ import (
 // AtomDID is a term which represents a DID as a compound term `did(Method, ID, Path, Query, Fragment)`.
 var AtomDID = engine.NewAtom("did")
 
+// DIDPrefix is the prefix for a DID.
+const DIDPrefix = "did:"
+
 // DIDComponents is a predicate which breaks down a DID into its components according to the [W3C DID] specification.
 //
 // The signature is as follows:
@@ -34,10 +37,12 @@ var AtomDID = engine.NewAtom("did")
 //	- did_components('did:example:123456?versionId=1', did(Method, ID, Path, Query, Fragment)).
 //
 //	# Reconstruct a DID from its components.
-//	- did_components(DID, did('example', '123456', null, 'versionId=1', _42)).
+//	- did_components(DID, did('example', '123456', _, 'versionId=1', _42)).
 //
 // [W3C DID]: https://w3c.github.io/did-core
 // [DID syntax]: https://w3c.github.io/did-core/#did-syntax
+//
+//nolint:funlen
 func DIDComponents(vm *engine.VM, did, components engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	switch t1 := env.Resolve(did).(type) {
 	case engine.Variable:
@@ -69,32 +74,58 @@ func DIDComponents(vm *engine.VM, did, components engine.Term, cont engine.Cont,
 		}
 
 		buf := strings.Builder{}
-		buf.WriteString("did:")
-		if segment, err := util.ResolveToAtom(env, t2.Arg(0)); err == nil {
-			buf.WriteString(url.PathEscape(segment.String()))
+		buf.WriteString(DIDPrefix)
+
+		processors := []func(engine.Atom){
+			func(segment engine.Atom) {
+				buf.WriteString(segment.String())
+			},
+			func(segment engine.Atom) {
+				buf.WriteString(":")
+				buf.WriteString(url.PathEscape(segment.String()))
+			},
+			func(segment engine.Atom) {
+				for _, s := range strings.FieldsFunc(segment.String(), func(c rune) bool { return c == '/' }) {
+					buf.WriteString("/")
+					buf.WriteString(url.PathEscape(s))
+				}
+			},
+			func(segment engine.Atom) {
+				buf.WriteString("?")
+				buf.WriteString(url.PathEscape(segment.String()))
+			},
+			func(segment engine.Atom) {
+				buf.WriteString("#")
+				buf.WriteString(url.PathEscape(segment.String()))
+			},
 		}
-		if segment, err := util.ResolveToAtom(env, t2.Arg(1)); err == nil {
-			buf.WriteString(":")
-			buf.WriteString(url.PathEscape(segment.String()))
-		}
-		if segment, err := util.ResolveToAtom(env, t2.Arg(2)); err == nil {
-			for _, s := range strings.FieldsFunc(segment.String(), func(c rune) bool { return c == '/' }) {
-				buf.WriteString("/")
-				buf.WriteString(url.PathEscape(s))
+
+		for i := 0; i < t2.Arity(); i++ {
+			if err := processSegment(t2, uint8(i), processors[i], env); err != nil {
+				return engine.Error(fmt.Errorf("did_components/2: %w", err))
 			}
 		}
-		if segment, err := util.ResolveToAtom(env, t2.Arg(3)); err == nil {
-			buf.WriteString("?")
-			buf.WriteString(url.PathEscape(segment.String()))
-		}
-		if segment, err := util.ResolveToAtom(env, t2.Arg(4)); err == nil {
-			buf.WriteString("#")
-			buf.WriteString(url.PathEscape(segment.String()))
-		}
+
 		return engine.Unify(vm, did, engine.NewAtom(buf.String()), cont, env)
 	default:
 		return engine.Error(fmt.Errorf("did_components/2: cannot unify did with %T", t2))
 	}
+}
+
+// processSegment processes a segment of a DID.
+func processSegment(segments engine.Compound, segmentNumber uint8, fn func(segment engine.Atom), env *engine.Env) error {
+	term := env.Resolve(segments.Arg(int(segmentNumber)))
+	if _, ok := term.(engine.Variable); ok {
+		return nil
+	}
+	segment, err := util.ResolveToAtom(env, segments.Arg(int(segmentNumber)))
+	if err != nil {
+		return fmt.Errorf("failed to resolve atom at segment %d: %w", segmentNumber, err)
+	}
+
+	fn(segment)
+
+	return nil
 }
 
 // didToTerms converts a DID to a "tuple" of terms (either an Atom or a Variable),
