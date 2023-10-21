@@ -158,7 +158,7 @@ func TestGetOption(t *testing.T) {
 							So(err, ShouldNotBeNil)
 
 							Convey("and should be as expected", func() {
-								So(err, ShouldResemble, tc.wantError)
+								So(err, ShouldBeError, tc.wantError)
 							})
 						})
 					}

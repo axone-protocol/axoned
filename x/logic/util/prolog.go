@@ -82,25 +82,25 @@ func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.T
 
 	resolvedTerm := env.Resolve(options)
 
-	if v, ok := resolvedTerm.(engine.Compound); ok { //nolint:nestif
-		if IsList(v) {
-			iter := engine.ListIterator{List: v, Env: env}
+	compound, ok := resolvedTerm.(engine.Compound)
+	if ok && IsList(compound) {
+		iter := engine.ListIterator{List: compound, Env: env}
 
-			for iter.Next() {
-				opt := env.Resolve(iter.Current())
+		for iter.Next() {
+			opt := env.Resolve(iter.Current())
 
-				term, err := extractOption(opt)
-				if err != nil {
-					return nil, err
-				}
-
-				if term != nil {
-					return term, nil
-				}
+			term, err := extractOption(opt)
+			if err != nil {
+				return nil, err
 			}
-			return nil, nil
+
+			if term != nil {
+				return term, nil
+			}
 		}
+		return nil, nil
 	}
+
 	return extractOption(resolvedTerm)
 }
 
