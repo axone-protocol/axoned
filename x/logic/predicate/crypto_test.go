@@ -259,7 +259,7 @@ func TestXVerify(t *testing.T) {
 			ecdsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("ecdsa_verify/4: failed to verify signature: failed to parse compressed public key"),
+				wantError:   fmt.Errorf("ecdsa_verify/4: failed to verify signature: failed to parse compressed public key (first 10 bytes): 0213c8426be471e55506"),
 			},
 			{ // Unsupported algo
 				program: `verify :-

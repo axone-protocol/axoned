@@ -49,7 +49,7 @@ func VerifySignature(alg Alg, pubKey []byte, msg, sig []byte) (_ bool, err error
 func verifySignatureWithCurve(curve elliptic.Curve, pubKey, msg, sig []byte) (bool, error) {
 	x, y := ecc.UnmarshalCompressed(curve, pubKey)
 	if x == nil || y == nil {
-		return false, fmt.Errorf("failed to parse compressed public key")
+		return false, fmt.Errorf("failed to parse compressed public key (first 10 bytes): %x", pubKey[:10])
 	}
 
 	pk := &ecdsa.PublicKey{
