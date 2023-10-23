@@ -350,7 +350,7 @@ proto-gen: proto-build ## Generate all the code from the Protobuf files
 
 ## Documentation:
 .PHONY: doc
-doc: doc-proto doc-command ## Generate all the documentation
+doc: doc-proto doc-command doc-predicate ## Generate all the documentation
 
 .PHONY: doc-proto
 doc-proto: proto-gen ## Generate the documentation from the Protobuf files
@@ -381,12 +381,10 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 .PHONY: doc-command
 doc-command: ## Generate markdown documentation for the command
 	@echo "${COLOR_CYAN} 📖 Generate markdown documentation for the command${COLOR_RESET}"
-	@cd docs; \
-	OUT_FOLDER="command"; \
+	@OUT_FOLDER="docs/command"; \
 	rm -rf $$OUT_FOLDER; \
-	go version; \
 	go get ./scripts; \
-	go run ../scripts/generate_command_doc.go; \
+	go run ./scripts/. command; \
 	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.okp4d\")/(default \"\/home\/john\/\.okp4d\")/g' $$OUT_FOLDER/*.md; \
 	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' $$OUT_FOLDER/*.md; \
 	sed -i $(SED_FLAG) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' $$OUT_FOLDER/*.md; \
@@ -395,7 +393,21 @@ doc-command: ## Generate markdown documentation for the command
 	docker run --rm \
 	  -v `pwd`:/usr/src/docs \
 	  -w /usr/src/docs \
-	  ${DOCKER_IMAGE_MARKDOWNLINT} -f $$OUT_FOLDER
+	  ${DOCKER_IMAGE_MARKDOWNLINT} -f $$OUT_FOLDER -c docs/.markdownlint.yaml
+
+.PHONY: doc-predicate
+doc-predicate: ## Generate markdown documentation for all the predicates (module logic)
+	@echo "${COLOR_CYAN} 📖 Generate markdown documentation for the predicates${COLOR_RESET}"
+	@OUT_FOLDER="docs/predicate"; \
+	rm -rf $$OUT_FOLDER; \
+	mkdir -p $$OUT_FOLDER; \
+	go get ./scripts; \
+	go run ./scripts/. predicate; \
+	docker run --rm \
+	  -v `pwd`:/usr/src/docs \
+	  -w /usr/src/docs \
+	  ${DOCKER_IMAGE_MARKDOWNLINT} -f $$OUT_FOLDER -c docs/.markdownlint.yaml
+
 
 ## Mock:
 .PHONY: mock
