@@ -25,7 +25,7 @@ import (
 //   - Length is the optional maximum number of characters to read from the Stream. If unbound, denotes the full length of Stream.
 //   - String is the resultant string after reading from the Stream.
 //
-// Example:
+// Examples:
 //
 //	# Given a file `foo.txt` that contains `Hello World`:
 //

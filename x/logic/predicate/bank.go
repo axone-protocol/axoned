@@ -57,7 +57,7 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 //   - Account represents the account address (in Bech32 format).
 //   - Balances represents the spendable balances of the account as a list of pairs of coin denomination and amount.
 //
-// Example:
+// Examples:
 //
 //	# Query the spendable balances of the account.
 //	- bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).

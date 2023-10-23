@@ -26,7 +26,7 @@ import (
 // Note: Due to the principles of the hash algorithm (pre-image resistance), this predicate can only compute the hash
 // value from input data, and cannot compute the original input data from the hash value.
 //
-// Example:
+// Examples:
 //
 //	# Compute the hash of the given data and unify it with the given Hash.
 //	- sha_hash("Hello OKP4", Hash).
@@ -53,7 +53,7 @@ func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engin
 //   - Hex is an Atom, string or list of characters in hexadecimal encoding.
 //   - Bytes is the list of numbers between 0 and 255 that represent the sequence of bytes.
 //
-// Example:
+// Examples:
 //
 //	# Convert hexadecimal atom to list of bytes.
 //	- hex_bytes('2c26b46b68ffc68ff99b453c1d3041341342d706483bfa0f98a5e886266e7ae', Bytes).

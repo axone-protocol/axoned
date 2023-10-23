@@ -28,7 +28,7 @@ var AtomDID = engine.NewAtom("did")
 //     query component and Fragment is The fragment component.
 //     For any component not present, its value will be null and thus will be left as an uninstantiated variable.
 //
-// Example:
+// Examples:
 //
 //	# Decompose a DID into its components.
 //	- did_components('did:example:123456?versionId=1', did(Method, ID, Path, Query, Fragment)).

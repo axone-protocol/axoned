@@ -19,7 +19,7 @@ import (
 //
 //   - Height represents the current chain height at the time of the query.
 //
-// Example:
+// Examples:
 //
 //	# Query the current block height.
 //	- block_height(Height).
@@ -43,7 +43,7 @@ func BlockHeight(vm *engine.VM, height engine.Term, cont engine.Cont, env *engin
 // where:
 //   - Time represents the current chain time at the time of the query.
 //
-// Example:
+// Examples:
 //
 //	# Query the current block time.
 //	- block_time(Time).

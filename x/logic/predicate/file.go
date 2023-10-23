@@ -19,7 +19,7 @@ import (
 // Where:
 //   - File represents a loaded source file.
 //
-// Example:
+// Examples:
 //
 //	# Query all the loaded source files, in alphanumeric order.
 //	- source_file(File).
@@ -100,7 +100,7 @@ func (m ioMode) Term() engine.Term {
 //   - Stream is the stream to be opened.
 //   - Options is a list of options.
 //
-// Example:
+// Examples:
 //
 //	# Open a stream from a cosmwasm query.
 //	# The Stream should be read as a string with a read_string/3 predicate, and then closed with the close/1 predicate.
