@@ -7,10 +7,12 @@ package testutil
 import (
 	reflect "reflect"
 
+	gomock "github.com/golang/mock/gomock"
+
 	math "cosmossdk.io/math"
+
 	types "github.com/cosmos/cosmos-sdk/types"
 	types0 "github.com/cosmos/cosmos-sdk/x/auth/types"
-	gomock "github.com/golang/mock/gomock"
 )
 
 // MockStakingKeeper is a mock of StakingKeeper interface.

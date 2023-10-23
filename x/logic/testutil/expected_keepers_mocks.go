@@ -7,10 +7,11 @@ package testutil
 import (
 	reflect "reflect"
 
+	gomock "github.com/golang/mock/gomock"
+
 	types "github.com/cosmos/cosmos-sdk/types"
 	types0 "github.com/cosmos/cosmos-sdk/x/auth/types"
 	types1 "github.com/cosmos/cosmos-sdk/x/bank/types"
-	gomock "github.com/golang/mock/gomock"
 )
 
 // MockAccountKeeper is a mock of AccountKeeper interface.

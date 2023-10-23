@@ -104,7 +104,7 @@ func (m ioMode) Term() engine.Term {
 //
 //	# Open a stream from a cosmwasm query.
 //	# The Stream should be read as a string with a read_string/3 predicate, and then closed with the close/1 predicate.
-//	- open('cosmwasm:okp4-objectarium:okp41lppz4x9dtmccek2m6cezjlwwzup6pdqrkvxjpk95806c3dewgrfq602kgx?query=%7B%22object_data%22%3A%7B%22id%22%3A%222625337e6025495a87cb32eb7f5a042f31e4385fd7e34c90d661bfc94dd539e3%22%7D%7D', 'read', Stream)
+//	- open('cosmwasm:okp4-objectarium:okp412kgx?query=%7B%22object_data%22%3A%7B%...4dd539e3%22%7D%7D', 'read', Stream)
 func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
 	var name string
 	switch s := env.Resolve(sourceSink).(type) {

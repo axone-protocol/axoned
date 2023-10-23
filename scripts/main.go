@@ -4,8 +4,9 @@ import (
 	"errors"
 	"os"
 
-	"github.com/cosmos/cosmos-sdk/server"
 	"github.com/spf13/cobra"
+
+	"github.com/cosmos/cosmos-sdk/server"
 )
 
 func main() {

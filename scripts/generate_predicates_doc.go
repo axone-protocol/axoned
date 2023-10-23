@@ -61,18 +61,13 @@ func GeneratePredicateDocumentation() error {
 		return err
 	}
 
-	if err := writeToFile("docs/predicate/predicates.md", content); err != nil {
-		return err
-	}
-
-	return nil
+	return writeToFile("docs/predicate/predicates.md", content)
 }
 
 func readTemplateMust(templateName string) string {
 	template, err := f.ReadFile("templates/" + templateName)
-
 	if err != nil {
-		panic(fmt.Errorf("failed to read file %s: %s", templateName, err))
+		panic(fmt.Errorf("failed to read file %s: %w", templateName, err))
 	}
 
 	return string(template)

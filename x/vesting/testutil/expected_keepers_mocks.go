@@ -7,8 +7,9 @@ package testutil
 import (
 	reflect "reflect"
 
-	types "github.com/cosmos/cosmos-sdk/types"
 	gomock "github.com/golang/mock/gomock"
+
+	types "github.com/cosmos/cosmos-sdk/types"
 )
 
 // MockBankKeeper is a mock of BankKeeper interface.
