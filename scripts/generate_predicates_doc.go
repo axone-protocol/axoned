@@ -20,7 +20,6 @@ import (
 var f embed.FS
 
 func GeneratePredicateDocumentation() error {
-	// Create a renderer to output data
 	out, err := gomarkdoc.NewRenderer(
 		gomarkdoc.WithTemplateOverride("text", readTemplateMust("text.gotxt")),
 		gomarkdoc.WithTemplateOverride("doc", readTemplateMust("doc.gotxt")),
