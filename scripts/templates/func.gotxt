@@ -1,0 +1,16 @@
+{{- $name := snakecase .Name -}}
+{{ $arity := add (countSubstr "," .Signature) -2 }}
+
+## {{ $name -}}/{{- $arity -}}
+{{- spacer -}}
+
+{{- template "doc" .Doc -}}
+
+{{- if len .Examples -}}
+	{{- spacer -}}
+
+	{{- range (iter .Examples) -}}
+		{{- template "example" .Entry -}}
+		{{- if (not .Last) -}}{{- spacer -}}{{- end -}}
+	{{- end -}}
+{{- end -}}
