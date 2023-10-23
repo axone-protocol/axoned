@@ -208,6 +208,10 @@ jobs:
         run: |
           make doc-proto
 
+      - name: Generate predicates documentation
+        run: |
+          make doc-predicate
+
       - name: Check Git diff in generated files (proto + docs)
         run: |
           if [[ $(git status -s | grep --fixed-strings -v "go.mod" | grep --fixed-strings -v "go.sum") != "" ]]; then
