@@ -2,7 +2,7 @@
 
 ## bank_balances/2
 
-BankBalances is a predicate which unifies the given terms with the list of balances \(coins\) of the given account.
+bank_balances/2 is a predicate which unifies the given terms with the list of balances \(coins\) of the given account.
 
 The signature is as follows:
 
@@ -30,7 +30,7 @@ Examples:
 
 ## bank_locked_balances/2
 
-BankLockedBalances is a predicate which unifies the given terms with the list of locked coins of the given account.
+bank_locked_balances/2 is a predicate which unifies the given terms with the list of locked coins of the given account.
 
 The signature is as follows:
 
@@ -58,7 +58,7 @@ Examples:
 
 ## bank_spendable_balances/2
 
-BankSpendableBalances is a predicate which unifies the given terms with the list of spendable coins of the given account.
+bank_spendable_balances/2 is a predicate which unifies the given terms with the list of spendable coins of the given account.
 
 The signature is as follows:
 
@@ -86,7 +86,7 @@ Examples:
 
 ## bech32_address/2
 
-Bech32Address is a predicate that convert a [bech32](<https://docs.cosmos.network/main/build/spec/addresses/bech32#hrp-table>) encoded string into [base64](<https://fr.wikipedia.org/wiki/Base64>) bytes and give the address prefix, or convert a prefix \(HRP\) and [base64](<https://fr.wikipedia.org/wiki/Base64>) encoded bytes to [bech32](<https://docs.cosmos.network/main/build/spec/addresses/bech32#hrp-table>) encoded string.
+bech32_address/2 is a predicate that convert a [bech32](<https://docs.cosmos.network/main/build/spec/addresses/bech32#hrp-table>) encoded string into [base64](<https://fr.wikipedia.org/wiki/Base64>) bytes and give the address prefix, or convert a prefix \(HRP\) and [base64](<https://fr.wikipedia.org/wiki/Base64>) encoded bytes to [bech32](<https://docs.cosmos.network/main/build/spec/addresses/bech32#hrp-table>) encoded string.
 
 The signature is as follows:
 
@@ -114,7 +114,7 @@ base64 encoded value (Address).
 
 ## block_height/1
 
-BlockHeight is a predicate which unifies the given term with the current block height.
+block_height/1 is a predicate which unifies the given term with the current block height.
 
 The signature is as follows:
 
@@ -135,7 +135,7 @@ Examples:
 
 ## block_time/1
 
-BlockTime is a predicate which unifies the given term with the current block time.
+block_time/1 is a predicate which unifies the given term with the current block time.
 
 The signature is as follows:
 
@@ -156,28 +156,28 @@ Examples:
 
 ## chain_id/1
 
-ChainID is a predicate which unifies the given term with the current chain ID. The signature is:
+chain_id/1 is a predicate which unifies the given term with the current chain ID. The signature is:
 
 The signature is as follows:
 
 ```text
-chain_id(?ChainID)
+chain_id(?chain_id/1)
 ```
 
 where:
 
-- ChainID represents the current chain ID at the time of the query.
+- chain_id/1 represents the current chain ID at the time of the query.
 
 Examples:
 
 ```text
 # Query the current chain ID.
-- chain_id(ChainID).
+- chain_id(chain_id/1).
 ```
 
 ## did_components/2
 
-DIDComponents is a predicate which breaks down a DID into its components according to the [W3C DID](<https://w3c.github.io/did-core>) specification.
+did_components/2 is a predicate which breaks down a DID into its components according to the [W3C DID](<https://w3c.github.io/did-core>) specification.
 
 The signature is as follows:
 
@@ -203,7 +203,7 @@ Examples:
 
 ## hex_bytes/2
 
-HexBytes is a predicate that unifies hexadecimal encoded bytes to a list of bytes.
+hex_bytes/2 is a predicate that unifies hexadecimal encoded bytes to a list of bytes.
 
 The signature is as follows:
 
@@ -225,7 +225,7 @@ Examples:
 
 ## json_prolog/2
 
-JSONProlog is a predicate that will unify a JSON string into prolog terms and vice versa.
+json_prolog/2 is a predicate that will unify a JSON string into prolog terms and vice versa.
 
 The signature is as follows:
 
@@ -249,7 +249,7 @@ Examples:
 
 ## open/4
 
-Open is a predicate that unify a stream with a source sink on a virtual file system.
+open/4 is a predicate that unify a stream with a source sink on a virtual file system.
 
 The signature is as follows:
 
@@ -267,14 +267,14 @@ Where:
 Examples:
 
 ```text
-# Open a stream from a cosmwasm query.
+# open/4 a stream from a cosmwasm query.
 # The Stream should be read as a string with a read_string/3 predicate, and then closed with the close/1 predicate.
 - open('cosmwasm:okp4-objectarium:okp412kgx?query=%7B%22object_data%22%3A%7B%...4dd539e3%22%7D%7D', 'read', Stream)
 ```
 
 ## read_string/3
 
-ReadString is a predicate that reads characters from the provided Stream and unifies them with String. Users can optionally specify a maximum length for reading; if the stream reaches this length, the reading stops. If Length remains unbound, the entire Stream is read, and upon completion, Length is unified with the count of characters read.
+read_string/3 is a predicate that reads characters from the provided Stream and unifies them with String. Users can optionally specify a maximum length for reading; if the stream reaches this length, the reading stops. If Length remains unbound, the entire Stream is read, and upon completion, Length is unified with the count of characters read.
 
 The signature is as follows:
 
@@ -308,7 +308,7 @@ Length = 11
 
 ## sha_hash/2
 
-SHAHash is a predicate that computes the Hash of the given Data.
+sha_hash/2 is a predicate that computes the Hash of the given Data.
 
 The signature is as follows:
 
@@ -333,7 +333,7 @@ Examples:
 
 ## source_file/1
 
-SourceFile is a predicate that unify the given term with the currently loaded source file.
+source_file/1 is a predicate that unify the given term with the currently loaded source file.
 
 The signature is as follows:
 
@@ -357,7 +357,7 @@ Examples:
 
 ## uri_encoded/3
 
-URIEncoded is a predicate that unifies the given URI component with the given encoded or decoded string.
+uri_encoded/3 is a predicate that unifies the given URI component with the given encoded or decoded string.
 
 The signature is as follows:
 
