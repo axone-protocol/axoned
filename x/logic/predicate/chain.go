@@ -11,9 +11,12 @@ import (
 
 // ChainID is a predicate which unifies the given term with the current chain ID. The signature is:
 //
+// The signature is as follows:
+//
 //	chain_id(?ChainID)
 //
-// where ChainID represents the current chain ID at the time of the query.
+// where:
+//   - ChainID represents the current chain ID at the time of the query.
 //
 // Example:
 //

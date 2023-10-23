@@ -19,18 +19,20 @@ import (
 
 // JSONProlog is a predicate that will unify a JSON string into prolog terms and vice versa.
 //
-// json_prolog(?Json, ?Term) is det
+// The signature is as follows:
 //
-// Where
-//   - `Json` is the string representation of the json
-//   - `Term` is an Atom that would be unified by the JSON representation as Prolog terms.
+//	json_prolog(?Json, ?Term) is det
+//
+// Where:
+//   - Json is the string representation of the json
+//   - Term is an Atom that would be unified by the JSON representation as Prolog terms.
 //
 // In addition, when passing Json and Term, this predicate return true if both result match.
 //
 // Example:
 //
-// # JSON conversion to Prolog.
-// - json_prolog('{"foo": "bar"}', json([foo-bar])).
+//	# JSON conversion to Prolog.
+//	- json_prolog('{"foo": "bar"}', json([foo-bar])).
 func JSONProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		var result engine.Term
