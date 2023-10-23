@@ -1,10 +1,13 @@
+{{- $funcName := get globalCtx "funcName" -}}
+{{- $predicate := get globalCtx "predicate" -}}
+
 {{- range . -}}
 	{{- if eq .Kind "text" -}}
-		{{- escape .Text -}}
+		{{- escape .Text | replace $funcName $predicate -}}
 	{{- else if eq .Kind "rawText" -}}
-		{{- .Text -}}
+		{{- .Text | replace $funcName $predicate -}}
 	{{- else if eq .Kind "autolink" -}}
-		{{- .Text -}}
+		{{- .Text | replace $funcName $predicate -}}
 	{{- else if eq .Kind "link" -}}
 		{{- link (escape .Text) .URL -}}
 	{{- end -}}

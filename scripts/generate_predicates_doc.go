@@ -11,7 +11,6 @@ import (
 
 	"github.com/Masterminds/sprig/v3"
 	"github.com/princjef/gomarkdoc"
-	"github.com/princjef/gomarkdoc/format"
 	"github.com/princjef/gomarkdoc/lang"
 	"github.com/princjef/gomarkdoc/logger"
 )
@@ -19,24 +18,12 @@ import (
 //go:embed templates/*.gotxt
 var f embed.FS
 
+// globalCtx used to keep track of contexts between templates.
+// (yes it's a hack).
+var globalCtx = make(map[string]interface{})
+
 func GeneratePredicateDocumentation() error {
-	out, err := gomarkdoc.NewRenderer(
-		gomarkdoc.WithTemplateOverride("text", readTemplateMust("text.gotxt")),
-		gomarkdoc.WithTemplateOverride("doc", readTemplateMust("doc.gotxt")),
-		gomarkdoc.WithTemplateOverride("list", readTemplateMust("list.gotxt")),
-		gomarkdoc.WithTemplateOverride("import", ""),
-		gomarkdoc.WithTemplateOverride("package", readTemplateMust("package.gotxt")),
-		gomarkdoc.WithTemplateOverride("file", ""),
-		gomarkdoc.WithTemplateOverride("func", readTemplateMust("func.gotxt")),
-		gomarkdoc.WithTemplateOverride("index", ""),
-		gomarkdoc.WithTemplateFunc("snakecase", sprig.TxtFuncMap()["snakecase"]),
-		gomarkdoc.WithTemplateFunc("hasSuffix", sprig.TxtFuncMap()["hasSuffix"]),
-		gomarkdoc.WithTemplateFunc("countSubstr", func(substr string, s string) int {
-			return strings.Count(s, substr)
-		}),
-		gomarkdoc.WithTemplateFunc("dict", sprig.TxtFuncMap()["dict"]),
-		gomarkdoc.WithFormat(&format.GitHubFlavoredMarkdown{}),
-	)
+	out, err := createRenderer()
 	if err != nil {
 		return err
 	}
@@ -56,12 +43,47 @@ func GeneratePredicateDocumentation() error {
 	if err != nil {
 		return err
 	}
+
 	content, err := out.Package(pkg)
 	if err != nil {
 		return err
 	}
 
 	return writeToFile("docs/predicate/predicates.md", content)
+}
+
+func createRenderer() (*gomarkdoc.Renderer, error) {
+	templateFunctionOpts := make([]gomarkdoc.RendererOption, 0)
+
+	templateFunctionOpts = append(
+		templateFunctionOpts,
+		gomarkdoc.WithTemplateOverride("text", readTemplateMust("text.gotxt")),
+		gomarkdoc.WithTemplateOverride("doc", readTemplateMust("doc.gotxt")),
+		gomarkdoc.WithTemplateOverride("list", readTemplateMust("list.gotxt")),
+		gomarkdoc.WithTemplateOverride("import", ""),
+		gomarkdoc.WithTemplateOverride("package", readTemplateMust("package.gotxt")),
+		gomarkdoc.WithTemplateOverride("file", ""),
+		gomarkdoc.WithTemplateOverride("func", readTemplateMust("func.gotxt")),
+		gomarkdoc.WithTemplateOverride("index", ""),
+	)
+
+	for k, v := range sprig.GenericFuncMap() {
+		templateFunctionOpts = append(
+			templateFunctionOpts,
+			gomarkdoc.WithTemplateFunc(k, v),
+		)
+	}
+
+	templateFunctionOpts = append(
+		templateFunctionOpts,
+		gomarkdoc.WithTemplateFunc("countSubstr", func(substr string, s string) int {
+			return strings.Count(s, substr)
+		}),
+		gomarkdoc.WithTemplateFunc("globalCtx", func() map[string]interface{} {
+			return globalCtx
+		}),
+	)
+	return gomarkdoc.NewRenderer(templateFunctionOpts...)
 }
 
 func readTemplateMust(templateName string) string {
@@ -78,7 +100,9 @@ func writeToFile(filePath string, content string) error {
 	if err != nil {
 		return fmt.Errorf("failed to create file %s: %w", filePath, err)
 	}
-	defer file.Close()
+	defer func(file *os.File) {
+		_ = file.Close()
+	}(file)
 
 	w := bufio.NewWriter(file)
 	if _, err = w.WriteString(content); err != nil {
