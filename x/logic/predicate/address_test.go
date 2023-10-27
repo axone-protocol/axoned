@@ -89,7 +89,7 @@ func TestBech32(t *testing.T) {
 			},
 			{
 				query:       `bech32_address(-('okp4', ['8956',167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: failed to convert term to bytes list: invalid term type in list engine.Atom, only integer allowed"),
+				wantError:   fmt.Errorf("bech32_address/2: failed to convert term to bytes list: invalid term type in list at position 1: engine.Atom, only engine.Integer allowed"),
 				wantSuccess: false,
 			},
 			{

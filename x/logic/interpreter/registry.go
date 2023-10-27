@@ -116,6 +116,8 @@ var registry = map[string]any{
 	"json_prolog/2":             predicate.JSONProlog,
 	"uri_encoded/3":             predicate.URIEncoded,
 	"read_string/3":             predicate.ReadString,
+	"eddsa_verify/4":            predicate.EDDSAVerify,
+	"ecdsa_verify/4":            predicate.ECDSAVerify,
 }
 
 // RegistryNames is the list of the predicate names in the Registry.
