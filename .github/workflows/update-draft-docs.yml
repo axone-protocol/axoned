@@ -43,3 +43,21 @@ jobs:
                 "draft": "true"
               }
             }
+
+      - name: Update predicates docs repository
+        uses: fjogeleit/http-request-action@v1
+        with:
+          url: 'https://api.github.com/repos/okp4/docs/actions/workflows/39152549/dispatches'
+          method: 'POST'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          data: |-
+            {
+              "ref": "main",
+              "inputs": {
+                "version": "main",
+                "repository": "${{github.repository}}",
+                "section": "predicates",
+                "docs_directory": "docs/predicate/*",
+                "draft": "true"
+              }
+            }

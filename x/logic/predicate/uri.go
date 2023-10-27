@@ -131,6 +131,29 @@ func (comp Component) Unescape(v string) (string, error) {
 	return url.PathUnescape(v)
 }
 
+// URIEncoded is a predicate that unifies the given URI component with the given encoded or decoded string.
+//
+// The signature is as follows:
+//
+//	uri_encoded(+Component, +Decoded, -Encoded)
+//
+// Where:
+//   - Component represents the component of the URI to be escaped. It can be the atom query, fragment, path or
+//     segment.
+//   - Decoded represents the decoded string to be escaped.
+//   - Encoded represents the encoded string.
+//
+// For more information on URI encoding, refer to [RFC 3986].
+//
+// Examples:
+//
+//	# Escape the given string to be used in the path component.
+//	- uri_encoded(path, "foo/bar", Encoded).
+//
+//	# Unescape the given string to be used in the path component.
+//	- uri_encoded(path, Decoded, foo%2Fbar).
+//
+// [RFC 3986]: https://datatracker.ietf.org/doc/html/rfc3986#section-2.1
 func URIEncoded(vm *engine.VM, component, decoded, encoded engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		var comp Component

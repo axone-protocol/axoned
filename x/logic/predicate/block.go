@@ -9,13 +9,17 @@ import (
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
-// BlockHeight is a predicate which unifies the given term with the current block height. The signature is:
+// BlockHeight is a predicate which unifies the given term with the current block height.
+//
+// The signature is as follows:
 //
 //	block_height(?Height)
 //
-// where Height represents the current chain height at the time of the query.
+// where:
 //
-// Example:
+//   - Height represents the current chain height at the time of the query.
+//
+// Examples:
 //
 //	# Query the current block height.
 //	- block_height(Height).
@@ -30,13 +34,16 @@ func BlockHeight(vm *engine.VM, height engine.Term, cont engine.Cont, env *engin
 	})
 }
 
-// BlockTime is a predicate which unifies the given term with the current block time. The signature is:
+// BlockTime is a predicate which unifies the given term with the current block time.
+//
+// The signature is as follows:
 //
 //	block_time(?Time)
 //
-// where Time represents the current chain time at the time of the query.
+// where:
+//   - Time represents the current chain time at the time of the query.
 //
-// Example:
+// Examples:
 //
 //	# Query the current block time.
 //	- block_time(Time).

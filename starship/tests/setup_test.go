@@ -4,10 +4,10 @@ import (
 	"context"
 	"testing"
 
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
+	"github.com/stretchr/testify/suite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	"github.com/stretchr/testify/suite"
+	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 )
 
 func TestE2ETestSuite(t *testing.T) {

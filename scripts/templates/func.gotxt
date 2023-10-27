@@ -1,0 +1,19 @@
+{{- $name := snakecase .Name -}}
+{{- $arity := sub (countSubstr "," .Signature) 2 -}}
+{{- $predicate := print $name "/" $arity -}}
+{{- $_ := set globalCtx "funcName" .Name -}}
+{{- $_ := set globalCtx "predicate" $predicate -}}
+
+## {{ $predicate -}}
+{{- spacer -}}
+
+{{- template "doc" .Doc -}}
+
+{{- if len .Examples -}}
+	{{- spacer -}}
+
+	{{- range (iter .Examples) -}}
+		{{- template "example" .Entry -}}
+		{{- if (not .Last) -}}{{- spacer -}}{{- end -}}
+	{{- end -}}
+{{- end -}}

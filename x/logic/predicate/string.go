@@ -12,39 +12,34 @@ import (
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
-// ReadString is a predicate that will read a given Stream and unify it to String.
-// Optionally give a max length of reading, when stream reach the given length, the reading is stop.
-// If Length is unbound, Stream is read to the end and Length is unified with the number of characters read.
+// ReadString is a predicate that reads characters from the provided Stream and unifies them with String.
+// Users can optionally specify a maximum length for reading; if the stream reaches this length, the reading stops.
+// If Length remains unbound, the entire Stream is read, and upon completion, Length is unified with the count of characters read.
 //
-// read_string(+Stream, ?Length, -String) is det
+// The signature is as follows:
 //
-// Where
-//   - `Stream`: represent a stream
-//   - `Length`: is the max length to read
-//   - `String`: represent the unified read stream as string
+//	read_string(+Stream, ?Length, -String) is det
 //
-// Example:
+// Where:
+//   - Stream is the input stream to read from.
+//   - Length is the optional maximum number of characters to read from the Stream. If unbound, denotes the full length of Stream.
+//   - String is the resultant string after reading from the Stream.
 //
-// # Given a file `foo.txt` that contains `Hello World`:
-// ```
-// file_to_string(File, String, Length) :-
+// Examples:
+//
+//	# Given a file `foo.txt` that contains `Hello World`:
+//
+//	file_to_string(File, String, Length) :-
 //
 //	open(File, read, In),
 //	read_string(In, Length, String),
 //	close(Stream).
 //
-// ```
-//
-// Result :
-//
-// ```
-//
+//	# It gives:
 //	?- file_to_string('path/file/foo.txt', String, Length).
 //
 //	String = 'Hello World'
 //	Length = 11
-//
-// ```.
 func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		var s *engine.Stream

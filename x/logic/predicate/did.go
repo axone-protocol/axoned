@@ -16,22 +16,25 @@ var AtomDID = engine.NewAtom("did")
 
 // DIDComponents is a predicate which breaks down a DID into its components according to the [W3C DID] specification.
 //
-// did_components(+DID, -Components) is det
-// did_components(-DID, +Components) is det
+// The signature is as follows:
+//
+//	did_components(+DID, -Components) is det
+//	did_components(-DID, +Components) is det
 //
 // where:
-//   - `DID` represents the DID URI as a `text`, compliant with the [W3C DID] specification.
-//   - `Components` is a term `did(Method, ID, Path, Query, Fragment)` following the [DID syntax] which represents
-//     respectively the method name, the method-specific ID, the path, the query, and the fragment of the DID, in decoded
-//     form. Components that are not found (i.e. `null`) are left uninstantiated (variable).
+//   - DID represents DID URI, given as an Atom, compliant with [W3C DID] specification.
+//   - Components is a compound Term in the format did(Method, ID, Path, Query, Fragment), aligned with the [DID syntax],
+//     where: Method is The method name, ID is The method-specific identifier, Path is the path component, Query is the
+//     query component and Fragment is The fragment component.
+//     For any component not present, its value will be null and thus will be left as an uninstantiated variable.
 //
-// Example:
+// Examples:
 //
-// # Decompose a DID into its components.
-// - did_components('did:example:123456?versionId=1', did(Method, ID, Path, Query, Fragment)).
+//	# Decompose a DID into its components.
+//	- did_components('did:example:123456?versionId=1', did(Method, ID, Path, Query, Fragment)).
 //
-// # Reconstruct a DID from its components.
-// - did_components(DID, did('example', '123456', null, 'versionId=1', _42)).
+//	# Reconstruct a DID from its components.
+//	- did_components(DID, did('example', '123456', null, 'versionId=1', _42)).
 //
 // [W3C DID]: https://w3c.github.io/did-core
 // [DID syntax]: https://w3c.github.io/did-core/#did-syntax
