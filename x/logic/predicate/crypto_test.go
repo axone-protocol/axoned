@@ -327,7 +327,7 @@ func TestXVerify(t *testing.T) {
 					Convey("and a vm", func() {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
-						interpreter.Register4(engine.NewAtom("eddsa_verify"), EdDSAVerify)
+						interpreter.Register4(engine.NewAtom("eddsa_verify"), EDDSAVerify)
 						interpreter.Register4(engine.NewAtom("ecdsa_verify"), ECDSAVerify)
 
 						err := interpreter.Compile(ctx, tc.program)
