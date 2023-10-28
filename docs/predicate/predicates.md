@@ -1,3 +1,5 @@
+[//]: # (This file is auto-generated. Please do not modify it yourself.)
+
 # Predicates documentation
 
 ## bank_balances/2
