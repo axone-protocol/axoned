@@ -1,3 +1,4 @@
+[//]: # (This file is auto-generated. Please do not modify it yourself.)
 # Predicates documentation
 
 {{- if len .Funcs -}}
