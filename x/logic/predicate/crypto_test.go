@@ -121,6 +121,12 @@ func TestCrypto(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
+				program:     `test :- crypto_data_hash('hello world', Hash, []), hex_bytes('b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9', Hash).`,
+				query:       `test.`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: true,
+			},
+			{
 				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [algorithm(sha256)]), hex_bytes(Hex, Hash).`,
 				query:   `test(Hex).`,
 				wantResult: []types.TermResults{{
@@ -154,8 +160,16 @@ func TestCrypto(t *testing.T) {
 			},
 			{
 				query:       ` crypto_data_hash('hello world', Hash, [algorithm(cheh)]).`,
-				wantError:   fmt.Errorf("crypto_data_hash/3: invalid algorithm: cheh. Possible values: [sha256]"),
+				wantError:   fmt.Errorf("crypto_data_hash/3: invalid algorithm: cheh. Possible values: [md5 sha256 sha512]"),
 				wantSuccess: false,
+			},
+			{
+				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [algorithm(sha512)]), hex_bytes(Hex, Hash).`,
+				query:   `test(Hex).`,
+				wantResult: []types.TermResults{{
+					"Hex": "'309ecc489c12d6eb4cc40f50c902f2b4d0ed77ee511a7c7a9bcd3ca86d4cd86f989dd35bc5ff499670da34255b45b0cfd830e81f605dcf7dc5542e93ae9cd76f'",
+				}},
+				wantSuccess: true,
 			},
 		}
 		for nc, tc := range cases {
