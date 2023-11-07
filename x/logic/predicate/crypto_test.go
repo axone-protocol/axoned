@@ -20,7 +20,7 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
-func TestCrypto(t *testing.T) {
+func TestCryptoOperations(t *testing.T) {
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			program     string

@@ -113,7 +113,7 @@ func CryptoDataHash(
 
 		result, err := util.Hash(algorithm, decodedData)
 		if err != nil {
-			engine.Error(fmt.Errorf("sha_hash/2: failed to hash data: %w", err))
+			engine.Error(fmt.Errorf("%s: failed to hash data: %w", functor, err))
 		}
 
 		return engine.Unify(vm, hash, BytesToList(result), cont, env)
