@@ -4,27 +4,38 @@ import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/elliptic"
+	"crypto/sha256"
 	"fmt"
 
 	"github.com/dustinxie/ecc"
 )
 
-// Alg is the type of algorithm supported by the crypto util functions.
-type Alg string
+// KeyAlg is the type of key algorithm supported by the crypto util functions.
+type KeyAlg string
 
-// String returns the string representation of the algorithm.
-func (a Alg) String() string {
+// String returns the string representation of the key algorithm.
+func (a KeyAlg) String() string {
+	return string(a)
+}
+
+// HashAlg is the type of hash algorithm supported by the crypto util functions.
+type HashAlg string
+
+// String returns the string representation of the hash algorithm.
+func (a HashAlg) String() string {
 	return string(a)
 }
 
 const (
-	Secp256k1 Alg = "secp256k1"
-	Secp256r1 Alg = "secp256r1"
-	Ed25519   Alg = "ed25519"
+	Secp256k1 KeyAlg = "secp256k1"
+	Secp256r1 KeyAlg = "secp256r1"
+	Ed25519   KeyAlg = "ed25519"
+
+	Sha256 HashAlg = "sha256"
 )
 
 // VerifySignature verifies the signature of the given message with the given public key using the given algorithm.
-func VerifySignature(alg Alg, pubKey []byte, msg, sig []byte) (_ bool, err error) {
+func VerifySignature(alg KeyAlg, pubKey []byte, msg, sig []byte) (_ bool, err error) {
 	defer func() {
 		if recoveredErr := recover(); recoveredErr != nil {
 			err = fmt.Errorf("%s", recoveredErr)
@@ -40,6 +51,18 @@ func VerifySignature(alg Alg, pubKey []byte, msg, sig []byte) (_ bool, err error
 		return verifySignatureWithCurve(ecc.P256k1(), pubKey, msg, sig)
 	default:
 		return false, fmt.Errorf("algo %s not supported", alg)
+	}
+}
+
+// Hash hashes the given data using the given algorithm.
+func Hash(alg HashAlg, bytes []byte) ([]byte, error) {
+	switch alg {
+	case Sha256:
+		hasher := sha256.New()
+		hasher.Write(bytes)
+		return hasher.Sum(nil), nil
+	default:
+		return nil, fmt.Errorf("algo %s not supported", alg)
 	}
 }
 
