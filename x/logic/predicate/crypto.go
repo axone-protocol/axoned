@@ -73,6 +73,7 @@ func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engin
 //
 //   - sha256 (default): The SHA-256 algorithm.
 //   - sha512: The SHA-512 algorithm.
+//   - md5: (insecure) The MD5 algorithm.
 //
 // Note: Due to the principles of the hash algorithm (pre-image resistance), this predicate can only compute the hash
 // value from input data, and cannot compute the original input data from the hash value.

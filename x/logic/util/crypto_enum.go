@@ -12,19 +12,22 @@ import (
 )
 
 const (
+	// HashAlgMd5 is a HashAlg of type Md5.
+	HashAlgMd5 HashAlg = iota
 	// HashAlgSha256 is a HashAlg of type Sha256.
-	HashAlgSha256 HashAlg = iota
+	HashAlgSha256
 	// HashAlgSha512 is a HashAlg of type Sha512.
 	HashAlgSha512
 )
 
 var ErrInvalidHashAlg = fmt.Errorf("not a valid HashAlg, try [%s]", strings.Join(_HashAlgNames, ", "))
 
-const _HashAlgName = "sha256sha512"
+const _HashAlgName = "md5sha256sha512"
 
 var _HashAlgNames = []string{
-	_HashAlgName[0:6],
-	_HashAlgName[6:12],
+	_HashAlgName[0:3],
+	_HashAlgName[3:9],
+	_HashAlgName[9:15],
 }
 
 // HashAlgNames returns a list of possible string values of HashAlg.
@@ -35,8 +38,9 @@ func HashAlgNames() []string {
 }
 
 var _HashAlgMap = map[HashAlg]string{
-	HashAlgSha256: _HashAlgName[0:6],
-	HashAlgSha512: _HashAlgName[6:12],
+	HashAlgMd5:    _HashAlgName[0:3],
+	HashAlgSha256: _HashAlgName[3:9],
+	HashAlgSha512: _HashAlgName[9:15],
 }
 
 // String implements the Stringer interface.
@@ -55,8 +59,9 @@ func (x HashAlg) IsValid() bool {
 }
 
 var _HashAlgValue = map[string]HashAlg{
-	_HashAlgName[0:6]:  HashAlgSha256,
-	_HashAlgName[6:12]: HashAlgSha512,
+	_HashAlgName[0:3]:  HashAlgMd5,
+	_HashAlgName[3:9]:  HashAlgSha256,
+	_HashAlgName[9:15]: HashAlgSha512,
 }
 
 // ParseHashAlg attempts to convert a string to a HashAlg.

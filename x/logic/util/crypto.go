@@ -5,9 +5,11 @@ import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/elliptic"
+	"crypto/md5"
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
+	"hash"
 
 	"github.com/dustinxie/ecc"
 )
@@ -27,8 +29,22 @@ func (a KeyAlg) String() string {
 }
 
 // HashAlg is the type of hash algorithm supported by the crypto util functions.
-// ENUM(sha256,sha512)
+// ENUM(md5,sha256,sha512)
 type HashAlg int
+
+// Hasher returns a new hash.Hash for the given algorithm.
+func (a HashAlg) Hasher() (hash.Hash, error) {
+	switch a {
+	case HashAlgMd5:
+		return md5.New(), nil
+	case HashAlgSha256:
+		return sha256.New(), nil
+	case HashAlgSha512:
+		return sha512.New(), nil
+	default:
+		return nil, fmt.Errorf("algo %s not supported", a.String())
+	}
+}
 
 // VerifySignature verifies the signature of the given message with the given public key using the given algorithm.
 func VerifySignature(alg KeyAlg, pubKey []byte, msg, sig []byte) (_ bool, err error) {
@@ -52,18 +68,13 @@ func VerifySignature(alg KeyAlg, pubKey []byte, msg, sig []byte) (_ bool, err er
 
 // Hash hashes the given data using the given algorithm.
 func Hash(alg HashAlg, bytes []byte) ([]byte, error) {
-	switch alg {
-	case HashAlgSha256:
-		hasher := sha256.New()
-		hasher.Write(bytes)
-		return hasher.Sum(nil), nil
-	case HashAlgSha512:
-		hasher := sha512.New()
-		hasher.Write(bytes)
-		return hasher.Sum(nil), nil
-	default:
-		return nil, fmt.Errorf("algo %s not supported", alg)
+	hasher, err := alg.Hasher()
+	if err != nil {
+		return nil, err
 	}
+
+	hasher.Write(bytes)
+	return hasher.Sum(nil), nil
 }
 
 // verifySignatureWithCurve verifies the ASN1 signature of the given message with the given
