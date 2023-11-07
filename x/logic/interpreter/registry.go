@@ -110,6 +110,7 @@ var registry = map[string]any{
 	"bank_locked_balances/2":    predicate.BankLockedBalances,
 	"did_components/2":          predicate.DIDComponents,
 	"sha_hash/2":                predicate.SHAHash,
+	"crypto_data_hash":          predicate.CryptoDataHash,
 	"hex_bytes/2":               predicate.HexBytes,
 	"bech32_address/2":          predicate.Bech32Address,
 	"source_file/1":             predicate.SourceFile,
