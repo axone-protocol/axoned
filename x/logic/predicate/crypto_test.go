@@ -154,7 +154,7 @@ func TestCrypto(t *testing.T) {
 			},
 			{
 				query:       ` crypto_data_hash('hello world', Hash, [algorithm(cheh)]).`,
-				wantError:   fmt.Errorf("crypto_data_hash/3: invalid algorithm: cheh. Possible values: sha256"),
+				wantError:   fmt.Errorf("crypto_data_hash/3: invalid algorithm: cheh. Possible values: [sha256]"),
 				wantSuccess: false,
 			},
 		}

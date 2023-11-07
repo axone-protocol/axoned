@@ -1,3 +1,4 @@
+//go:generate go-enum --names
 package util
 
 import (
@@ -10,6 +11,12 @@ import (
 	"github.com/dustinxie/ecc"
 )
 
+const (
+	Secp256k1 KeyAlg = "secp256k1"
+	Secp256r1 KeyAlg = "secp256r1"
+	Ed25519   KeyAlg = "ed25519"
+)
+
 // KeyAlg is the type of key algorithm supported by the crypto util functions.
 type KeyAlg string
 
@@ -19,20 +26,8 @@ func (a KeyAlg) String() string {
 }
 
 // HashAlg is the type of hash algorithm supported by the crypto util functions.
-type HashAlg string
-
-// String returns the string representation of the hash algorithm.
-func (a HashAlg) String() string {
-	return string(a)
-}
-
-const (
-	Secp256k1 KeyAlg = "secp256k1"
-	Secp256r1 KeyAlg = "secp256r1"
-	Ed25519   KeyAlg = "ed25519"
-
-	Sha256 HashAlg = "sha256"
-)
+// ENUM(sha256)
+type HashAlg int
 
 // VerifySignature verifies the signature of the given message with the given public key using the given algorithm.
 func VerifySignature(alg KeyAlg, pubKey []byte, msg, sig []byte) (_ bool, err error) {
@@ -57,7 +52,7 @@ func VerifySignature(alg KeyAlg, pubKey []byte, msg, sig []byte) (_ bool, err er
 // Hash hashes the given data using the given algorithm.
 func Hash(alg HashAlg, bytes []byte) ([]byte, error) {
 	switch alg {
-	case Sha256:
+	case HashAlgSha256:
 		hasher := sha256.New()
 		hasher.Write(bytes)
 		return hasher.Sum(nil), nil

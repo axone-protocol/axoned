@@ -37,7 +37,7 @@ func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engin
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		switch d := env.Resolve(data).(type) {
 		case engine.Atom:
-			result, err := util.Hash(util.Sha256, []byte(d.String()))
+			result, err := util.Hash(util.HashAlgSha256, []byte(d.String()))
 			if err != nil {
 				engine.Error(fmt.Errorf("sha_hash/2: failed to hash data: %w", err))
 			}
@@ -102,9 +102,9 @@ func CryptoDataHash(
 			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
 		}
 
-		switch algorithm {
-		case engine.NewAtom("sha256"):
-			result, err := util.Hash(util.Sha256, decodedData)
+		switch algorithm.String() {
+		case util.HashAlgSha256.String():
+			result, err := util.Hash(util.HashAlgSha256, decodedData)
 			if err != nil {
 				engine.Error(fmt.Errorf("sha_hash/2: failed to hash data: %w", err))
 			}
@@ -114,7 +114,7 @@ func CryptoDataHash(
 			return engine.Error(fmt.Errorf("%s: invalid algorithm: %s. Possible values: %s",
 				functor,
 				algorithm.String(),
-				strings.Join(util.Map([]util.HashAlg{util.Sha256}, func(a util.HashAlg) string { return a.String() }), ", ")))
+				util.HashAlgNames()))
 		}
 	})
 }
