@@ -171,6 +171,14 @@ func TestCrypto(t *testing.T) {
 				}},
 				wantSuccess: true,
 			},
+			{
+				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [algorithm(md5)]), hex_bytes(Hex, Hash).`,
+				query:   `test(Hex).`,
+				wantResult: []types.TermResults{{
+					"Hex": "'5eb63bbbe01eeed093cb22bb8f5acdc3'",
+				}},
+				wantSuccess: true,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
