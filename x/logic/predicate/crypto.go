@@ -16,6 +16,9 @@ import (
 
 // SHAHash is a predicate that computes the Hash of the given Data.
 //
+// Deprecated: sha_hash/2 should not be used anymore as it will be removed in a future release.
+// Use the new sha_hash/3 predicate instead.
+//
 // The signature is as follows:
 //
 //	sha_hash(+Data, -Hash) is det
@@ -31,7 +34,7 @@ import (
 // Examples:
 //
 //	# Compute the hash of the given data and unify it with the given Hash.
-//	- sha_hash("Hello OKP4", Hash).
+//	- sha_hash('Hello OKP4', Hash).
 func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		var result []byte
