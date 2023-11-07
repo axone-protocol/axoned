@@ -109,7 +109,6 @@ var registry = map[string]any{
 	"bank_spendable_balances/2": predicate.BankSpendableBalances,
 	"bank_locked_balances/2":    predicate.BankLockedBalances,
 	"did_components/2":          predicate.DIDComponents,
-	"sha_hash/2":                predicate.SHAHash,
 	"crypto_data_hash":          predicate.CryptoDataHash,
 	"hex_bytes/2":               predicate.HexBytes,
 	"bech32_address/2":          predicate.Bech32Address,
@@ -119,6 +118,8 @@ var registry = map[string]any{
 	"read_string/3":             predicate.ReadString,
 	"eddsa_verify/4":            predicate.EDDSAVerify,
 	"ecdsa_verify/4":            predicate.ECDSAVerify,
+	//nolint:staticcheck
+	"sha_hash/2": predicate.SHAHash,
 }
 
 // RegistryNames is the list of the predicate names in the Registry.

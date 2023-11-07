@@ -86,7 +86,9 @@ func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engin
 //
 //	 # Compute the SHA-256 hash of the given hexadecimal data and unify it with the given Hash.
 //	 - crypto_data_hash([127, ...], Hash, encoding(octet)).
-func CryptoDataHash(vm *engine.VM, data, hash, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+func CryptoDataHash(
+	vm *engine.VM, data, hash, options engine.Term, cont engine.Cont, env *engine.Env,
+) *engine.Promise {
 	functor := "crypto_data_hash/3"
 	algorithmOpt := engine.NewAtom("algorithm")
 
@@ -114,7 +116,6 @@ func CryptoDataHash(vm *engine.VM, data, hash, options engine.Term, cont engine.
 				algorithm.String(),
 				strings.Join(util.Map([]util.HashAlg{util.Sha256}, func(a util.HashAlg) string { return a.String() }), ", ")))
 		}
-
 	})
 }
 
@@ -304,7 +305,9 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 
 // getOptionAsAtomWithDefault is a helper function that returns the value of the first option with the given name in the
 // given options.
-func getOptionAsAtomWithDefault(algorithmOpt engine.Atom, options engine.Term, defaultValue engine.Term, env *engine.Env, functor string) (engine.Atom, error) {
+func getOptionAsAtomWithDefault(algorithmOpt engine.Atom, options engine.Term, defaultValue engine.Term, env *engine.Env,
+	functor string,
+) (engine.Atom, error) {
 	term, err := util.GetOptionWithDefault(algorithmOpt, options, defaultValue, env)
 	if err != nil {
 		return util.AtomEmpty, fmt.Errorf("%s: %w", functor, err)
