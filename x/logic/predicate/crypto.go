@@ -57,8 +57,8 @@ func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engin
 //	crypto_data_hash(+Data, +Hash, +Options) is det
 //
 // Where:
-//   - Data represents the data to be hashed with the SHA-256 algorithm, given as an atom, or code-list.
-//   - Hash represents the Hashed value of Data, which can be given as an atom or a variable..
+//   - Data represents the data to be hashed, given as an atom, or code-list.
+//   - Hash represents the Hashed value of Data, which can be given as an atom or a variable.
 //   - Options are additional configurations for the hashing process. Supported options include:
 //     encoding(+Format) which specifies the encoding used for the Data, and algorithm(+Alg) which chooses the hashing
 //     algorithm among the supported ones (see below for details).
@@ -80,14 +80,14 @@ func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engin
 //
 // Examples:
 //
-//		# Compute the SHA-256 hash of the given data and unify it with the given Hash.
-//		- crypto_data_hash('Hello OKP4', Hash).
+//	# Compute the SHA-256 hash of the given data and unify it with the given Hash.
+//	- crypto_data_hash('Hello OKP4', Hash).
 //
-//		# Compute the SHA-256 hash of the given hexadecimal data and unify it with the given Hash.
-//		- crypto_data_hash('9b038f8ef6918cbb56040dfda401b56b...', Hash, encoding(hex)).
+//	# Compute the SHA-256 hash of the given hexadecimal data and unify it with the given Hash.
+//	- crypto_data_hash('9b038f8ef6918cbb56040dfda401b56b...', Hash, encoding(hex)).
 //
-//	 # Compute the SHA-256 hash of the given hexadecimal data and unify it with the given Hash.
-//	 - crypto_data_hash([127, ...], Hash, encoding(octet)).
+//	# Compute the SHA-256 hash of the given hexadecimal data and unify it with the given Hash.
+//	- crypto_data_hash([127, ...], Hash, encoding(octet)).
 func CryptoDataHash(
 	vm *engine.VM, data, hash, options engine.Term, cont engine.Cont, env *engine.Env,
 ) *engine.Promise {

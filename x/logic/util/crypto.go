@@ -5,7 +5,7 @@ import (
 	"crypto/ecdsa"
 	"crypto/ed25519"
 	"crypto/elliptic"
-	"crypto/md5"
+	"crypto/md5" //nolint:gosec
 	"crypto/sha256"
 	"crypto/sha512"
 	"fmt"
@@ -29,13 +29,14 @@ func (a KeyAlg) String() string {
 }
 
 // HashAlg is the type of hash algorithm supported by the crypto util functions.
-// ENUM(md5,sha256,sha512)
+// ENUM(md5,sha256,sha512).
 type HashAlg int
 
 // Hasher returns a new hash.Hash for the given algorithm.
 func (a HashAlg) Hasher() (hash.Hash, error) {
 	switch a {
 	case HashAlgMd5:
+		//nolint:gosec // md5 is used for hashing, not for cryptography
 		return md5.New(), nil
 	case HashAlgSha256:
 		return sha256.New(), nil
