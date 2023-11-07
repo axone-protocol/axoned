@@ -72,6 +72,7 @@ func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engin
 // For Alg, the supported algorithms are:
 //
 //   - sha256 (default): The SHA-256 algorithm.
+//   - sha512: The SHA-512 algorithm.
 //
 // Note: Due to the principles of the hash algorithm (pre-image resistance), this predicate can only compute the hash
 // value from input data, and cannot compute the original input data from the hash value.
@@ -93,29 +94,28 @@ func CryptoDataHash(
 	algorithmOpt := engine.NewAtom("algorithm")
 
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		algorithm, err := getOptionAsAtomWithDefault(algorithmOpt, options, engine.NewAtom("sha256"), env, functor)
+		algorithmAtom, err := getOptionAsAtomWithDefault(algorithmOpt, options, engine.NewAtom("sha256"), env, functor)
 		if err != nil {
 			return engine.Error(err)
+		}
+		algorithm, err := util.ParseHashAlg(algorithmAtom.String())
+		if err != nil {
+			return engine.Error(fmt.Errorf("%s: invalid algorithm: %s. Possible values: %s",
+				functor,
+				algorithmAtom.String(),
+				util.HashAlgNames()))
 		}
 		decodedData, err := TermToBytes(data, options, AtomUtf8, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
 		}
 
-		switch algorithm.String() {
-		case util.HashAlgSha256.String():
-			result, err := util.Hash(util.HashAlgSha256, decodedData)
-			if err != nil {
-				engine.Error(fmt.Errorf("sha_hash/2: failed to hash data: %w", err))
-			}
-
-			return engine.Unify(vm, hash, BytesToList(result), cont, env)
-		default:
-			return engine.Error(fmt.Errorf("%s: invalid algorithm: %s. Possible values: %s",
-				functor,
-				algorithm.String(),
-				util.HashAlgNames()))
+		result, err := util.Hash(algorithm, decodedData)
+		if err != nil {
+			engine.Error(fmt.Errorf("sha_hash/2: failed to hash data: %w", err))
 		}
+
+		return engine.Unify(vm, hash, BytesToList(result), cont, env)
 	})
 }
 

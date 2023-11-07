@@ -6,6 +6,7 @@ import (
 	"crypto/ed25519"
 	"crypto/elliptic"
 	"crypto/sha256"
+	"crypto/sha512"
 	"fmt"
 
 	"github.com/dustinxie/ecc"
@@ -26,7 +27,7 @@ func (a KeyAlg) String() string {
 }
 
 // HashAlg is the type of hash algorithm supported by the crypto util functions.
-// ENUM(sha256)
+// ENUM(sha256,sha512)
 type HashAlg int
 
 // VerifySignature verifies the signature of the given message with the given public key using the given algorithm.
@@ -54,6 +55,10 @@ func Hash(alg HashAlg, bytes []byte) ([]byte, error) {
 	switch alg {
 	case HashAlgSha256:
 		hasher := sha256.New()
+		hasher.Write(bytes)
+		return hasher.Sum(nil), nil
+	case HashAlgSha512:
+		hasher := sha512.New()
 		hasher.Write(bytes)
 		return hasher.Sum(nil), nil
 	default:
