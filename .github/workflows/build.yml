@@ -54,7 +54,7 @@ jobs:
 
       - name: Setup buf
         if: steps.changed-proto-files.outputs.any_changed == 'true'
-        uses: bufbuild/buf-setup-action@v1.23.1
+        uses: bufbuild/buf-setup-action@v1.27.2
 
       - name: Build and generate proto
         if: steps.changed-proto-files.outputs.any_changed == 'true'
