@@ -103,6 +103,12 @@ func TestTermToBytes(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
+				term:        engine.NewAtom("foo"),
+				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("utf8")),
+				result:      []byte{102, 111, 111},
+				wantSuccess: true,
+			},
+			{
 				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
 				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("octet")),
 				result:      nil,
@@ -120,7 +126,7 @@ func TestTermToBytes(t *testing.T) {
 				options:     engine.NewAtom("encoding").Apply(engine.NewAtom("foo")),
 				result:      nil,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("invalid encoding option: foo, valid values are 'hex' or 'octet'"),
+				wantError:   fmt.Errorf("invalid encoding option: foo. Possible values: utf8, octet, hex"),
 			},
 			{
 				term:        engine.NewAtom("486579202120596f752077616e7420746f20736565207468697320746578742c20776f6e64657266756c21"),
@@ -162,7 +168,7 @@ func TestTermToBytes(t *testing.T) {
 			Convey(fmt.Sprintf("Given the term #%d: %s", nc, tc.term), func() {
 				Convey("when check try convert", func() {
 					env := engine.Env{}
-					result, err := TermToBytes(tc.term, tc.options, &env)
+					result, err := TermToBytes(tc.term, tc.options, AtomHex, &env)
 
 					if tc.wantSuccess {
 						Convey("then no error should be thrown", func() {

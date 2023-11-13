@@ -13,6 +13,9 @@ var (
 
 	// AtomEmpty is the term used to represent empty.
 	AtomEmpty = engine.NewAtom("")
+
+	// AtomEmptyList is the term used to represent an empty list.
+	AtomEmptyList = engine.NewAtom("[]")
 )
 
 // StringToTerm converts a string to a term.
@@ -51,9 +54,24 @@ func PredicateMatches(this string) func(string) bool {
 	}
 }
 
-// IsList returns true if the given compound is a list.
-func IsList(compound engine.Compound) bool {
-	return compound.Functor() == AtomDot && compound.Arity() == 2
+// IsList returns true if the given term is a list.
+func IsList(term engine.Term) bool {
+	switch v := term.(type) {
+	case engine.Compound:
+		return v.Functor() == AtomDot && v.Arity() == 2
+	case engine.Atom:
+		return v == AtomEmptyList
+	}
+
+	return false
+}
+
+// IsEmptyList returns true if the given term is an empty list.
+func IsEmptyList(term engine.Term) bool {
+	if v, ok := term.(engine.Atom); ok {
+		return v == AtomEmptyList
+	}
+	return false
 }
 
 // GetOption returns the value of the first option with the given name in the given options.
@@ -82,9 +100,12 @@ func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.T
 
 	resolvedTerm := env.Resolve(options)
 
-	compound, ok := resolvedTerm.(engine.Compound)
-	if ok && IsList(compound) {
-		iter := engine.ListIterator{List: compound, Env: env}
+	if IsEmptyList(resolvedTerm) {
+		return nil, nil
+	}
+
+	if IsList(resolvedTerm) {
+		iter := engine.ListIterator{List: resolvedTerm, Env: env}
 
 		for iter.Next() {
 			opt := env.Resolve(iter.Current())

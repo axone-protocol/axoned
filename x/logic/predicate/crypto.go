@@ -9,39 +9,77 @@ import (
 
 	"github.com/ichiban/prolog/engine"
 
-	cometcrypto "github.com/cometbft/cometbft/crypto"
-
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
-// SHAHash is a predicate that computes the Hash of the given Data.
+// CryptoDataHash is a predicate that computes the Hash of the given Data using different algorithms.
 //
 // The signature is as follows:
 //
-//	sha_hash(+Data, -Hash) is det
-//	sha_hash(+Data, +Hash) is det
+//	crypto_data_hash(+Data, -Hash, +Options) is det
+//	crypto_data_hash(+Data, +Hash, +Options) is det
 //
 // Where:
-//   - Data represents the data to be hashed with the SHA-256 algorithm.
-//   - Hash is the variable that will contain Hashed value of Data.
+//   - Data represents the data to be hashed, given as an atom, or code-list.
+//   - Hash represents the Hashed value of Data, which can be given as an atom or a variable.
+//   - Options are additional configurations for the hashing process. Supported options include:
+//     encoding(+Format) which specifies the encoding used for the Data, and algorithm(+Alg) which chooses the hashing
+//     algorithm among the supported ones (see below for details).
+//
+// For Format, the supported encodings are:
+//
+//   - utf8 (default), the UTF-8 encoding represented as an atom.
+//   - hex, the hexadecimal encoding represented as an atom.
+//   - octet, the raw byte encoding depicted as a list of integers ranging from 0 to 255.
+//
+// For Alg, the supported algorithms are:
+//
+//   - sha256 (default): The SHA-256 algorithm.
+//   - sha512: The SHA-512 algorithm.
+//   - md5: (insecure) The MD5 algorithm.
 //
 // Note: Due to the principles of the hash algorithm (pre-image resistance), this predicate can only compute the hash
 // value from input data, and cannot compute the original input data from the hash value.
 //
 // Examples:
 //
-//	# Compute the hash of the given data and unify it with the given Hash.
-//	- sha_hash("Hello OKP4", Hash).
-func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+//	# Compute the SHA-256 hash of the given data and unify it with the given Hash.
+//	- crypto_data_hash('Hello OKP4', Hash).
+//
+//	# Compute the SHA-256 hash of the given hexadecimal data and unify it with the given Hash.
+//	- crypto_data_hash('9b038f8ef6918cbb56040dfda401b56b...', Hash, encoding(hex)).
+//
+//	# Compute the SHA-256 hash of the given hexadecimal data and unify it with the given Hash.
+//	- crypto_data_hash([127, ...], Hash, encoding(octet)).
+func CryptoDataHash(
+	vm *engine.VM, data, hash, options engine.Term, cont engine.Cont, env *engine.Env,
+) *engine.Promise {
+	functor := "crypto_data_hash/3"
+	algorithmOpt := engine.NewAtom("algorithm")
+
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		var result []byte
-		switch d := env.Resolve(data).(type) {
-		case engine.Atom:
-			result = cometcrypto.Sha256([]byte(d.String()))
-			return engine.Unify(vm, hash, BytesToList(result), cont, env)
-		default:
-			return engine.Error(fmt.Errorf("sha_hash/2: invalid data type: %T, should be Atom", d))
+		algorithmAtom, err := getOptionAsAtomWithDefault(algorithmOpt, options, engine.NewAtom("sha256"), env, functor)
+		if err != nil {
+			return engine.Error(err)
 		}
+		algorithm, err := util.ParseHashAlg(algorithmAtom.String())
+		if err != nil {
+			return engine.Error(fmt.Errorf("%s: invalid algorithm: %s. Possible values: %s",
+				functor,
+				algorithmAtom.String(),
+				util.HashAlgNames()))
+		}
+		decodedData, err := TermToBytes(data, options, AtomUtf8, env)
+		if err != nil {
+			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
+		}
+
+		result, err := util.Hash(algorithm, decodedData)
+		if err != nil {
+			return engine.Error(fmt.Errorf("%s: failed to hash data: %w", functor, err))
+		}
+
+		return engine.Unify(vm, hash, BytesToList(result), cont, env)
 	})
 }
 
@@ -134,7 +172,7 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 //	# Verify a signature for binary data.
 //	- eddsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(ed25519)])
 func EDDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return xVerify("eddsa_verify/4", key, data, sig, options, util.Ed25519, []util.Alg{util.Ed25519}, cont, env)
+	return xVerify("eddsa_verify/4", key, data, sig, options, util.Ed25519, []util.KeyAlg{util.Ed25519}, cont, env)
 }
 
 // ECDSAVerify determines if a given signature is valid as per the ECDSA algorithm for the provided data, using the
@@ -174,14 +212,14 @@ func EDDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.
 //	# Verify a signature for binary data using the ECDSA secp256k1 algorithm.
 //	- ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(secp256k1)])
 func ECDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return xVerify("ecdsa_verify/4", key, data, sig, options, util.Secp256r1, []util.Alg{util.Secp256r1, util.Secp256k1}, cont, env)
+	return xVerify("ecdsa_verify/4", key, data, sig, options, util.Secp256r1, []util.KeyAlg{util.Secp256r1, util.Secp256k1}, cont, env)
 }
 
 // xVerify return `true` if the Signature can be verified as the signature for Data, using the given PubKey for a
 // considered algorithm.
 // This is a generic predicate implementation that can be used to verify any signature.
-func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo util.Alg,
-	algos []util.Alg, cont engine.Cont, env *engine.Env,
+func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo util.KeyAlg,
+	algos []util.KeyAlg, cont engine.Cont, env *engine.Env,
 ) *engine.Promise {
 	typeOpt := engine.NewAtom("type")
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
@@ -194,29 +232,29 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 			return engine.Error(fmt.Errorf("%s: %w", functor, err))
 		}
 
-		if idx := slices.IndexFunc(algos, func(a util.Alg) bool { return a.String() == typeAtom.String() }); idx == -1 {
+		if idx := slices.IndexFunc(algos, func(a util.KeyAlg) bool { return a.String() == typeAtom.String() }); idx == -1 {
 			return engine.Error(fmt.Errorf("%s: invalid type: %s. Possible values: %s",
 				functor,
 				typeAtom.String(),
-				strings.Join(util.Map(algos, func(a util.Alg) string { return a.String() }), ", ")))
+				strings.Join(util.Map(algos, func(a util.KeyAlg) string { return a.String() }), ", ")))
 		}
 
-		decodedKey, err := TermToBytes(key, AtomEncoding.Apply(AtomOctet), env)
+		decodedKey, err := TermToBytes(key, AtomEncoding.Apply(AtomOctet), AtomHex, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode public key: %w", functor, err))
 		}
 
-		decodedData, err := TermToBytes(data, options, env)
+		decodedData, err := TermToBytes(data, options, AtomHex, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
 		}
 
-		decodedSignature, err := TermToBytes(sig, AtomEncoding.Apply(AtomOctet), env)
+		decodedSignature, err := TermToBytes(sig, AtomEncoding.Apply(AtomOctet), AtomHex, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode signature: %w", functor, err))
 		}
 
-		r, err := util.VerifySignature(util.Alg(typeAtom.String()), decodedKey, decodedData, decodedSignature)
+		r, err := util.VerifySignature(util.KeyAlg(typeAtom.String()), decodedKey, decodedData, decodedSignature)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to verify signature: %w", functor, err))
 		}
@@ -227,4 +265,21 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 
 		return cont(env)
 	})
+}
+
+// getOptionAsAtomWithDefault is a helper function that returns the value of the first option with the given name in the
+// given options.
+func getOptionAsAtomWithDefault(algorithmOpt engine.Atom, options engine.Term, defaultValue engine.Term, env *engine.Env,
+	functor string,
+) (engine.Atom, error) {
+	term, err := util.GetOptionWithDefault(algorithmOpt, options, defaultValue, env)
+	if err != nil {
+		return util.AtomEmpty, fmt.Errorf("%s: %w", functor, err)
+	}
+	atom, err := util.ResolveToAtom(env, term)
+	if err != nil {
+		return util.AtomEmpty, fmt.Errorf("%s: %w", functor, err)
+	}
+
+	return atom, nil
 }

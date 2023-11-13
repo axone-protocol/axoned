@@ -20,7 +20,7 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
-func TestCryptoHash(t *testing.T) {
+func TestCryptoOperations(t *testing.T) {
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			program     string
@@ -30,50 +30,8 @@ func TestCryptoHash(t *testing.T) {
 			wantSuccess bool
 		}{
 			{
-				query: `sha_hash('foo', Hash).`,
-				wantResult: []types.TermResults{{
-					"Hash": "[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]",
-				}},
-				wantSuccess: true,
-			},
-			{
-				query:       `sha_hash(Foo, Hash).`,
-				wantResult:  []types.TermResults{},
-				wantError:   fmt.Errorf("sha_hash/2: invalid data type: engine.Variable, should be Atom"),
-				wantSuccess: false,
-			},
-			{
-				query: `sha_hash('bar',
-[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantSuccess: false,
-			},
-			{
-				query: `sha_hash('bar',
-[252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185]).`,
-				wantResult:  []types.TermResults{{}},
-				wantSuccess: true,
-			},
-			{
-				query: `sha_hash('bar',
-[345,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185]).`,
-				wantSuccess: false,
-			},
-			{
-				program: `test :- sha_hash('bar', H),
-H == [252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185].`,
-				query:       `test.`,
-				wantResult:  []types.TermResults{{}},
-				wantSuccess: true,
-			},
-			{
-				program: `test :- sha_hash('bar', H),
-H == [2252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185].`,
-				query:       `test.`,
-				wantSuccess: false,
-			},
-			{
 				query: `hex_bytes(Hex,
-[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
 				wantResult:  []types.TermResults{{"Hex": "'2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae'"}},
 				wantSuccess: true,
 			},
@@ -86,31 +44,98 @@ H == [2252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,
 			},
 			{
 				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
-[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
 				wantResult:  []types.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
 				query: `hex_bytes('3c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
-[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
 				wantSuccess: false,
 			},
 			{
 				query: `hex_bytes('fail',
-[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
 				wantError:   fmt.Errorf("hex_bytes/2: failed decode hexadecimal encoding/hex: invalid byte: U+0069 'i'"),
 				wantSuccess: false,
 			},
 			{
 				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
-[45,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				[45,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
 				wantSuccess: false,
 			},
 			{
 				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
-[345,38,'hey',107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
+				[345,38,'hey',107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
 				wantSuccess: false,
 				wantError:   fmt.Errorf("hex_bytes/2: failed convert list into bytes: invalid integer value in list at position 1: 345 is out of byte range (0-255)"),
+			},
+			{
+				program: `test(Hex) :- crypto_data_hash('hello world', Hash, []), hex_bytes(Hex, Hash).`,
+				query:   `test(Hex).`,
+				wantResult: []types.TermResults{{
+					"Hex": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
+				}},
+				wantSuccess: true,
+			},
+			{
+				program:     `test :- crypto_data_hash('hello world', Hash, []), hex_bytes('b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9', Hash).`,
+				query:       `test.`,
+				wantResult:  []types.TermResults{{}},
+				wantSuccess: true,
+			},
+			{
+				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [algorithm(sha256)]), hex_bytes(Hex, Hash).`,
+				query:   `test(Hex).`,
+				wantResult: []types.TermResults{{
+					"Hex": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
+				}},
+				wantSuccess: true,
+			},
+			{
+				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [encoding(utf8)]), hex_bytes(Hex, Hash).`,
+				query:   `test(Hex).`,
+				wantResult: []types.TermResults{{
+					"Hex": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
+				}},
+				wantSuccess: true,
+			},
+			{
+				program: `test(Hex) :- crypto_data_hash('68656c6c6f20776f726c64', Hash, [encoding(hex)]), hex_bytes(Hex, Hash).`,
+				query:   `test(Hex).`,
+				wantResult: []types.TermResults{{
+					"Hex": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
+				}},
+				wantSuccess: true,
+			},
+			{
+				program: `test(Hex) :- crypto_data_hash([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100], Hash, [algorithm(sha256),encoding(octet)]), hex_bytes(Hex, Hash).`,
+				query:   `test(Hex).`,
+				wantResult: []types.TermResults{{
+					"Hex": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
+				}},
+				wantSuccess: true,
+			},
+			{
+				query:       ` crypto_data_hash('hello world', Hash, [algorithm(cheh)]).`,
+				wantError:   fmt.Errorf("crypto_data_hash/3: invalid algorithm: cheh. Possible values: [md5 sha256 sha512]"),
+				wantSuccess: false,
+			},
+			{
+				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [algorithm(sha512)]), hex_bytes(Hex, Hash).`,
+				query:   `test(Hex).`,
+				wantResult: []types.TermResults{{
+					"Hex": "'309ecc489c12d6eb4cc40f50c902f2b4d0ed77ee511a7c7a9bcd3ca86d4cd86f989dd35bc5ff499670da34255b45b0cfd830e81f605dcf7dc5542e93ae9cd76f'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [algorithm(md5)]), hex_bytes(Hex, Hash).`,
+				query:   `test(Hex).`,
+				wantResult: []types.TermResults{{
+					"Hex": "'5eb63bbbe01eeed093cb22bb8f5acdc3'",
+				}},
+				wantSuccess: true,
 			},
 		}
 		for nc, tc := range cases {
@@ -122,7 +147,7 @@ H == [2252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,
 
 					Convey("and a vm", func() {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
-						interpreter.Register2(engine.NewAtom("sha_hash"), SHAHash)
+						interpreter.Register3(engine.NewAtom("crypto_data_hash"), CryptoDataHash)
 						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
 
 						err := interpreter.Compile(ctx, tc.program)

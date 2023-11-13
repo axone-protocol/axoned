@@ -25,6 +25,12 @@ func TestGetOption(t *testing.T) {
 			},
 			{
 				option:     engine.NewAtom("foo"),
+				options:    engine.List(),
+				wantResult: nil,
+				wantError:  nil,
+			},
+			{
+				option:     engine.NewAtom("foo"),
 				options:    engine.NewAtom("foo").Apply(engine.NewAtom("bar")),
 				wantResult: engine.NewAtom("bar"),
 				wantError:  nil,

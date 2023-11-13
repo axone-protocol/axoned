@@ -4,6 +4,7 @@ import (
 	"encoding/hex"
 	"fmt"
 	"sort"
+	"strings"
 
 	"github.com/ichiban/prolog/engine"
 
@@ -16,6 +17,9 @@ import (
 var (
 	// AtomEncoding is the term used to indicate the encoding type option.
 	AtomEncoding = engine.NewAtom("encoding")
+
+	// AtomUtf8 is the term used to indicate the UTF-8 encoding type option.
+	AtomUtf8 = engine.NewAtom("utf8")
 
 	// AtomHex is the term used to indicate the hexadecimal encoding type option.
 	AtomHex = engine.NewAtom("hex")
@@ -83,38 +87,48 @@ func BytesToList(bt []byte) engine.Term {
 // Options are:
 //   - encoding(+Format).
 //     where Format is the encoding format to use. Possible values are:
-//     -- `hex` (default): hexadecimal encoding represented as an atom.
-//     -- `octet`: plain bytes encoding represented as a list of integers between 0 and 255.
-func TermToBytes(term, options engine.Term, env *engine.Env) ([]byte, error) {
-	encoding, err := util.GetOptionWithDefault(AtomEncoding, options, AtomHex, env)
+//     -- utf8: UTF-8 encoding represented as an atom.
+//     -- hex: hexadecimal encoding represented as an atom.
+//     -- octet: plain bytes encoding represented as a list of integers between 0 and 255.
+func TermToBytes(term, options engine.Term, defaultValue engine.Atom, env *engine.Env) ([]byte, error) {
+	encodingTerm, err := util.GetOptionWithDefault(AtomEncoding, options, defaultValue, env)
 	if err != nil {
 		return nil, err
 	}
 
-	switch enc := env.Resolve(encoding).(type) {
-	case engine.Atom:
-		switch enc {
-		case AtomOctet:
-			v := env.Resolve(term)
-			if c, ok := v.(engine.Compound); ok && util.IsList(c) {
-				iter := engine.ListIterator{List: v, Env: env}
-				return ListToBytes(iter, env)
-			}
-			return nil, fmt.Errorf("term should be a List, given %T", term)
-		case AtomHex:
-			v := env.Resolve(term)
-			if atom, ok := v.(engine.Atom); ok {
-				src := []byte(atom.String())
-				result := make([]byte, hex.DecodedLen(len(src)))
-				_, err := hex.Decode(result, src)
-				return result, err
-			}
-			return nil, fmt.Errorf("invalid term type: %T, should be an atom", term)
-		default:
-			return nil, fmt.Errorf("invalid encoding option: %s, valid values are '%s' or '%s'", enc, AtomHex, AtomOctet)
+	encoding, ok := env.Resolve(encodingTerm).(engine.Atom)
+	if !ok {
+		return nil, fmt.Errorf("invalid term '%s' - expected engine.Atom but got %T", encodingTerm, encodingTerm)
+	}
+
+	switch encoding {
+	case AtomUtf8:
+		v := env.Resolve(term)
+		if atom, ok := v.(engine.Atom); ok {
+			return []byte(atom.String()), nil
 		}
+		return nil, fmt.Errorf("invalid term type: %T, should be an atom", term)
+	case AtomOctet:
+		v := env.Resolve(term)
+		if c, ok := v.(engine.Compound); ok && util.IsList(c) {
+			iter := engine.ListIterator{List: v, Env: env}
+			return ListToBytes(iter, env)
+		}
+		return nil, fmt.Errorf("term should be a List, given %T", term)
+	case AtomHex:
+		v := env.Resolve(term)
+		if atom, ok := v.(engine.Atom); ok {
+			src := []byte(atom.String())
+			result := make([]byte, hex.DecodedLen(len(src)))
+			_, err := hex.Decode(result, src)
+			return result, err
+		}
+		return nil, fmt.Errorf("invalid term type: %T, should be an atom", term)
 	default:
-		return nil, fmt.Errorf("invalid term '%s' - expected engine.Atom but got %T", encoding, encoding)
+		return nil, fmt.Errorf(
+			"invalid encoding option: %s. Possible values: %s",
+			encodingTerm,
+			strings.Join(util.Map([]engine.Atom{AtomUtf8, AtomOctet, AtomHex}, func(a engine.Atom) string { return a.String() }), ", "))
 	}
 }
 
