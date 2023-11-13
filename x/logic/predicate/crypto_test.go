@@ -30,48 +30,6 @@ func TestCryptoOperations(t *testing.T) {
 			wantSuccess bool
 		}{
 			{
-				query: `sha_hash('foo', Hash).`,
-				wantResult: []types.TermResults{{
-					"Hash": "[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]",
-				}},
-				wantSuccess: true,
-			},
-			{
-				query:       `sha_hash(Foo, Hash).`,
-				wantResult:  []types.TermResults{},
-				wantError:   fmt.Errorf("sha_hash/2: invalid data type: engine.Variable, should be Atom"),
-				wantSuccess: false,
-			},
-			{
-				query: `sha_hash('bar',
-				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantSuccess: false,
-			},
-			{
-				query: `sha_hash('bar',
-				[252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185]).`,
-				wantResult:  []types.TermResults{{}},
-				wantSuccess: true,
-			},
-			{
-				query: `sha_hash('bar',
-				[345,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185]).`,
-				wantSuccess: false,
-			},
-			{
-				program: `test :- sha_hash('bar', H),
-				H == [252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185].`,
-				query:       `test.`,
-				wantResult:  []types.TermResults{{}},
-				wantSuccess: true,
-			},
-			{
-				program: `test :- sha_hash('bar', H),
-				H == [2252,222,43,46,219,165,107,244,8,96,31,183,33,254,155,92,51,141,16,238,66,158,160,79,174,85,17,182,143,191,143,185].`,
-				query:       `test.`,
-				wantSuccess: false,
-			},
-			{
 				query: `hex_bytes(Hex,
 				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
 				wantResult:  []types.TermResults{{"Hex": "'2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae'"}},
@@ -189,7 +147,6 @@ func TestCryptoOperations(t *testing.T) {
 
 					Convey("and a vm", func() {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
-						interpreter.Register2(engine.NewAtom("sha_hash"), SHAHash)
 						interpreter.Register3(engine.NewAtom("crypto_data_hash"), CryptoDataHash)
 						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
 

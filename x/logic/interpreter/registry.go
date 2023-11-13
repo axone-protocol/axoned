@@ -118,8 +118,6 @@ var registry = map[string]any{
 	"read_string/3":             predicate.ReadString,
 	"eddsa_verify/4":            predicate.EDDSAVerify,
 	"ecdsa_verify/4":            predicate.ECDSAVerify,
-	//nolint:staticcheck
-	"sha_hash/2": predicate.SHAHash,
 }
 
 // RegistryNames is the list of the predicate names in the Registry.

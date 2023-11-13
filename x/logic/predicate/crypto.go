@@ -12,43 +12,6 @@ import (
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
-// SHAHash is a predicate that computes the Hash of the given Data.
-//
-// Deprecated: sha_hash/2 should not be used anymore as it will be removed in a future release.
-// Use the new crypto_data_hash/3 predicate instead.
-//
-// The signature is as follows:
-//
-//	sha_hash(+Data, -Hash) is det
-//	sha_hash(+Data, +Hash) is det
-//
-// Where:
-//   - Data represents the data to be hashed with the SHA-256 algorithm.
-//   - Hash is the variable that will contain Hashed value of Data.
-//
-// Note: Due to the principles of the hash algorithm (pre-image resistance), this predicate can only compute the hash
-// value from input data, and cannot compute the original input data from the hash value.
-//
-// Examples:
-//
-//	# Compute the hash of the given data and unify it with the given Hash.
-//	- sha_hash('Hello OKP4', Hash).
-func SHAHash(vm *engine.VM, data, hash engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		switch d := env.Resolve(data).(type) {
-		case engine.Atom:
-			result, err := util.Hash(util.HashAlgSha256, []byte(d.String()))
-			if err != nil {
-				engine.Error(fmt.Errorf("sha_hash/2: failed to hash data: %w", err))
-			}
-
-			return engine.Unify(vm, hash, BytesToList(result), cont, env)
-		default:
-			return engine.Error(fmt.Errorf("sha_hash/2: invalid data type: %T, should be Atom", d))
-		}
-	})
-}
-
 // CryptoDataHash is a predicate that computes the Hash of the given Data using different algorithms.
 //
 // The signature is as follows:
