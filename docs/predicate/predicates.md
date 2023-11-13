@@ -428,33 +428,6 @@ String = 'Hello World'
 Length = 11
 ```
 
-## sha_hash/2
-
-sha_hash/2 is a predicate that computes the Hash of the given Data.
-
-Deprecated: sha\_hash/2 should not be used anymore as it will be removed in a future release. Use the new crypto\_data\_hash/3 predicate instead.
-
-The signature is as follows:
-
-```text
-sha_hash(+Data, -Hash) is det
-sha_hash(+Data, +Hash) is det
-```
-
-Where:
-
-- Data represents the data to be hashed with the SHA\-256 algorithm.
-- Hash is the variable that will contain Hashed value of Data.
-
-Note: Due to the principles of the hash algorithm \(pre\-image resistance\), this predicate can only compute the hash value from input data, and cannot compute the original input data from the hash value.
-
-Examples:
-
-```text
-# Compute the hash of the given data and unify it with the given Hash.
-- sha_hash('Hello OKP4', Hash).
-```
-
 ## source_file/1
 
 source_file/1 is a predicate that unify the given term with the currently loaded source file.
