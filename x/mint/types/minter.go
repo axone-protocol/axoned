@@ -17,46 +17,55 @@ func NewMinter(inflation, annualProvisions sdk.Dec) Minter {
 	}
 }
 
-// InitialMinter returns an initial Minter object with a given inflation value and annual reduction factor.
-func InitialMinter(inflation sdk.Dec) Minter {
+// NewMinterWithInitialInflation returns an initial Minter object with a given inflation value and zero annual provisions.
+func NewMinterWithInitialInflation(inflation sdk.Dec) Minter {
 	return NewMinter(
 		inflation,
 		sdk.NewDec(0),
 	)
 }
 
+// NewMinterWithInflationCoef returns a new Minter with updated inflation and annual provisions values.
+func NewMinterWithInflationCoef(inflationCoef sdk.Dec, bondedRatio sdk.Dec, totalSupply math.Int) (Minter, error) {
+	inflationRate, err := inflationRate(inflationCoef, bondedRatio)
+	if err != nil {
+		return Minter{}, err
+	}
+	minter := NewMinter(inflationRate, inflationRate.MulInt(totalSupply))
+
+	return minter, minter.Validate()
+}
+
 // DefaultInitialMinter returns a default initial Minter object for a new chain
-// which uses an inflation rate of 18%.
+// which uses an inflation rate of 0%.
 func DefaultInitialMinter() Minter {
-	return InitialMinter(
-		sdk.NewDecWithPrec(18, 2),
+	return NewMinterWithInitialInflation(
+		sdk.NewDec(0),
 	)
 }
 
-// validate minter.
-func ValidateMinter(minter Minter) error {
-	if minter.Inflation.IsNegative() {
+// Validate validates the mint parameters.
+func (m Minter) Validate() error {
+	if m.Inflation.IsNegative() {
 		return fmt.Errorf("mint parameter Inflation should be positive, is %s",
-			minter.Inflation.String())
+			m.Inflation.String())
 	}
 	return nil
 }
 
-// NextInflation return estimated yearly inflation rate for the current block.
-func (m Minter) NextInflation(params Params, bondedRatio sdk.Dec) sdk.Dec {
-	bonded := params.BondingAdjustment.Sub(bondedRatio.Quo(params.TargetBondingRatio))
-	return params.InflationCoef.Mul(bonded)
-}
+// inflationRate returns the inflation rate computed from the current bonded ratio
+// and the inflation parameter.
+func inflationRate(inflationCoef sdk.Dec, bondedRatio sdk.Dec) (sdk.Dec, error) {
+	if bondedRatio.IsZero() {
+		return math.LegacyZeroDec(), ErrBondedRatioIsZero
+	}
 
-// NextAnnualProvisions returns the annual provisions based on current total
-// supply and inflation rate.
-func (m Minter) NextAnnualProvisions(_ Params, totalSupply math.Int) math.LegacyDec {
-	return m.Inflation.MulInt(totalSupply)
+	return inflationCoef.Quo(bondedRatio), nil
 }
 
 // BlockProvision returns the provisions for a block based on the annual
 // provisions rate.
 func (m Minter) BlockProvision(params Params) sdk.Coin {
-	provisionAmt := m.AnnualProvisions.QuoInt(sdk.NewInt(int64(params.BlocksPerYear)))
+	provisionAmt := m.AnnualProvisions.QuoInt(sdk.NewIntFromUint64(params.BlocksPerYear))
 	return sdk.NewCoin(params.MintDenom, provisionAmt.TruncateInt())
 }
