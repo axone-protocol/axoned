@@ -28,6 +28,27 @@ var (
 
 	// AtomNull is the term null.
 	AtomNull = engine.NewAtom("null")
+
+	// AtomEncoding is the term used to indicate the encoding type option.
+	AtomEncoding = engine.NewAtom("encoding")
+
+	// AtomUtf8 is the term used to indicate the UTF-8 encoding type option.
+	AtomUtf8 = engine.NewAtom("utf8")
+
+	// AtomHex is the term used to indicate the hexadecimal encoding type option.
+	AtomHex = engine.NewAtom("hex")
+
+	// AtomOctet is the term used to indicate the byte encoding type option.
+	AtomOctet = engine.NewAtom("octet")
+
+	// AtomCharset is the term used to indicate the charset encoding type option.
+	AtomCharset = engine.NewAtom("charset")
+
+	// AtomPadding is the term used to indicate the padding encoding type option.
+	AtomPadding = engine.NewAtom("padding")
+
+	// AtomAs is the term used to indicate the as encoding type option.
+	AtomAs = engine.NewAtom("as")
 )
 
 // MakeNull returns the compound term @(null).

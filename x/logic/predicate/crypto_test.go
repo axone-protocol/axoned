@@ -30,47 +30,6 @@ func TestCryptoOperations(t *testing.T) {
 			wantSuccess bool
 		}{
 			{
-				query: `hex_bytes(Hex,
-				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantResult:  []types.TermResults{{"Hex": "'2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae'"}},
-				wantSuccess: true,
-			},
-			{
-				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae', Bytes).`,
-				wantResult: []types.TermResults{{
-					"Bytes": "[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]",
-				}},
-				wantSuccess: true,
-			},
-			{
-				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
-				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantResult:  []types.TermResults{{}},
-				wantSuccess: true,
-			},
-			{
-				query: `hex_bytes('3c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
-				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantSuccess: false,
-			},
-			{
-				query: `hex_bytes('fail',
-				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantError:   fmt.Errorf("hex_bytes/2: failed decode hexadecimal encoding/hex: invalid byte: U+0069 'i'"),
-				wantSuccess: false,
-			},
-			{
-				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
-				[45,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantSuccess: false,
-			},
-			{
-				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
-				[345,38,'hey',107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantSuccess: false,
-				wantError:   fmt.Errorf("hex_bytes/2: failed convert list into bytes: invalid integer value in list at position 1: 345 is out of byte range (0-255)"),
-			},
-			{
 				program: `test(Hex) :- crypto_data_hash('hello world', Hash, []), hex_bytes(Hex, Hash).`,
 				query:   `test(Hex).`,
 				wantResult: []types.TermResults{{

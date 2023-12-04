@@ -74,6 +74,8 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 			}
 		}
 
-		return engine.Unify(vm, Tuple(result, length), Tuple(util.StringToTerm(builder.String()), engine.Integer(totalLen)), cont, env)
+		return engine.Unify(
+			vm, util.Tuple(result, length),
+			util.Tuple(util.StringToTerm(builder.String()), engine.Integer(totalLen)), cont, env)
 	})
 }

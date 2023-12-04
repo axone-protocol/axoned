@@ -2,7 +2,6 @@ package predicate
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"slices"
 	"strings"
@@ -58,9 +57,9 @@ func CryptoDataHash(
 	algorithmOpt := engine.NewAtom("algorithm")
 
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		algorithmAtom, err := getOptionAsAtomWithDefault(algorithmOpt, options, engine.NewAtom("sha256"), env, functor)
+		algorithmAtom, err := util.GetOptionAsAtomWithDefault(algorithmOpt, options, engine.NewAtom("sha256"), env)
 		if err != nil {
-			return engine.Error(err)
+			return engine.Error(fmt.Errorf("%s: %w", functor, err))
 		}
 		algorithm, err := util.ParseHashAlg(algorithmAtom.String())
 		if err != nil {
@@ -69,7 +68,7 @@ func CryptoDataHash(
 				algorithmAtom.String(),
 				util.HashAlgNames()))
 		}
-		decodedData, err := TermToBytes(data, options, AtomUtf8, env)
+		decodedData, err := termToBytes(data, options, AtomUtf8, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
 		}
@@ -79,62 +78,7 @@ func CryptoDataHash(
 			return engine.Error(fmt.Errorf("%s: failed to hash data: %w", functor, err))
 		}
 
-		return engine.Unify(vm, hash, BytesToList(result), cont, env)
-	})
-}
-
-// HexBytes is a predicate that unifies hexadecimal encoded bytes to a list of bytes.
-//
-// The signature is as follows:
-//
-//	hex_bytes(?Hex, ?Bytes) is det
-//
-// Where:
-//   - Hex is an Atom, string or list of characters in hexadecimal encoding.
-//   - Bytes is the list of numbers between 0 and 255 that represent the sequence of bytes.
-//
-// Examples:
-//
-//	# Convert hexadecimal atom to list of bytes.
-//	- hex_bytes('2c26b46b68ffc68ff99b453c1d3041341342d706483bfa0f98a5e886266e7ae', Bytes).
-func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		var result []byte
-
-		switch h := env.Resolve(hexa).(type) {
-		case engine.Variable:
-		case engine.Atom:
-			src := []byte(h.String())
-			result = make([]byte, hex.DecodedLen(len(src)))
-			_, err := hex.Decode(result, src)
-			if err != nil {
-				return engine.Error(fmt.Errorf("hex_bytes/2: failed decode hexadecimal %w", err))
-			}
-		default:
-			return engine.Error(fmt.Errorf("hex_bytes/2: invalid hex type: %T, should be Atom or Variable", h))
-		}
-
-		switch b := env.Resolve(bts).(type) {
-		case engine.Variable:
-			if result == nil {
-				return engine.Error(fmt.Errorf("hex_bytes/2: nil hexadecimal conversion in input"))
-			}
-			return engine.Unify(vm, bts, BytesToList(result), cont, env)
-		case engine.Compound:
-			if b.Arity() != 2 || b.Functor().String() != "." {
-				return engine.Error(fmt.Errorf("hex_bytes/2: bytes should be a List, give %T", b))
-			}
-			iter := engine.ListIterator{List: b, Env: env}
-
-			src, err := ListToBytes(iter, env)
-			if err != nil {
-				return engine.Error(fmt.Errorf("hex_bytes/2: failed convert list into bytes: %w", err))
-			}
-			dst := hex.EncodeToString(src)
-			return engine.Unify(vm, hexa, util.StringToTerm(dst), cont, env)
-		default:
-			return engine.Error(fmt.Errorf("hex_bytes/2: invalid hex type: %T, should be Variable or List", b))
-		}
+		return engine.Unify(vm, hash, util.BytesToStringTermDefault(result), cont, env)
 	})
 }
 
@@ -227,7 +171,7 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: %w", functor, err))
 		}
-		typeAtom, err := util.ResolveToAtom(env, typeTerm)
+		typeAtom, err := util.AssertAtom(env, typeTerm)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: %w", functor, err))
 		}
@@ -239,17 +183,17 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 				strings.Join(util.Map(algos, func(a util.KeyAlg) string { return a.String() }), ", ")))
 		}
 
-		decodedKey, err := TermToBytes(key, AtomEncoding.Apply(AtomOctet), AtomHex, env)
+		decodedKey, err := termToBytes(key, AtomEncoding.Apply(AtomOctet), AtomHex, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode public key: %w", functor, err))
 		}
 
-		decodedData, err := TermToBytes(data, options, AtomHex, env)
+		decodedData, err := termToBytes(data, options, AtomHex, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
 		}
 
-		decodedSignature, err := TermToBytes(sig, AtomEncoding.Apply(AtomOctet), AtomHex, env)
+		decodedSignature, err := termToBytes(sig, AtomEncoding.Apply(AtomOctet), AtomHex, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode signature: %w", functor, err))
 		}
@@ -267,19 +211,22 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 	})
 }
 
-// getOptionAsAtomWithDefault is a helper function that returns the value of the first option with the given name in the
-// given options.
-func getOptionAsAtomWithDefault(algorithmOpt engine.Atom, options engine.Term, defaultValue engine.Term, env *engine.Env,
-	functor string,
-) (engine.Atom, error) {
-	term, err := util.GetOptionWithDefault(algorithmOpt, options, defaultValue, env)
+func termToBytes(term, options, defaultEncoding engine.Term, env *engine.Env) ([]byte, error) {
+	encodingTerm, err := util.GetOptionWithDefault(AtomEncoding, options, defaultEncoding, env)
 	if err != nil {
-		return util.AtomEmpty, fmt.Errorf("%s: %w", functor, err)
+		return nil, err
 	}
-	atom, err := util.ResolveToAtom(env, term)
+	encodingAtom, err := util.AssertAtom(env, encodingTerm)
 	if err != nil {
-		return util.AtomEmpty, fmt.Errorf("%s: %w", functor, err)
+		return nil, err
 	}
 
-	return atom, nil
+	switch encodingAtom {
+	case AtomHex:
+		return util.TermHexToBytes(term, env)
+	case AtomOctet, AtomUtf8:
+		return util.StringTermToBytes(term, "", env)
+	default:
+		return nil, fmt.Errorf("invalid encoding: %s. Possible values: hex, octet", encodingAtom.String())
+	}
 }

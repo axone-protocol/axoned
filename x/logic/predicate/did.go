@@ -118,7 +118,7 @@ func processSegment(segments engine.Compound, segmentNumber uint8, fn func(segme
 	if _, ok := term.(engine.Variable); ok {
 		return nil
 	}
-	segment, err := util.ResolveToAtom(env, segments.Arg(int(segmentNumber)))
+	segment, err := util.AssertAtom(env, segments.Arg(int(segmentNumber)))
 	if err != nil {
 		return fmt.Errorf("failed to resolve atom at segment %d: %w", segmentNumber, err)
 	}

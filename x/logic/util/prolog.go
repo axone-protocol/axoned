@@ -1,10 +1,14 @@
 package util
 
 import (
+	"bytes"
+	"encoding/hex"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/ichiban/prolog/engine"
+	"golang.org/x/net/html/charset"
 )
 
 var (
@@ -18,20 +22,165 @@ var (
 	AtomEmptyList = engine.NewAtom("[]")
 )
 
+// Tuple is a predicate which unifies the given term with a tuple of the given arity.
+func Tuple(args ...engine.Term) engine.Term {
+	return engine.Atom(0).Apply(args...)
+}
+
+// ListOfIntegers converts a list of integers to a term.
+func ListOfIntegers(args ...int) engine.Term {
+	terms := make([]engine.Term, 0, len(args))
+	for _, arg := range args {
+		terms = append(terms, engine.Integer(arg))
+	}
+	return engine.List(terms...)
+}
+
 // StringToTerm converts a string to a term.
 func StringToTerm(s string) engine.Term {
 	return engine.NewAtom(s)
 }
 
-// ResolveToAtom resolves a term and attempts to convert it into an engine.Atom if possible.
-// If conversion fails, the function returns the empty atom and the error.
-func ResolveToAtom(env *engine.Env, t engine.Term) (engine.Atom, error) {
-	switch t := env.Resolve(t).(type) {
+// BytesToStringTerm try to convert a given golang []byte into a string term.
+// Function is the reverse of StringTermToBytes.
+func BytesToStringTerm(in []byte, encoding string) (engine.Term, error) {
+	out, err := decode(in, encoding)
+	if err != nil {
+		return nil, err
+	}
+
+	terms := make([]engine.Term, 0, len(out))
+	for _, b := range out {
+		terms = append(terms, engine.Integer(b))
+	}
+	return engine.List(terms...), nil
+}
+
+// BytesToStringTermDefault is like the BytesToStringTerm function but with a default encoding.
+// This function panics if the conversion fails, which can't happen with the default encoding.
+func BytesToStringTermDefault(in []byte) engine.Term {
+	term, err := BytesToStringTerm(in, "")
+	if err != nil {
+		panic(err)
+	}
+	return term
+}
+
+// StringTermToBytes try to convert a given string into native golang []byte.
+// String is an instantiated term which represents text as an atom, string, list of character codes or list or characters.
+// Encoding is the supported encoding type:
+//   - empty encoding or 'text', return the original bytes without modification.
+//   - 'octet', decode the bytes as unicode code points and return the resulting bytes. If a code point is greater than
+//     0xff, an error is returned.
+//   - any other encoding label, convert the bytes to the specified encoding.
+//
+// The mapping from encoding labels to encodings is defined at https://encoding.spec.whatwg.org/.
+func StringTermToBytes(str engine.Term, encoding string, env *engine.Env) ([]byte, error) {
+	v := env.Resolve(str)
+	switch v := v.(type) {
 	case engine.Atom:
-		return t, nil
+		return encode([]byte(v.String()), encoding)
+	case engine.Compound:
+		if IsList(v) {
+			iter := engine.ListIterator{List: v, Env: env}
+			bs := make([]byte, 0)
+			index := 0
+
+			for iter.Next() {
+				term := env.Resolve(iter.Current())
+				index++
+
+				switch t := term.(type) {
+				case engine.Integer:
+					if t >= 0 && t <= 255 {
+						bs = append(bs, byte(t))
+					} else {
+						return nil, fmt.Errorf("invalid integer value '%d' in list at position %d: out of byte range (0-255)", t, index)
+					}
+				case engine.Atom:
+					rs := []rune(t.String())
+					if len(rs) != 1 {
+						return nil, fmt.Errorf("invalid character_code '%s' value in list at position %d: should be a single character",
+							t.String(), index)
+					}
+
+					bs = append(bs, []byte(t.String())...)
+				default:
+					return nil, fmt.Errorf("invalid term type in list at position %d: %T, only character_code or integer allowed", index, term)
+				}
+			}
+			return encode(bs, encoding)
+		}
+		return nil, fmt.Errorf("invalid compound term: expected a list of character_code or integer")
 	default:
-		return AtomEmpty,
-			fmt.Errorf("invalid term '%s' - expected engine.Atom but got %T", t, t)
+		return nil, fmt.Errorf("term should be a List, given %T", str)
+	}
+}
+
+// encode converts a byte slice to a specified encoding.
+//
+// In case of:
+//   - empty encoding label or 'text', return the original bytes without modification.
+//   - 'octet', decode the bytes as unicode code points and return the resulting bytes. If a code point is greater than
+//     0xff, an error is returned.
+//   - any other encoding label, convert the bytes to the specified encoding.
+func encode(bs []byte, label string) ([]byte, error) {
+	switch label {
+	case "", "text":
+		return bs, nil
+	case "octet":
+		result := make([]byte, 0, len(bs))
+		for i := 0; i < len(bs); {
+			runeValue, width := utf8.DecodeRune(bs[i:])
+
+			if runeValue > 0xff {
+				return nil, fmt.Errorf("cannot convert character '%c' to %s", runeValue, label)
+			}
+			result = append(result, byte(runeValue))
+			i += width
+		}
+		return result, nil
+	default:
+		encoding, _ := charset.Lookup(label)
+		if encoding == nil {
+			return nil, fmt.Errorf("invalid encoding: %s", label)
+		}
+		return encoding.NewEncoder().Bytes(bs)
+	}
+}
+
+// decode converts a byte slice from a specified encoding.
+// decode function is the reverse of encode function.
+func decode(bs []byte, label string) ([]byte, error) {
+	switch label {
+	case "", "text":
+		return bs, nil
+	case "octet":
+		var buffer bytes.Buffer
+		for _, b := range bs {
+			buffer.WriteRune(rune(b))
+		}
+		return buffer.Bytes(), nil
+	default:
+		encoding, _ := charset.Lookup(label)
+		if encoding == nil {
+			return nil, fmt.Errorf("invalid encoding: %s", label)
+		}
+		return encoding.NewDecoder().Bytes(bs)
+	}
+}
+
+// TermHexToBytes try to convert an hexadecimal encoded atom to native golang []byte.
+func TermHexToBytes(term engine.Term, env *engine.Env) ([]byte, error) {
+	v := env.Resolve(term)
+	switch v := v.(type) {
+	case engine.Atom:
+		src := []byte(v.String())
+		result := make([]byte, hex.DecodedLen(len(src)))
+		_, err := hex.Decode(result, src)
+		return result, err
+	default:
+		return nil, fmt.Errorf("invalid term: expected a hexadecimal encoded atom, given %T", term)
 	}
 }
 
@@ -72,6 +221,36 @@ func IsEmptyList(term engine.Term) bool {
 		return v == AtomEmptyList
 	}
 	return false
+}
+
+// IsVariable returns true if the given term is a variable.
+func IsVariable(term engine.Term) bool {
+	_, ok := term.(engine.Variable)
+	return ok
+}
+
+// IsAtom returns true if the given term is an atom.
+func IsAtom(term engine.Term) bool {
+	_, ok := term.(engine.Atom)
+	return ok
+}
+
+// IsCompound returns true if the given term is a compound.
+func IsCompound(term engine.Term) bool {
+	_, ok := term.(engine.Compound)
+	return ok
+}
+
+// AssertAtom resolves a term and attempts to convert it into an engine.Atom if possible.
+// If conversion fails, the function returns the empty atom and the error.
+func AssertAtom(env *engine.Env, t engine.Term) (engine.Atom, error) {
+	switch t := env.Resolve(t).(type) {
+	case engine.Atom:
+		return t, nil
+	default:
+		return AtomEmpty,
+			fmt.Errorf("invalid term '%s' - expected engine.Atom but got %T", t, t)
+	}
 }
 
 // GetOption returns the value of the first option with the given name in the given options.
@@ -127,11 +306,30 @@ func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.T
 
 // GetOptionWithDefault returns the value of the first option with the given name in the given options, or the given
 // default value if no option is found.
-func GetOptionWithDefault(name engine.Atom, options engine.Term, defaultValue engine.Term, env *engine.Env) (engine.Term, error) {
+func GetOptionWithDefault(
+	name engine.Atom, options engine.Term, defaultValue engine.Term, env *engine.Env,
+) (engine.Term, error) {
 	if term, err := GetOption(name, options, env); err != nil {
 		return nil, err
 	} else if term != nil {
 		return term, nil
 	}
 	return defaultValue, nil
+}
+
+// GetOptionAsAtomWithDefault is a helper function that returns the value of the first option with the given name in the
+// given options.
+func GetOptionAsAtomWithDefault(
+	algorithmOpt engine.Atom, options engine.Term, defaultValue engine.Term, env *engine.Env,
+) (engine.Atom, error) {
+	term, err := GetOptionWithDefault(algorithmOpt, options, defaultValue, env)
+	if err != nil {
+		return AtomEmpty, err
+	}
+	atom, err := AssertAtom(env, term)
+	if err != nil {
+		return AtomEmpty, err
+	}
+
+	return atom, nil
 }

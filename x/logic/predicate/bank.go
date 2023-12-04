@@ -162,8 +162,8 @@ func fetchBalances(
 				func(ctx context.Context) *engine.Promise {
 					return engine.Unify(
 						vm,
-						Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
-						Tuple(account, balances),
+						util.Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
+						util.Tuple(account, balances),
 						cont,
 						env,
 					)
