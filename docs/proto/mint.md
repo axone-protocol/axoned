@@ -4,43 +4,21 @@
 
 <a name="top"></a>
 
-## Purpose
+## Function
 
-The Minting Module is a fundamental component within the blockchain ecosystem, responsible for managing the dynamic
-issuance of tokens to validators, thereby ensuring the stability and sustainability of the network.
-This module operates on a continuous basis, recalculating parameters with each new block to maintain an optimal
-token supply.
+The Minting Module plays a crucial role in the blockchain ecosystem, tasked with regulating the issuance of tokens to
+validators. This ensures the network's ongoing stability and viability. The module operates consistently, adjusting
+key parameters with each block to maintain a balanced token supply.
 
-## 🧮 Calculation
+## Calculation of Inflation
 
-The formula for calculating the yearly staking reward target (srty) is as follows:
+The method for determining the inflation rate is outlined in the
+[OKP4 Whitepaper - Token Model](https://docs.okp4.network/whitepaper/token-model).
 
-```
-srty = a • i • (c - b / bt)
-```
+## Per-Block Token Generation
 
-- `srty`: Represents the yearly staking reward target.
-- `a`: Denotes the total token supply within the blockchain.
-- `i`: Refers to the inflation coefficient, a configurable parameter set at 0.073 by default.
-- `c`: Signifies the bonding ratio adjustment coefficient.
-- `b`: A dynamic variable ranging from 0 to 1, symbolizing the current bonding ratio at the current block.
-- `bt`: Represents the target bonding ratio, conventionally set to 0.66.
-
-### Yearly Inflation Rate
-
-Upon the determination of srty, the Minting Module proceeds to convert it into a yearly inflation rate
-expressed as a percentage (Iy):
-
-```
-Iy = (srty • 100) / a = (a • i • (c - b / bt) • 100) / a = i • (c - b / bt) • 100
-```
-
-- `Iy` (in percentage): Represents the yearly inflation rate.
-
-### Block-Level Token Minting
-
-With the yearly inflation rate in hand, the Minting Module can calculate the number of tokens to be minted for
-each individual block by knowing the number of block in one years.
+Given the annual inflation rate, the Minting Module calculates the exact amount of tokens to be generated for each
+block, based on the total number of blocks in a year.
 
 ## Table of Contents
 
@@ -78,33 +56,24 @@ each individual block by knowing the number of block in one years.
 
 ### Minter
 
-Minter represents the minting state within the blockchain, tasked with the continuous calculation and distribution
-of tokens to validators.
-
-This calculation occurs with each block, where the minting module dynamically recalculates the annual `inflation` rate.
-Using the resulting inflation rate, it deduces the quantity of tokens to be provisioned for the upcoming year.
-
-Furthermore, based on the current block's position within the year, it computes the exact number of tokens to be
-minted for that specific block.
+Minter holds the state of minting within the blockchain.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `inflation` | [string](#string) |  | Represents the current annual inflation rate. |
-| `annual_provisions` | [string](#string) |  | Represents the current annual expected provisions. |
+| `inflation` | [string](#string) |  | Current annual inflation rate. |
+| `annual_provisions` | [string](#string) |  | Current annual anticipated provisions. |
 
 <a name="mint.v1beta1.Params"></a>
 
 ### Params
 
-Params holds parameters for the mint module.
+Params defines the parameters for the mint module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `mint_denom` | [string](#string) |  | Type of coin to mint |
-| `inflation_coef` | [string](#string) |  | Annual inflation coefficient |
-| `bonding_adjustment` | [string](#string) |  | Bonding adjustment |
-| `target_bonding_ratio` | [string](#string) |  | Represent the target bonding ratio to reach |
-| `blocks_per_year` | [uint64](#uint64) |  | Estimated blocks per year |
+| `mint_denom` | [string](#string) |  | Denomination of the coin to be minted. |
+| `inflation_coef` | [string](#string) |  | Annual inflation coefficient, influencing the inflation rate based on the bonded ratio. Values range from 0 to 1, with higher values indicating higher inflation. |
+| `blocks_per_year` | [uint64](#uint64) |  | Estimated number of blocks per year. |
 
  [//]: # (end messages)
 

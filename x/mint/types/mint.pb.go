@@ -25,17 +25,11 @@ var _ = math.Inf
 // proto package needs to be updated.
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
-// Minter represents the minting state within the blockchain.
-//
-// At each block, the minting module recalculates the annual inflation rate dynamically. It then determines the total
-// amount of tokens to be provisioned for the upcoming year based on this rate.
-//
-// Additionally, the module computes the precise number of tokens to be minted for the current block, taking into account
-// its position within the annual cycle.
+// Minter holds the state of minting within the blockchain.
 type Minter struct {
-	// Represents the current annual inflation rate.
+	// Current annual inflation rate.
 	Inflation github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,1,opt,name=inflation,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"inflation"`
-	// Represents the current annual expected provisions.
+	// Current annual anticipated provisions.
 	AnnualProvisions github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=annual_provisions,json=annualProvisions,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"annual_provisions"`
 }
 
@@ -72,13 +66,14 @@ func (m *Minter) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_Minter proto.InternalMessageInfo
 
-// Params holds parameters for the mint module.
+// Params defines the parameters for the mint module.
 type Params struct {
-	// Type of coin to mint
+	// Denomination of the coin to be minted.
 	MintDenom string `protobuf:"bytes,1,opt,name=mint_denom,json=mintDenom,proto3" json:"mint_denom,omitempty"`
-	// Annual inflation coefficient
+	// Annual inflation coefficient, influencing the inflation rate based on the bonded ratio.
+	// Values range from 0 to 1, with higher values indicating higher inflation.
 	InflationCoef github_com_cosmos_cosmos_sdk_types.Dec `protobuf:"bytes,2,opt,name=inflation_coef,json=inflationCoef,proto3,customtype=github.com/cosmos/cosmos-sdk/types.Dec" json:"inflation_coef"`
-	// Estimated blocks per year
+	// Estimated number of blocks per year.
 	BlocksPerYear uint64 `protobuf:"varint,3,opt,name=blocks_per_year,json=blocksPerYear,proto3" json:"blocks_per_year,omitempty"`
 }
 

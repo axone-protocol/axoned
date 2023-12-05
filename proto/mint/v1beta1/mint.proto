@@ -7,21 +7,15 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/okp4/okp4d/x/mint/types";
 
-// Minter represents the minting state within the blockchain.
-//
-// At each block, the minting module recalculates the annual inflation rate dynamically. It then determines the total
-// amount of tokens to be provisioned for the upcoming year based on this rate.
-//
-// Additionally, the module computes the precise number of tokens to be minted for the current block, taking into account
-// its position within the annual cycle.
+// Minter holds the state of minting within the blockchain.
 message Minter {
-  // Represents the current annual inflation rate.
+  // Current annual inflation rate.
   string inflation = 1 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // Represents the current annual expected provisions.
+  // Current annual anticipated provisions.
   string annual_provisions = 2 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
@@ -29,18 +23,20 @@ message Minter {
   ];
 }
 
-// Params holds parameters for the mint module.
+// Params defines the parameters for the mint module.
 message Params {
   option (gogoproto.goproto_stringer) = false;
 
-  // Type of coin to mint
+  // Denomination of the coin to be minted.
   string mint_denom = 1;
-  // Annual inflation coefficient
+
+  // Annual inflation coefficient, influencing the inflation rate based on the bonded ratio.
+  // Values range from 0 to 1, with higher values indicating higher inflation.
   string inflation_coef = 2 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // Estimated blocks per year
+  // Estimated number of blocks per year.
   uint64 blocks_per_year = 3;
 }
