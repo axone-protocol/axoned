@@ -18,7 +18,6 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
 	"github.com/okp4/okp4d/x/mint/client/cli"
-	"github.com/okp4/okp4d/x/mint/exported"
 	"github.com/okp4/okp4d/x/mint/keeper"
 	"github.com/okp4/okp4d/x/mint/simulation"
 	"github.com/okp4/okp4d/x/mint/types"
@@ -87,17 +86,14 @@ type AppModule struct {
 
 	keeper     keeper.Keeper
 	authKeeper types.AccountKeeper
-	// legacySubspace is used principally for migration
-	legacySubspace exported.Subspace
 }
 
 // NewAppModule creates a new AppModule object.
-func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, ak types.AccountKeeper, legacySubspace exported.Subspace) AppModule {
+func NewAppModule(cdc codec.Codec, keeper keeper.Keeper, ak types.AccountKeeper) AppModule {
 	return AppModule{
 		AppModuleBasic: AppModuleBasic{cdc: cdc},
 		keeper:         keeper,
 		authKeeper:     ak,
-		legacySubspace: legacySubspace,
 	}
 }
 
@@ -115,13 +111,13 @@ func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServer(cfg.QueryServer(), am.keeper)
 
-	migrator := keeper.NewMigrator(am.keeper, am.legacySubspace)
+	migrator := keeper.NewMigrator(am.keeper)
 
 	migrations := []struct {
 		fromVersion uint64
 		migrator    func(ctx sdk.Context) error
 	}{
-		{1, migrator.Migrate1to2},
+		{2, migrator.Migrate2to3},
 	}
 
 	for _, migration := range migrations {
@@ -150,7 +146,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 }
 
 // ConsensusVersion implements AppModule/ConsensusVersion.
-func (AppModule) ConsensusVersion() uint64 { return 2 }
+func (AppModule) ConsensusVersion() uint64 { return 3 }
 
 // BeginBlock returns the begin blocker for the mint module.
 func (am AppModule) BeginBlock(ctx sdk.Context, _ abci.RequestBeginBlock) {

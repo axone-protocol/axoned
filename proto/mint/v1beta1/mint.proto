@@ -7,49 +7,36 @@ import "gogoproto/gogo.proto";
 
 option go_package = "github.com/okp4/okp4d/x/mint/types";
 
-// Minter represents the minting state.
-//
-// At the beginning of the chain (first block) the mint module will recalculate the `annual_provisions` and
-// `target_supply` based on the genesis total token supply and the inflation configured.
-// By default inflation is set to 15%. If the genesis total token supply is 200M token, the `annual_provision` will be 30M
-// and `target_supply` 230M.
+// Minter holds the state of minting within the blockchain.
 message Minter {
-  // current annual inflation rate
+  // Current annual inflation rate.
   string inflation = 1 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // current annual expected provisions
+  // Current annual anticipated provisions.
   string annual_provisions = 2 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // target supply at end of period
-  string target_supply = 3 [
-    (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Int",
-    (gogoproto.nullable) = false
-  ];
 }
 
-// Params holds parameters for the mint module.
-//
-// Configure the annual reduction factor will update at the each end of year the new token distribution rate by reducing
-// the actual inflation by the `annual_reduction_factor` configured.
-// By default, `annual_reduction_factor` is 20%. For example, with an initial inflation of 15%, at the end of the year,
-// new inflation will be 12%.
+// Params defines the parameters for the mint module.
 message Params {
   option (gogoproto.goproto_stringer) = false;
 
-  // type of coin to mint
+  // Denomination of the coin to be minted.
   string mint_denom = 1;
-  // annual reduction factor inflation rate change
-  string annual_reduction_factor = 2 [
+
+  // Annual inflation coefficient, influencing the inflation rate based on the bonded ratio.
+  // Values range from 0 to 1, with higher values indicating higher inflation.
+  string inflation_coef = 2 [
     (cosmos_proto.scalar) = "cosmos.Dec",
     (gogoproto.customtype) = "github.com/cosmos/cosmos-sdk/types.Dec",
     (gogoproto.nullable) = false
   ];
-  // expected blocks per year
+  // Estimated number of blocks per year.
   uint64 blocks_per_year = 3;
 }

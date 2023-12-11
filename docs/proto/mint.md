@@ -4,24 +4,21 @@
 
 <a name="top"></a>
 
-## Purpose
+## Function
 
-This module is designed to calculate an inflation rewards each years based on static params. Each block rewards is
-the same over the year.
+The Minting Module plays a crucial role in the blockchain ecosystem, tasked with regulating the issuance of tokens to
+validators. This ensures the network's ongoing stability and viability. The module operates consistently, adjusting
+key parameters with each block to maintain a balanced token supply.
 
-### 🧮 Calculation
+## Calculation of Inflation
 
-The initial inflation is set to 15%, `annual_provisions` and `target_supply` will set at the beginning of the chain (on the first block).
-It's based on the initial total supply. For example, with a total supply of 200M token, annual_provisions will be configured to 30M and target_supply 230M.
+The method for determining the inflation rate is outlined in the
+[OKP4 Whitepaper - Token Model](https://docs.okp4.network/whitepaper/token-model).
 
-At the end of the year (the last block of the year, to be more precise), due to rounding imprecision, if the distributed
-tokens for the last block of the year added with the actual tokens total supply is bigger than the `target_supply`,
-only the difference to reach the `target_supply` will be minted. Conversely, in some case, due to rounding also,
-the `target_supply` is not reached at the last block, but at the next block.
+## Per-Block Token Generation
 
-The new inflation, `annual_provisions` and `target_supply` is recalculated at the next block after the block that
-reach the `target_supply`. To calculate the new inflation, get the current inflation multiplied by (`1 - annual_reduction_factor`),
-then the new `annual_provisions` and `target_supply` is deducted based on the current total supply (that is the old `target_supply`)
+Given the annual inflation rate, the Minting Module calculates the exact amount of tokens to be generated for each
+block, based on the total number of blocks in a year.
 
 ## Table of Contents
 
@@ -59,35 +56,24 @@ then the new `annual_provisions` and `target_supply` is deducted based on the cu
 
 ### Minter
 
-Minter represents the minting state.
-
-At the beginning of the chain (first block) the mint module will recalculate the `annual_provisions` and
-`target_supply` based on the genesis total token supply and the inflation configured.
-By default inflation is set to 15%. If the genesis total token supply is 200M token, the `annual_provision` will be 30M
-and `target_supply` 230M.
+Minter holds the state of minting within the blockchain.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `inflation` | [string](#string) |  | current annual inflation rate |
-| `annual_provisions` | [string](#string) |  | current annual expected provisions |
-| `target_supply` | [string](#string) |  | target supply at end of period |
+| `inflation` | [string](#string) |  | Current annual inflation rate. |
+| `annual_provisions` | [string](#string) |  | Current annual anticipated provisions. |
 
 <a name="mint.v1beta1.Params"></a>
 
 ### Params
 
-Params holds parameters for the mint module.
-
-Configure the annual reduction factor will update at the each end of year the new token distribution rate by reducing
-the actual inflation by the `annual_reduction_factor` configured.
-By default, `annual_reduction_factor` is 20%. For example, with an initial inflation of 15%, at the end of the year,
-new inflation will be 12%.
+Params defines the parameters for the mint module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `mint_denom` | [string](#string) |  | type of coin to mint |
-| `annual_reduction_factor` | [string](#string) |  | annual reduction factor inflation rate change |
-| `blocks_per_year` | [uint64](#uint64) |  | expected blocks per year |
+| `mint_denom` | [string](#string) |  | Denomination of the coin to be minted. |
+| `inflation_coef` | [string](#string) |  | Annual inflation coefficient, influencing the inflation rate based on the bonded ratio. Values range from 0 to 1, with higher values indicating higher inflation. |
+| `blocks_per_year` | [uint64](#uint64) |  | Estimated number of blocks per year. |
 
  [//]: # (end messages)
 

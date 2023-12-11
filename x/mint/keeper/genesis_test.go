@@ -6,8 +6,6 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 
-	"cosmossdk.io/math"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	"github.com/cosmos/cosmos-sdk/testutil"
@@ -60,7 +58,7 @@ func (s *GenesisTestSuite) SetupTest() {
 
 func (s *GenesisTestSuite) TestImportExportGenesis() {
 	genesisState := types.DefaultGenesisState()
-	genesisState.Minter = types.NewMinter(sdk.OneDec(), sdk.NewDecWithPrec(20, 2), math.NewInt(1))
+	genesisState.Minter = types.NewMinter(sdk.OneDec(), sdk.NewDecWithPrec(20, 2))
 	genesisState.Params = types.NewParams(
 		"testDenom",
 		sdk.NewDecWithPrec(69, 2),

@@ -269,11 +269,11 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
 	PROPOSAL=${PROPOSAL}; \
 	if [[ ! -f "$$PROPOSAL" ]]; then \
         echo "${COLOR_CYAN} 👩‍🚀 No proposal given  ${COLOR_RESET}"; \
-        echo '{"messages": [{"@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade","authority": "okp410d07y265gmmuvt4z0w9aw880jnsr700jh7kd2g","plan": {"name": "","time": "0001-01-01T00:00:00Z","height": "10","info": "","upgraded_client_state": null}}],"metadata": "ipfs://CID","deposit": "1uknow"}' | \
+        echo '{"messages": [{"@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade","authority": "okp410d07y265gmmuvt4z0w9aw880jnsr700jh7kd2g","plan": {"name": "","time": "0001-01-01T00:00:00Z","height": "10","info": "","upgraded_client_state": null}}],"title": "Software update", "summary": "Update the binary", "metadata": "ipfs://CID","deposit": "1uknow"}' | \
         jq --arg name "${TO_VERSION}" '.messages[].plan.name = $$name' > ${TARGET_FOLDER}/proposal.json; \
       	PROPOSAL=${TARGET_FOLDER}/proposal.json; \
     fi; \
-    cat <<< $$(jq '.app_state.gov.voting_params.voting_period = "20s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
+    cat <<< $$(jq '.app_state.gov.params.voting_period = "30s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
 	\
  	cosmovisor init $$BINARY_OLD; \
  	cosmovisor run start --moniker ${CHAIN_MONIKER} \
@@ -286,23 +286,25 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
  		--home ${CHAIN_HOME} \
  		--chain-id okp4-${CHAIN} \
  		--keyring-backend test \
- 		-b block; \
+ 		-b sync; \
  	\
+ 	sleep 5;\
  	$$BINARY_OLD tx gov deposit 1 10000000uknow \
      		--from validator \
      		--yes \
      		--home ${CHAIN_HOME} \
      		--chain-id okp4-${CHAIN} \
      		--keyring-backend test \
-     		-b block; \
+     		-b sync; \
 	\
+	sleep 5;\
  	$$BINARY_OLD tx gov vote 1 yes \
      		--from validator \
      		--yes \
      		--home ${CHAIN_HOME} \
      		--chain-id okp4-${CHAIN} \
      		--keyring-backend test \
-     		-b block; \
+     		-b sync; \
 	mkdir -p ${DAEMON_HOME}/cosmovisor/upgrades/${TO_VERSION}/bin && cp ${CHAIN_BINARY} ${DAEMON_HOME}/cosmovisor/upgrades/${TO_VERSION}/bin; \
 	wait
 

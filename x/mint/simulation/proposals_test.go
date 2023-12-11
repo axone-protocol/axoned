@@ -40,6 +40,6 @@ func TestProposalMsgs(t *testing.T) {
 
 	assert.Equal(t, sdk.AccAddress(address.Module("gov")).String(), msgUpdateParams.Authority)
 	assert.Equal(t, uint64(122877), msgUpdateParams.Params.BlocksPerYear)
-	assert.DeepEqual(t, sdk.NewDecWithPrec(95, 2), msgUpdateParams.Params.AnnualReductionFactor)
+	assert.DeepEqual(t, sdk.NewDecWithPrec(95, 2), msgUpdateParams.Params.InflationCoef)
 	assert.Equal(t, "eAerqyNEUz", msgUpdateParams.Params.MintDenom)
 }

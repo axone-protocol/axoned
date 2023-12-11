@@ -20,13 +20,13 @@ func (s *IntegrationTestSuite) TestUpdateParams() {
 			expectErr: true,
 		},
 		{
-			name: "set invalid params",
+			name: "set invalid params for inflation coef (negative value)",
 			request: &types.MsgUpdateParams{
 				Authority: s.mintKeeper.GetAuthority(),
 				Params: types.Params{
-					MintDenom:             sdk.DefaultBondDenom,
-					AnnualReductionFactor: sdk.NewDecWithPrec(-13, 2),
-					BlocksPerYear:         uint64(60 * 60 * 8766 / 5),
+					MintDenom:     sdk.DefaultBondDenom,
+					InflationCoef: sdk.NewDecWithPrec(-73, 2),
+					BlocksPerYear: uint64(60 * 60 * 8766 / 5),
 				},
 			},
 			expectErr: true,
@@ -36,9 +36,9 @@ func (s *IntegrationTestSuite) TestUpdateParams() {
 			request: &types.MsgUpdateParams{
 				Authority: s.mintKeeper.GetAuthority(),
 				Params: types.Params{
-					MintDenom:             sdk.DefaultBondDenom,
-					AnnualReductionFactor: sdk.NewDecWithPrec(8, 2),
-					BlocksPerYear:         uint64(60 * 60 * 8766 / 5),
+					MintDenom:     sdk.DefaultBondDenom,
+					InflationCoef: sdk.NewDecWithPrec(73, 2),
+					BlocksPerYear: uint64(60 * 60 * 8766 / 5),
 				},
 			},
 			expectErr: false,

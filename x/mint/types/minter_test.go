@@ -2,10 +2,11 @@
 package types
 
 import (
+	"fmt"
 	"math/rand"
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	. "github.com/smartystreets/goconvey/convey"
 
 	"cosmossdk.io/math"
 
@@ -13,65 +14,69 @@ import (
 )
 
 func TestNextInflation(t *testing.T) {
-	minter := DefaultInitialMinter()
-	params := DefaultParams()
+	Convey("Given a test cases", t, func() {
+		cases := []struct {
+			name                     string
+			inflationRatio           sdk.Dec
+			bondedRatio              sdk.Dec
+			totalSupply              math.Int
+			expectedInflation        sdk.Dec
+			expectedAnnualProvisions sdk.Dec
+			expectedErr              error
+		}{
+			{
+				name:                     "inflation ratio is 0",
+				inflationRatio:           sdk.NewDec(0),
+				bondedRatio:              sdk.NewDecWithPrec(20, 2),
+				totalSupply:              math.NewInt(1000),
+				expectedInflation:        sdk.NewDec(0),
+				expectedAnnualProvisions: sdk.NewDec(0),
+			},
+			{
+				name:                     "inflation ratio is 0.03",
+				inflationRatio:           sdk.NewDecWithPrec(3, 2),
+				bondedRatio:              sdk.NewDecWithPrec(2, 1),
+				totalSupply:              math.NewInt(1000),
+				expectedInflation:        sdk.NewDecWithPrec(15, 2),
+				expectedAnnualProvisions: sdk.NewDec(150),
+			},
+			{
+				name:           "bonded ratio is 0",
+				inflationRatio: sdk.NewDecWithPrec(3, 2),
+				bondedRatio:    sdk.NewDec(0),
+				totalSupply:    math.NewInt(1000),
+				expectedErr:    fmt.Errorf("bonded ratio is zero"),
+			},
+			{
+				name:           "negative inflation ratio",
+				inflationRatio: sdk.NewDecWithPrec(3, 2),
+				bondedRatio:    sdk.NewDecWithPrec(-2, 1),
+				totalSupply:    math.NewInt(1000),
+				expectedErr:    fmt.Errorf("mint parameter Inflation should be positive, is -0.150000000000000000"),
+			},
+		}
 
-	tests := []struct {
-		setInflation, expInflation sdk.Dec
-	}{
-		// With annual reduction factor of 20 % (defined in params), next infaltion should be 12%
-		{sdk.NewDecWithPrec(15, 2), sdk.NewDecWithPrec(12, 2)},
-		// With annual reduction factor of 20 % (defined in params), next infaltion should be 9.6%
-		{sdk.NewDecWithPrec(12, 2), sdk.NewDecWithPrec(96, 3)},
-	}
-	for i, tc := range tests {
-		minter.Inflation = tc.setInflation
-
-		inflation := minter.NextInflation(params)
-
-		require.True(t, inflation.Equal(tc.expInflation),
-			"Test Index: %v\nInflation:  %v\nExpected: %v\n", i, inflation, tc.expInflation)
-	}
-}
-
-//nolint:lll
-func TestBlockProvision(t *testing.T) {
-	minter := InitialMinter(sdk.NewDecWithPrec(1, 1), math.NewInt(1))
-	params := DefaultParams()
-
-	secondsPerYear := int64(60 * 60 * 8766)
-	blockInterval := int64(5) // there is 1 block each 5 second approximately
-
-	tests := []struct {
-		annualProvisions sdk.Dec
-		expProvisions    int64
-		targetSupply     math.Int
-		totalSupply      math.Int
-	}{
-		{sdk.NewDec(secondsPerYear / blockInterval), 1, sdk.NewInt(secondsPerYear / blockInterval), sdk.NewInt(1)},
-		{sdk.NewDec(secondsPerYear/blockInterval + 1), 1, sdk.NewInt(secondsPerYear/blockInterval + 1), math.NewInt(1)},
-		{sdk.NewDec((secondsPerYear / blockInterval) * 2), 2, sdk.NewInt((secondsPerYear / 5) * 2), math.NewInt(1)},
-		{sdk.NewDec((secondsPerYear / blockInterval) / 2), 0, sdk.NewInt(1), math.NewInt(1)},
-		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 20, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), math.NewInt(1)},
-		// Only two token should be minted to reach the target supply
-		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 2, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), sdk.NewInt(((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)) - 2)},
-		// Zero token should be minted since the target supply is already reached, the new inflation should be calculated
-		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 0, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval))},
-		// Zero token should be minted since target supply are exceeded (avoid negative coin)
-		{sdk.NewDec((secondsPerYear / blockInterval) * 20), 0, sdk.NewInt((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)), sdk.NewInt(((secondsPerYear / blockInterval) * 20 * (secondsPerYear / blockInterval)) + 2)},
-	}
-	for i, tc := range tests {
-		minter.AnnualProvisions = tc.annualProvisions
-		minter.TargetSupply = tc.targetSupply
-		provisions := minter.BlockProvision(params, tc.totalSupply)
-
-		expProvisions := sdk.NewCoin(params.MintDenom,
-			sdk.NewInt(tc.expProvisions))
-
-		require.True(t, expProvisions.IsEqual(provisions),
-			"test: %v\n\tExp: %v\n\tGot: %v\n",
-			i, tc.expProvisions, provisions)
-	}
+		for nc, tc := range cases {
+			Convey(
+				fmt.Sprintf("Given test case #%d: %v", nc, tc.name), func() {
+					Convey("when calling NewMinterWithInflationCoef function", func() {
+						minter, err := NewMinterWithInflationCoef(tc.inflationRatio, tc.bondedRatio, tc.totalSupply)
+						if tc.expectedErr != nil {
+							Convey("then an error should occur", func() {
+								So(err, ShouldNotBeNil)
+								So(err.Error(), ShouldEqual, tc.expectedErr.Error())
+							})
+						} else {
+							Convey("then minter values should be as expected", func() {
+								So(err, ShouldBeNil)
+								So(minter.Inflation.String(), ShouldEqual, tc.expectedInflation.String())
+								So(minter.AnnualProvisions.String(), ShouldEqual, tc.expectedAnnualProvisions.String())
+							})
+						}
+					})
+				})
+		}
+	})
 }
 
 // Benchmarking :)
@@ -82,7 +87,7 @@ func TestBlockProvision(t *testing.T) {
 // BenchmarkBlockProvision-4 3000000 429 ns/op.
 func BenchmarkBlockProvision(b *testing.B) {
 	b.ReportAllocs()
-	minter := InitialMinter(sdk.NewDecWithPrec(1, 1), math.NewInt(1))
+	minter := NewMinterWithInitialInflation(sdk.NewDecWithPrec(1, 1))
 	params := DefaultParams()
 
 	s1 := rand.NewSource(100)
@@ -91,7 +96,7 @@ func BenchmarkBlockProvision(b *testing.B) {
 
 	// run the BlockProvision function b.N times
 	for n := 0; n < b.N; n++ {
-		minter.BlockProvision(params, math.NewInt(1))
+		minter.BlockProvision(params)
 	}
 }
 
@@ -99,25 +104,16 @@ func BenchmarkBlockProvision(b *testing.B) {
 // BenchmarkNextInflation-4 1000000 1828 ns/op.
 func BenchmarkNextInflation(b *testing.B) {
 	b.ReportAllocs()
-	minter := InitialMinter(sdk.NewDecWithPrec(1, 1), math.NewInt(1))
+
 	params := DefaultParams()
+	bondedRatio := sdk.NewDecWithPrec(66, 2)
+	totalSupply := sdk.NewInt(100000000000000)
 
 	// run the NextInflationRate function b.N times
 	for n := 0; n < b.N; n++ {
-		minter.NextInflation(params)
-	}
-}
-
-// // Next annual provisions benchmarking
-// // BenchmarkNextAnnualProvisions-4 5000000 251 ns/op.
-func BenchmarkNextAnnualProvisions(b *testing.B) {
-	b.ReportAllocs()
-	minter := InitialMinter(sdk.NewDecWithPrec(1, 1), math.NewInt(1))
-	params := DefaultParams()
-	totalSupply := sdk.NewInt(100000000000000)
-
-	// run the NextAnnualProvisions function b.N times
-	for n := 0; n < b.N; n++ {
-		minter.NextAnnualProvisions(params, totalSupply)
+		_, err := NewMinterWithInflationCoef(params.InflationCoef, bondedRatio, totalSupply)
+		if err != nil {
+			panic(err)
+		}
 	}
 }

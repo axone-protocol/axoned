@@ -15,8 +15,8 @@ import (
 
 // Simulation parameter constants.
 const (
-	Inflation             = "inflation"
-	AnnualReductionFactor = "annual_reduction_factor"
+	Inflation     = "inflation"
+	InflationCoef = "inflation_coef"
 )
 
 // GenInflation randomized Inflation.
@@ -24,9 +24,9 @@ func GenInflation(r *rand.Rand) sdk.Dec {
 	return sdk.NewDecWithPrec(int64(r.Intn(99)), 2)
 }
 
-// GenAnnualReductionFactor randomized AnnualReductionFactor.
-func GenAnnualReductionFactorMax(_ *rand.Rand) sdk.Dec {
-	return sdk.NewDecWithPrec(20, 2)
+// GenInflationCoefMax randomized AnnualReductionFactor.
+func GenInflationCoefMax(_ *rand.Rand) sdk.Dec {
+	return sdk.NewDecWithPrec(73, 3)
 }
 
 // RandomizedGenState generates a random GenesisState for mint.
@@ -42,19 +42,18 @@ func RandomizedGenState(simState *module.SimulationState) {
 
 	// params
 
-	var annualReductionFactor sdk.Dec
+	var inflationCoef sdk.Dec
 	simState.AppParams.GetOrGenerate(
-		simState.Cdc, AnnualReductionFactor, &annualReductionFactor, simState.Rand,
-		func(r *rand.Rand) { annualReductionFactor = GenAnnualReductionFactorMax(r) },
+		simState.Cdc, InflationCoef, &inflationCoef, simState.Rand,
+		func(r *rand.Rand) { inflationCoef = GenInflationCoefMax(r) },
 	)
 
 	mintDenom := sdk.DefaultBondDenom
 	blocksPerYear := uint64(60 * 60 * 8766 / 5)
-	params := types.NewParams(mintDenom, annualReductionFactor, blocksPerYear)
+	params := types.NewParams(mintDenom, inflationCoef, blocksPerYear)
 	annualProvision := inflation.MulInt(simState.InitialStake)
-	targetSupply := simState.InitialStake.Add(annualProvision.TruncateInt())
 
-	minter := types.InitialMinter(inflation, targetSupply)
+	minter := types.NewMinterWithInitialInflation(inflation)
 	minter.AnnualProvisions = annualProvision
 
 	mintGenesis := types.NewGenesisState(minter, params)

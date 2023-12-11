@@ -14,32 +14,25 @@ import (
 func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
 
-	// fetch stored minter & params
-	minter := k.GetMinter(ctx)
+	// fetch stored params
 	params := k.GetParams(ctx)
 
+	// recalculate inflation rate
 	totalSupply := k.TokenSupply(ctx, params.MintDenom)
+	bondedRatio := k.BondedRatio(ctx)
 
-	if uint64(ctx.BlockHeight()) == 1 {
-		minter.AnnualProvisions = minter.NextAnnualProvisions(params, totalSupply)
-		minter.TargetSupply = totalSupply.Add(minter.AnnualProvisions.TruncateInt())
-		k.SetMinter(ctx, minter)
+	minter, err := types.NewMinterWithInflationCoef(params.InflationCoef, bondedRatio, totalSupply)
+	if err != nil {
+		panic(err)
 	}
 
-	// If we have reached the end of the year by reaching the targeted supply for the year
-	// We need to re-calculate the next inflation for the next year.
-	if totalSupply.GTE(minter.TargetSupply) {
-		minter.Inflation = minter.NextInflation(params)
-		minter.AnnualProvisions = minter.NextAnnualProvisions(params, totalSupply)
-		minter.TargetSupply = totalSupply.Add(minter.AnnualProvisions.TruncateInt())
-		k.SetMinter(ctx, minter)
-	}
+	k.SetMinter(ctx, minter)
 
 	// mint coins, update supply
-	mintedCoin := minter.BlockProvision(params, totalSupply)
+	mintedCoin := minter.BlockProvision(params)
 	mintedCoins := sdk.NewCoins(mintedCoin)
 
-	err := k.MintCoins(ctx, mintedCoins)
+	err = k.MintCoins(ctx, mintedCoins)
 	if err != nil {
 		panic(err)
 	}
@@ -57,6 +50,7 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 	ctx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeMint,
+			sdk.NewAttribute(types.AttributeKeyBondedRatio, bondedRatio.String()),
 			sdk.NewAttribute(types.AttributeKeyInflation, minter.Inflation.String()),
 			sdk.NewAttribute(types.AttributeKeyAnnualProvisions, minter.AnnualProvisions.String()),
 			sdk.NewAttribute(sdk.AttributeKeyAmount, mintedCoin.Amount.String()),
