@@ -9,7 +9,7 @@ import (
 )
 
 // NewMinter returns a new Minter object with the given inflation, annual
-// provisions values and annual reduction factor.
+// provisions values.
 func NewMinter(inflation, annualProvisions sdk.Dec) Minter {
 	return Minter{
 		Inflation:        inflation,
