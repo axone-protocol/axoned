@@ -22,7 +22,7 @@ okp4d add-genesis-account [address_or_key_name] [coin][,[coin]] [flags]
   -h, --help                     help for add-genesis-account
       --home string              The application home directory (default "/home/john/.okp4d")
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test) (default "test")
-      --node string              &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string            Output format (text|json) (default "text")
       --vesting-amount string    amount of coins for vesting accounts
       --vesting-cliff-time int   schedule cliff time (unix epoch) for vesting accounts

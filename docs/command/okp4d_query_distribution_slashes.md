@@ -22,7 +22,7 @@ okp4d query distribution slashes [validator] [start-height] [end-height] [flags]
       --height int         Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help               help for slashes
       --limit uint         pagination limit of validator slashes to query for (default 100)
-      --node string        &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string        <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
       --offset uint        pagination offset of validator slashes to query for
   -o, --output string      Output format (text|json) (default "text")
       --page uint          pagination page of validator slashes to query for. This sets offset to a multiple of limit (default 1)

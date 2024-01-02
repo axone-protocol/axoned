@@ -6,7 +6,7 @@ Transfer a fungible token through IBC
 
 Transfer a fungible token through IBC. Timeouts can be specified
 as absolute or relative using the "absolute-timeouts" flag. Timeout height can be set by passing in the height string
-in the form {revision}-{height} using the "packet-timeout-height" flag. Relative timeout height is added to the block
+in the form \{revision\}-\{height\} using the "packet-timeout-height" flag. Relative timeout height is added to the block
 height queried from the latest consensus state corresponding to the counterparty channel. Relative timeout timestamp
 is added to the greater value of the local clock time and the block timestamp queried from the latest consensus state
 corresponding to the counterparty channel. Any timeout set to 0 is disabled.
@@ -43,7 +43,7 @@ okp4d tx ibc-transfer transfer [src-port] [src-channel] [receiver] [amount]
       --keyring-dir string              The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                          Use a connected Ledger device
       --memo string                     Memo to be sent along with the packet.
-      --node string                     &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string                     <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string                     Note to add a description to the transaction (previously --memo)
       --offline                         Offline mode (does not allow any online functionality)
   -o, --output string                   Output format (text|json) (default "json")

@@ -7,7 +7,7 @@ OKP4 Daemon 👹
 OKP4 Daemon 👹 - a revolutionary public PoS layer 1 specifically designed to enable communities to trustlessly share data,
 algorithms and resources to build the Dataverse!
 
-Want to lean more about OKP4 network? Complete documentation is available at <https://docs.okp4.network> 👀
+Want to lean more about OKP4 network? Complete documentation is available at [https://docs.okp4.network](https://docs.okp4.network)  👀
 
 ### Options
 

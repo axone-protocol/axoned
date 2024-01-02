@@ -20,7 +20,7 @@ transaction that is signed.
 If --account-number or --sequence flag is used when offline=false, they are ignored and
 overwritten by the default flag values.
 
-The --multisig=<multisig_key> flag generates a signature on behalf of a multisig
+The --multisig=&lt;multisig_key&gt; flag generates a signature on behalf of a multisig
 account key. It implies --signature-only.
 
 ```
@@ -49,7 +49,7 @@ okp4d tx sign-batch [file] ([file2]...) [flags]
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
       --multisig string          Address or key name of the multisig account on behalf of which the transaction shall be signed
-      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

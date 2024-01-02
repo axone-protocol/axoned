@@ -7,7 +7,7 @@ execute tx on behalf of granter account
 execute tx on behalf of granter account:
 Example:
  $ okp4d tx authz exec tx.json --from grantee
- $ okp4d tx bank send &lt;granter&gt; &lt;recipient&gt; --from &lt;granter&gt; --chain-id &lt;chain-id&gt; --generate-only > tx.json && okp4d tx authz exec tx.json --from grantee
+ $ okp4d tx bank send &lt;granter&gt; &lt;recipient&gt; --from &lt;granter&gt; --chain-id &lt;chain-id&gt; --generate-only &gt; tx.json && okp4d tx authz exec tx.json --from grantee
 
 ```
 okp4d tx authz exec [tx-json-file] --from [grantee] [flags]
@@ -33,7 +33,7 @@ okp4d tx authz exec [tx-json-file] --from [grantee] [flags]
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

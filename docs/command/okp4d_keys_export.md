@@ -14,7 +14,7 @@ FULLY AWARE OF THE RISKS. If you are unsure, you may want to do some research
 and export your keys in ASCII-armored encrypted format.
 
 ```
-okp4d keys export &lt;name&gt; [flags]
+okp4d keys export <name> [flags]
 ```
 
 ### Options

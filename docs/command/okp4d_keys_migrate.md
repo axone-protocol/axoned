@@ -10,7 +10,7 @@ If this is the case, the key is already migrated. Therefore, we skip it and cont
 Otherwise, we try to deserialize it using Amino into LegacyInfo. If this attempt is successful, we serialize
 LegacyInfo to Protobuf serialization format and overwrite the keyring entry. If any error occurred, it will be
 outputted in CLI and migration will be continued until all keys in the keyring DB are exhausted.
-See <https://github.com/cosmos/cosmos-sdk/pull/9695> for more details.
+See [https://github.com/cosmos/cosmos-sdk/pull/9695](https://github.com/cosmos/cosmos-sdk/pull/9695)  for more details.
 
 It is recommended to run in 'dry-run' mode first to verify all key migration material.
 

@@ -13,7 +13,7 @@ okp4d debug prefixes [flags]
 ### Examples
 
 ```
-okp4d debug prefixes
+$ okp4d debug prefixes
 ```
 
 ### Options

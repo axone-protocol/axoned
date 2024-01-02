@@ -6,11 +6,11 @@ Grant authorization to an address
 
 Grant authorization to an address.
 Examples:
-$ okp4d tx grant <grantee_addr> execution <contract_addr> --allow-all-messages --max-calls 1 --no-token-transfer --expiration 1667979596
+$ okp4d tx grant &lt;grantee_addr&gt; execution &lt;contract_addr&gt; --allow-all-messages --max-calls 1 --no-token-transfer --expiration 1667979596
 
-$ okp4d tx grant <grantee_addr> execution <contract_addr> --allow-all-messages --max-funds 100000uwasm --expiration 1667979596
+$ okp4d tx grant &lt;grantee_addr&gt; execution &lt;contract_addr&gt; --allow-all-messages --max-funds 100000uwasm --expiration 1667979596
 
-$ okp4d tx grant <grantee_addr> execution <contract_addr> --allow-all-messages --max-calls 5 --max-funds 100000uwasm --expiration 1667979596
+$ okp4d tx grant &lt;grantee_addr&gt; execution &lt;contract_addr&gt; --allow-all-messages --max-calls 5 --max-funds 100000uwasm --expiration 1667979596
 
 ```
 okp4d tx wasm grant [grantee] [message_type="execution"|"migration"] [contract_addr_bech32] --allow-raw-msgs [msg1,msg2,...] --allow-msg-keys [key1,key2,...] --allow-all-messages [flags]
@@ -43,7 +43,7 @@ okp4d tx wasm grant [grantee] [message_type="execution"|"migration"] [contract_a
       --max-calls uint           Maximal number of calls to the contract
       --max-funds string         Maximal amount of tokens transferable to the contract.
       --no-token-transfer        Don't allow token transfer
-      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

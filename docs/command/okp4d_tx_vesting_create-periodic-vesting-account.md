@@ -8,18 +8,18 @@ A sequence of coins and period length in seconds. Periods are sequential, in tha
 		Where periods.json contains:
 
 		An array of coin strings and unix epoch times for coins to vest
-{ "start_time": 1625204910,
+\{ "start_time": 1625204910,
 "period":[
- {
+ \{
   "coins": "10test",
   "length_seconds":2592000 //30 days
- },
- {
+ \},
+ \{
 	"coins": "10test",
 	"length_seconds":2592000 //30 days
- },
+ \},
 ]
-	}
+	\}
 		
 ```
 okp4d tx vesting create-periodic-vesting-account [to_address] [periods_json_file] [flags]
@@ -45,7 +45,7 @@ okp4d tx vesting create-periodic-vesting-account [to_address] [periods_json_file
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

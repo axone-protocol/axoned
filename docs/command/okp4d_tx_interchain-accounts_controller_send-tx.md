@@ -6,7 +6,7 @@ Send an interchain account tx on the provided connection.
 
 Submits pre-built packet data containing messages to be executed on the host chain
 and attempts to send the packet. Packet data is provided as json, file or string. An
-appropriate relative timeoutTimestamp must be provided with flag {relative-packet-timeout}
+appropriate relative timeoutTimestamp must be provided with flag \{relative-packet-timeout\}
 
 ```
 okp4d tx interchain-accounts controller send-tx [connection-id] [path/to/packet_msg.json] [flags]
@@ -32,7 +32,7 @@ okp4d tx interchain-accounts controller send-tx [connection-id] [path/to/packet_
       --keyring-backend string         Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string             The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                         Use a connected Ledger device
-      --node string                    &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string                    <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string                    Note to add a description to the transaction (previously --memo)
       --offline                        Offline mode (does not allow any online functionality)
   -o, --output string                  Output format (text|json) (default "json")
