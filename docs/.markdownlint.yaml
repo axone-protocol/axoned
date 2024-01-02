@@ -5,3 +5,4 @@ no-inline-html: false
 fenced-code-language: false
 code-block-style: false
 link-fragments: false
+commands-show-output: false
