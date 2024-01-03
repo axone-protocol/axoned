@@ -9,7 +9,7 @@ okp4d query bank spendable-balances [address] [flags]
 ### Examples
 
 ```
-okp4d query bank spendable-balances [address]
+$ okp4d query bank spendable-balances [address]
 ```
 
 ### Options
@@ -22,7 +22,7 @@ okp4d query bank spendable-balances [address]
       --height int         Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help               help for spendable-balances
       --limit uint         pagination limit of spendable balances to query for (default 100)
-      --node string        &lt;host&gt;:&lt;port&gt; to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
+      --node string        <host>:<port> to Tendermint RPC interface for this chain (default "tcp://localhost:26657")
       --offset uint        pagination offset of spendable balances to query for
   -o, --output string      Output format (text|json) (default "text")
       --page uint          pagination page of spendable balances to query for. This sets offset to a multiple of limit (default 1)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"bufio"
 	"embed"
 	"fmt"
 	"go/build"
@@ -93,25 +92,4 @@ func readTemplateMust(templateName string) string {
 	}
 
 	return string(template)
-}
-
-func writeToFile(filePath string, content string) error {
-	file, err := os.Create(filePath)
-	if err != nil {
-		return fmt.Errorf("failed to create file %s: %w", filePath, err)
-	}
-	defer func(file *os.File) {
-		_ = file.Close()
-	}(file)
-
-	w := bufio.NewWriter(file)
-	if _, err = w.WriteString(content); err != nil {
-		return fmt.Errorf("failed to write to file %s: %w", filePath, err)
-	}
-
-	if err = w.Flush(); err != nil {
-		return fmt.Errorf("failed to flush writer: %w", err)
-	}
-
-	return nil
 }

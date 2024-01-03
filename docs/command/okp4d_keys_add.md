@@ -24,7 +24,7 @@ Example:
     keys add mymultisig --multisig "keyname1,keyname2,keyname3" --multisig-threshold 2
 
 ```
-okp4d keys add &lt;name&gt; [flags]
+okp4d keys add <name> [flags]
 ```
 
 ### Options
@@ -43,7 +43,7 @@ okp4d keys add &lt;name&gt; [flags]
       --multisig-threshold int   K out of N required signatures. For use in conjunction with --multisig (default 1)
       --no-backup                Don't print out seed phrase (if others are watching the terminal)
       --nosort                   Keys passed to --multisig are taken in the order they're supplied
-      --pubkey string            Parse a public key in JSON format and saves key info to &lt;name&gt; file.
+      --pubkey string            Parse a public key in JSON format and saves key info to <name> file.
       --recover                  Provide seed phrase to recover existing key instead of creating
 ```
 

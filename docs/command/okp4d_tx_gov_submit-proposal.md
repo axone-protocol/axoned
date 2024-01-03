@@ -12,15 +12,15 @@ $ okp4d tx gov submit-proposal path/to/proposal.json
 
 Where proposal.json contains:
 
-{
+\{
   // array of proto-JSON-encoded sdk.Msgs
   "messages": [
-    {
+    \{
       "@type": "/cosmos.bank.v1beta1.MsgSend",
       "from_address": "cosmos1...",
       "to_address": "cosmos1...",
-      "amount":[{"denom": "stake","amount": "10"}]
-    }
+      "amount":[\{"denom": "stake","amount": "10"\}]
+    \}
   ],
   // metadata can be any of base64 encoded, raw text, stringified json, IPFS link to json
   // see below for example metadata
@@ -28,17 +28,17 @@ Where proposal.json contains:
   "deposit": "10stake"
   "title: "My proposal"
   "summary": "A short summary of my proposal"
-}
+\}
 
 metadata example:
-{
+\{
 	"title": "",
 	"authors": [""],
 	"summary": "",
 	"details": "",
 	"proposal_forum_url": "",
 	"vote_option_context": "",
-}
+\}
 
 ```
 okp4d tx gov submit-proposal [path/to/proposal.json] [flags]
@@ -64,7 +64,7 @@ okp4d tx gov submit-proposal [path/to/proposal.json] [flags]
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

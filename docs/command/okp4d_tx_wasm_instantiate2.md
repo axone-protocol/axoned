@@ -9,7 +9,7 @@ Each contract instance has a unique address assigned. They are assigned automati
 for special use cases, the given 'salt' argument and '--fix-msg' parameters can be used to generate a custom address.
 
 Predictable address example (also see 'okp4d query wasm build-address -h'):
-$ okp4d tx wasm instantiate2 1 '{"foo":"bar"}' $(echo -n "testing" | xxd -ps) --admin="$(okp4d keys show mykey -a)" \
+$ okp4d tx wasm instantiate2 1 '\{"foo":"bar"\}' $(echo -n "testing" | xxd -ps) --admin="$(okp4d keys show mykey -a)" \
   --from mykey --amount="100ustake" --label "local0.1.0" \
    --fix-msg
 
@@ -45,7 +45,7 @@ okp4d tx wasm instantiate2 [code_id_int64] [json_encoded_init_args] [salt] --lab
       --label string             A human-readable name for this contract in lists
       --ledger                   Use a connected Ledger device
       --no-admin                 You must set this explicitly if you don't want an admin
-      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

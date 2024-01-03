@@ -22,5 +22,10 @@ func GenerateCommandDocumentation() error {
 		return err
 	}
 
-	return doc.GenMarkdownTree(rootCmd, targetPath)
+	err = doc.GenMarkdownTree(rootCmd, targetPath)
+	if err != nil {
+		return err
+	}
+
+	return normalizeMarkdownFiles(targetPath)
 }

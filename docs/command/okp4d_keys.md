@@ -21,10 +21,10 @@ The keyring supports the following backends:
 
 kwallet and pass backends depend on external tools. Refer to their respective documentation for more
 information:
-    KWallet     <https://github.com/KDE/kwallet>
-    pass        <https://www.passwordstore.org/>
+    KWallet     [https://github.com/KDE/kwallet](https://github.com/KDE/kwallet)
+    pass        [https://www.passwordstore.org/](https://www.passwordstore.org/)
 
-The pass backend requires GnuPG: <https://gnupg.org/>
+The pass backend requires GnuPG: [https://gnupg.org/](https://gnupg.org/)
 
 ### Options
 

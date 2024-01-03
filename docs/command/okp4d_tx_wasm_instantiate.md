@@ -7,7 +7,7 @@ Instantiate a wasm contract
 Creates a new instance of an uploaded wasm code with the given 'constructor' message.
 Each contract instance has a unique address assigned.
 Example:
-$ okp4d tx wasm instantiate 1 '{"foo":"bar"}' --admin="$(okp4d keys show mykey -a)" \
+$ okp4d tx wasm instantiate 1 '\{"foo":"bar"\}' --admin="$(okp4d keys show mykey -a)" \
   --from mykey --amount="100ustake" --label "local0.1.0"
 
 ```
@@ -38,7 +38,7 @@ okp4d tx wasm instantiate [code_id_int64] [json_encoded_init_args] --label [text
       --label string             A human-readable name for this contract in lists
       --ledger                   Use a connected Ledger device
       --no-admin                 You must set this explicitly if you don't want an admin
-      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

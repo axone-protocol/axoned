@@ -7,7 +7,7 @@ Register an interchain account on the provided connection.
 Register an account on the counterparty chain via the
 connection id from the source chain. Connection identifier should be for the source chain
 and the interchain account will be created on the counterparty chain. Callers are expected to
-provide the appropriate application version string via {version} flag. Generates a new
+provide the appropriate application version string via \{version\} flag. Generates a new
 port identifier using the provided owner string, binds to the port identifier and claims
 the associated capability.
 
@@ -35,7 +35,7 @@ okp4d tx interchain-accounts controller register [connection-id] [flags]
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

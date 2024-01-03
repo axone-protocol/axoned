@@ -6,7 +6,7 @@ Submit a software upgrade proposal
 
 Submit a software upgrade along with an initial deposit.
 Please specify a unique name and height for the upgrade to take effect.
-You may include info to reference a binary download link, in a format compatible with: <https://github.com/cosmos/cosmos-sdk/tree/main/cosmovisor>
+You may include info to reference a binary download link, in a format compatible with: [https://github.com/cosmos/cosmos-sdk/tree/main/cosmovisor](https://github.com/cosmos/cosmos-sdk/tree/main/cosmovisor)
 
 ```
 okp4d tx gov submit-legacy-proposal software-upgrade [name] (--upgrade-height [height]) (--upgrade-info [info]) [flags]
@@ -36,7 +36,7 @@ okp4d tx gov submit-legacy-proposal software-upgrade [name] (--upgrade-height [h
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
       --no-validate              Skip validation of the upgrade info
-      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

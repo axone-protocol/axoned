@@ -32,7 +32,7 @@ okp4d tx wasm submit-proposal instantiate-contract-2 [code_id_int64] [json_encod
       --label string             A human-readable name for this contract in lists
       --ledger                   Use a connected Ledger device
       --no-admin                 You must set this explicitly if you don't want an admin
-      --node string              &lt;host&gt;:&lt;port&gt; to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")

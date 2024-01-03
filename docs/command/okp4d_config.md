@@ -3,7 +3,7 @@
 Create or query an application CLI configuration file
 
 ```
-okp4d config &lt;key&gt; [value] [flags]
+okp4d config <key> [value] [flags]
 ```
 
 ### Options

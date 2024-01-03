@@ -390,8 +390,9 @@ doc-command: ## Generate markdown documentation for the command
 	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.okp4d\")/(default \"\/home\/john\/\.okp4d\")/g' $$OUT_FOLDER/*.md; \
 	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' $$OUT_FOLDER/*.md; \
 	sed -i $(SED_FLAG) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' $$OUT_FOLDER/*.md; \
+	sed -i $(SED_FLAG) 's/&lt;appd&gt;/okp4d/g' $$OUT_FOLDER/*.md; \
 	sed -i $(SED_FLAG) 's/<appd>/okp4d/g' $$OUT_FOLDER/*.md; \
-    sed -i $(SED_FLAG) 's/<\([a-zA-Z-]*\)>/\&lt;\1\&gt;/g' $$OUT_FOLDER/*.md; \
+	sed -i $(SED_FLAG) -E 's| (https?://[a-zA-Z0-9\.\/_=%-]+)| [\1](\1) |g' $$OUT_FOLDER/*.md; \
 	docker run --rm \
 	  -v `pwd`:/usr/src/docs \
 	  -w /usr/src/docs \
