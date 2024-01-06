@@ -81,6 +81,7 @@ func TestHexBytesPredicate(t *testing.T) {
 					Convey("and a vm", func() {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
+						interpreter.Register3(engine.NewAtom("string_bytes"), StringBytes)
 
 						err := interpreter.Compile(ctx, tc.program)
 						So(err, ShouldBeNil)

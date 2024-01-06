@@ -79,3 +79,67 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 			util.Tuple(util.StringToTerm(builder.String()), engine.Integer(totalLen)), cont, env)
 	})
 }
+
+// StringBytes is a predicate that unifies a string with a list of bytes, returning true when the (Unicode) String is
+// represented by Bytes in Encoding.
+//
+// The signature is as follows:
+//
+//	string_bytes(?String, ?Bytes, +Encoding)
+//
+// Where:
+//   - String is the string to convert to bytes. It can be an Atom, string or list of characters codes.
+//   - Bytes is the list of numbers between 0 and 255 that represent the sequence of bytes.
+//   - Encoding is the encoding to use for the conversion.
+//
+// Encoding can be one of the following:
+// - 'text' considers the string as a sequence of Unicode characters.
+// - 'octet' considers the string as a sequence of bytes.
+// - 'utf8' considers the string as a sequence of UTF-8 characters.
+// - '<encoding>' considers the string as a sequence of characters in the given encoding.
+//
+// At least one of String or Bytes must be instantiated.
+//
+// Examples:
+//
+//	# Convert a string to a list of bytes.
+//	- string_bytes('Hello World', Bytes, octet).
+//
+//	# Convert a list of bytes to a string.
+//	- string_bytes(String, [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100], octet).
+func StringBytes(
+	vm *engine.VM, str, bts, encoding engine.Term, cont engine.Cont, env *engine.Env,
+) *engine.Promise {
+	return engine.Delay(func(ctx context.Context) *engine.Promise {
+		encodingAtom, err := util.AssertAtom(env, encoding)
+		if err != nil {
+			return engine.Error(fmt.Errorf("string_bytes/3: %w", err))
+		}
+		forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+			bs, err := util.StringTermToBytes(value[0], encodingAtom.String(), env)
+			if err != nil {
+				return nil, fmt.Errorf("string_bytes/3: %w", err)
+			}
+			result, err := util.BytesToCodepointListTerm(bs, "text")
+			if err != nil {
+				return nil, fmt.Errorf("string_bytes/3: %w", err)
+			}
+			return []engine.Term{result}, nil
+		}
+		backwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+			if !util.IsList(value[0]) {
+				return nil, engine.TypeError(engine.NewAtom("list"), value[0], env)
+			}
+			bs, err := util.StringTermToBytes(value[0], "text", env)
+			if err != nil {
+				return nil, fmt.Errorf("string_bytes/3: %w", err)
+			}
+			result, err := util.BytesToAtomListTerm(bs, encodingAtom.String())
+			if err != nil {
+				return nil, fmt.Errorf("string_bytes/3: %w", err)
+			}
+			return []engine.Term{result}, nil
+		}
+		return util.UnifyFunctional(vm, []engine.Term{str}, []engine.Term{bts}, encoding, forwardConverter, backwardConverter, cont, env)
+	})
+}

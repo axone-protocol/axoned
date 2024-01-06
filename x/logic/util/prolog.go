@@ -2,12 +2,14 @@ package util
 
 import (
 	"bytes"
+	"context"
 	"encoding/hex"
 	"fmt"
 	"strings"
 	"unicode/utf8"
 
 	"github.com/ichiban/prolog/engine"
+	"github.com/samber/lo"
 	"golang.org/x/net/html/charset"
 )
 
@@ -41,9 +43,8 @@ func StringToTerm(s string) engine.Term {
 	return engine.NewAtom(s)
 }
 
-// BytesToStringTerm try to convert a given golang []byte into a string term.
-// Function is the reverse of StringTermToBytes.
-func BytesToStringTerm(in []byte, encoding string) (engine.Term, error) {
+// BytesToCodepointListTerm try to convert a given golang []byte into a list of codepoints.
+func BytesToCodepointListTerm(in []byte, encoding string) (engine.Term, error) {
 	out, err := decode(in, encoding)
 	if err != nil {
 		return nil, err
@@ -56,14 +57,28 @@ func BytesToStringTerm(in []byte, encoding string) (engine.Term, error) {
 	return engine.List(terms...), nil
 }
 
-// BytesToStringTermDefault is like the BytesToStringTerm function but with a default encoding.
+// BytesToCodepointListTermWithDefault is like the BytesToCodepointListTerm function but with a default encoding.
 // This function panics if the conversion fails, which can't happen with the default encoding.
-func BytesToStringTermDefault(in []byte) engine.Term {
-	term, err := BytesToStringTerm(in, "")
+func BytesToCodepointListTermWithDefault(in []byte) engine.Term {
+	term, err := BytesToCodepointListTerm(in, "")
 	if err != nil {
 		panic(err)
 	}
 	return term
+}
+
+// BytesToAtomListTerm try to convert a given golang []byte into a list of atoms, one for each character.
+func BytesToAtomListTerm(in []byte, encoding string) (engine.Term, error) {
+	out, err := decode(in, encoding)
+	if err != nil {
+		return nil, err
+	}
+	str := string(out)
+	terms := make([]engine.Term, 0, len(str))
+	for _, c := range str {
+		terms = append(terms, engine.NewAtom(string(c)))
+	}
+	return engine.List(terms...), nil
 }
 
 // StringTermToBytes try to convert a given string into native golang []byte.
@@ -241,6 +256,31 @@ func IsCompound(term engine.Term) bool {
 	return ok
 }
 
+// IsFullyInstantiated returns true if the given term is fully instantiated.
+func IsFullyInstantiated(term engine.Term, env *engine.Env) bool {
+	switch term := env.Resolve(term).(type) {
+	case engine.Variable:
+		return false
+	case engine.Compound:
+		for i := 0; i < term.Arity(); i++ {
+			if !IsFullyInstantiated(term.Arg(i), env) {
+				return false
+			}
+		}
+		return true
+	default:
+		return true
+	}
+}
+
+func AreFullyInstantiated(terms []engine.Term, env *engine.Env) bool {
+	_, ok := lo.Find(terms, func(t engine.Term) bool {
+		return IsFullyInstantiated(t, env)
+	})
+
+	return ok
+}
+
 // AssertAtom resolves a term and attempts to convert it into an engine.Atom if possible.
 // If conversion fails, the function returns the empty atom and the error.
 func AssertAtom(env *engine.Env, t engine.Term) (engine.Atom, error) {
@@ -320,9 +360,9 @@ func GetOptionWithDefault(
 // GetOptionAsAtomWithDefault is a helper function that returns the value of the first option with the given name in the
 // given options.
 func GetOptionAsAtomWithDefault(
-	algorithmOpt engine.Atom, options engine.Term, defaultValue engine.Term, env *engine.Env,
+	name engine.Atom, options engine.Term, defaultValue engine.Term, env *engine.Env,
 ) (engine.Atom, error) {
-	term, err := GetOptionWithDefault(algorithmOpt, options, defaultValue, env)
+	term, err := GetOptionWithDefault(name, options, defaultValue, env)
 	if err != nil {
 		return AtomEmpty, err
 	}
@@ -332,4 +372,78 @@ func GetOptionAsAtomWithDefault(
 	}
 
 	return atom, nil
+}
+
+// ConvertFunc is a function mapping a domain which is a list of terms with a codomain which is a set of terms.
+// Domains and co-domains can have different cardinalities.
+// options is a list of options that can be used to parameterize the conversion.
+// All the terms provided are fully instantiated (i.e. no variables).
+type ConvertFunc func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error)
+
+// UnifyFunctional is a generic unification which unifies a set of input terms with a set of output terms, using the
+// given conversion functions maintaining the function's relationship.
+//
+// The aim of this function is to simplify the implementation of a wide range of predicates which are essentially
+// functional, like hash functions, encoding functions, etc.
+//
+// The semantic of the unification is as follows:
+//  1. first all the variables are resolved
+//  2. if there's variables in the input and the output,
+//     the conversion is not possible and a not sufficiently instantiated error is returned.
+//  3. if there's no variables in the input,
+//     then the conversion is attempted from the input to the output and the result is unified with the output.
+//  4. if there's no variables in the output,
+//     then the conversion is attempted from the output to the input and the result is unified with the input.
+//
+// The following table summarizes the behavior, where:
+// - fi = fully instantiated (i.e. no variables)
+// - !fi = not fully instantiated (i.e. at least one variable)
+//
+// | input | output | result                               |
+// |-------|--------|--------------------------------------|
+// | !fi   | !fi    | error: not sufficiently instantiated |
+// |  fi   | !fi    | unify(forward(input), output)        |
+// |  fi   |  fi    | unify(forward(input), output)        |
+// | !fi   |  fi    | unify(input,backward(output))        |
+//
+// Conversion functions may produce an error in scenarios where the conversion is unsuccessful or infeasible due to
+// the inherent characteristics of the function's relationship, such as the absence of a one-to-one correspondence
+// (e.g. hash functions).
+func UnifyFunctional(
+	vm *engine.VM,
+	in,
+	out []engine.Term,
+	options engine.Term,
+	forwardConverter ConvertFunc,
+	backwardConverter ConvertFunc,
+	cont engine.Cont,
+	env *engine.Env,
+) *engine.Promise {
+	return engine.Delay(func(ctx context.Context) *engine.Promise {
+		isInFI, isOutFi := AreFullyInstantiated(in, env), AreFullyInstantiated(out, env)
+		if !isInFI && !isOutFi {
+			return engine.Error(engine.InstantiationError(env))
+		}
+
+		var err error
+		from, to := in, out
+		if isInFI {
+			from, err = forwardConverter(in, options, env)
+			if err != nil {
+				return engine.Error(err)
+			}
+		} else {
+			to, err = backwardConverter(out, options, env)
+			if err != nil {
+				return engine.Error(err)
+			}
+		}
+		return engine.Unify(
+			vm,
+			Tuple(from...),
+			Tuple(to...),
+			cont,
+			env,
+		)
+	})
 }

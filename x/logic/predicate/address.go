@@ -45,7 +45,7 @@ func Bech32Address(vm *engine.VM, address, bech32 engine.Term, cont engine.Cont,
 			if err != nil {
 				return engine.Error(fmt.Errorf("bech32_address/2: failed to decode Bech32: %w", err))
 			}
-			pair := AtomPair.Apply(util.StringToTerm(h), util.BytesToStringTermDefault(a))
+			pair := AtomPair.Apply(util.StringToTerm(h), util.BytesToCodepointListTermWithDefault(a))
 			return engine.Unify(vm, address, pair, cont, env)
 		default:
 			return engine.Error(fmt.Errorf("bech32_address/2: invalid Bech32 type: %T, should be Atom or Variable", b))

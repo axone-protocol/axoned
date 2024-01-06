@@ -78,7 +78,7 @@ func CryptoDataHash(
 			return engine.Error(fmt.Errorf("%s: failed to hash data: %w", functor, err))
 		}
 
-		return engine.Unify(vm, hash, util.BytesToStringTermDefault(result), cont, env)
+		return engine.Unify(vm, hash, util.BytesToCodepointListTermWithDefault(result), cont, env)
 	})
 }
 

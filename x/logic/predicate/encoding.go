@@ -46,7 +46,7 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 			if result == nil {
 				return engine.Error(fmt.Errorf("hex_bytes/2: nil hexadecimal conversion in input"))
 			}
-			return engine.Unify(vm, bts, util.BytesToStringTermDefault(result), cont, env)
+			return engine.Unify(vm, bts, util.BytesToCodepointListTermWithDefault(result), cont, env)
 		case engine.Compound:
 			src, err := util.StringTermToBytes(b, "", env)
 			if err != nil {
