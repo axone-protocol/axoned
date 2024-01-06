@@ -7,6 +7,7 @@ import (
 	"strings"
 
 	"github.com/ichiban/prolog/engine"
+	"github.com/okp4/okp4d/x/logic/prolog"
 
 	"github.com/okp4/okp4d/x/logic/util"
 )
@@ -57,7 +58,7 @@ func CryptoDataHash(
 	algorithmOpt := engine.NewAtom("algorithm")
 
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		algorithmAtom, err := util.GetOptionAsAtomWithDefault(algorithmOpt, options, engine.NewAtom("sha256"), env)
+		algorithmAtom, err := prolog.GetOptionAsAtomWithDefault(algorithmOpt, options, engine.NewAtom("sha256"), env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: %w", functor, err))
 		}
@@ -68,7 +69,7 @@ func CryptoDataHash(
 				algorithmAtom.String(),
 				util.HashAlgNames()))
 		}
-		decodedData, err := termToBytes(data, options, AtomUtf8, env)
+		decodedData, err := termToBytes(data, options, prolog.AtomUtf8, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
 		}
@@ -78,7 +79,7 @@ func CryptoDataHash(
 			return engine.Error(fmt.Errorf("%s: failed to hash data: %w", functor, err))
 		}
 
-		return engine.Unify(vm, hash, util.BytesToCodepointListTermWithDefault(result), cont, env)
+		return engine.Unify(vm, hash, prolog.BytesToCodepointListTermWithDefault(result), cont, env)
 	})
 }
 
@@ -167,11 +168,11 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 ) *engine.Promise {
 	typeOpt := engine.NewAtom("type")
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		typeTerm, err := util.GetOptionWithDefault(typeOpt, options, engine.NewAtom(defaultAlgo.String()), env)
+		typeTerm, err := prolog.GetOptionWithDefault(typeOpt, options, engine.NewAtom(defaultAlgo.String()), env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: %w", functor, err))
 		}
-		typeAtom, err := util.AssertAtom(env, typeTerm)
+		typeAtom, err := prolog.AssertAtom(env, typeTerm)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: %w", functor, err))
 		}
@@ -183,17 +184,17 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 				strings.Join(util.Map(algos, func(a util.KeyAlg) string { return a.String() }), ", ")))
 		}
 
-		decodedKey, err := termToBytes(key, AtomEncoding.Apply(AtomOctet), AtomHex, env)
+		decodedKey, err := termToBytes(key, prolog.AtomEncoding.Apply(prolog.AtomOctet), prolog.AtomHex, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode public key: %w", functor, err))
 		}
 
-		decodedData, err := termToBytes(data, options, AtomHex, env)
+		decodedData, err := termToBytes(data, options, prolog.AtomHex, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
 		}
 
-		decodedSignature, err := termToBytes(sig, AtomEncoding.Apply(AtomOctet), AtomHex, env)
+		decodedSignature, err := termToBytes(sig, prolog.AtomEncoding.Apply(prolog.AtomOctet), prolog.AtomHex, env)
 		if err != nil {
 			return engine.Error(fmt.Errorf("%s: failed to decode signature: %w", functor, err))
 		}
@@ -212,20 +213,20 @@ func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo ut
 }
 
 func termToBytes(term, options, defaultEncoding engine.Term, env *engine.Env) ([]byte, error) {
-	encodingTerm, err := util.GetOptionWithDefault(AtomEncoding, options, defaultEncoding, env)
+	encodingTerm, err := prolog.GetOptionWithDefault(prolog.AtomEncoding, options, defaultEncoding, env)
 	if err != nil {
 		return nil, err
 	}
-	encodingAtom, err := util.AssertAtom(env, encodingTerm)
+	encodingAtom, err := prolog.AssertAtom(env, encodingTerm)
 	if err != nil {
 		return nil, err
 	}
 
 	switch encodingAtom {
-	case AtomHex:
-		return util.TermHexToBytes(term, env)
-	case AtomOctet, AtomUtf8:
-		return util.StringTermToBytes(term, "", env)
+	case prolog.AtomHex:
+		return prolog.TermHexToBytes(term, env)
+	case prolog.AtomOctet, prolog.AtomUtf8:
+		return prolog.StringTermToBytes(term, "", env)
 	default:
 		return nil, fmt.Errorf("invalid encoding: %s. Possible values: hex, octet", encodingAtom.String())
 	}

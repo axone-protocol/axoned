@@ -5,10 +5,9 @@ import (
 	"fmt"
 
 	"github.com/ichiban/prolog/engine"
+	"github.com/okp4/okp4d/x/logic/prolog"
 
 	bech322 "github.com/cosmos/cosmos-sdk/types/bech32"
-
-	"github.com/okp4/okp4d/x/logic/util"
 )
 
 // Bech32Address is a predicate that convert a [bech32] encoded string into [base64] bytes and give the address prefix,
@@ -45,7 +44,7 @@ func Bech32Address(vm *engine.VM, address, bech32 engine.Term, cont engine.Cont,
 			if err != nil {
 				return engine.Error(fmt.Errorf("bech32_address/2: failed to decode Bech32: %w", err))
 			}
-			pair := AtomPair.Apply(util.StringToTerm(h), util.BytesToCodepointListTermWithDefault(a))
+			pair := prolog.AtomPair.Apply(prolog.StringToTerm(h), prolog.BytesToCodepointListTermWithDefault(a))
 			return engine.Unify(vm, address, pair, cont, env)
 		default:
 			return engine.Error(fmt.Errorf("bech32_address/2: invalid Bech32 type: %T, should be Atom or Variable", b))
@@ -57,7 +56,7 @@ func Bech32Address(vm *engine.VM, address, bech32 engine.Term, cont engine.Cont,
 			if err != nil {
 				return engine.Error(fmt.Errorf("bech32_address/2: %w", err))
 			}
-			return engine.Unify(vm, bech32, util.StringToTerm(bech32Decoded), cont, env)
+			return engine.Unify(vm, bech32, prolog.StringToTerm(bech32Decoded), cont, env)
 		default:
 			return engine.Error(fmt.Errorf("bech32_address/2: invalid address type: %T, should be Compound (Hrp, Address)", addressPair))
 		}
@@ -65,13 +64,13 @@ func Bech32Address(vm *engine.VM, address, bech32 engine.Term, cont engine.Cont,
 }
 
 func addressPairToBech32(addressPair engine.Compound, env *engine.Env) (string, error) {
-	if addressPair.Functor() != AtomPair || addressPair.Arity() != 2 {
+	if addressPair.Functor() != prolog.AtomPair || addressPair.Arity() != 2 {
 		return "", fmt.Errorf("address should be a Pair '-(Hrp, Address)'")
 	}
 
 	switch a := env.Resolve(addressPair.Arg(1)).(type) {
 	case engine.Compound:
-		data, err := util.StringTermToBytes(a, "", env)
+		data, err := prolog.StringTermToBytes(a, "", env)
 		if err != nil {
 			return "", fmt.Errorf("failed to convert term to bytes list: %w", err)
 		}

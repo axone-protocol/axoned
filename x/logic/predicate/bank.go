@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/ichiban/prolog/engine"
+	"github.com/okp4/okp4d/x/logic/prolog"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -162,8 +163,8 @@ func fetchBalances(
 				func(ctx context.Context) *engine.Promise {
 					return engine.Unify(
 						vm,
-						util.Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
-						util.Tuple(account, balances),
+						prolog.Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
+						prolog.Tuple(account, balances),
 						cont,
 						env,
 					)

@@ -16,6 +16,7 @@ import (
 	"github.com/okp4/okp4d/x/logic/interpreter"
 	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
 	"github.com/okp4/okp4d/x/logic/meter"
+	prolog2 "github.com/okp4/okp4d/x/logic/prolog"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
 )
@@ -126,7 +127,7 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.Bo
 		lo.Map(
 			lo.Filter(
 				interpreter.RegistryNames,
-				util.Indexed(util.WhitelistBlacklistMatches(whitelistPredicates, blacklistPredicates, util.PredicateMatches))),
+				util.Indexed(util.WhitelistBlacklistMatches(whitelistPredicates, blacklistPredicates, prolog2.PredicateMatches))),
 			toPredicate(
 				nonNilNorZeroOrDefaultUint64(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
 				gasPolicy.GetPredicateCosts())),
@@ -165,7 +166,7 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.Bo
 func toPredicate(defaultCost uint64, predicateCosts []types.PredicateCost) func(string, int) lo.Tuple2[string, uint64] {
 	return func(predicate string, _ int) lo.Tuple2[string, uint64] {
 		for _, c := range predicateCosts {
-			if util.PredicateMatches(predicate)(c.Predicate) {
+			if prolog2.PredicateMatches(predicate)(c.Predicate) {
 				return lo.T2(predicate, nonNilNorZeroOrDefaultUint64(c.Cost, defaultCost))
 			}
 		}

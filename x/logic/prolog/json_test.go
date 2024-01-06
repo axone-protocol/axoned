@@ -1,11 +1,10 @@
-package predicate
+package prolog
 
 import (
 	"fmt"
 	"testing"
 
 	"github.com/ichiban/prolog/engine"
-
 	. "github.com/smartystreets/goconvey/convey"
 )
 

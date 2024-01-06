@@ -1,9 +1,10 @@
-package util
+package prolog
 
 import (
 	"fmt"
 	"testing"
 
+	"github.com/okp4/okp4d/x/logic/util"
 	"github.com/samber/lo"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -13,7 +14,7 @@ var (
 	predicateMatches = PredicateMatches
 	urlMatches       = func(this string) func(string) bool {
 		return func(that string) bool {
-			return URLMatches(ParseURLMust(this))(ParseURLMust(that))
+			return util.URLMatches(util.ParseURLMust(this))(util.ParseURLMust(that))
 		}
 	}
 )
@@ -168,7 +169,7 @@ func TestWhitelistBlacklistMatches(t *testing.T) {
 				fmt.Sprintf("Given test case #%d with values: %v cheked against whitelist: %v and blacklist: %v",
 					nc, tc.values, tc.whitelist, tc.blacklist), func() {
 					Convey("When the function WhitelistBlacklistMatches() is called", func() {
-						result := lo.Filter(tc.values, Indexed(WhitelistBlacklistMatches(tc.whitelist, tc.blacklist, tc.predicate)))
+						result := lo.Filter(tc.values, util.Indexed(util.WhitelistBlacklistMatches(tc.whitelist, tc.blacklist, tc.predicate)))
 
 						Convey(fmt.Sprintf("Then it should return the expected output: %v", tc.wantResult), func() {
 							So(result, ShouldResemble, tc.wantResult)

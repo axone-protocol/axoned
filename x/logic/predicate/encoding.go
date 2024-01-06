@@ -6,8 +6,7 @@ import (
 	"fmt"
 
 	"github.com/ichiban/prolog/engine"
-
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
 // HexBytes is a predicate that unifies hexadecimal encoded bytes to a list of bytes.
@@ -46,14 +45,14 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 			if result == nil {
 				return engine.Error(fmt.Errorf("hex_bytes/2: nil hexadecimal conversion in input"))
 			}
-			return engine.Unify(vm, bts, util.BytesToCodepointListTermWithDefault(result), cont, env)
+			return engine.Unify(vm, bts, prolog.BytesToCodepointListTermWithDefault(result), cont, env)
 		case engine.Compound:
-			src, err := util.StringTermToBytes(b, "", env)
+			src, err := prolog.StringTermToBytes(b, "", env)
 			if err != nil {
 				return engine.Error(fmt.Errorf("hex_bytes/2: %w", err))
 			}
 			dst := hex.EncodeToString(src)
-			return engine.Unify(vm, hexa, util.StringToTerm(dst), cont, env)
+			return engine.Unify(vm, hexa, prolog.StringToTerm(dst), cont, env)
 		default:
 			return engine.Error(fmt.Errorf("hex_bytes/2: invalid hex type: %T, should be Variable or List", b))
 		}

@@ -8,8 +8,7 @@ import (
 	"strings"
 
 	"github.com/ichiban/prolog/engine"
-
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
 // ReadString is a predicate that reads characters from the provided Stream and unifies them with String.
@@ -75,8 +74,8 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 		}
 
 		return engine.Unify(
-			vm, util.Tuple(result, length),
-			util.Tuple(util.StringToTerm(builder.String()), engine.Integer(totalLen)), cont, env)
+			vm, prolog.Tuple(result, length),
+			prolog.Tuple(prolog.StringToTerm(builder.String()), engine.Integer(totalLen)), cont, env)
 	})
 }
 
@@ -108,38 +107,44 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 //	# Convert a list of bytes to a string.
 //	- string_bytes(String, [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100], octet).
 func StringBytes(
-	vm *engine.VM, str, bts, encoding engine.Term, cont engine.Cont, env *engine.Env,
+	_ *engine.VM, str, bts, encoding engine.Term, cont engine.Cont, env *engine.Env,
 ) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		encodingAtom, err := util.AssertAtom(env, encoding)
+	encodingAtom, err := prolog.AssertAtom(env, encoding)
+	if err != nil {
+		return engine.Error(err)
+	}
+	forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+		bs, err := prolog.StringTermToBytes(value[0], encodingAtom.String(), env)
 		if err != nil {
-			return engine.Error(fmt.Errorf("string_bytes/3: %w", err))
+			return nil, err
 		}
-		forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
-			bs, err := util.StringTermToBytes(value[0], encodingAtom.String(), env)
-			if err != nil {
-				return nil, fmt.Errorf("string_bytes/3: %w", err)
-			}
-			result, err := util.BytesToCodepointListTerm(bs, "text")
-			if err != nil {
-				return nil, fmt.Errorf("string_bytes/3: %w", err)
-			}
-			return []engine.Term{result}, nil
+		result, err := prolog.BytesToCodepointListTerm(bs, "text")
+		if err != nil {
+			return nil, err
 		}
-		backwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
-			if !util.IsList(value[0]) {
-				return nil, engine.TypeError(engine.NewAtom("list"), value[0], env)
-			}
-			bs, err := util.StringTermToBytes(value[0], "text", env)
-			if err != nil {
-				return nil, fmt.Errorf("string_bytes/3: %w", err)
-			}
-			result, err := util.BytesToAtomListTerm(bs, encodingAtom.String())
-			if err != nil {
-				return nil, fmt.Errorf("string_bytes/3: %w", err)
-			}
-			return []engine.Term{result}, nil
+		return []engine.Term{result}, nil
+	}
+	backwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+		if _, err := prolog.AssertList(env, value[0]); err != nil {
+			return nil, err
 		}
-		return util.UnifyFunctional(vm, []engine.Term{str}, []engine.Term{bts}, encoding, forwardConverter, backwardConverter, cont, env)
-	})
+		bs, err := prolog.StringTermToBytes(value[0], "text", env)
+		if err != nil {
+			return nil, err
+		}
+		result, err := prolog.BytesToAtomListTerm(bs, encodingAtom.String())
+		if err != nil {
+			return nil, err
+		}
+		return []engine.Term{result}, nil
+	}
+
+	ok, env, err := prolog.UnifyFunctional([]engine.Term{str}, []engine.Term{bts}, encoding, forwardConverter, backwardConverter, env)
+	if err != nil {
+		return engine.Error(err)
+	}
+	if !ok {
+		return engine.Bool(false)
+	}
+	return cont(env)
 }
