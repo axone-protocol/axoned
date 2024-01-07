@@ -98,6 +98,24 @@ func AssertAtom(env *engine.Env, t engine.Term) (engine.Atom, error) {
 	return AtomEmpty, engine.TypeError(AtomAtom, t, env)
 }
 
+// AssertCharacterCode resolves a term and attempts to convert it into an engine.Integer if possible.
+// If conversion fails, the function returns the zero value and the error.
+func AssertCharacterCode(env *engine.Env, t engine.Term) (engine.Integer, error) {
+	if t, ok := env.Resolve(t).(engine.Integer); ok {
+		return t, nil
+	}
+	return 0, engine.TypeError(AtomCharacterCode, t, env)
+}
+
+// AssertCharacter resolves a term and attempts to convert it into an engine.Atom if possible.
+// If conversion fails, the function returns the empty atom and the error.
+func AssertCharacter(env *engine.Env, t engine.Term) (engine.Atom, error) {
+	if t, ok := env.Resolve(t).(engine.Atom); ok {
+		return t, nil
+	}
+	return AtomEmpty, engine.TypeError(AtomCharacter, t, env)
+}
+
 // AssertList resolves a term as a list and returns it as a engine.Compound.
 // If conversion fails, the function returns nil and the error.
 func AssertList(env *engine.Env, t engine.Term) (engine.Compound, error) {

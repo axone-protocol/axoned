@@ -2,12 +2,31 @@ package prolog
 
 import "github.com/ichiban/prolog/engine"
 
-// Error atoms
 var (
-	AtomEncodingError = engine.NewAtom("encoding_error") // AtomEncodingError is the term used to indicate the encoding error.
+	AtomDomainError        = engine.NewAtom("domain_error")         // AtomDomainError is the atom domain_error.
+	AtomValidByte          = engine.NewAtom("valid_byte")           // AtomValidByte is the atom valid_byte.
+	AtomValidCharset       = engine.NewAtom("valid_charset")        // AtomValidCharset is the atom valid_charset.
+	AtomValidCharacterCode = engine.NewAtom("valid_character_code") // AtomValidCharacterCode is the atom valid_character_code.
+	AtomValidEncoding      = engine.NewAtom("valid_encoding")       // AtomValidEncoding is the atom valid_encoding.
+	AtomValidHexDigit      = engine.NewAtom("valid_hex_digit")      // AtomValidHexDigit is the atom valid_hex_digit.
 )
 
-// EncodingError returns the compound term error(encoding_error(Encoding, cause)).
-func EncodingError(encoding string, cause error, env *engine.Env) engine.Exception {
-	return engine.NewException(AtomError.Apply(AtomEncodingError.Apply(engine.NewAtom(encoding)), StringToTerm(cause.Error())), env)
+func ValidCharset() engine.Term {
+	return AtomValidCharset
+}
+
+func ValidEncoding(encoding string, cause error) engine.Term {
+	return AtomValidEncoding.Apply(engine.NewAtom(encoding), StringToStringTerm(cause.Error()))
+}
+
+func ValidByte(v int64) engine.Term {
+	return AtomValidByte.Apply(engine.Integer(v))
+}
+
+func ValidCharacterCode(c string) engine.Term {
+	return AtomValidCharacterCode.Apply(engine.NewAtom(c))
+}
+
+func ValidHexDigit(d string) engine.Term {
+	return AtomValidHexDigit.Apply(engine.NewAtom(d))
 }

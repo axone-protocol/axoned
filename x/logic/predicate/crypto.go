@@ -7,8 +7,8 @@ import (
 	"strings"
 
 	"github.com/ichiban/prolog/engine"
-	"github.com/okp4/okp4d/x/logic/prolog"
 
+	"github.com/okp4/okp4d/x/logic/prolog"
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
@@ -79,7 +79,7 @@ func CryptoDataHash(
 			return engine.Error(fmt.Errorf("%s: failed to hash data: %w", functor, err))
 		}
 
-		return engine.Unify(vm, hash, prolog.BytesToCodepointListTermWithDefault(result), cont, env)
+		return engine.Unify(vm, hash, prolog.BytesToCodepointListTermWithDefault(result, env), cont, env)
 	})
 }
 
@@ -226,7 +226,7 @@ func termToBytes(term, options, defaultEncoding engine.Term, env *engine.Env) ([
 	case prolog.AtomHex:
 		return prolog.TermHexToBytes(term, env)
 	case prolog.AtomOctet, prolog.AtomUtf8:
-		return prolog.StringTermToBytes(term, "", env)
+		return prolog.StringTermToBytes(term, prolog.AtomEmpty, env)
 	default:
 		return nil, fmt.Errorf("invalid encoding: %s. Possible values: hex, octet", encodingAtom.String())
 	}

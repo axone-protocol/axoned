@@ -5,9 +5,9 @@ import (
 	"fmt"
 	"testing"
 
-	. "github.com/smartystreets/goconvey/convey"
-
 	"github.com/ichiban/prolog/engine"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestTermHexToBytes(t *testing.T) {
@@ -27,7 +27,7 @@ func TestTermHexToBytes(t *testing.T) {
 				term:        engine.NewAtom("foo").Apply(engine.NewAtom("bar")),
 				result:      nil,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("invalid term: expected a hexadecimal encoded atom, given *engine.compound"),
+				wantError:   fmt.Errorf("error(type_error(atom,foo(bar)),_2)"),
 			},
 		}
 		for nc, tc := range cases {
@@ -46,10 +46,10 @@ func TestTermHexToBytes(t *testing.T) {
 						})
 					} else {
 						Convey("then error should occurs", func() {
-							So(err, ShouldNotBeNil)
+							So(err, ShouldNotEqual, nil)
 
 							Convey("and should be as expected", func() {
-								So(err, ShouldResemble, tc.wantError)
+								So(err.Error(), ShouldEqual, tc.wantError.Error())
 							})
 						})
 					}
@@ -167,7 +167,7 @@ func TestTermToBytes(t *testing.T) {
 			Convey(fmt.Sprintf("Given the term #%d: %s", nc, tc.term), func() {
 				Convey("when converting string term to bytes", func() {
 					env := engine.Env{}
-					result, err := StringTermToBytes(tc.term, tc.encoding, &env)
+					result, err := StringTermToBytes(tc.term, engine.NewAtom(tc.encoding), &env)
 
 					if tc.wantSuccess {
 						Convey("then no error should be thrown", func() {

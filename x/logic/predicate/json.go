@@ -8,12 +8,13 @@ import (
 	"strings"
 
 	"github.com/ichiban/prolog/engine"
-	"github.com/okp4/okp4d/x/logic/prolog"
 	"github.com/samber/lo"
 
 	"cosmossdk.io/math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+
+	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
 // JSONProlog is a predicate that will unify a JSON string into prolog terms and vice versa.
@@ -123,13 +124,13 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 		}
 
 		switch {
-		case prolog.JsonBool(true).Compare(t, env) == 0:
+		case prolog.JSONBool(true).Compare(t, env) == 0:
 			return json.Marshal(true)
-		case prolog.JsonBool(false).Compare(t, env) == 0:
+		case prolog.JSONBool(false).Compare(t, env) == 0:
 			return json.Marshal(false)
-		case prolog.JsonEmptyArray().Compare(t, env) == 0:
+		case prolog.JSONEmptyArray().Compare(t, env) == 0:
 			return json.Marshal([]json.RawMessage{})
-		case prolog.JsonNull().Compare(t, env) == 0:
+		case prolog.JSONNull().Compare(t, env) == 0:
 			return json.Marshal(nil)
 		}
 
@@ -153,9 +154,9 @@ func jsonToTerms(value any) (engine.Term, error) {
 		}
 		return engine.Integer(r.Int64()), nil
 	case bool:
-		return prolog.JsonBool(v), nil
+		return prolog.JSONBool(v), nil
 	case nil:
-		return prolog.JsonNull(), nil
+		return prolog.JSONNull(), nil
 	case map[string]any:
 		keys := lo.Keys(v)
 		sort.Strings(keys)
@@ -172,7 +173,7 @@ func jsonToTerms(value any) (engine.Term, error) {
 	case []any:
 		elements := make([]engine.Term, 0, len(v))
 		if len(v) == 0 {
-			return prolog.JsonEmptyArray(), nil
+			return prolog.JSONEmptyArray(), nil
 		}
 
 		for _, element := range v {

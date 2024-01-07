@@ -8,6 +8,7 @@ import (
 	"strings"
 
 	"github.com/ichiban/prolog/engine"
+
 	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
@@ -114,11 +115,11 @@ func StringBytes(
 		return engine.Error(err)
 	}
 	forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
-		bs, err := prolog.StringTermToBytes(value[0], encodingAtom.String(), env)
+		bs, err := prolog.StringTermToBytes(value[0], encodingAtom, env)
 		if err != nil {
 			return nil, err
 		}
-		result, err := prolog.BytesToCodepointListTerm(bs, "text")
+		result, err := prolog.BytesToCodepointListTerm(bs, prolog.AtomText, env)
 		if err != nil {
 			return nil, err
 		}
@@ -128,11 +129,11 @@ func StringBytes(
 		if _, err := prolog.AssertList(env, value[0]); err != nil {
 			return nil, err
 		}
-		bs, err := prolog.StringTermToBytes(value[0], "text", env)
+		bs, err := prolog.StringTermToBytes(value[0], prolog.AtomText, env)
 		if err != nil {
 			return nil, err
 		}
-		result, err := prolog.BytesToAtomListTerm(bs, encodingAtom.String())
+		result, err := prolog.BytesToAtomListTerm(bs, encodingAtom, env)
 		if err != nil {
 			return nil, err
 		}

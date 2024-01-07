@@ -94,7 +94,7 @@ func TestDID(t *testing.T) {
 				query:      `did_components(X,did(example,'123456','path with/space',5,test)).`,
 				wantResult: []types.TermResults{},
 				wantError: fmt.Errorf(
-					"did_components/2: failed to resolve atom at segment 3: invalid term '%%!s(engine.Integer=5)' - expected engine.Atom but got engine.Integer"), //nolint:lll
+					"did_components/2: failed to resolve atom at segment 3: error(type_error(atom,5),did_components/2)"),
 			},
 			{
 				query:      `did_components('did:example:123456',foo(X)).`,

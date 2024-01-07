@@ -6,14 +6,14 @@ import (
 	"github.com/ichiban/prolog/engine"
 )
 
-// JsonNull returns the compound term @(null).
+// JSONNull returns the compound term @(null).
 // It is used to represent the null value in json objects.
-func JsonNull() engine.Term {
+func JSONNull() engine.Term {
 	return AtomAt.Apply(AtomNull)
 }
 
-// JsonBool returns the compound term @(true) if b is true, otherwise @(false).
-func JsonBool(b bool) engine.Term {
+// JSONBool returns the compound term @(true) if b is true, otherwise @(false).
+func JSONBool(b bool) engine.Term {
 	if b {
 		return AtomAt.Apply(AtomTrue)
 	}
@@ -21,9 +21,9 @@ func JsonBool(b bool) engine.Term {
 	return AtomAt.Apply(AtomFalse)
 }
 
-// JsonEmptyArray returns is the compound term @([]).
+// JSONEmptyArray returns is the compound term @([]).
 // It is used to represent the empty array in json objects.
-func JsonEmptyArray() engine.Term {
+func JSONEmptyArray() engine.Term {
 	return AtomAt.Apply(AtomEmptyArray)
 }
 

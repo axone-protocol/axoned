@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/okp4/okp4d/x/logic/util"
 	"github.com/samber/lo"
 
 	. "github.com/smartystreets/goconvey/convey"
+
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 var (

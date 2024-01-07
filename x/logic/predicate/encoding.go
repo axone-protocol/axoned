@@ -6,6 +6,7 @@ import (
 	"fmt"
 
 	"github.com/ichiban/prolog/engine"
+
 	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
@@ -45,9 +46,9 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 			if result == nil {
 				return engine.Error(fmt.Errorf("hex_bytes/2: nil hexadecimal conversion in input"))
 			}
-			return engine.Unify(vm, bts, prolog.BytesToCodepointListTermWithDefault(result), cont, env)
+			return engine.Unify(vm, bts, prolog.BytesToCodepointListTermWithDefault(result, env), cont, env)
 		case engine.Compound:
-			src, err := prolog.StringTermToBytes(b, "", env)
+			src, err := prolog.StringTermToBytes(b, prolog.AtomEmpty, env)
 			if err != nil {
 				return engine.Error(fmt.Errorf("hex_bytes/2: %w", err))
 			}

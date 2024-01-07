@@ -68,7 +68,7 @@ func TestHexBytesPredicate(t *testing.T) {
 				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
 				[345,38,'hey',107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("hex_bytes/2: invalid integer value '345' in list at position 1: out of byte range (0-255)"),
+				wantError:   fmt.Errorf("hex_bytes/2: error(domain_error(valid_byte(345),[345,38,hey,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]),hex_bytes/2)"), //nolint:lll
 			},
 		}
 		for nc, tc := range cases {

@@ -7,6 +7,7 @@ import (
 
 	"github.com/ichiban/prolog/engine"
 	godid "github.com/nuts-foundation/go-did/did"
+
 	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
