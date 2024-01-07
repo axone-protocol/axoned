@@ -141,26 +141,26 @@ func TestTermToBytes(t *testing.T) {
 				encoding:    "octet",
 				result:      nil,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("cannot convert character 'ツ' to octet"),
+				wantError:   fmt.Errorf("error(domain_error(valid_byte(12484),[227,131,132]),_3)"),
 			},
 			{
 				term:        engine.NewAtom("foo").Apply(engine.NewAtom("bar")),
 				result:      nil,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("invalid compound term: expected a list of character_code or integer"),
+				wantError:   fmt.Errorf("error(type_error(character_code,foo(bar)),_4)"),
 			},
 			{
 				term:        engine.List(engine.NewAtom("f"), engine.NewAtom("oo")),
 				result:      nil,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("invalid character_code 'oo' value in list at position 2: should be a single character"),
+				wantError:   fmt.Errorf("error(domain_error(valid_character_code(oo),[f,oo]),_5)"),
 			},
 			{
 				term:        engine.NewAtom("foo"),
 				encoding:    "foo",
 				result:      nil,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("invalid encoding: foo"),
+				wantError:   fmt.Errorf("error(domain_error(valid_charset,foo),_6)"),
 			},
 		}
 		for nc, tc := range cases {
@@ -171,7 +171,7 @@ func TestTermToBytes(t *testing.T) {
 
 					if tc.wantSuccess {
 						Convey("then no error should be thrown", func() {
-							So(err, ShouldBeNil)
+							So(err, ShouldEqual, nil)
 
 							Convey("and result should be as expected", func() {
 								So(result, ShouldResemble, tc.result)
@@ -179,7 +179,7 @@ func TestTermToBytes(t *testing.T) {
 						})
 					} else {
 						Convey("then error should occurs", func() {
-							So(err, ShouldNotBeNil)
+							So(err, ShouldNotEqual, nil)
 
 							Convey("and should be as expected", func() {
 								So(err.Error(), ShouldEqual, tc.wantError.Error())
