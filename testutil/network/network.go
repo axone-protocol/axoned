@@ -73,7 +73,7 @@ func DefaultConfig(t *testing.T) network.Config {
 				baseapp.SetChainID(chainID),
 			)
 		},
-		GenesisState:    app.NewDefaultGenesisState(encoding.Codec),
+		GenesisState:    app.NewDefaultGenesisState(t, encoding.Codec),
 		TimeoutCommit:   2 * time.Second,
 		ChainID:         chainID,
 		NumValidators:   1,

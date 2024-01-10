@@ -2,6 +2,12 @@ package app
 
 import (
 	"encoding/json"
+	"testing"
+
+	"cosmossdk.io/log"
+
+	dbm "github.com/cosmos/cosmos-db"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 )
@@ -15,7 +21,8 @@ import (
 // object provided to it during init.
 type GenesisState map[string]json.RawMessage
 
-// NewDefaultGenesisState generates the default state for the application.
-func NewDefaultGenesisState(cdc codec.JSONCodec) GenesisState {
-	return ModuleBasics.DefaultGenesis(cdc)
+// NewDefaultGenesisState generates the default state for the application, for testing purpose.
+func NewDefaultGenesisState(t testing.TB, cdc codec.JSONCodec) GenesisState {
+	tempApp := New(log.NewNopLogger(), dbm.NewMemDB(), nil, true, simtestutil.NewAppOptionsWithFlagHome(t.TempDir()))
+	return tempApp.BasicModuleManager.DefaultGenesis(cdc)
 }
