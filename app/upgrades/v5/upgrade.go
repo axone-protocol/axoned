@@ -1,10 +1,14 @@
 package v5
 
 import (
+	"context"
+
+	wasmmigrationtypes "github.com/CosmWasm/wasmd/x/wasm/migrations/v2"
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
+	storetypes "cosmossdk.io/store/types"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
 	"github.com/cosmos/cosmos-sdk/baseapp"
-	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -19,11 +23,10 @@ import (
 	paramstypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
-	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
-	icacontrollertypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/controller/types"
-	icahosttypes "github.com/cosmos/ibc-go/v7/modules/apps/27-interchain-accounts/host/types"
-	ibctransfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
+	icacontrollertypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/controller/types"
+	icahosttypes "github.com/cosmos/ibc-go/v8/modules/apps/27-interchain-accounts/host/types"
+	ibctransfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
 )
 
 const UpgradeName = "v5.0.0"
@@ -83,7 +86,7 @@ func CreateUpgradeHandler(
 			keyTable = icacontrollertypes.ParamKeyTable()
 			// wasm
 		case wasmtypes.ModuleName:
-			keyTable = wasmtypes.ParamKeyTable() //nolint:staticcheck
+			keyTable = wasmmigrationtypes.ParamKeyTable() //nolint:staticcheck
 		default:
 			continue
 		}
@@ -95,11 +98,14 @@ func CreateUpgradeHandler(
 
 	baseAppLegacySS := paramsKeeper.Subspace(baseapp.Paramspace).WithKeyTable(paramstypes.ConsensusParamsKeyTable())
 
-	return func(ctx sdk.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
-		logger := ctx.Logger().With("upgrade", UpgradeName)
+	return func(ctx context.Context, plan upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+		sdkCtx := sdk.UnwrapSDKContext(ctx)
+		logger := sdkCtx.Logger().With("upgrade", UpgradeName)
 
 		logger.Debug("migrate consensus params keeper")
-		baseapp.MigrateParams(ctx, baseAppLegacySS, consensusParamsKeeper)
+		if err := baseapp.MigrateParams(sdkCtx, baseAppLegacySS, consensusParamsKeeper.ParamsStore); err != nil {
+			return nil, err
+		}
 
 		logger.Debug("running module migrations...")
 		return mm.RunMigrations(ctx, configurator, vm)
