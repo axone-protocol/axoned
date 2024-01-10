@@ -14,7 +14,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
 // JSONProlog is a predicate that will unify a JSON string into prolog terms and vice versa.
@@ -65,7 +65,7 @@ func JSONProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engin
 			if err != nil {
 				return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
 			}
-			return engine.Unify(vm, j, util.StringToTerm(string(b)), cont, env)
+			return engine.Unify(vm, j, prolog.StringToTerm(string(b)), cont, env)
 		}
 	})
 }
@@ -106,8 +106,8 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 				elements = append(elements, element)
 			}
 			return json.Marshal(elements)
-		case AtomJSON.String():
-			terms, err := ExtractJSONTerm(t, env)
+		case prolog.AtomJSON.String():
+			terms, err := prolog.ExtractJSONTerm(t, env)
 			if err != nil {
 				return nil, err
 			}
@@ -124,13 +124,13 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 		}
 
 		switch {
-		case MakeBool(true).Compare(t, env) == 0:
+		case prolog.JSONBool(true).Compare(t, env) == 0:
 			return json.Marshal(true)
-		case MakeBool(false).Compare(t, env) == 0:
+		case prolog.JSONBool(false).Compare(t, env) == 0:
 			return json.Marshal(false)
-		case MakeEmptyArray().Compare(t, env) == 0:
+		case prolog.JSONEmptyArray().Compare(t, env) == 0:
 			return json.Marshal([]json.RawMessage{})
-		case MakeNull().Compare(t, env) == 0:
+		case prolog.JSONNull().Compare(t, env) == 0:
 			return json.Marshal(nil)
 		}
 
@@ -143,7 +143,7 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 func jsonToTerms(value any) (engine.Term, error) {
 	switch v := value.(type) {
 	case string:
-		return util.StringToTerm(v), nil
+		return prolog.StringToTerm(v), nil
 	case json.Number:
 		r, ok := math.NewIntFromString(string(v))
 		if !ok {
@@ -154,9 +154,9 @@ func jsonToTerms(value any) (engine.Term, error) {
 		}
 		return engine.Integer(r.Int64()), nil
 	case bool:
-		return MakeBool(v), nil
+		return prolog.JSONBool(v), nil
 	case nil:
-		return MakeNull(), nil
+		return prolog.JSONNull(), nil
 	case map[string]any:
 		keys := lo.Keys(v)
 		sort.Strings(keys)
@@ -167,13 +167,13 @@ func jsonToTerms(value any) (engine.Term, error) {
 			if err != nil {
 				return nil, err
 			}
-			attributes = append(attributes, AtomPair.Apply(engine.NewAtom(key), attributeValue))
+			attributes = append(attributes, prolog.AtomPair.Apply(engine.NewAtom(key), attributeValue))
 		}
-		return AtomJSON.Apply(engine.List(attributes...)), nil
+		return prolog.AtomJSON.Apply(engine.List(attributes...)), nil
 	case []any:
 		elements := make([]engine.Term, 0, len(v))
 		if len(v) == 0 {
-			return MakeEmptyArray(), nil
+			return prolog.JSONEmptyArray(), nil
 		}
 
 		for _, element := range v {

@@ -8,6 +8,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/okp4/okp4d/x/logic/prolog"
 	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
 )
@@ -162,8 +163,8 @@ func fetchBalances(
 				func(ctx context.Context) *engine.Promise {
 					return engine.Unify(
 						vm,
-						Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
-						Tuple(account, balances),
+						prolog.Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
+						prolog.Tuple(account, balances),
 						cont,
 						env,
 					)

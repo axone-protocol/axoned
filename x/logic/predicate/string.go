@@ -9,7 +9,7 @@ import (
 
 	"github.com/ichiban/prolog/engine"
 
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
 // ReadString is a predicate that reads characters from the provided Stream and unifies them with String.
@@ -74,6 +74,78 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 			}
 		}
 
-		return engine.Unify(vm, Tuple(result, length), Tuple(util.StringToTerm(builder.String()), engine.Integer(totalLen)), cont, env)
+		return engine.Unify(
+			vm, prolog.Tuple(result, length),
+			prolog.Tuple(prolog.StringToTerm(builder.String()), engine.Integer(totalLen)), cont, env)
 	})
+}
+
+// StringBytes is a predicate that unifies a string with a list of bytes, returning true when the (Unicode) String is
+// represented by Bytes in Encoding.
+//
+// The signature is as follows:
+//
+//	string_bytes(?String, ?Bytes, +Encoding)
+//
+// Where:
+//   - String is the string to convert to bytes. It can be an Atom, string or list of characters codes.
+//   - Bytes is the list of numbers between 0 and 255 that represent the sequence of bytes.
+//   - Encoding is the encoding to use for the conversion.
+//
+// Encoding can be one of the following:
+// - 'text' considers the string as a sequence of Unicode characters.
+// - 'octet' considers the string as a sequence of bytes.
+// - 'utf8' considers the string as a sequence of UTF-8 characters.
+// - '<encoding>' considers the string as a sequence of characters in the given encoding.
+//
+// At least one of String or Bytes must be instantiated.
+//
+// Examples:
+//
+//	# Convert a string to a list of bytes.
+//	- string_bytes('Hello World', Bytes, octet).
+//
+//	# Convert a list of bytes to a string.
+//	- string_bytes(String, [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100], octet).
+func StringBytes(
+	_ *engine.VM, str, bts, encoding engine.Term, cont engine.Cont, env *engine.Env,
+) *engine.Promise {
+	encodingAtom, err := prolog.AssertAtom(env, encoding)
+	if err != nil {
+		return engine.Error(err)
+	}
+	forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+		bs, err := prolog.StringTermToBytes(value[0], encodingAtom, env)
+		if err != nil {
+			return nil, err
+		}
+		result, err := prolog.BytesToCodepointListTerm(bs, prolog.AtomText, env)
+		if err != nil {
+			return nil, err
+		}
+		return []engine.Term{result}, nil
+	}
+	backwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+		if _, err := prolog.AssertList(env, value[0]); err != nil {
+			return nil, err
+		}
+		bs, err := prolog.StringTermToBytes(value[0], prolog.AtomText, env)
+		if err != nil {
+			return nil, err
+		}
+		result, err := prolog.BytesToAtomListTerm(bs, encodingAtom, env)
+		if err != nil {
+			return nil, err
+		}
+		return []engine.Term{result}, nil
+	}
+
+	ok, env, err := prolog.UnifyFunctional([]engine.Term{str}, []engine.Term{bts}, encoding, forwardConverter, backwardConverter, env)
+	if err != nil {
+		return engine.Error(err)
+	}
+	if !ok {
+		return engine.Bool(false)
+	}
+	return cont(env)
 }

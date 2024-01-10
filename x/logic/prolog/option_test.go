@@ -1,4 +1,4 @@
-package util
+package prolog
 
 import (
 	"fmt"

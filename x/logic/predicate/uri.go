@@ -7,7 +7,7 @@ import (
 
 	"github.com/ichiban/prolog/engine"
 
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
 type Component string
@@ -179,13 +179,13 @@ func URIEncoded(vm *engine.VM, component, decoded, encoded engine.Term, cont eng
 
 		switch e := env.Resolve(encoded).(type) {
 		case engine.Variable:
-			return engine.Unify(vm, encoded, util.StringToTerm(dec), cont, env)
+			return engine.Unify(vm, encoded, prolog.StringToTerm(dec), cont, env)
 		case engine.Atom:
 			enc, err := comp.Unescape(e.String())
 			if err != nil {
 				return engine.Error(fmt.Errorf("uri_encoded/3: %w", err))
 			}
-			return engine.Unify(vm, decoded, util.StringToTerm(enc), cont, env)
+			return engine.Unify(vm, decoded, prolog.StringToTerm(enc), cont, env)
 		default:
 			return engine.Error(fmt.Errorf("uri_encoded/3: invalid encoded type: %T, should be Variable or Atom", e))
 		}

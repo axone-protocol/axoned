@@ -8,7 +8,7 @@ import (
 	"github.com/ichiban/prolog/engine"
 	godid "github.com/nuts-foundation/go-did/did"
 
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
 // AtomDID is a term which represents a DID as a compound term `did(Method, ID, Path, Query, Fragment)`.
@@ -118,7 +118,7 @@ func processSegment(segments engine.Compound, segmentNumber uint8, fn func(segme
 	if _, ok := term.(engine.Variable); ok {
 		return nil
 	}
-	segment, err := util.ResolveToAtom(env, segments.Arg(int(segmentNumber)))
+	segment, err := prolog.AssertAtom(env, segments.Arg(int(segmentNumber)))
 	if err != nil {
 		return fmt.Errorf("failed to resolve atom at segment %d: %w", segmentNumber, err)
 	}
@@ -140,7 +140,7 @@ func didToTerms(did *godid.DID) ([]engine.Term, error) {
 		if err != nil {
 			return nil, err
 		}
-		terms = append(terms, util.StringToTerm(r))
+		terms = append(terms, prolog.StringToTerm(r))
 	}
 
 	return terms, nil
