@@ -1,35 +1,30 @@
 package app
 
 import (
-	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/codec/types"
-	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/cosmos/cosmos-sdk/x/auth/tx"
+	"testing"
 
+	"cosmossdk.io/log"
+
+	dbm "github.com/cosmos/cosmos-db"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 	"github.com/okp4/okp4d/app/params"
 )
 
-// makeEncodingConfig creates an EncodingConfig for an amino based test configuration.
-func makeEncodingConfig() params.EncodingConfig {
-	amino := codec.NewLegacyAmino()
-	interfaceRegistry := types.NewInterfaceRegistry()
-	marshaler := codec.NewProtoCodec(interfaceRegistry)
-	txCfg := tx.NewTxConfig(marshaler, tx.DefaultSignModes)
-
-	return params.EncodingConfig{
-		InterfaceRegistry: interfaceRegistry,
-		Marshaler:         marshaler,
-		TxConfig:          txCfg,
-		Amino:             amino,
+// makeEncodingConfig creates an EncodingConfig test configuration.
+func makeEncodingConfig(tempApp *App) params.EncodingConfig {
+	encodingConfig := params.EncodingConfig{
+		InterfaceRegistry: tempApp.InterfaceRegistry(),
+		Codec:             tempApp.AppCodec(),
+		TxConfig:          tempApp.TxConfig(),
+		Amino:             tempApp.LegacyAmino(),
 	}
+	return encodingConfig
 }
 
 // MakeEncodingConfig creates an EncodingConfig for testing.
-func MakeEncodingConfig() params.EncodingConfig {
-	encodingConfig := makeEncodingConfig()
-	std.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	std.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	ModuleBasics.RegisterLegacyAminoCodec(encodingConfig.Amino)
-	ModuleBasics.RegisterInterfaces(encodingConfig.InterfaceRegistry)
-	return encodingConfig
+func MakeEncodingConfig(t testing.TB) params.EncodingConfig {
+	t.Helper()
+	// we "pre"-instantiate the application for getting the injected/configured encoding configuration
+	tempApp := New(log.NewNopLogger(), dbm.NewMemDB(), nil, true, simtestutil.NewAppOptionsWithFlagHome(t.TempDir()))
+	return makeEncodingConfig(tempApp)
 }
