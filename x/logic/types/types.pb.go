@@ -5,20 +5,17 @@ package types
 
 import (
 	fmt "fmt"
+	_ "github.com/cosmos/gogoproto/gogoproto"
+	proto "github.com/cosmos/gogoproto/proto"
 	io "io"
 	math "math"
 	math_bits "math/bits"
-
-	_ "github.com/cosmos/gogoproto/gogoproto"
-	proto "github.com/cosmos/gogoproto/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var (
-	_ = proto.Marshal
-	_ = fmt.Errorf
-	_ = math.Inf
-)
+var _ = proto.Marshal
+var _ = fmt.Errorf
+var _ = math.Inf
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -40,11 +37,9 @@ func (*Term) ProtoMessage()    {}
 func (*Term) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f3c73c95465ca7a8, []int{0}
 }
-
 func (m *Term) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *Term) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Term.Marshal(b, m, deterministic)
@@ -57,15 +52,12 @@ func (m *Term) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *Term) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Term.Merge(m, src)
 }
-
 func (m *Term) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *Term) XXX_DiscardUnknown() {
 	xxx_messageInfo_Term.DiscardUnknown(m)
 }
@@ -100,11 +92,9 @@ func (*Substitution) ProtoMessage()    {}
 func (*Substitution) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f3c73c95465ca7a8, []int{1}
 }
-
 func (m *Substitution) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *Substitution) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Substitution.Marshal(b, m, deterministic)
@@ -117,15 +107,12 @@ func (m *Substitution) XXX_Marshal(b []byte, deterministic bool) ([]byte, error)
 		return b[:n], nil
 	}
 }
-
 func (m *Substitution) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Substitution.Merge(m, src)
 }
-
 func (m *Substitution) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *Substitution) XXX_DiscardUnknown() {
 	xxx_messageInfo_Substitution.DiscardUnknown(m)
 }
@@ -158,11 +145,9 @@ func (*Result) ProtoMessage()    {}
 func (*Result) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f3c73c95465ca7a8, []int{2}
 }
-
 func (m *Result) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *Result) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Result.Marshal(b, m, deterministic)
@@ -175,15 +160,12 @@ func (m *Result) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *Result) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Result.Merge(m, src)
 }
-
 func (m *Result) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *Result) XXX_DiscardUnknown() {
 	xxx_messageInfo_Result.DiscardUnknown(m)
 }
@@ -217,11 +199,9 @@ func (*Answer) ProtoMessage()    {}
 func (*Answer) Descriptor() ([]byte, []int) {
 	return fileDescriptor_f3c73c95465ca7a8, []int{3}
 }
-
 func (m *Answer) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *Answer) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Answer.Marshal(b, m, deterministic)
@@ -234,15 +214,12 @@ func (m *Answer) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *Answer) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Answer.Merge(m, src)
 }
-
 func (m *Answer) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *Answer) XXX_DiscardUnknown() {
 	xxx_messageInfo_Answer.DiscardUnknown(m)
 }
@@ -533,7 +510,6 @@ func encodeVarintTypes(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-
 func (m *Term) Size() (n int) {
 	if m == nil {
 		return 0
@@ -617,11 +593,9 @@ func (m *Answer) Size() (n int) {
 func sovTypes(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-
 func sozTypes(x uint64) (n int) {
 	return sovTypes(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-
 func (m *Term) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -738,7 +712,6 @@ func (m *Term) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *Substitution) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -854,7 +827,6 @@ func (m *Substitution) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *Result) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -939,7 +911,6 @@ func (m *Result) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *Answer) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1128,7 +1099,6 @@ func (m *Answer) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func skipTypes(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0

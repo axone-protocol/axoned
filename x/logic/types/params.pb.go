@@ -4,23 +4,19 @@
 package types
 
 import (
+	cosmossdk_io_math "cosmossdk.io/math"
 	fmt "fmt"
+	_ "github.com/cosmos/gogoproto/gogoproto"
+	proto "github.com/cosmos/gogoproto/proto"
 	io "io"
 	math "math"
 	math_bits "math/bits"
-
-	cosmossdk_io_math "cosmossdk.io/math"
-
-	_ "github.com/cosmos/gogoproto/gogoproto"
-	proto "github.com/cosmos/gogoproto/proto"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var (
-	_ = proto.Marshal
-	_ = fmt.Errorf
-	_ = math.Inf
-)
+var _ = proto.Marshal
+var _ = fmt.Errorf
+var _ = math.Inf
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -45,11 +41,9 @@ func (*Params) ProtoMessage() {}
 func (*Params) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3af0daa241de0fa3, []int{0}
 }
-
 func (m *Params) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *Params) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Params.Marshal(b, m, deterministic)
@@ -62,15 +56,12 @@ func (m *Params) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *Params) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Params.Merge(m, src)
 }
-
 func (m *Params) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *Params) XXX_DiscardUnknown() {
 	xxx_messageInfo_Params.DiscardUnknown(m)
 }
@@ -123,11 +114,9 @@ func (*Limits) ProtoMessage()    {}
 func (*Limits) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3af0daa241de0fa3, []int{1}
 }
-
 func (m *Limits) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *Limits) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Limits.Marshal(b, m, deterministic)
@@ -140,15 +129,12 @@ func (m *Limits) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *Limits) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Limits.Merge(m, src)
 }
-
 func (m *Limits) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *Limits) XXX_DiscardUnknown() {
 	xxx_messageInfo_Limits.DiscardUnknown(m)
 }
@@ -174,11 +160,9 @@ func (*Filter) ProtoMessage()    {}
 func (*Filter) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3af0daa241de0fa3, []int{2}
 }
-
 func (m *Filter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *Filter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Filter.Marshal(b, m, deterministic)
@@ -191,15 +175,12 @@ func (m *Filter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *Filter) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Filter.Merge(m, src)
 }
-
 func (m *Filter) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *Filter) XXX_DiscardUnknown() {
 	xxx_messageInfo_Filter.DiscardUnknown(m)
 }
@@ -250,11 +231,9 @@ func (*Interpreter) ProtoMessage()    {}
 func (*Interpreter) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3af0daa241de0fa3, []int{3}
 }
-
 func (m *Interpreter) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *Interpreter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Interpreter.Marshal(b, m, deterministic)
@@ -267,15 +246,12 @@ func (m *Interpreter) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) 
 		return b[:n], nil
 	}
 }
-
 func (m *Interpreter) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Interpreter.Merge(m, src)
 }
-
 func (m *Interpreter) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *Interpreter) XXX_DiscardUnknown() {
 	xxx_messageInfo_Interpreter.DiscardUnknown(m)
 }
@@ -324,11 +300,9 @@ func (*GasPolicy) ProtoMessage()    {}
 func (*GasPolicy) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3af0daa241de0fa3, []int{4}
 }
-
 func (m *GasPolicy) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *GasPolicy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_GasPolicy.Marshal(b, m, deterministic)
@@ -341,15 +315,12 @@ func (m *GasPolicy) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *GasPolicy) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_GasPolicy.Merge(m, src)
 }
-
 func (m *GasPolicy) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *GasPolicy) XXX_DiscardUnknown() {
 	xxx_messageInfo_GasPolicy.DiscardUnknown(m)
 }
@@ -378,11 +349,9 @@ func (*PredicateCost) ProtoMessage()    {}
 func (*PredicateCost) Descriptor() ([]byte, []int) {
 	return fileDescriptor_3af0daa241de0fa3, []int{5}
 }
-
 func (m *PredicateCost) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *PredicateCost) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_PredicateCost.Marshal(b, m, deterministic)
@@ -395,15 +364,12 @@ func (m *PredicateCost) XXX_Marshal(b []byte, deterministic bool) ([]byte, error
 		return b[:n], nil
 	}
 }
-
 func (m *PredicateCost) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PredicateCost.Merge(m, src)
 }
-
 func (m *PredicateCost) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *PredicateCost) XXX_DiscardUnknown() {
 	xxx_messageInfo_PredicateCost.DiscardUnknown(m)
 }
@@ -808,7 +774,6 @@ func encodeVarintParams(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-
 func (m *Params) Size() (n int) {
 	if m == nil {
 		return 0
@@ -930,11 +895,9 @@ func (m *PredicateCost) Size() (n int) {
 func sovParams(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-
 func sozParams(x uint64) (n int) {
 	return sovParams(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-
 func (m *Params) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1084,7 +1047,6 @@ func (m *Params) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *Limits) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1279,7 +1241,6 @@ func (m *Limits) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *Filter) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1394,7 +1355,6 @@ func (m *Filter) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *Interpreter) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1543,7 +1503,6 @@ func (m *Interpreter) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *GasPolicy) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1700,7 +1659,6 @@ func (m *GasPolicy) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *PredicateCost) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1819,7 +1777,6 @@ func (m *PredicateCost) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func skipParams(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0

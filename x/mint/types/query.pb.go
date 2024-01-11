@@ -5,13 +5,8 @@ package types
 
 import (
 	context "context"
-	fmt "fmt"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-
 	cosmossdk_io_math "cosmossdk.io/math"
-
+	fmt "fmt"
 	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	grpc1 "github.com/cosmos/gogoproto/grpc"
@@ -20,14 +15,15 @@ import (
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
+	io "io"
+	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var (
-	_ = proto.Marshal
-	_ = fmt.Errorf
-	_ = math.Inf
-)
+var _ = proto.Marshal
+var _ = fmt.Errorf
+var _ = math.Inf
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -36,7 +32,8 @@ var (
 const _ = proto.GoGoProtoPackageIsVersion3 // please upgrade the proto package
 
 // QueryParamsRequest is the request type for the Query/Params RPC method.
-type QueryParamsRequest struct{}
+type QueryParamsRequest struct {
+}
 
 func (m *QueryParamsRequest) Reset()         { *m = QueryParamsRequest{} }
 func (m *QueryParamsRequest) String() string { return proto.CompactTextString(m) }
@@ -44,11 +41,9 @@ func (*QueryParamsRequest) ProtoMessage()    {}
 func (*QueryParamsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_b0718dda172d2cb4, []int{0}
 }
-
 func (m *QueryParamsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *QueryParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryParamsRequest.Marshal(b, m, deterministic)
@@ -61,15 +56,12 @@ func (m *QueryParamsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-
 func (m *QueryParamsRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryParamsRequest.Merge(m, src)
 }
-
 func (m *QueryParamsRequest) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *QueryParamsRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryParamsRequest.DiscardUnknown(m)
 }
@@ -88,11 +80,9 @@ func (*QueryParamsResponse) ProtoMessage()    {}
 func (*QueryParamsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_b0718dda172d2cb4, []int{1}
 }
-
 func (m *QueryParamsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *QueryParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryParamsResponse.Marshal(b, m, deterministic)
@@ -105,15 +95,12 @@ func (m *QueryParamsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-
 func (m *QueryParamsResponse) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryParamsResponse.Merge(m, src)
 }
-
 func (m *QueryParamsResponse) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *QueryParamsResponse) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryParamsResponse.DiscardUnknown(m)
 }
@@ -128,7 +115,8 @@ func (m *QueryParamsResponse) GetParams() Params {
 }
 
 // QueryInflationRequest is the request type for the Query/Inflation RPC method.
-type QueryInflationRequest struct{}
+type QueryInflationRequest struct {
+}
 
 func (m *QueryInflationRequest) Reset()         { *m = QueryInflationRequest{} }
 func (m *QueryInflationRequest) String() string { return proto.CompactTextString(m) }
@@ -136,11 +124,9 @@ func (*QueryInflationRequest) ProtoMessage()    {}
 func (*QueryInflationRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_b0718dda172d2cb4, []int{2}
 }
-
 func (m *QueryInflationRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *QueryInflationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryInflationRequest.Marshal(b, m, deterministic)
@@ -153,15 +139,12 @@ func (m *QueryInflationRequest) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-
 func (m *QueryInflationRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryInflationRequest.Merge(m, src)
 }
-
 func (m *QueryInflationRequest) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *QueryInflationRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryInflationRequest.DiscardUnknown(m)
 }
@@ -181,11 +164,9 @@ func (*QueryInflationResponse) ProtoMessage()    {}
 func (*QueryInflationResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_b0718dda172d2cb4, []int{3}
 }
-
 func (m *QueryInflationResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *QueryInflationResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryInflationResponse.Marshal(b, m, deterministic)
@@ -198,15 +179,12 @@ func (m *QueryInflationResponse) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-
 func (m *QueryInflationResponse) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryInflationResponse.Merge(m, src)
 }
-
 func (m *QueryInflationResponse) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *QueryInflationResponse) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryInflationResponse.DiscardUnknown(m)
 }
@@ -215,7 +193,8 @@ var xxx_messageInfo_QueryInflationResponse proto.InternalMessageInfo
 
 // QueryAnnualProvisionsRequest is the request type for the
 // Query/AnnualProvisions RPC method.
-type QueryAnnualProvisionsRequest struct{}
+type QueryAnnualProvisionsRequest struct {
+}
 
 func (m *QueryAnnualProvisionsRequest) Reset()         { *m = QueryAnnualProvisionsRequest{} }
 func (m *QueryAnnualProvisionsRequest) String() string { return proto.CompactTextString(m) }
@@ -223,11 +202,9 @@ func (*QueryAnnualProvisionsRequest) ProtoMessage()    {}
 func (*QueryAnnualProvisionsRequest) Descriptor() ([]byte, []int) {
 	return fileDescriptor_b0718dda172d2cb4, []int{4}
 }
-
 func (m *QueryAnnualProvisionsRequest) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *QueryAnnualProvisionsRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryAnnualProvisionsRequest.Marshal(b, m, deterministic)
@@ -240,15 +217,12 @@ func (m *QueryAnnualProvisionsRequest) XXX_Marshal(b []byte, deterministic bool)
 		return b[:n], nil
 	}
 }
-
 func (m *QueryAnnualProvisionsRequest) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryAnnualProvisionsRequest.Merge(m, src)
 }
-
 func (m *QueryAnnualProvisionsRequest) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *QueryAnnualProvisionsRequest) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryAnnualProvisionsRequest.DiscardUnknown(m)
 }
@@ -268,11 +242,9 @@ func (*QueryAnnualProvisionsResponse) ProtoMessage()    {}
 func (*QueryAnnualProvisionsResponse) Descriptor() ([]byte, []int) {
 	return fileDescriptor_b0718dda172d2cb4, []int{5}
 }
-
 func (m *QueryAnnualProvisionsResponse) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *QueryAnnualProvisionsResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_QueryAnnualProvisionsResponse.Marshal(b, m, deterministic)
@@ -285,15 +257,12 @@ func (m *QueryAnnualProvisionsResponse) XXX_Marshal(b []byte, deterministic bool
 		return b[:n], nil
 	}
 }
-
 func (m *QueryAnnualProvisionsResponse) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_QueryAnnualProvisionsResponse.Merge(m, src)
 }
-
 func (m *QueryAnnualProvisionsResponse) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *QueryAnnualProvisionsResponse) XXX_DiscardUnknown() {
 	xxx_messageInfo_QueryAnnualProvisionsResponse.DiscardUnknown(m)
 }
@@ -346,10 +315,8 @@ var fileDescriptor_b0718dda172d2cb4 = []byte{
 }
 
 // Reference imports to suppress errors if they are not otherwise used.
-var (
-	_ context.Context
-	_ grpc.ClientConn
-)
+var _ context.Context
+var _ grpc.ClientConn
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the grpc package it is being compiled against.
@@ -413,16 +380,15 @@ type QueryServer interface {
 }
 
 // UnimplementedQueryServer can be embedded to have forward compatible implementations.
-type UnimplementedQueryServer struct{}
+type UnimplementedQueryServer struct {
+}
 
 func (*UnimplementedQueryServer) Params(ctx context.Context, req *QueryParamsRequest) (*QueryParamsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Params not implemented")
 }
-
 func (*UnimplementedQueryServer) Inflation(ctx context.Context, req *QueryInflationRequest) (*QueryInflationResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Inflation not implemented")
 }
-
 func (*UnimplementedQueryServer) AnnualProvisions(ctx context.Context, req *QueryAnnualProvisionsRequest) (*QueryAnnualProvisionsResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AnnualProvisions not implemented")
 }
@@ -685,7 +651,6 @@ func encodeVarintQuery(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-
 func (m *QueryParamsRequest) Size() (n int) {
 	if m == nil {
 		return 0
@@ -749,11 +714,9 @@ func (m *QueryAnnualProvisionsResponse) Size() (n int) {
 func sovQuery(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-
 func sozQuery(x uint64) (n int) {
 	return sovQuery(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-
 func (m *QueryParamsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -804,7 +767,6 @@ func (m *QueryParamsRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -888,7 +850,6 @@ func (m *QueryParamsResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *QueryInflationRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -939,7 +900,6 @@ func (m *QueryInflationRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *QueryInflationResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1023,7 +983,6 @@ func (m *QueryInflationResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *QueryAnnualProvisionsRequest) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1074,7 +1033,6 @@ func (m *QueryAnnualProvisionsRequest) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *QueryAnnualProvisionsResponse) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1158,7 +1116,6 @@ func (m *QueryAnnualProvisionsResponse) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func skipQuery(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0

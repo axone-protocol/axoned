@@ -25,15 +25,13 @@ import (
 )
 
 // Suppress "imported and not used" errors
-var (
-	_ codes.Code
-	_ io.Reader
-	_ status.Status
-	_ = runtime.String
-	_ = utilities.NewDoubleArray
-	_ = descriptor.ForMessage
-	_ = metadata.Join
-)
+var _ codes.Code
+var _ io.Reader
+var _ status.Status
+var _ = runtime.String
+var _ = utilities.NewDoubleArray
+var _ = descriptor.ForMessage
+var _ = metadata.Join
 
 func request_QueryService_Params_0(ctx context.Context, marshaler runtime.Marshaler, client QueryServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryServiceParamsRequest
@@ -41,6 +39,7 @@ func request_QueryService_Params_0(ctx context.Context, marshaler runtime.Marsha
 
 	msg, err := client.Params(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_QueryService_Params_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -49,9 +48,12 @@ func local_request_QueryService_Params_0(ctx context.Context, marshaler runtime.
 
 	msg, err := server.Params(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
-var filter_QueryService_Ask_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+var (
+	filter_QueryService_Ask_0 = &utilities.DoubleArray{Encoding: map[string]int{}, Base: []int(nil), Check: []int(nil)}
+)
 
 func request_QueryService_Ask_0(ctx context.Context, marshaler runtime.Marshaler, client QueryServiceClient, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
 	var protoReq QueryServiceAskRequest
@@ -66,6 +68,7 @@ func request_QueryService_Ask_0(ctx context.Context, marshaler runtime.Marshaler
 
 	msg, err := client.Ask(ctx, &protoReq, grpc.Header(&metadata.HeaderMD), grpc.Trailer(&metadata.TrailerMD))
 	return msg, metadata, err
+
 }
 
 func local_request_QueryService_Ask_0(ctx context.Context, marshaler runtime.Marshaler, server QueryServiceServer, req *http.Request, pathParams map[string]string) (proto.Message, runtime.ServerMetadata, error) {
@@ -81,6 +84,7 @@ func local_request_QueryService_Ask_0(ctx context.Context, marshaler runtime.Mar
 
 	msg, err := server.Ask(ctx, &protoReq)
 	return msg, metadata, err
+
 }
 
 // RegisterQueryServiceHandlerServer registers the http handlers for service QueryService to "mux".
@@ -88,6 +92,7 @@ func local_request_QueryService_Ask_0(ctx context.Context, marshaler runtime.Mar
 // StreamingRPC :currently unsupported pending https://github.com/grpc/grpc-go/issues/906.
 // Note that using this registration option will cause many gRPC library features to stop working. Consider using RegisterQueryServiceHandlerFromEndpoint instead.
 func RegisterQueryServiceHandlerServer(ctx context.Context, mux *runtime.ServeMux, server QueryServiceServer) error {
+
 	mux.Handle("GET", pattern_QueryService_Params_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -108,6 +113,7 @@ func RegisterQueryServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		}
 
 		forward_QueryService_Params_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
 
 	mux.Handle("GET", pattern_QueryService_Ask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
@@ -130,6 +136,7 @@ func RegisterQueryServiceHandlerServer(ctx context.Context, mux *runtime.ServeMu
 		}
 
 		forward_QueryService_Ask_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
 
 	return nil
@@ -172,6 +179,7 @@ func RegisterQueryServiceHandler(ctx context.Context, mux *runtime.ServeMux, con
 // doesn't go through the normal gRPC flow (creating a gRPC client etc.) then it will be up to the passed in
 // "QueryServiceClient" to call the correct interceptors.
 func RegisterQueryServiceHandlerClient(ctx context.Context, mux *runtime.ServeMux, client QueryServiceClient) error {
+
 	mux.Handle("GET", pattern_QueryService_Params_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
 		ctx, cancel := context.WithCancel(req.Context())
 		defer cancel()
@@ -189,6 +197,7 @@ func RegisterQueryServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		}
 
 		forward_QueryService_Params_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
 
 	mux.Handle("GET", pattern_QueryService_Ask_0, func(w http.ResponseWriter, req *http.Request, pathParams map[string]string) {
@@ -208,6 +217,7 @@ func RegisterQueryServiceHandlerClient(ctx context.Context, mux *runtime.ServeMu
 		}
 
 		forward_QueryService_Ask_0(ctx, mux, outboundMarshaler, w, req, resp, mux.GetForwardResponseOptions()...)
+
 	})
 
 	return nil

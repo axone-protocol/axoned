@@ -5,24 +5,21 @@ package types
 
 import (
 	fmt "fmt"
-	io "io"
-	math "math"
-	math_bits "math/bits"
-
 	github_com_cosmos_cosmos_sdk_types "github.com/cosmos/cosmos-sdk/types"
 	types1 "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/cosmos/cosmos-sdk/types/tx/amino"
 	types "github.com/cosmos/cosmos-sdk/x/auth/types"
 	_ "github.com/cosmos/gogoproto/gogoproto"
 	proto "github.com/cosmos/gogoproto/proto"
+	io "io"
+	math "math"
+	math_bits "math/bits"
 )
 
 // Reference imports to suppress errors if they are not otherwise used.
-var (
-	_ = proto.Marshal
-	_ = fmt.Errorf
-	_ = math.Inf
-)
+var _ = proto.Marshal
+var _ = fmt.Errorf
+var _ = math.Inf
 
 // This is a compile-time assertion to ensure that this generated file
 // is compatible with the proto package it is being compiled against.
@@ -46,11 +43,9 @@ func (*BaseVestingAccount) ProtoMessage() {}
 func (*BaseVestingAccount) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eac461ec52018387, []int{0}
 }
-
 func (m *BaseVestingAccount) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *BaseVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_BaseVestingAccount.Marshal(b, m, deterministic)
@@ -63,15 +58,12 @@ func (m *BaseVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]byte, 
 		return b[:n], nil
 	}
 }
-
 func (m *BaseVestingAccount) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_BaseVestingAccount.Merge(m, src)
 }
-
 func (m *BaseVestingAccount) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *BaseVestingAccount) XXX_DiscardUnknown() {
 	xxx_messageInfo_BaseVestingAccount.DiscardUnknown(m)
 }
@@ -91,11 +83,9 @@ func (*ContinuousVestingAccount) ProtoMessage() {}
 func (*ContinuousVestingAccount) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eac461ec52018387, []int{1}
 }
-
 func (m *ContinuousVestingAccount) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *ContinuousVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_ContinuousVestingAccount.Marshal(b, m, deterministic)
@@ -108,15 +98,12 @@ func (m *ContinuousVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]
 		return b[:n], nil
 	}
 }
-
 func (m *ContinuousVestingAccount) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_ContinuousVestingAccount.Merge(m, src)
 }
-
 func (m *ContinuousVestingAccount) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *ContinuousVestingAccount) XXX_DiscardUnknown() {
 	xxx_messageInfo_ContinuousVestingAccount.DiscardUnknown(m)
 }
@@ -135,11 +122,9 @@ func (*DelayedVestingAccount) ProtoMessage() {}
 func (*DelayedVestingAccount) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eac461ec52018387, []int{2}
 }
-
 func (m *DelayedVestingAccount) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *DelayedVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_DelayedVestingAccount.Marshal(b, m, deterministic)
@@ -152,15 +137,12 @@ func (m *DelayedVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]byt
 		return b[:n], nil
 	}
 }
-
 func (m *DelayedVestingAccount) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_DelayedVestingAccount.Merge(m, src)
 }
-
 func (m *DelayedVestingAccount) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *DelayedVestingAccount) XXX_DiscardUnknown() {
 	xxx_messageInfo_DelayedVestingAccount.DiscardUnknown(m)
 }
@@ -178,11 +160,9 @@ func (*Period) ProtoMessage() {}
 func (*Period) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eac461ec52018387, []int{3}
 }
-
 func (m *Period) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *Period) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_Period.Marshal(b, m, deterministic)
@@ -195,15 +175,12 @@ func (m *Period) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 		return b[:n], nil
 	}
 }
-
 func (m *Period) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_Period.Merge(m, src)
 }
-
 func (m *Period) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *Period) XXX_DiscardUnknown() {
 	xxx_messageInfo_Period.DiscardUnknown(m)
 }
@@ -237,11 +214,9 @@ func (*PeriodicVestingAccount) ProtoMessage() {}
 func (*PeriodicVestingAccount) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eac461ec52018387, []int{4}
 }
-
 func (m *PeriodicVestingAccount) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *PeriodicVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_PeriodicVestingAccount.Marshal(b, m, deterministic)
@@ -254,15 +229,12 @@ func (m *PeriodicVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-
 func (m *PeriodicVestingAccount) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PeriodicVestingAccount.Merge(m, src)
 }
-
 func (m *PeriodicVestingAccount) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *PeriodicVestingAccount) XXX_DiscardUnknown() {
 	xxx_messageInfo_PeriodicVestingAccount.DiscardUnknown(m)
 }
@@ -283,11 +255,9 @@ func (*PermanentLockedAccount) ProtoMessage() {}
 func (*PermanentLockedAccount) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eac461ec52018387, []int{5}
 }
-
 func (m *PermanentLockedAccount) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *PermanentLockedAccount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_PermanentLockedAccount.Marshal(b, m, deterministic)
@@ -300,15 +270,12 @@ func (m *PermanentLockedAccount) XXX_Marshal(b []byte, deterministic bool) ([]by
 		return b[:n], nil
 	}
 }
-
 func (m *PermanentLockedAccount) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_PermanentLockedAccount.Merge(m, src)
 }
-
 func (m *PermanentLockedAccount) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *PermanentLockedAccount) XXX_DiscardUnknown() {
 	xxx_messageInfo_PermanentLockedAccount.DiscardUnknown(m)
 }
@@ -331,11 +298,9 @@ func (*CliffVestingAccount) ProtoMessage() {}
 func (*CliffVestingAccount) Descriptor() ([]byte, []int) {
 	return fileDescriptor_eac461ec52018387, []int{6}
 }
-
 func (m *CliffVestingAccount) XXX_Unmarshal(b []byte) error {
 	return m.Unmarshal(b)
 }
-
 func (m *CliffVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
 	if deterministic {
 		return xxx_messageInfo_CliffVestingAccount.Marshal(b, m, deterministic)
@@ -348,15 +313,12 @@ func (m *CliffVestingAccount) XXX_Marshal(b []byte, deterministic bool) ([]byte,
 		return b[:n], nil
 	}
 }
-
 func (m *CliffVestingAccount) XXX_Merge(src proto.Message) {
 	xxx_messageInfo_CliffVestingAccount.Merge(m, src)
 }
-
 func (m *CliffVestingAccount) XXX_Size() int {
 	return m.Size()
 }
-
 func (m *CliffVestingAccount) XXX_DiscardUnknown() {
 	xxx_messageInfo_CliffVestingAccount.DiscardUnknown(m)
 }
@@ -763,7 +725,6 @@ func encodeVarintVesting(dAtA []byte, offset int, v uint64) int {
 	dAtA[offset] = uint8(v)
 	return base
 }
-
 func (m *BaseVestingAccount) Size() (n int) {
 	if m == nil {
 		return 0
@@ -902,11 +863,9 @@ func (m *CliffVestingAccount) Size() (n int) {
 func sovVesting(x uint64) (n int) {
 	return (math_bits.Len64(x|1) + 6) / 7
 }
-
 func sozVesting(x uint64) (n int) {
 	return sovVesting(uint64((x << 1) ^ uint64((int64(x) >> 63))))
 }
-
 func (m *BaseVestingAccount) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1114,7 +1073,6 @@ func (m *BaseVestingAccount) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *ContinuousVestingAccount) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1220,7 +1178,6 @@ func (m *ContinuousVestingAccount) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *DelayedVestingAccount) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1307,7 +1264,6 @@ func (m *DelayedVestingAccount) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *Period) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1411,7 +1367,6 @@ func (m *Period) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *PeriodicVestingAccount) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1551,7 +1506,6 @@ func (m *PeriodicVestingAccount) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *PermanentLockedAccount) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1638,7 +1592,6 @@ func (m *PermanentLockedAccount) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func (m *CliffVestingAccount) Unmarshal(dAtA []byte) error {
 	l := len(dAtA)
 	iNdEx := 0
@@ -1763,7 +1716,6 @@ func (m *CliffVestingAccount) Unmarshal(dAtA []byte) error {
 	}
 	return nil
 }
-
 func skipVesting(dAtA []byte) (n int, err error) {
 	l := len(dAtA)
 	iNdEx := 0
