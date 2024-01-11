@@ -11,7 +11,10 @@ LEDGER_ENABLED         ?= true
 # Docker images
 DOCKER_IMAGE_GOLANG		  = golang:1.21-alpine3.17
 DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v1.54
-DOCKER_IMAGE_BUF  		  = okp4/buf-cosmos:1.4.7
+DOCKER_IMAGE_PROTO        = ghcr.io/cosmos/proto-builder:0.14.0
+DOCKER_IMAGE_BUF          = bufbuild/buf:1.4.0
+DOCKER_PROTO_RUN          := docker run --rm -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_PROTO)
+DOCKER_BUF_RUN            := docker run --rm -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_BUF)
 DOCKER_BUILDX_BUILDER     = okp4-builder
 DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
 DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
@@ -124,18 +127,7 @@ lint-go: ## Lint go source code
 .PHONY: lint-proto
 lint-proto: ## Lint proto files
 	@echo "${COLOR_CYAN}🔍️ lint proto${COLOR_RESET}"
-	@docker run --rm \
-		-v ${HOME}/.cache:/root/.cache \
-  		-v `pwd`:/proto \
-  		-w /proto \
-  		${DOCKER_IMAGE_BUF} \
-  		lint proto -v
-	@docker run --rm \
- 		-v ${HOME}/.cache:/root/.cache \
-   		-v `pwd`:/proto \
-   		-w /proto \
-   		${DOCKER_IMAGE_BUF} \
-   		format -d --exit-code
+	@$(DOCKER_BUF_RUN) lint proto -v
 
 ## Format:
 .PHONY: format
@@ -154,12 +146,7 @@ format-go: ## Format go files
 .PHONY: format-proto
 format-proto: ## Format proto files
 	@echo "${COLOR_CYAN}📐 Formatting proto files${COLOR_RESET}"
-	@docker run --rm \
-		-v ${HOME}/.cache:/root/.cache \
-  		-v `pwd`:/proto \
-  		-w /proto \
-  		${DOCKER_IMAGE_BUF} \
-  		format -w
+	@$(DOCKER_BUF_RUN) format -w
 
 ## Build:
 .PHONY: build
@@ -316,39 +303,13 @@ clean: ## Remove all the files from the target folder
 
 ## Proto:
 .PHONY: proto
-proto: proto-format lint-proto proto-build proto-gen doc-proto ## Generate all resources for proto files (go, doc, etc.)
-
-.PHONY: proto-format
-proto-format: ## Format Protobuf files
-	@echo "${COLOR_CYAN} 📐 Formatting Protobuf files${COLOR_RESET}"
-	@docker run --rm \
-    		-v ${HOME}/.cache:/root/.cache \
-    		-v `pwd`:/proto \
-    		-w /proto \
-    		${DOCKER_IMAGE_BUF} \
-    		format -w -v
-
-.PHONY: proto-build
-proto-build: ## Build all Protobuf files
-	@echo "${COLOR_CYAN} 🔨️Build Protobuf files${COLOR_RESET}"
-	@docker run --rm \
-		-v ${HOME}/.cache:/root/.cache \
-		-v `pwd`:/proto \
-		-w /proto \
-		${DOCKER_IMAGE_BUF} \
-		build proto -v
+proto: format-proto lint-proto proto-gen doc-proto ## Generate all resources for proto files (go, doc, etc.)
 
 .PHONY: proto-gen
-proto-gen: proto-build ## Generate all the code from the Protobuf files
+proto-gen: ## Generate all the code from the Protobuf files
 	@echo "${COLOR_CYAN} 📝 Generating code from Protobuf files${COLOR_RESET}"
-	@docker run --rm \
-		-v ${HOME}/.cache:/root/.cache \
-		-v `pwd`:/proto \
-		-w /proto \
-		${DOCKER_IMAGE_BUF} \
-		generate proto --template buf.gen.proto.yaml -v
-	@cp -r github.com/okp4/okp4d/x/* x/
-	@sudo rm -rf github.com
+	@$(DOCKER_PROTO_RUN) sh ./scripts/protocgen-code.sh
+
 
 ## Documentation:
 .PHONY: doc
@@ -356,14 +317,10 @@ doc: doc-proto doc-command doc-predicate ## Generate all the documentation
 
 .PHONY: doc-proto
 doc-proto: proto-gen ## Generate the documentation from the Protobuf files
+	@echo "${COLOR_CYAN} 📝 Generating doc from Protobuf files${COLOR_RESET}"
+	@$(DOCKER_PROTO_RUN) sh ./scripts/protocgen-doc.sh
 	@for MODULE in $(shell find proto -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
 		echo "${COLOR_CYAN} 📖 Generate documentation for $${MODULE} module${COLOR_RESET}" ; \
-  		docker run --rm \
-        		-v ${HOME}/.cache:/root/.cache \
-        		-v `pwd`:/proto \
-        		-w /proto \
-        		${DOCKER_IMAGE_BUF} \
-        		generate --path $${MODULE} --template buf.gen.doc.yaml -v ; \
         DEFAULT_DATASOURCE="./docs/proto/templates/default.yaml" ; \
         MODULE_DATASOURCE="merge:./$${MODULE}/docs.yaml|$${DEFAULT_DATASOURCE}" ; \
         DATASOURCE="docs=`[ -f $${MODULE}/docs.yaml ] && echo $$MODULE_DATASOURCE || echo $${DEFAULT_DATASOURCE}`" ; \
@@ -372,8 +329,7 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 				-v `pwd`:/usr/src/okp4d \
 				-w /usr/src/okp4d \
 				${DOCKER_IMAGE_GOTEMPLATE} \
-				-d $$DATASOURCE -f docs/proto/docs.md -o docs/$${MODULE}.md ; \
-		rm -f docs/proto/docs.md ; \
+				-d $$DATASOURCE -f docs/$${MODULE}.md -o docs/$${MODULE}.md ; \
 	done
 	@docker run --rm \
 	  -v `pwd`:/usr/src/okp4d \
