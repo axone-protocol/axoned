@@ -8,6 +8,8 @@ import (
 	"os"
 	"time"
 
+	"cosmossdk.io/math"
+
 	starship "github.com/cosmology-tech/starship/clients/go/client"
 	lens "github.com/strangelove-ventures/lens/client"
 	"github.com/stretchr/testify/suite"
@@ -18,8 +20,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	transfertypes "github.com/cosmos/ibc-go/v7/modules/apps/transfer/types"
-	clienttypes "github.com/cosmos/ibc-go/v7/modules/core/02-client/types"
+	transfertypes "github.com/cosmos/ibc-go/v8/modules/apps/transfer/types"
+	clienttypes "github.com/cosmos/ibc-go/v8/modules/core/02-client/types"
 )
 
 var configFile = "../configs/devnet.yaml"
@@ -101,7 +103,7 @@ func (s *TestSuite) IBCTransferTokens(chain1, chain2 *starship.ChainClient, chai
 	denom, err := chain1.GetChainDenom()
 	s.Require().NoError(err)
 
-	coin := sdk.Coin{Denom: denom, Amount: sdk.NewInt(int64(amount))}
+	coin := sdk.Coin{Denom: denom, Amount: math.NewInt(int64(amount))}
 	req := &transfertypes.MsgTransfer{
 		SourcePort:       channel.Chain_2.PortId,
 		SourceChannel:    channel.Chain_2.ChannelId,
