@@ -6,16 +6,21 @@ import (
 	"strings"
 	"testing"
 
+	"cosmossdk.io/math"
+
+	"cosmossdk.io/store/metrics"
+
+	dbm "github.com/cosmos/cosmos-db"
+
 	"github.com/golang/mock/gomock"
 	"github.com/ichiban/prolog/engine"
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	tmdb "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/cosmos/cosmos-sdk/store"
+	"cosmossdk.io/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 
@@ -41,7 +46,7 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(100))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(100))),
 					},
 				},
 				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
@@ -51,7 +56,7 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(100))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(100))),
 					},
 				},
 				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
@@ -61,7 +66,7 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
@@ -71,7 +76,7 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
@@ -81,11 +86,11 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(589)), sdk.NewCoin("uatom", sdk.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				query:      `bank_balances('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
@@ -95,11 +100,11 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(589)), sdk.NewCoin("uatom", sdk.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				program:    `bank_balances_has_coin(A, D, V) :- bank_balances(A, R), member(D-V, R).`,
@@ -111,12 +116,12 @@ func TestBank(t *testing.T) {
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
 						Coins: sdk.NewCoins(
-							sdk.NewCoin("uknow", sdk.NewInt(589)),
-							sdk.NewCoin("uatom", sdk.NewInt(693)),
-							sdk.NewCoin("uband", sdk.NewInt(4282)),
-							sdk.NewCoin("uakt", sdk.NewInt(4099)),
-							sdk.NewCoin("ukava", sdk.NewInt(836)),
-							sdk.NewCoin("uscrt", sdk.NewInt(599)),
+							sdk.NewCoin("uknow", math.NewInt(589)),
+							sdk.NewCoin("uatom", math.NewInt(693)),
+							sdk.NewCoin("uband", math.NewInt(4282)),
+							sdk.NewCoin("uakt", math.NewInt(4099)),
+							sdk.NewCoin("ukava", math.NewInt(836)),
+							sdk.NewCoin("uscrt", math.NewInt(599)),
 						),
 					},
 				},
@@ -128,11 +133,11 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query: `bank_balances(Accounts, Balances).`,
@@ -152,13 +157,13 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(1000))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1000))),
 					},
 				},
 				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(100))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(100))),
 					},
 				},
 				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
@@ -168,7 +173,7 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(100))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(100))),
 					},
 				},
 				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
@@ -178,7 +183,7 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
@@ -188,7 +193,7 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
@@ -198,11 +203,11 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(589)), sdk.NewCoin("uatom", sdk.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				query:      `bank_spendable_balances('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
@@ -212,11 +217,11 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(589)), sdk.NewCoin("uatom", sdk.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				program:    `bank_spendable_has_coin(A, D, V) :- bank_spendable_balances(A, R), member(D-V, R).`,
@@ -228,12 +233,12 @@ func TestBank(t *testing.T) {
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
 						Coins: sdk.NewCoins(
-							sdk.NewCoin("uknow", sdk.NewInt(589)),
-							sdk.NewCoin("uatom", sdk.NewInt(693)),
-							sdk.NewCoin("uband", sdk.NewInt(4282)),
-							sdk.NewCoin("uakt", sdk.NewInt(4099)),
-							sdk.NewCoin("ukava", sdk.NewInt(836)),
-							sdk.NewCoin("uscrt", sdk.NewInt(599)),
+							sdk.NewCoin("uknow", math.NewInt(589)),
+							sdk.NewCoin("uatom", math.NewInt(693)),
+							sdk.NewCoin("uband", math.NewInt(4282)),
+							sdk.NewCoin("uakt", math.NewInt(4099)),
+							sdk.NewCoin("ukava", math.NewInt(836)),
+							sdk.NewCoin("uscrt", math.NewInt(599)),
 						),
 					},
 				},
@@ -246,21 +251,21 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(1220))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1220))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(8000))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(8000))),
 					},
 				},
 				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query: `bank_spendable_balances(Accounts, SpendableCoins).`,
@@ -281,19 +286,19 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(1000))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1000))),
 					},
 				},
 				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(100))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(100))),
 					},
 				},
 				lockedCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(900))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(900))),
 					},
 				},
 				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
@@ -303,7 +308,7 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(100))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(100))),
 					},
 				},
 				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
@@ -313,7 +318,7 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
@@ -323,7 +328,7 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
@@ -333,11 +338,11 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(589)), sdk.NewCoin("uatom", sdk.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				query:      `bank_locked_balances('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
@@ -347,11 +352,11 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420)), sdk.NewCoin("uatom", sdk.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(589)), sdk.NewCoin("uatom", sdk.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				program:    `bank_locked_has_coin(A, D, V) :- bank_locked_balances(A, R), member(D-V, R).`,
@@ -363,12 +368,12 @@ func TestBank(t *testing.T) {
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
 						Coins: sdk.NewCoins(
-							sdk.NewCoin("uknow", sdk.NewInt(589)),
-							sdk.NewCoin("uatom", sdk.NewInt(693)),
-							sdk.NewCoin("uband", sdk.NewInt(4282)),
-							sdk.NewCoin("uakt", sdk.NewInt(4099)),
-							sdk.NewCoin("ukava", sdk.NewInt(836)),
-							sdk.NewCoin("uscrt", sdk.NewInt(599)),
+							sdk.NewCoin("uknow", math.NewInt(589)),
+							sdk.NewCoin("uatom", math.NewInt(693)),
+							sdk.NewCoin("uband", math.NewInt(4282)),
+							sdk.NewCoin("uakt", math.NewInt(4099)),
+							sdk.NewCoin("ukava", math.NewInt(836)),
+							sdk.NewCoin("uscrt", math.NewInt(599)),
 						),
 					},
 				},
@@ -381,31 +386,31 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(1220))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1220))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(8000))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(8000))),
 					},
 				},
 				spendableCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(420))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				lockedCoins: []bank.Balance{
 					{
 						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", sdk.NewInt(800))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(800))),
 					},
 					{
 						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", sdk.NewInt(7411))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(7411))),
 					},
 				},
 				query: `bank_locked_balances(Accounts, LockedCoins).`,
@@ -425,8 +430,8 @@ func TestBank(t *testing.T) {
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
 				Convey("and a context", func() {
-					db := tmdb.NewMemDB()
-					stateStore := store.NewCommitMultiStore(db)
+					db := dbm.NewMemDB()
+					stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 					bankKeeper := testutil.NewMockBankKeeper(ctrl)
 					ctx := sdk.
 						NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger()).

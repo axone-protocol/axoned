@@ -3,6 +3,8 @@ package keeper
 import (
 	goctx "context"
 
+	storetypes "cosmossdk.io/store/types"
+
 	errorsmod "cosmossdk.io/errors"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -26,7 +28,7 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 	sdkCtx = withGasMeter(sdkCtx, limits)
 	defer func() {
 		if r := recover(); r != nil {
-			if gasError, ok := r.(sdk.ErrorOutOfGas); ok {
+			if gasError, ok := r.(storetypes.ErrorOutOfGas); ok {
 				response, err = nil, errorsmod.Wrapf(
 					types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
 					types.ModuleName, gasError.Descriptor, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
@@ -49,7 +51,7 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 // withGasMeter returns a new context with a gas meter that has the given limit.
 // The gas meter is go-router-safe.
 func withGasMeter(sdkCtx sdk.Context, limits types.Limits) sdk.Context {
-	gasMeter := meter.WithSafeMeter(sdk.NewGasMeter(limits.MaxGas.Uint64()))
+	gasMeter := meter.WithSafeMeter(storetypes.NewGasMeter(limits.MaxGas.Uint64()))
 
 	return sdkCtx.WithGasMeter(gasMeter)
 }

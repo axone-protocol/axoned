@@ -3,17 +3,17 @@ package meter
 import (
 	"math"
 
-	"github.com/cosmos/cosmos-sdk/types"
+	storetypes "cosmossdk.io/store/types"
 )
 
 // weightedMeterDecorator is decorator that wraps a gas meter and adds a weight multiplier to the consumed gas.
 type weightedMeterDecorator struct {
-	decorated types.GasMeter
+	decorated storetypes.GasMeter
 	weight    uint64
 }
 
 // WithWeightedMeter returns a new weightedMeterDecorator with the given weight.
-func WithWeightedMeter(decorated types.GasMeter, weight uint64) types.GasMeter {
+func WithWeightedMeter(decorated storetypes.GasMeter, weight uint64) storetypes.GasMeter {
 	return &weightedMeterDecorator{
 		decorated: decorated,
 		weight:    weight,
@@ -21,27 +21,27 @@ func WithWeightedMeter(decorated types.GasMeter, weight uint64) types.GasMeter {
 }
 
 // GasConsumed returns the amount of gas consumed by the decorated gas meter.
-func (m *weightedMeterDecorator) GasConsumed() types.Gas {
+func (m *weightedMeterDecorator) GasConsumed() storetypes.Gas {
 	return m.decorated.GasConsumed()
 }
 
 // GasConsumedToLimit returns the amount of gas consumed by the decorated gas meter.
-func (m *weightedMeterDecorator) GasConsumedToLimit() types.Gas {
+func (m *weightedMeterDecorator) GasConsumedToLimit() storetypes.Gas {
 	return m.decorated.GasConsumedToLimit()
 }
 
 // GasRemaining returns the amount of gas remaining in the decorated gas meter.
-func (m *weightedMeterDecorator) GasRemaining() types.Gas {
+func (m *weightedMeterDecorator) GasRemaining() storetypes.Gas {
 	return m.decorated.GasRemaining()
 }
 
 // Limit returns the limit of the decorated gas meter.
-func (m *weightedMeterDecorator) Limit() types.Gas {
+func (m *weightedMeterDecorator) Limit() storetypes.Gas {
 	return m.decorated.Limit()
 }
 
 // ConsumeGas consumes the given amount of gas from the decorated gas meter.
-func (m *weightedMeterDecorator) ConsumeGas(amount types.Gas, descriptor string) {
+func (m *weightedMeterDecorator) ConsumeGas(amount storetypes.Gas, descriptor string) {
 	consumed, overflow := multiplyUint64Overflow(m.weight, amount)
 	if overflow {
 		m.decorated.ConsumeGas(math.MaxUint64, descriptor)
@@ -51,7 +51,7 @@ func (m *weightedMeterDecorator) ConsumeGas(amount types.Gas, descriptor string)
 }
 
 // RefundGas refunds the given amount of gas to the decorated gas meter.
-func (m *weightedMeterDecorator) RefundGas(amount types.Gas, descriptor string) {
+func (m *weightedMeterDecorator) RefundGas(amount storetypes.Gas, descriptor string) {
 	consumed, overflow := multiplyUint64Overflow(m.decorated.GasConsumed(), amount)
 	if overflow {
 		m.decorated.RefundGas(math.MaxUint64, descriptor)

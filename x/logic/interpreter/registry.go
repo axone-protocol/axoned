@@ -5,10 +5,10 @@ import (
 	"strconv"
 	"strings"
 
+	storetypes "cosmossdk.io/store/types"
+
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/predicate"
 )
@@ -138,7 +138,7 @@ var RegistryNames = func() []string {
 // executing the predicate(ctx).
 //
 //nolint:lll
-func Register(i *prolog.Interpreter, name string, cost uint64, meter sdk.GasMeter) error {
+func Register(i *prolog.Interpreter, name string, cost uint64, meter storetypes.GasMeter) error {
 	if p, ok := registry[name]; ok {
 		parts := strings.Split(name, "/")
 		if len(parts) == 2 {
@@ -148,7 +148,7 @@ func Register(i *prolog.Interpreter, name string, cost uint64, meter sdk.GasMete
 				return err
 			}
 
-			hook := func() sdk.Gas {
+			hook := func() storetypes.Gas {
 				meter.ConsumeGas(cost, fmt.Sprintf("predicate %s", name))
 
 				return meter.GasRemaining()

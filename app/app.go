@@ -740,6 +740,7 @@ func New(
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		wasmtypes.ModuleName,
+		logicmoduletypes.ModuleName,
 	)
 
 	app.ModuleManager.SetOrderEndBlockers(

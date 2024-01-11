@@ -8,15 +8,17 @@ import (
 	"net/url"
 	"testing"
 
+	"cosmossdk.io/store/metrics"
+
 	"github.com/golang/mock/gomock"
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	tmdb "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
+	"cosmossdk.io/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
 
-	"github.com/cosmos/cosmos-sdk/store"
+	"cosmossdk.io/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
@@ -122,8 +124,8 @@ func TestWasmHandler(t *testing.T) {
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the uri #%d: %s", nc, tc.uri), func() {
 				Convey("and a wasm keeper initialized with the given values", func() {
-					db := tmdb.NewMemDB()
-					stateStore := store.NewCommitMultiStore(db)
+					db := dbm.NewMemDB()
+					stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 					wasmKeeper := testutil.NewMockWasmKeeper(ctrl)
 					ctx := sdk.
 						NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())

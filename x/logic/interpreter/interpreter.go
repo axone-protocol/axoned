@@ -6,10 +6,10 @@ import (
 	"io"
 	"io/fs"
 
+	storetypes "cosmossdk.io/store/types"
+
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // Predicates is a map of predicate names to their execution costs.
@@ -20,7 +20,7 @@ type Option func(*prolog.Interpreter) error
 
 // WithPredicates configures the interpreter to register the specified predicates.
 // The predicates names must be present in the registry, otherwise the function will return an error.
-func WithPredicates(_ goctx.Context, predicates Predicates, meter sdk.GasMeter) Option {
+func WithPredicates(_ goctx.Context, predicates Predicates, meter storetypes.GasMeter) Option {
 	return func(i *prolog.Interpreter) error {
 		for predicate, cost := range predicates {
 			if err := Register(i, predicate, cost, meter); err != nil {

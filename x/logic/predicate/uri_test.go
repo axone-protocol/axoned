@@ -10,11 +10,11 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	"cosmossdk.io/log"
 	tmdb "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/cosmos/cosmos-sdk/store"
+	"cosmossdk.io/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
@@ -173,8 +173,8 @@ func TestURIEncoded(t *testing.T) {
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
 				Convey("and a context", func() {
-					db := tmdb.NewMemDB()
-					stateStore := store.NewCommitMultiStore(db)
+					db := dbm.NewMemDB()
+					stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 					Convey("and a vm", func() {

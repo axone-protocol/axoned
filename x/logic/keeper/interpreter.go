@@ -4,6 +4,8 @@ import (
 	goctx "context"
 	"math"
 
+	storetypes "cosmossdk.io/store/types"
+
 	"github.com/ichiban/prolog"
 	"github.com/samber/lo"
 
@@ -98,7 +100,7 @@ func (k Keeper) solsToAnswer(sdkCtx sdk.Context, sols *prolog.Solutions) (*types
 
 	if err := sols.Err(); err != nil {
 		if sdkCtx.GasMeter().IsOutOfGas() {
-			panic(sdk.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
+			panic(storetypes.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
 		}
 		solError = sols.Err().Error()
 	}
