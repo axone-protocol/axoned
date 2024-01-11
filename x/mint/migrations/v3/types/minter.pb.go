@@ -148,11 +148,6 @@ func (m *Params) GetBlocksPerYear() uint64 {
 	return 0
 }
 
-func init() {
-	proto.RegisterType((*Minter)(nil), "mint.v1beta1.Minter")
-	proto.RegisterType((*Params)(nil), "mint.v1beta1.Params")
-}
-
 func init() { proto.RegisterFile("mint/v1beta1/mint.proto", fileDescriptor_06339c129491fd39) }
 
 var fileDescriptor_06339c129491fd39 = []byte{
