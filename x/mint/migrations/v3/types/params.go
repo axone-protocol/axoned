@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"cosmossdk.io/math"
+
 	"sigs.k8s.io/yaml"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -18,7 +20,7 @@ var (
 )
 
 func NewParams(
-	mintDenom string, annualReductionFactor sdk.Dec, blocksPerYear uint64,
+	mintDenom string, annualReductionFactor math.LegacyDec, blocksPerYear uint64,
 ) Params {
 	return Params{
 		MintDenom:             mintDenom,
@@ -31,8 +33,8 @@ func NewParams(
 func DefaultParams() Params {
 	return Params{
 		MintDenom:             sdk.DefaultBondDenom,
-		AnnualReductionFactor: sdk.NewDecWithPrec(20, 2),  // Tha annual reduction factor is configured to 20% per year
-		BlocksPerYear:         uint64(60 * 60 * 8766 / 5), // assuming 5-second block times
+		AnnualReductionFactor: math.LegacyNewDecWithPrec(20, 2), // Tha annual reduction factor is configured to 20% per year
+		BlocksPerYear:         uint64(60 * 60 * 8766 / 5),       // assuming 5-second block times
 	}
 }
 
@@ -68,7 +70,7 @@ func validateMintDenom(i interface{}) error {
 }
 
 func validateAnnualReductionFactor(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(math.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
@@ -76,7 +78,7 @@ func validateAnnualReductionFactor(i interface{}) error {
 	if v.IsNegative() {
 		return fmt.Errorf("annual reduction factor cannot be negative: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
+	if v.GT(math.LegacyOneDec()) {
 		return fmt.Errorf("annual reduction factor too large: %s", v)
 	}
 

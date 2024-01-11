@@ -8,11 +8,10 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	sdkmath "cosmossdk.io/math"
+	"cosmossdk.io/math"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
@@ -35,7 +34,7 @@ func TestRandomizedGenState(t *testing.T) {
 		Rand:         r,
 		NumBonded:    3,
 		Accounts:     simtypes.RandomAccounts(r, 3),
-		InitialStake: sdkmath.NewInt(1000),
+		InitialStake: math.NewInt(1000),
 		GenState:     make(map[string]json.RawMessage),
 	}
 
@@ -44,8 +43,8 @@ func TestRandomizedGenState(t *testing.T) {
 	var mintGenesis types.GenesisState
 	simState.Cdc.MustUnmarshalJSON(simState.GenState[types.ModuleName], &mintGenesis)
 
-	inflationCoef := sdk.NewDecWithPrec(3, 2)
-	bondedRatio := sdk.NewDecWithPrec(2, 1)
+	inflationCoef := math.LegacyNewDecWithPrec(3, 2)
+	bondedRatio := math.LegacyNewDecWithPrec(2, 1)
 	minter, _ := types.NewMinterWithInflationCoef(inflationCoef, bondedRatio, simState.InitialStake)
 
 	require.Equal(t, uint64(6311520), mintGenesis.Params.BlocksPerYear)

@@ -1,6 +1,7 @@
 package v3
 
 import (
+	storetypes "cosmossdk.io/core/store"
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -12,7 +13,7 @@ import (
 // version 3.
 // This version include new/deleted parameters in store.
 func MigrateStore(ctx sdk.Context,
-	store sdk.KVStore,
+	store storetypes.KVStore,
 	cdc codec.BinaryCodec,
 ) error {
 	logger := ctx.Logger().
@@ -24,8 +25,11 @@ func MigrateStore(ctx sdk.Context,
 	logger.Debug("migrate old mint params with new params")
 
 	var oldParams oldTypes.Params
-	d := store.Get(types.ParamsKey)
-	err := cdc.Unmarshal(d, &oldParams)
+	d, err := store.Get(types.ParamsKey)
+	if err != nil {
+		return err
+	}
+	err = cdc.Unmarshal(d, &oldParams)
 	if err != nil {
 		return err
 	}
@@ -42,7 +46,10 @@ func MigrateStore(ctx sdk.Context,
 	logger.Debug("migrate minter store")
 
 	var oldMinter oldTypes.Minter
-	d = store.Get(types.MinterKey)
+	d, err = store.Get(types.MinterKey)
+	if err != nil {
+		return err
+	}
 	err = cdc.Unmarshal(d, &oldMinter)
 	if err != nil {
 		return err

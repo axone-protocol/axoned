@@ -78,7 +78,7 @@ func (s *IntegrationTestSuite) TestParams() {
 			name: "set invalid params",
 			input: types.Params{
 				MintDenom:     sdk.DefaultBondDenom,
-				InflationCoef: sdk.NewDecWithPrec(-73, 2),
+				InflationCoef: math.LegacyNewDecWithPrec(-73, 2),
 				BlocksPerYear: uint64(60 * 60 * 8766 / 5),
 			},
 			expectErr: true,
@@ -87,7 +87,7 @@ func (s *IntegrationTestSuite) TestParams() {
 			name: "set full valid params",
 			input: types.Params{
 				MintDenom:     sdk.DefaultBondDenom,
-				InflationCoef: sdk.NewDecWithPrec(73, 2),
+				InflationCoef: math.LegacyNewDecWithPrec(73, 2),
 				BlocksPerYear: uint64(60 * 60 * 8766 / 5),
 			},
 			expectErr: false,
@@ -118,7 +118,7 @@ func (s *IntegrationTestSuite) TestAliasFunctions() {
 	s.stakingKeeper.EXPECT().StakingTokenSupply(s.ctx).Return(stakingTokenSupply)
 	s.Require().Equal(s.mintKeeper.StakingTokenSupply(s.ctx), stakingTokenSupply)
 
-	bondedRatio := sdk.NewDecWithPrec(15, 2)
+	bondedRatio := math.LegacyNewDecWithPrec(15, 2)
 	s.stakingKeeper.EXPECT().BondedRatio(s.ctx).Return(bondedRatio)
 	s.Require().Equal(s.mintKeeper.BondedRatio(s.ctx), bondedRatio)
 

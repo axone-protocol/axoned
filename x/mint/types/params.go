@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"strings"
 
+	"cosmossdk.io/math"
+
 	"sigs.k8s.io/yaml"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -12,7 +14,7 @@ import (
 
 // NewParams creates a new Params object.
 func NewParams(
-	mintDenom string, inflationCoef sdk.Dec, blocksPerYear uint64,
+	mintDenom string, inflationCoef math.LegacyDec, blocksPerYear uint64,
 ) Params {
 	return Params{
 		MintDenom:     mintDenom,
@@ -25,7 +27,7 @@ func NewParams(
 func DefaultParams() Params {
 	return Params{
 		MintDenom:     sdk.DefaultBondDenom,
-		InflationCoef: sdk.NewDecWithPrec(3, 2),
+		InflationCoef: math.LegacyNewDecWithPrec(3, 2),
 		BlocksPerYear: uint64(60 * 60 * 8766 / 5), // assuming 5-second block times
 	}
 }
@@ -62,7 +64,7 @@ func validateMintDenom(i interface{}) error {
 }
 
 func validateInflationCoef(i interface{}) error {
-	v, ok := i.(sdk.Dec)
+	v, ok := i.(math.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
 	}
@@ -70,7 +72,7 @@ func validateInflationCoef(i interface{}) error {
 	if v.IsNegative() {
 		return fmt.Errorf("inflation coefficient cannot be negative: %s", v)
 	}
-	if v.GT(sdk.OneDec()) {
+	if v.GT(math.LegacyOneDec()) {
 		// while there's no theoretical limit to the inflation rate, a coefficient of
 		// 1 or more would lead to hyper-hyperinflation.
 		return fmt.Errorf("inflation coefficient too large: %s", v)

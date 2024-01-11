@@ -10,7 +10,7 @@ import (
 
 // NewMinter returns a new Minter object with the given inflation, annual
 // provisions values.
-func NewMinter(inflation, annualProvisions sdk.Dec) Minter {
+func NewMinter(inflation, annualProvisions math.LegacyDec) Minter {
 	return Minter{
 		Inflation:        inflation,
 		AnnualProvisions: annualProvisions,
@@ -18,15 +18,15 @@ func NewMinter(inflation, annualProvisions sdk.Dec) Minter {
 }
 
 // NewMinterWithInitialInflation returns an initial Minter object with a given inflation value and zero annual provisions.
-func NewMinterWithInitialInflation(inflation sdk.Dec) Minter {
+func NewMinterWithInitialInflation(inflation math.LegacyDec) Minter {
 	return NewMinter(
 		inflation,
-		sdk.NewDec(0),
+		math.LegacyNewDec(0),
 	)
 }
 
 // NewMinterWithInflationCoef returns a new Minter with updated inflation and annual provisions values.
-func NewMinterWithInflationCoef(inflationCoef sdk.Dec, bondedRatio sdk.Dec, totalSupply math.Int) (Minter, error) {
+func NewMinterWithInflationCoef(inflationCoef math.LegacyDec, bondedRatio math.LegacyDec, totalSupply math.Int) (Minter, error) {
 	inflationRate, err := inflationRate(inflationCoef, bondedRatio)
 	if err != nil {
 		return Minter{}, err
@@ -40,7 +40,7 @@ func NewMinterWithInflationCoef(inflationCoef sdk.Dec, bondedRatio sdk.Dec, tota
 // which uses an inflation rate of 0%.
 func DefaultInitialMinter() Minter {
 	return NewMinterWithInitialInflation(
-		sdk.NewDec(0),
+		math.LegacyNewDec(0),
 	)
 }
 
@@ -55,7 +55,7 @@ func (m Minter) Validate() error {
 
 // inflationRate returns the inflation rate computed from the current bonded ratio
 // and the inflation parameter.
-func inflationRate(inflationCoef sdk.Dec, bondedRatio sdk.Dec) (sdk.Dec, error) {
+func inflationRate(inflationCoef math.LegacyDec, bondedRatio math.LegacyDec) (math.LegacyDec, error) {
 	if bondedRatio.IsZero() {
 		return math.LegacyZeroDec(), ErrBondedRatioIsZero
 	}
@@ -66,6 +66,6 @@ func inflationRate(inflationCoef sdk.Dec, bondedRatio sdk.Dec) (sdk.Dec, error) 
 // BlockProvision returns the provisions for a block based on the annual
 // provisions rate.
 func (m Minter) BlockProvision(params Params) sdk.Coin {
-	provisionAmt := m.AnnualProvisions.QuoInt(sdk.NewIntFromUint64(params.BlocksPerYear))
+	provisionAmt := m.AnnualProvisions.QuoInt(math.NewIntFromUint64(params.BlocksPerYear))
 	return sdk.NewCoin(params.MintDenom, provisionAmt.TruncateInt())
 }

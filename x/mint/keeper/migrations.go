@@ -17,5 +17,5 @@ func NewMigrator(keeper Keeper) Migrator {
 }
 
 func (m Migrator) Migrate2to3(ctx sdk.Context) error {
-	return v3.MigrateStore(ctx, ctx.KVStore(m.keeper.storeKey), m.keeper.cdc)
+	return v3.MigrateStore(ctx, m.keeper.storeService.OpenKVStore(ctx), m.keeper.cdc)
 }
