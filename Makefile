@@ -213,18 +213,18 @@ chain-init: build ## Initialize the blockchain with default settings.
 	      --keyring-backend test \
 	      --home "${CHAIN_HOME}"; \
 	\
-	${CHAIN_BINARY} add-genesis-account validator 1000000000uknow \
+	${CHAIN_BINARY} genesis add-genesis-account validator 1000000000uknow \
 	  --keyring-backend test \
 	  --home "${CHAIN_HOME}"; \
 	\
 	NODE_ID=`${CHAIN_BINARY} tendermint show-node-id --home ${CHAIN_HOME}`; \
-	${CHAIN_BINARY} gentx validator 1000000uknow \
+	${CHAIN_BINARY} genesis gentx validator 1000000uknow \
 	  --node-id $$NODE_ID \
 	  --chain-id=okp4-${CHAIN} \
 	  --keyring-backend test \
       --home "${CHAIN_HOME}"; \
 	\
-	${CHAIN_BINARY} collect-gentxs \
+	${CHAIN_BINARY} genesis collect-gentxs \
 	  --home "${CHAIN_HOME}"
 
 chain-start: build ## Start the blockchain with existing configuration (see chain-init)
