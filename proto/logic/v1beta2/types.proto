@@ -47,8 +47,13 @@ message Result {
 message Answer {
   option (gogoproto.goproto_stringer) = true;
 
-  // result is the result of the query.
+  // success specifies if the query was successful.
   bool success = 1 [(gogoproto.moretags) = "yaml:\"success\",omitempty"];
+  // error specifies the error message if the query caused an error.
+  string error = 5 [
+    (gogoproto.nullable) = true,
+    (gogoproto.moretags) = "yaml:\"error\",omitempty"
+  ];
   // has_more specifies if there are more solutions than the ones returned.
   bool has_more = 2 [(gogoproto.moretags) = "yaml:\"has_more\",omitempty"];
   // variables represent all the variables in the query.

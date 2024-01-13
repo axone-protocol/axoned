@@ -58,12 +58,32 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 		_ = sols.Close()
 	}()
 
-	success := false
-	limits := k.limits(ctx)
+	var userOutput string
+	if userOutputBuffer != nil {
+		userOutput = userOutputBuffer.String()
+	}
+	answer, err := k.solsToAnswer(sdkCtx, sols) //nolint:contextcheck
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.QueryServiceAskResponse{
+		Height:     uint64(sdkCtx.BlockHeight()),
+		GasUsed:    sdkCtx.GasMeter().GasConsumed(),
+		Answer:     answer,
+		UserOutput: userOutput,
+	}, nil
+}
+
+// solsToAnswer consumes the given prolog solutions and convert it to an answer.
+func (k Keeper) solsToAnswer(sdkCtx sdk.Context, sols *prolog.Solutions) (*types.Answer, error) {
+	solSuccess := false
+	solError := ""
+	limits := k.limits(sdkCtx)
 	var variables []string
 	results := make([]types.Result, 0)
 	for nb := sdkmath.ZeroUint(); nb.LT(*limits.MaxResultCount) && sols.Next(); nb = nb.Incr() {
-		success = true
+		solSuccess = true
 
 		m := types.TermResults{}
 		if err := sols.Scan(m); err != nil {
@@ -80,24 +100,15 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 		if sdkCtx.GasMeter().IsOutOfGas() {
 			panic(sdk.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
 		}
-		return nil, errorsmod.Wrapf(types.InvalidArgument, "error interpreting solutions: %v", err.Error())
+		solError = sols.Err().Error()
 	}
 
-	var userOutput string
-	if userOutputBuffer != nil {
-		userOutput = userOutputBuffer.String()
-	}
-
-	return &types.QueryServiceAskResponse{
-		Height:  uint64(sdkCtx.BlockHeight()),
-		GasUsed: sdkCtx.GasMeter().GasConsumed(),
-		Answer: &types.Answer{
-			Success:   success,
-			HasMore:   sols.Next(),
-			Variables: variables,
-			Results:   results,
-		},
-		UserOutput: userOutput,
+	return &types.Answer{
+		Success:   solSuccess,
+		Error:     solError,
+		HasMore:   sols.Next(),
+		Variables: variables,
+		Results:   results,
 	}, nil
 }
 
