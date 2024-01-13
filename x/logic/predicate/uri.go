@@ -1,7 +1,6 @@
 package predicate
 
 import (
-	"context"
 	"fmt"
 	"net/url"
 
@@ -153,41 +152,39 @@ func (comp Component) Unescape(v string) (string, error) {
 //
 // [RFC 3986]: https://datatracker.ietf.org/doc/html/rfc3986#section-2.1
 func URIEncoded(vm *engine.VM, component, decoded, encoded engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		var comp Component
-		switch c := env.Resolve(component).(type) {
-		case engine.Atom:
-			cc, err := NewComponent(c.String())
-			if err != nil {
-				return engine.Error(fmt.Errorf("uri_encoded/3: %w", err))
-			}
-			comp = cc
-		default:
-			return engine.Error(fmt.Errorf("uri_encoded/3: invalid component type: %T, should be Atom", component))
+	var comp Component
+	switch c := env.Resolve(component).(type) {
+	case engine.Atom:
+		cc, err := NewComponent(c.String())
+		if err != nil {
+			return engine.Error(fmt.Errorf("uri_encoded/3: %w", err))
 		}
+		comp = cc
+	default:
+		return engine.Error(fmt.Errorf("uri_encoded/3: invalid component type: %T, should be Atom", component))
+	}
 
-		var dec string
-		switch d := env.Resolve(decoded).(type) {
-		case engine.Variable:
-		case engine.Atom:
-			dec = comp.Escape(d.String())
-		default:
-			return engine.Error(fmt.Errorf("uri_encoded/3: invalid decoded type: %T, should be Variable or Atom", d))
-		}
+	var dec string
+	switch d := env.Resolve(decoded).(type) {
+	case engine.Variable:
+	case engine.Atom:
+		dec = comp.Escape(d.String())
+	default:
+		return engine.Error(fmt.Errorf("uri_encoded/3: invalid decoded type: %T, should be Variable or Atom", d))
+	}
 
-		switch e := env.Resolve(encoded).(type) {
-		case engine.Variable:
-			var r engine.Term = engine.NewAtom(dec)
-			return engine.Unify(vm, encoded, r, cont, env)
-		case engine.Atom:
-			enc, err := comp.Unescape(e.String())
-			if err != nil {
-				return engine.Error(fmt.Errorf("uri_encoded/3: %w", err))
-			}
-			var r engine.Term = engine.NewAtom(enc)
-			return engine.Unify(vm, decoded, r, cont, env)
-		default:
-			return engine.Error(fmt.Errorf("uri_encoded/3: invalid encoded type: %T, should be Variable or Atom", e))
+	switch e := env.Resolve(encoded).(type) {
+	case engine.Variable:
+		var r engine.Term = engine.NewAtom(dec)
+		return engine.Unify(vm, encoded, r, cont, env)
+	case engine.Atom:
+		enc, err := comp.Unescape(e.String())
+		if err != nil {
+			return engine.Error(fmt.Errorf("uri_encoded/3: %w", err))
 		}
-	})
+		var r engine.Term = engine.NewAtom(enc)
+		return engine.Unify(vm, decoded, r, cont, env)
+	default:
+		return engine.Error(fmt.Errorf("uri_encoded/3: invalid encoded type: %T, should be Variable or Atom", e))
+	}
 }

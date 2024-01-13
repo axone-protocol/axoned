@@ -1,7 +1,6 @@
 package predicate
 
 import (
-	"context"
 	"errors"
 	"io"
 	"strings"
@@ -41,44 +40,42 @@ import (
 //	String = 'Hello World'
 //	Length = 11
 func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		var s *engine.Stream
-		switch st := env.Resolve(stream).(type) {
-		case engine.Variable:
-			return engine.Error(engine.InstantiationError(env))
-		case *engine.Stream:
-			s = st
-		default:
-			return engine.Error(engine.TypeError(prolog.AtomTypeStream, stream, env))
-		}
+	var s *engine.Stream
+	switch st := env.Resolve(stream).(type) {
+	case engine.Variable:
+		return engine.Error(engine.InstantiationError(env))
+	case *engine.Stream:
+		s = st
+	default:
+		return engine.Error(engine.TypeError(prolog.AtomTypeStream, stream, env))
+	}
 
-		var maxLength uint64
-		if maxLen, ok := env.Resolve(length).(engine.Integer); ok {
-			maxLength = uint64(maxLen)
-		}
+	var maxLength uint64
+	if maxLen, ok := env.Resolve(length).(engine.Integer); ok {
+		maxLength = uint64(maxLen)
+	}
 
-		var builder strings.Builder
-		var totalLen uint64
-		for {
-			r, l, err := s.ReadRune()
-			if err != nil || (maxLength != 0 && totalLen >= maxLength) {
-				if errors.Is(err, io.EOF) || totalLen >= maxLength {
-					break
-				}
-				return engine.Error(prolog.SyntaxError(err, env))
+	var builder strings.Builder
+	var totalLen uint64
+	for {
+		r, l, err := s.ReadRune()
+		if err != nil || (maxLength != 0 && totalLen >= maxLength) {
+			if errors.Is(err, io.EOF) || totalLen >= maxLength {
+				break
 			}
-			totalLen += uint64(l)
-			_, err = builder.WriteRune(r)
-			if err != nil {
-				return engine.Error(prolog.SyntaxError(err, env))
-			}
+			return engine.Error(prolog.SyntaxError(err, env))
 		}
+		totalLen += uint64(l)
+		_, err = builder.WriteRune(r)
+		if err != nil {
+			return engine.Error(prolog.SyntaxError(err, env))
+		}
+	}
 
-		var r engine.Term = engine.NewAtom(builder.String())
-		return engine.Unify(
-			vm, prolog.Tuple(result, length),
-			prolog.Tuple(r, engine.Integer(totalLen)), cont, env)
-	})
+	var r engine.Term = engine.NewAtom(builder.String())
+	return engine.Unify(
+		vm, prolog.Tuple(result, length),
+		prolog.Tuple(r, engine.Integer(totalLen)), cont, env)
 }
 
 // StringBytes is a predicate that unifies a string with a list of bytes, returning true when the (Unicode) String is

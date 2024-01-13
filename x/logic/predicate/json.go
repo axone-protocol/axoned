@@ -1,7 +1,6 @@
 package predicate
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -34,43 +33,41 @@ import (
 //	# JSON conversion to Prolog.
 //	- json_prolog('{"foo": "bar"}', json([foo-bar])).
 func JSONProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		var result engine.Term
+	var result engine.Term
 
-		switch t1 := env.Resolve(j).(type) {
-		case engine.Variable:
-		case engine.Atom:
-			terms, err := jsonStringToTerms(t1, env)
-			if err != nil {
-				return engine.Error(err)
-			}
-			result = terms
-		default:
-			return engine.Error(engine.TypeError(prolog.AtomTypeAtom, j, env))
+	switch t1 := env.Resolve(j).(type) {
+	case engine.Variable:
+	case engine.Atom:
+		terms, err := jsonStringToTerms(t1, env)
+		if err != nil {
+			return engine.Error(err)
+		}
+		result = terms
+	default:
+		return engine.Error(engine.TypeError(prolog.AtomTypeAtom, j, env))
+	}
+
+	switch t2 := env.Resolve(term).(type) {
+	case engine.Variable:
+		if result == nil {
+			return engine.Error(engine.InstantiationError(env))
+		}
+		return engine.Unify(vm, term, result, cont, env)
+	default:
+		b, err := termsToJSON(t2, env)
+		if err != nil {
+			return engine.Error(err)
 		}
 
-		switch t2 := env.Resolve(term).(type) {
-		case engine.Variable:
-			if result == nil {
-				return engine.Error(engine.InstantiationError(env))
-			}
-			return engine.Unify(vm, term, result, cont, env)
-		default:
-			b, err := termsToJSON(t2, env)
-			if err != nil {
-				return engine.Error(err)
-			}
-
-			b, err = sdk.SortJSON(b)
-			if err != nil {
-				return engine.Error(
-					prolog.WithError(
-						engine.DomainError(prolog.ValidEncoding("json"), term, env), err, env))
-			}
-			var r engine.Term = engine.NewAtom(string(b))
-			return engine.Unify(vm, j, r, cont, env)
+		b, err = sdk.SortJSON(b)
+		if err != nil {
+			return engine.Error(
+				prolog.WithError(
+					engine.DomainError(prolog.ValidEncoding("json"), term, env), err, env))
 		}
-	})
+		var r engine.Term = engine.NewAtom(string(b))
+		return engine.Unify(vm, j, r, cont, env)
+	}
 }
 
 func jsonStringToTerms(j engine.Atom, env *engine.Env) (engine.Term, error) {

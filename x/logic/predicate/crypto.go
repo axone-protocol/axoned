@@ -1,7 +1,6 @@
 package predicate
 
 import (
-	"context"
 	"errors"
 	"slices"
 
@@ -56,27 +55,25 @@ func CryptoDataHash(
 ) *engine.Promise {
 	algorithmOpt := engine.NewAtom("algorithm")
 
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		algorithmAtom, err := prolog.GetOptionAsAtomWithDefault(algorithmOpt, options, engine.NewAtom("sha256"), env)
-		if err != nil {
-			return engine.Error(err)
-		}
-		algorithm, err := util.ParseHashAlg(algorithmAtom.String())
-		if err != nil {
-			return engine.Error(engine.TypeError(prolog.AtomTypeHashAlgorithm, algorithmAtom, env))
-		}
-		decodedData, err := termToBytes(data, options, prolog.AtomUtf8, env)
-		if err != nil {
-			return engine.Error(err)
-		}
+	algorithmAtom, err := prolog.GetOptionAsAtomWithDefault(algorithmOpt, options, engine.NewAtom("sha256"), env)
+	if err != nil {
+		return engine.Error(err)
+	}
+	algorithm, err := util.ParseHashAlg(algorithmAtom.String())
+	if err != nil {
+		return engine.Error(engine.TypeError(prolog.AtomTypeHashAlgorithm, algorithmAtom, env))
+	}
+	decodedData, err := termToBytes(data, options, prolog.AtomUtf8, env)
+	if err != nil {
+		return engine.Error(err)
+	}
 
-		result, err := util.Hash(algorithm, decodedData)
-		if err != nil {
-			return engine.Error(prolog.SyntaxError(err, env))
-		}
+	result, err := util.Hash(algorithm, decodedData)
+	if err != nil {
+		return engine.Error(prolog.SyntaxError(err, env))
+	}
 
-		return engine.Unify(vm, hash, prolog.BytesToByteListTerm(result), cont, env)
-	})
+	return engine.Unify(vm, hash, prolog.BytesToByteListTerm(result), cont, env)
 }
 
 // EDDSAVerify determines if a given signature is valid as per the EdDSA algorithm for the provided data, using the
