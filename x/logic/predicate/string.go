@@ -8,7 +8,6 @@ import (
 	"github.com/ichiban/prolog/engine"
 
 	"github.com/okp4/okp4d/x/logic/prolog"
-	"github.com/okp4/okp4d/x/logic/util"
 )
 
 // ReadString is a predicate that reads characters from the provided Stream and unifies them with String.
@@ -127,7 +126,7 @@ func StringBytes(
 			}
 			return []engine.Term{term}, nil
 		default:
-			bs, err := encode(value[0], str, encoding, env)
+			bs, err := prolog.Encode(value[0], str, encoding, env)
 			if err != nil {
 				return nil, err
 			}
@@ -154,7 +153,7 @@ func StringBytes(
 			if err != nil {
 				return nil, err
 			}
-			result, err = decode(value[0], bs, encoding, env)
+			result, err = prolog.Decode(value[0], bs, encoding, env)
 			if err != nil {
 				return nil, err
 			}
@@ -164,32 +163,4 @@ func StringBytes(
 
 	return prolog.UnifyFunctionalPredicate(
 		[]engine.Term{str}, []engine.Term{bts}, encoding, forwardConverter, backwardConverter, cont, env)
-}
-
-func decode(value engine.Term, bs []byte, encoding engine.Atom, env *engine.Env) (string, error) {
-	str, err := util.Decode(bs, encoding.String())
-	if err != nil {
-		switch {
-		case errors.Is(err, util.ErrInvalidCharset):
-			return "", engine.TypeError(prolog.AtomTypeCharset, encoding, env)
-		default:
-			return "", prolog.WithError(
-				engine.DomainError(prolog.ValidEncoding(encoding.String()), value, env), err, env)
-		}
-	}
-	return str, nil
-}
-
-func encode(value engine.Term, str string, encoding engine.Atom, env *engine.Env) ([]byte, error) {
-	bs, err := util.Encode(str, encoding.String())
-	if err != nil {
-		switch {
-		case errors.Is(err, util.ErrInvalidCharset):
-			return nil, engine.TypeError(prolog.AtomTypeCharset, encoding, env)
-		default:
-			return nil, prolog.WithError(
-				engine.DomainError(prolog.ValidEncoding(encoding.String()), value, env), err, env)
-		}
-	}
-	return bs, nil
 }

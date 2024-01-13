@@ -1,7 +1,6 @@
 package predicate
 
 import (
-	"errors"
 	"slices"
 
 	"github.com/ichiban/prolog/engine"
@@ -224,15 +223,9 @@ func termToBytes(term, options, defaultEncoding engine.Term, env *engine.Env) ([
 		if err != nil {
 			return nil, err
 		}
-		bs, err := util.Encode(str, encodingAtom.String())
+		bs, err := prolog.Encode(term, str, encodingAtom, env)
 		if err != nil {
-			switch {
-			case errors.Is(err, util.ErrInvalidCharset):
-				return nil, engine.TypeError(prolog.AtomTypeCharset, encodingTerm, env)
-			default:
-				return nil, prolog.WithError(
-					engine.DomainError(prolog.ValidEncoding(encodingAtom.String()), term, env), err, env)
-			}
+			return nil, err
 		}
 		return bs, nil
 	default:

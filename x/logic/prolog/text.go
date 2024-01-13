@@ -23,7 +23,8 @@ func AtomToString(atom engine.Term, env *engine.Env) (string, error) {
 func listTermToString(
 	term engine.Term,
 	converter func(*engine.Env, engine.Term) (rune, error),
-	env *engine.Env) (string, error) {
+	env *engine.Env,
+) (string, error) {
 	iter, err := ListIterator(term, env)
 	if err != nil {
 		return "", err
