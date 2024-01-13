@@ -1,15 +1,16 @@
-package util
+package prolog
 
 import (
 	"context"
-	"fmt"
+
+	"github.com/ichiban/prolog/engine"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 // UnwrapSDKContext retrieves a Context from a context.Context instance
 // attached with WrapSDKContext.
-func UnwrapSDKContext(ctx context.Context) (sdk.Context, error) {
+func UnwrapSDKContext(ctx context.Context, env *engine.Env) (sdk.Context, error) {
 	if sdkCtx, ok := ctx.(sdk.Context); ok {
 		return sdkCtx, nil
 	}
@@ -17,5 +18,5 @@ func UnwrapSDKContext(ctx context.Context) (sdk.Context, error) {
 		return sdkCtx, nil
 	}
 
-	return sdk.Context{}, fmt.Errorf("no sdk.Context found in context")
+	return sdk.Context{}, ResourceError(ResourceContext(), env)
 }

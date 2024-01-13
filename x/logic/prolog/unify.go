@@ -45,27 +45,55 @@ func UnifyFunctional(
 	backwardConverter ConvertFunc,
 	env *engine.Env,
 ) (bool, *engine.Env, error) {
-	isInFI, isOutFi := AreFullyInstantiated(in, env), AreFullyInstantiated(out, env)
+	isInFI, isOutFi := AreGround(in, env), AreGround(out, env)
 	if !isInFI && !isOutFi {
 		return false, env, engine.InstantiationError(env)
 	}
 
 	var err error
 	from, to := in, out
-	if isInFI {
+
+	switch {
+	case forwardConverter == nil && backwardConverter == nil:
+		// no-op
+	case isInFI && forwardConverter != nil:
 		from, err = forwardConverter(in, options, env)
 		if err != nil {
 			return false, env, err
 		}
-	} else {
+	case isOutFi && backwardConverter != nil:
 		to, err = backwardConverter(out, options, env)
 		if err != nil {
 			return false, env, err
 		}
+	default:
+		return false, env, engine.InstantiationError(env)
 	}
+
 	env, result := env.Unify(
 		Tuple(from...),
 		Tuple(to...),
 	)
+
 	return result, env, nil
+}
+
+// UnifyFunctionalPredicate is the predicate version of UnifyFunctional returning a promise.
+func UnifyFunctionalPredicate(
+	in,
+	out []engine.Term,
+	options engine.Term,
+	forwardConverter ConvertFunc,
+	backwardConverter ConvertFunc,
+	cont engine.Cont,
+	env *engine.Env,
+) *engine.Promise {
+	ok, env, err := UnifyFunctional(in, out, options, forwardConverter, backwardConverter, env)
+	if err != nil {
+		return engine.Error(err)
+	}
+	if !ok {
+		return engine.Bool(false)
+	}
+	return cont(env)
 }

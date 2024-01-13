@@ -1,8 +1,6 @@
 package prolog
 
 import (
-	"fmt"
-
 	"github.com/ichiban/prolog/engine"
 )
 
@@ -12,35 +10,40 @@ import (
 // The options are either a list of options or an option.
 // If no option is found nil is returned.
 func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.Term, error) {
-	extractOption := func(term engine.Term) (engine.Term, error) {
-		switch v := term.(type) {
+	extractOption := func(opt engine.Term) (engine.Term, error) {
+		switch v := opt.(type) {
 		case engine.Compound:
 			if v.Functor() == name {
 				if v.Arity() != 1 {
-					return nil, fmt.Errorf("invalid arity for compound '%s': %d but expected 1", name, v.Arity())
+					return nil, engine.TypeError(AtomTypeOption, opt, env)
 				}
 
 				return v.Arg(0), nil
 			}
 			return nil, nil
+		case engine.Atom:
+			if v == AtomEmptyList {
+				return nil, nil
+			}
 		case nil:
 			return nil, nil
-		default:
-			return nil, fmt.Errorf("invalid term '%s' - expected engine.Compound but got %T", term, v)
 		}
+		return nil, engine.TypeError(AtomTypeOption, opt, env)
 	}
 
 	resolvedTerm := env.Resolve(options)
-
-	if IsEmptyList(resolvedTerm) {
+	if resolvedTerm == nil {
 		return nil, nil
 	}
 
 	if IsList(resolvedTerm) {
-		iter := engine.ListIterator{List: resolvedTerm, Env: env}
+		iter, err := ListIterator(resolvedTerm, env)
+		if err != nil {
+			return nil, err
+		}
 
 		for iter.Next() {
-			opt := env.Resolve(iter.Current())
+			opt := iter.Current()
 
 			term, err := extractOption(opt)
 			if err != nil {
@@ -51,7 +54,6 @@ func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.T
 				return term, nil
 			}
 		}
-		return nil, nil
 	}
 
 	return extractOption(resolvedTerm)

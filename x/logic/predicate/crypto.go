@@ -2,9 +2,8 @@ package predicate
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"slices"
-	"strings"
 
 	"github.com/ichiban/prolog/engine"
 
@@ -29,6 +28,7 @@ import (
 // For Format, the supported encodings are:
 //
 //   - utf8 (default), the UTF-8 encoding represented as an atom.
+//   - text, the plain text encoding represented as an atom.
 //   - hex, the hexadecimal encoding represented as an atom.
 //   - octet, the raw byte encoding depicted as a list of integers ranging from 0 to 255.
 //
@@ -54,32 +54,28 @@ import (
 func CryptoDataHash(
 	vm *engine.VM, data, hash, options engine.Term, cont engine.Cont, env *engine.Env,
 ) *engine.Promise {
-	functor := "crypto_data_hash/3"
 	algorithmOpt := engine.NewAtom("algorithm")
 
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		algorithmAtom, err := prolog.GetOptionAsAtomWithDefault(algorithmOpt, options, engine.NewAtom("sha256"), env)
 		if err != nil {
-			return engine.Error(fmt.Errorf("%s: %w", functor, err))
+			return engine.Error(err)
 		}
 		algorithm, err := util.ParseHashAlg(algorithmAtom.String())
 		if err != nil {
-			return engine.Error(fmt.Errorf("%s: invalid algorithm: %s. Possible values: %s",
-				functor,
-				algorithmAtom.String(),
-				util.HashAlgNames()))
+			return engine.Error(engine.TypeError(prolog.AtomTypeHashAlgorithm, algorithmAtom, env))
 		}
 		decodedData, err := termToBytes(data, options, prolog.AtomUtf8, env)
 		if err != nil {
-			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
+			return engine.Error(err)
 		}
 
 		result, err := util.Hash(algorithm, decodedData)
 		if err != nil {
-			return engine.Error(fmt.Errorf("%s: failed to hash data: %w", functor, err))
+			return engine.Error(prolog.SyntaxError(err, env))
 		}
 
-		return engine.Unify(vm, hash, prolog.BytesToCodepointListTermWithDefault(result, env), cont, env)
+		return engine.Unify(vm, hash, prolog.BytesToByteListTerm(result), cont, env)
 	})
 }
 
@@ -104,6 +100,8 @@ func CryptoDataHash(
 //
 //   - hex (default), the hexadecimal encoding represented as an atom.
 //   - octet, the plain byte encoding depicted as a list of integers ranging from 0 to 255.
+//   - text, the plain text encoding represented as an atom.
+//   - utf8 (default), the UTF-8 encoding represented as an atom.
 //
 // For Alg, the supported algorithms are:
 //
@@ -117,7 +115,7 @@ func CryptoDataHash(
 //	# Verify a signature for binary data.
 //	- eddsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(ed25519)])
 func EDDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return xVerify("eddsa_verify/4", key, data, sig, options, util.Ed25519, []util.KeyAlg{util.Ed25519}, cont, env)
+	return xVerify(key, data, sig, options, util.Ed25519, []util.KeyAlg{util.Ed25519}, cont, env)
 }
 
 // ECDSAVerify determines if a given signature is valid as per the ECDSA algorithm for the provided data, using the
@@ -143,6 +141,8 @@ func EDDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.
 //
 //   - hex (default), the hexadecimal encoding represented as an atom.
 //   - octet, the plain byte encoding depicted as a list of integers ranging from 0 to 255.
+//   - text, the plain text encoding represented as an atom.
+//   - utf8 (default), the UTF-8 encoding represented as an atom.
 //
 // For Alg, the supported algorithms are:
 //
@@ -157,59 +157,54 @@ func EDDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.
 //	# Verify a signature for binary data using the ECDSA secp256k1 algorithm.
 //	- ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(secp256k1)])
 func ECDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return xVerify("ecdsa_verify/4", key, data, sig, options, util.Secp256r1, []util.KeyAlg{util.Secp256r1, util.Secp256k1}, cont, env)
+	return xVerify(key, data, sig, options, util.Secp256r1, []util.KeyAlg{util.Secp256r1, util.Secp256k1}, cont, env)
 }
 
 // xVerify return `true` if the Signature can be verified as the signature for Data, using the given PubKey for a
 // considered algorithm.
 // This is a generic predicate implementation that can be used to verify any signature.
-func xVerify(functor string, key, data, sig, options engine.Term, defaultAlgo util.KeyAlg,
+func xVerify(key, data, sig, options engine.Term, defaultAlgo util.KeyAlg,
 	algos []util.KeyAlg, cont engine.Cont, env *engine.Env,
 ) *engine.Promise {
 	typeOpt := engine.NewAtom("type")
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		typeTerm, err := prolog.GetOptionWithDefault(typeOpt, options, engine.NewAtom(defaultAlgo.String()), env)
-		if err != nil {
-			return engine.Error(fmt.Errorf("%s: %w", functor, err))
-		}
-		typeAtom, err := prolog.AssertAtom(env, typeTerm)
-		if err != nil {
-			return engine.Error(fmt.Errorf("%s: %w", functor, err))
-		}
+	typeTerm, err := prolog.GetOptionWithDefault(typeOpt, options, engine.NewAtom(defaultAlgo.String()), env)
+	if err != nil {
+		return engine.Error(err)
+	}
+	typeAtom, err := prolog.AssertAtom(env, typeTerm)
+	if err != nil {
+		return engine.Error(err)
+	}
 
-		if idx := slices.IndexFunc(algos, func(a util.KeyAlg) bool { return a.String() == typeAtom.String() }); idx == -1 {
-			return engine.Error(fmt.Errorf("%s: invalid type: %s. Possible values: %s",
-				functor,
-				typeAtom.String(),
-				strings.Join(util.Map(algos, func(a util.KeyAlg) string { return a.String() }), ", ")))
-		}
+	if idx := slices.IndexFunc(algos, func(a util.KeyAlg) bool { return a.String() == typeAtom.String() }); idx == -1 {
+		return engine.Error(engine.TypeError(prolog.AtomTypeCryptographicAlgorithm, typeTerm, env))
+	}
 
-		decodedKey, err := termToBytes(key, prolog.AtomEncoding.Apply(prolog.AtomOctet), prolog.AtomHex, env)
-		if err != nil {
-			return engine.Error(fmt.Errorf("%s: failed to decode public key: %w", functor, err))
-		}
+	decodedKey, err := termToBytes(key, prolog.AtomEncoding.Apply(prolog.AtomOctet), prolog.AtomHex, env)
+	if err != nil {
+		return engine.Error(err)
+	}
 
-		decodedData, err := termToBytes(data, options, prolog.AtomHex, env)
-		if err != nil {
-			return engine.Error(fmt.Errorf("%s: failed to decode data: %w", functor, err))
-		}
+	decodedData, err := termToBytes(data, options, prolog.AtomHex, env)
+	if err != nil {
+		return engine.Error(err)
+	}
 
-		decodedSignature, err := termToBytes(sig, prolog.AtomEncoding.Apply(prolog.AtomOctet), prolog.AtomHex, env)
-		if err != nil {
-			return engine.Error(fmt.Errorf("%s: failed to decode signature: %w", functor, err))
-		}
+	decodedSignature, err := termToBytes(sig, prolog.AtomEncoding.Apply(prolog.AtomOctet), prolog.AtomHex, env)
+	if err != nil {
+		return engine.Error(err)
+	}
 
-		r, err := util.VerifySignature(util.KeyAlg(typeAtom.String()), decodedKey, decodedData, decodedSignature)
-		if err != nil {
-			return engine.Error(fmt.Errorf("%s: failed to verify signature: %w", functor, err))
-		}
+	r, err := util.VerifySignature(util.KeyAlg(typeAtom.String()), decodedKey, decodedData, decodedSignature)
+	if err != nil {
+		return engine.Error(prolog.SyntaxError(err, env))
+	}
 
-		if !r {
-			return engine.Bool(false)
-		}
+	if !r {
+		return engine.Bool(false)
+	}
 
-		return cont(env)
-	})
+	return cont(env)
 }
 
 func termToBytes(term, options, defaultEncoding engine.Term, env *engine.Env) ([]byte, error) {
@@ -225,9 +220,25 @@ func termToBytes(term, options, defaultEncoding engine.Term, env *engine.Env) ([
 	switch encodingAtom {
 	case prolog.AtomHex:
 		return prolog.TermHexToBytes(term, env)
-	case prolog.AtomOctet, prolog.AtomUtf8:
-		return prolog.StringTermToBytes(term, prolog.AtomEmpty, env)
+	case prolog.AtomOctet:
+		return prolog.ByteListTermToBytes(term, env)
+	case prolog.AtomUtf8, prolog.AtomText:
+		str, err := prolog.TextTermToString(term, env)
+		if err != nil {
+			return nil, err
+		}
+		bs, err := util.Encode(str, encodingAtom.String())
+		if err != nil {
+			switch {
+			case errors.Is(err, util.ErrInvalidCharset):
+				return nil, engine.TypeError(prolog.AtomTypeCharset, encodingTerm, env)
+			default:
+				return nil, prolog.WithError(
+					engine.DomainError(prolog.ValidEncoding(encodingAtom.String()), term, env), err, env)
+			}
+		}
+		return bs, nil
 	default:
-		return nil, fmt.Errorf("invalid encoding: %s. Possible values: hex, octet", encodingAtom.String())
+		return nil, engine.DomainError(prolog.ValidEncoding(encodingAtom.String()), encodingTerm, env)
 	}
 }

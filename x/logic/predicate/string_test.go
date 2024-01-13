@@ -128,13 +128,13 @@ func TestReadString(t *testing.T) {
 				input:       "Hello World!",
 				program:     "read_input(String, Len) :- current_input(Stream), read_string(foo, Len, String).",
 				query:       `read_input(String, Len).`,
-				wantError:   fmt.Errorf("read_string/3: invalid domain for given stream"),
+				wantError:   fmt.Errorf("error(type_error(stream,foo),read_string/3)"),
 				wantSuccess: false,
 			},
 			{
 				input:       "Hello World!",
 				query:       `read_string(Stream, Len, data).`,
-				wantError:   fmt.Errorf("read_string/3: stream cannot be a variable"),
+				wantError:   fmt.Errorf("error(instantiation_error,read_string/3)"),
 				wantSuccess: false,
 			},
 		}
@@ -152,13 +152,13 @@ func TestReadString(t *testing.T) {
 						interpreter.SetUserInput(engine.NewInputTextStream(strings.NewReader(tc.input)))
 
 						err := interpreter.Compile(ctx, tc.program)
-						So(err, ShouldBeNil)
+						So(err, ShouldEqual, nil)
 
 						Convey("When the predicate is called", func() {
 							sols, err := interpreter.QueryContext(ctx, tc.query)
 
 							Convey("Then the error should be nil", func() {
-								So(err, ShouldBeNil)
+								So(err, ShouldEqual, nil)
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
@@ -171,10 +171,10 @@ func TestReadString(t *testing.T) {
 										got = append(got, m)
 									}
 									if tc.wantError != nil {
-										So(sols.Err(), ShouldNotBeNil)
+										So(sols.Err(), ShouldNotEqual, nil)
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 									} else {
-										So(sols.Err(), ShouldBeNil)
+										So(sols.Err(), ShouldEqual, nil)
 
 										if tc.wantSuccess {
 											So(len(got), ShouldBeGreaterThan, 0)
@@ -261,16 +261,36 @@ func TestStringBytes(t *testing.T) {
 				query:       "test.",
 				wantSuccess: true,
 			},
+			{
+				program:     `test :- string_bytes('ù', B, text), B == [195, 185].`,
+				query:       "test.",
+				wantSuccess: true,
+			},
+			{
+				program:     `test :- string_bytes(S, [195, 185], text), S == "ù".`,
+				query:       "test.",
+				wantSuccess: true,
+			},
+			{
+				program:     `test :- string_bytes('ù', B, octet), B == [249].`,
+				query:       "test.",
+				wantSuccess: true,
+			},
+			{
+				program:     `test :- string_bytes(S, [249], octet), S == "ù".`,
+				query:       "test.",
+				wantSuccess: true,
+			},
 			// error cases
 			{
 				query:       `string_bytes(_, [202,78,229,101,111,48], foo).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(domain_error(valid_charset,foo),string_bytes/3)"),
+				wantError:   fmt.Errorf("error(type_error(charset,foo),string_bytes/3)"),
 			},
 			{
 				query:       `string_bytes(_, [202,78,400,101,111,48], latin2).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(domain_error(valid_byte(400),[202,78,400,101,111,48]),string_bytes/3)"),
+				wantError:   fmt.Errorf("error(type_error(byte,400),string_bytes/3)"),
 			},
 			{
 				query:       `string_bytes([a, 97, p], B, latin2).`,
@@ -295,7 +315,7 @@ func TestStringBytes(t *testing.T) {
 			{
 				query:       `string_bytes(foo(bar), _, utf8).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(character_code,foo(bar)),string_bytes/3)"),
+				wantError:   fmt.Errorf("error(type_error(text,foo(bar)),string_bytes/3)"),
 			},
 			{
 				query:       `string_bytes(_, foo(bar), utf8).`,

@@ -2,6 +2,7 @@ package predicate
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/ichiban/prolog"
@@ -56,7 +57,8 @@ func TestHexBytesPredicate(t *testing.T) {
 			{
 				query: `hex_bytes('fail',
 				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantError:   fmt.Errorf("hex_bytes/2: failed decode hexadecimal encoding/hex: invalid byte: U+0069 'i'"),
+				wantError: fmt.Errorf("error(domain_error(encoding(hex),fail),[%s],hex_bytes/2)",
+					strings.Join(strings.Split("encoding/hex: invalid byte: U+0069 'i'", ""), ",")),
 				wantSuccess: false,
 			},
 			{
@@ -68,7 +70,7 @@ func TestHexBytesPredicate(t *testing.T) {
 				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
 				[345,38,'hey',107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("hex_bytes/2: error(domain_error(valid_byte(345),[345,38,hey,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]),hex_bytes/2)"), //nolint:lll
+				wantError:   fmt.Errorf("error(type_error(byte,345),hex_bytes/2)"),
 			},
 		}
 		for nc, tc := range cases {
@@ -81,16 +83,15 @@ func TestHexBytesPredicate(t *testing.T) {
 					Convey("and a vm", func() {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
-						interpreter.Register3(engine.NewAtom("string_bytes"), StringBytes)
 
 						err := interpreter.Compile(ctx, tc.program)
-						So(err, ShouldBeNil)
+						So(err, ShouldEqual, nil)
 
 						Convey("When the predicate is called", func() {
 							sols, err := interpreter.QueryContext(ctx, tc.query)
 
 							Convey("Then the error should be nil", func() {
-								So(err, ShouldBeNil)
+								So(err, ShouldEqual, nil)
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
@@ -110,15 +111,15 @@ func checkSolutions(sols *prolog.Solutions, wantResult []types.TermResults, want
 	for sols.Next() {
 		m := types.TermResults{}
 		err := sols.Scan(m)
-		So(err, ShouldBeNil)
+		So(err, ShouldEqual, nil)
 
 		got = append(got, m)
 	}
 	if wantError != nil {
-		So(sols.Err(), ShouldNotBeNil)
+		So(sols.Err(), ShouldNotEqual, nil)
 		So(sols.Err().Error(), ShouldEqual, wantError.Error())
 	} else {
-		So(sols.Err(), ShouldBeNil)
+		So(sols.Err(), ShouldEqual, nil)
 
 		if wantSuccess {
 			So(len(got), ShouldEqual, len(wantResult))

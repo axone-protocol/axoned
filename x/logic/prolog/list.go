@@ -10,3 +10,11 @@ func ListHead(list engine.Term, env *engine.Env) engine.Term {
 	}
 	return iter.Current()
 }
+
+// ListIterator returns a list iterator.
+func ListIterator(list engine.Term, env *engine.Env) (engine.ListIterator, error) {
+	if !IsList(env.Resolve(list)) {
+		return engine.ListIterator{}, engine.TypeError(AtomTypeList, list, env)
+	}
+	return engine.ListIterator{List: list, Env: env}, nil
+}

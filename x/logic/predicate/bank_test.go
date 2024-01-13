@@ -3,6 +3,7 @@ package predicate
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/golang/mock/gomock"
@@ -144,7 +145,8 @@ func TestBank(t *testing.T) {
 				balances:   []bank.Balance{},
 				query:      `bank_balances('foo', X).`,
 				wantResult: []types.TermResults{{"X": "[uknow-100]"}},
-				wantError:  fmt.Errorf("bank_balances/2: decoding bech32 failed: invalid bech32 string length 3"),
+				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],unknown)",
+					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
 			{
 				balances: []bank.Balance{
@@ -271,7 +273,8 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{},
 				query:          `bank_spendable_balances('foo', X).`,
 				wantResult:     []types.TermResults{{"X": "[uknow-100]"}},
-				wantError:      fmt.Errorf("bank_spendable_balances/2: decoding bech32 failed: invalid bech32 string length 3"),
+				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],unknown)",
+					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
 
 			{
@@ -415,7 +418,8 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{},
 				query:       `bank_locked_balances('foo', X).`,
 				wantResult:  []types.TermResults{{"X": "[uknow-100]"}},
-				wantError:   fmt.Errorf("bank_locked_balances/2: decoding bech32 failed: invalid bech32 string length 3"),
+				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],unknown)",
+					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
 		}
 		for nc, tc := range cases {
@@ -464,13 +468,13 @@ func TestBank(t *testing.T) {
 							interpreter.Register2(engine.NewAtom("bank_locked_balances"), BankLockedBalances)
 
 							err := interpreter.Compile(ctx, tc.program)
-							So(err, ShouldBeNil)
+							So(err, ShouldEqual, nil)
 
 							Convey("When the predicate is called", func() {
 								sols, err := interpreter.QueryContext(ctx, tc.query)
 
 								Convey("Then the error should be nil", func() {
-									So(err, ShouldBeNil)
+									So(err, ShouldEqual, nil)
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the bindings should be as expected", func() {
@@ -478,15 +482,15 @@ func TestBank(t *testing.T) {
 										for sols.Next() {
 											m := types.TermResults{}
 											err := sols.Scan(m)
-											So(err, ShouldBeNil)
+											So(err, ShouldEqual, nil)
 
 											got = append(got, m)
 										}
 										if tc.wantError != nil {
-											So(sols.Err(), ShouldNotBeNil)
+											So(sols.Err(), ShouldNotEqual, nil)
 											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 										} else {
-											So(sols.Err(), ShouldBeNil)
+											So(sols.Err(), ShouldEqual, nil)
 											So(got, ShouldResemble, tc.wantResult)
 										}
 									})

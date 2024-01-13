@@ -3,7 +3,6 @@ package predicate
 import (
 	"context"
 	"encoding/hex"
-	"fmt"
 
 	"github.com/ichiban/prolog/engine"
 
@@ -35,27 +34,30 @@ func HexBytes(vm *engine.VM, hexa, bts engine.Term, cont engine.Cont, env *engin
 			result = make([]byte, hex.DecodedLen(len(src)))
 			_, err := hex.Decode(result, src)
 			if err != nil {
-				return engine.Error(fmt.Errorf("hex_bytes/2: failed decode hexadecimal %w", err))
+				return engine.Error(
+					prolog.WithError(
+						engine.DomainError(prolog.ValidEncoding("hex"), hexa, env), err, env))
 			}
 		default:
-			return engine.Error(fmt.Errorf("hex_bytes/2: invalid hex type: %T, should be Atom or Variable", h))
+			return engine.Error(engine.TypeError(prolog.AtomTypeAtom, hexa, env))
 		}
 
 		switch b := env.Resolve(bts).(type) {
 		case engine.Variable:
 			if result == nil {
-				return engine.Error(fmt.Errorf("hex_bytes/2: nil hexadecimal conversion in input"))
+				return engine.Error(engine.InstantiationError(env))
 			}
-			return engine.Unify(vm, bts, prolog.BytesToCodepointListTermWithDefault(result, env), cont, env)
+			return engine.Unify(vm, bts, prolog.BytesToByteListTerm(result), cont, env)
 		case engine.Compound:
-			src, err := prolog.StringTermToBytes(b, prolog.AtomEmpty, env)
+			src, err := prolog.ByteListTermToBytes(b, env)
 			if err != nil {
-				return engine.Error(fmt.Errorf("hex_bytes/2: %w", err))
+				return engine.Error(err)
 			}
 			dst := hex.EncodeToString(src)
-			return engine.Unify(vm, hexa, prolog.StringToTerm(dst), cont, env)
+			var r engine.Term = engine.NewAtom(dst)
+			return engine.Unify(vm, hexa, r, cont, env)
 		default:
-			return engine.Error(fmt.Errorf("hex_bytes/2: invalid hex type: %T, should be Variable or List", b))
+			return engine.Error(engine.TypeError(prolog.AtomTypeText, bts, env))
 		}
 	})
 }

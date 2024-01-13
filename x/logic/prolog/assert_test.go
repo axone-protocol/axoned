@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"testing"
 
+	"github.com/ichiban/prolog/engine"
 	"github.com/samber/lo"
 
 	. "github.com/smartystreets/goconvey/convey"
@@ -178,5 +179,60 @@ func TestWhitelistBlacklistMatches(t *testing.T) {
 					})
 				})
 		}
+	})
+}
+
+func TestAreGround(t *testing.T) {
+	groundTerm := func(value string) engine.Term {
+		return engine.NewAtom(value)
+	}
+	nonGroundTerm := func() engine.Term {
+		return engine.NewVariable()
+	}
+
+	Convey("Given a test cases", t, func() {
+		cases := []struct {
+			name     string
+			terms    []engine.Term
+			expected bool
+		}{
+			{
+				name:     "all terms are ground",
+				terms:    []engine.Term{groundTerm("a"), groundTerm("b")},
+				expected: true,
+			},
+			{
+				name:     "one term is not ground",
+				terms:    []engine.Term{groundTerm("a"), nonGroundTerm()},
+				expected: false,
+			},
+			{
+				name:     "no terms",
+				terms:    []engine.Term{},
+				expected: true,
+			},
+			{
+				name:     "no terms (2)",
+				terms:    []engine.Term{AtomEmptyList},
+				expected: true,
+			},
+		}
+
+		Convey("and an environment", func() {
+			env := engine.NewEnv()
+
+			for nc, tc := range cases {
+				Convey(
+					fmt.Sprintf("Given the test case %s (#%d)", tc.name, nc), func() {
+						Convey("When the function AreGround() is called", func() {
+							result := AreGround(tc.terms, env)
+
+							Convey("Then it should return the expected output", func() {
+								So(result, ShouldEqual, tc.expected)
+							})
+						})
+					})
+			}
+		})
 	})
 }

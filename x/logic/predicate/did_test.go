@@ -3,6 +3,7 @@ package predicate
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/ichiban/prolog/engine"
@@ -63,38 +64,38 @@ func TestDID(t *testing.T) {
 			{
 				query:      `did_components(X,Y).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("did_components/2: at least one argument must be instantiated"),
+				wantError:  fmt.Errorf("error(instantiation_error,did_components/2)"),
 			},
 			{
 				query:      `did_components('foo',X).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("did_components/2: invalid DID: input length is less than 7"),
+				wantError: fmt.Errorf("error(domain_error(encoding(did),foo),[%s],did_components/2)",
+					strings.Join(strings.Split("invalid DID: input length is less than 7", ""), ",")),
 			},
 			{
 				query:      `did_components(123,X).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("did_components/2: cannot unify did with engine.Integer"),
+				wantError:  fmt.Errorf("error(type_error(atom,123),did_components/2)"),
 			},
 			{
 				query:      `did_components(X, 123).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("did_components/2: cannot unify did with engine.Integer"),
+				wantError:  fmt.Errorf("error(type_error(did,123),did_components/2)"),
 			},
 			{
 				query:      `did_components(X,foo('bar')).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("did_components/2: invalid functor foo. Expected did"),
+				wantError:  fmt.Errorf("error(domain_error(did,foo(bar)),did_components/2)"),
 			},
 			{
 				query:      `did_components(X,did('bar')).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("did_components/2: invalid arity 1. Expected 5"),
+				wantError:  fmt.Errorf("error(domain_error(did,did(bar)),did_components/2)"),
 			},
 			{
 				query:      `did_components(X,did(example,'123456','path with/space',5,test)).`,
 				wantResult: []types.TermResults{},
-				wantError: fmt.Errorf(
-					"did_components/2: failed to resolve atom at segment 3: error(type_error(atom,5),did_components/2)"),
+				wantError:  fmt.Errorf("error(type_error(atom,5),did_components/2)"),
 			},
 			{
 				query:      `did_components('did:example:123456',foo(X)).`,
@@ -113,13 +114,13 @@ func TestDID(t *testing.T) {
 						interpreter.Register2(engine.NewAtom("did_components"), DIDComponents)
 
 						err := interpreter.Compile(ctx, tc.program)
-						So(err, ShouldBeNil)
+						So(err, ShouldEqual, nil)
 
 						Convey("When the predicate is called", func() {
 							sols, err := interpreter.QueryContext(ctx, tc.query)
 
 							Convey("Then the error should be nil", func() {
-								So(err, ShouldBeNil)
+								So(err, ShouldEqual, nil)
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
@@ -127,12 +128,12 @@ func TestDID(t *testing.T) {
 									for sols.Next() {
 										m := types.TermResults{}
 										err := sols.Scan(m)
-										So(err, ShouldBeNil)
+										So(err, ShouldEqual, nil)
 
 										got = append(got, m)
 									}
 									if tc.wantError != nil {
-										So(sols.Err(), ShouldNotBeNil)
+										So(sols.Err(), ShouldNotEqual, nil)
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 									} else {
 										So(sols.Err(), ShouldBeNil)

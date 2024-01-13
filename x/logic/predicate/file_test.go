@@ -82,7 +82,7 @@ func TestSourceFile(t *testing.T) {
 				interpreter: testutil.NewLightInterpreterMust,
 				query:       "source_file(foo(bar)).",
 				wantResult:  []types.TermResults{},
-				wantError:   fmt.Errorf("source_file/1: cannot unify file with *engine.compound"),
+				wantError:   fmt.Errorf("error(type_error(atom,foo(bar)),source_file/1)"),
 			},
 
 			{
@@ -145,7 +145,7 @@ func TestSourceFile(t *testing.T) {
 								sols, err := interpreter.QueryContext(ctx, tc.query)
 
 								Convey("Then the error should be nil", func() {
-									So(err, ShouldBeNil)
+									So(err, ShouldEqual, nil)
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the bindings should be as expected", func() {
@@ -153,16 +153,16 @@ func TestSourceFile(t *testing.T) {
 										for sols.Next() {
 											m := types.TermResults{}
 											err := sols.Scan(m)
-											So(err, ShouldBeNil)
+											So(err, ShouldEqual, nil)
 
 											got = append(got, m)
 										}
 
 										if tc.wantError != nil {
-											So(sols.Err(), ShouldNotBeNil)
+											So(sols.Err(), ShouldNotEqual, nil)
 											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 										} else {
-											So(sols.Err(), ShouldBeNil)
+											So(sols.Err(), ShouldEqual, nil)
 
 											if tc.wantSuccess {
 												So(len(got), ShouldBeGreaterThan, 0)
@@ -228,7 +228,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(File, write, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: source cannot be a variable"),
+				wantError:   fmt.Errorf("error(instantiation_error,open/4)"),
 				wantSuccess: false,
 			},
 			{
@@ -237,7 +237,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(34, write, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: invalid domain for source, should be an atom, got engine.Integer"),
+				wantError:   fmt.Errorf("error(type_error(atom,34),open/4)"),
 				wantSuccess: false,
 			},
 			{
@@ -246,7 +246,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(file, write, stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: stream can only be a variable, got engine.Atom"),
+				wantError:   fmt.Errorf("error(instantiation_error,open/4)"),
 				wantSuccess: false,
 			},
 			{
@@ -255,7 +255,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(file, 45, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: invalid domain for open mode, should be an atom, got engine.Integer"),
+				wantError:   fmt.Errorf("error(type_error(io_mode,45),open/4)"),
 				wantSuccess: false,
 			},
 			{
@@ -264,25 +264,25 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(file, foo, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: invalid open mode (read | write | append)"),
+				wantError:   fmt.Errorf("error(type_error(io_mode,foo),open/4)"),
 				wantSuccess: false,
 			},
 			{
 				files: map[string][]byte{
 					"file": []byte("dumb(dumber)."),
 				},
-				program:     "get_first_char(C) :- open(file, write, Stream, _), get_char(Stream, C).",
+				program:     "get_first_char(C) :- open(my_file, write, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: only read mode is allowed here"),
+				wantError:   fmt.Errorf("error(permission_error(input,stream,my_file),unknown)"),
 				wantSuccess: false,
 			},
 			{
 				files: map[string][]byte{
 					"file": []byte("dumb(dumber)."),
 				},
-				program:     "get_first_char(C) :- open(file, append, Stream, _), get_char(Stream, C).",
+				program:     "get_first_char(C) :- open(my_file, append, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: only read mode is allowed here"),
+				wantError:   fmt.Errorf("error(permission_error(input,stream,my_file),unknown)"),
 				wantSuccess: false,
 			},
 			{
@@ -291,7 +291,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(file2, read, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: couldn't open stream: read file2: path not found"),
+				wantError:   fmt.Errorf("error(existence_error(source_sink,file2),unknown)"),
 				wantSuccess: false,
 			},
 			{
@@ -300,7 +300,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(file, read, Stream, [option1]), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("open/4: options is not allowed here"),
+				wantError:   fmt.Errorf("error(domain_error(empty_list,[option1]),open/4)"),
 				wantSuccess: false,
 			},
 		}
@@ -332,13 +332,13 @@ func TestOpen(t *testing.T) {
 							interpreter.Register4(engine.NewAtom("open"), Open)
 
 							err := interpreter.Compile(ctx, tc.program)
-							So(err, ShouldBeNil)
+							So(err, ShouldEqual, nil)
 
 							Convey("When the predicate is called", func() {
 								sols, err := interpreter.QueryContext(ctx, tc.query)
 
 								Convey("Then the error should be nil", func() {
-									So(err, ShouldBeNil)
+									So(err, ShouldEqual, nil)
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the bindings should be as expected", func() {
@@ -346,15 +346,15 @@ func TestOpen(t *testing.T) {
 										for sols.Next() {
 											m := types.TermResults{}
 											err := sols.Scan(m)
-											So(err, ShouldBeNil)
+											So(err, ShouldEqual, nil)
 
 											got = append(got, m)
 										}
 										if tc.wantError != nil {
-											So(sols.Err(), ShouldNotBeNil)
+											So(sols.Err(), ShouldNotEqual, nil)
 											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 										} else {
-											So(sols.Err(), ShouldBeNil)
+											So(sols.Err(), ShouldEqual, nil)
 
 											if tc.wantSuccess {
 												So(len(got), ShouldBeGreaterThan, 0)

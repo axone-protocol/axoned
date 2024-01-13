@@ -1,9 +1,6 @@
 package predicate
 
 import (
-	"context"
-	"fmt"
-
 	"github.com/ichiban/prolog/engine"
 
 	bech322 "github.com/cosmos/cosmos-sdk/types/bech32"
@@ -21,7 +18,7 @@ import (
 //	bech32_address(+Address, +Bech32)
 //
 // where:
-//   - Address is a pair of the HRP (Human-Readable Part) which holds the address prefix and a list of integers
+//   - Address is a pair of the HRP (Human-Readable Part) which holds the address prefix and a list of numbers
 //     ranging from 0 to 255 that represent the base64 encoded bech32 address string.
 //   - Bech32 is an Atom or string representing the bech32 encoded string address
 //
@@ -36,56 +33,41 @@ import (
 //
 // [bech32]: https://docs.cosmos.network/main/build/spec/addresses/bech32#hrp-table
 // [base64]: https://fr.wikipedia.org/wiki/Base64
-func Bech32Address(vm *engine.VM, address, bech32 engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		switch b := env.Resolve(bech32).(type) {
-		case engine.Variable:
-		case engine.Atom:
-			h, a, err := bech322.DecodeAndConvert(b.String())
-			if err != nil {
-				return engine.Error(fmt.Errorf("bech32_address/2: failed to decode Bech32: %w", err))
-			}
-			pair := prolog.AtomPair.Apply(prolog.StringToTerm(h), prolog.BytesToCodepointListTermWithDefault(a, env))
-			return engine.Unify(vm, address, pair, cont, env)
-		default:
-			return engine.Error(fmt.Errorf("bech32_address/2: invalid Bech32 type: %T, should be Atom or Variable", b))
-		}
-
-		switch addressPair := env.Resolve(address).(type) {
-		case engine.Compound:
-			bech32Decoded, err := addressPairToBech32(addressPair, env)
-			if err != nil {
-				return engine.Error(fmt.Errorf("bech32_address/2: %w", err))
-			}
-			return engine.Unify(vm, bech32, prolog.StringToTerm(bech32Decoded), cont, env)
-		default:
-			return engine.Error(fmt.Errorf("bech32_address/2: invalid address type: %T, should be Compound (Hrp, Address)", addressPair))
-		}
-	})
-}
-
-func addressPairToBech32(addressPair engine.Compound, env *engine.Env) (string, error) {
-	if addressPair.Functor() != prolog.AtomPair || addressPair.Arity() != 2 {
-		return "", fmt.Errorf("address should be a Pair '-(Hrp, Address)'")
-	}
-
-	switch a := env.Resolve(addressPair.Arg(1)).(type) {
-	case engine.Compound:
-		data, err := prolog.StringTermToBytes(a, prolog.AtomEmpty, env)
+func Bech32Address(_ *engine.VM, address, bech32 engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+		hrpTerm, dataTerm, err := prolog.AssertPair(env, value[0])
 		if err != nil {
-			return "", fmt.Errorf("failed to convert term to bytes list: %w", err)
+			return nil, err
 		}
-		hrp, ok := env.Resolve(addressPair.Arg(0)).(engine.Atom)
-		if !ok {
-			return "", fmt.Errorf("HRP should be instantiated")
+		data, err := prolog.ByteListTermToBytes(dataTerm, env)
+		if err != nil {
+			return nil, err
 		}
+		hrp, err := prolog.AssertAtom(env, hrpTerm)
+		if err != nil {
+			return nil, err
+		}
+
 		b, err := bech322.ConvertAndEncode(hrp.String(), data)
 		if err != nil {
-			return "", fmt.Errorf("failed to convert base64 encoded address to bech32 string encoded: %w", err)
+			return nil, prolog.WithError(engine.DomainError(prolog.ValidEncoding("bech32"), value[0], env), err, env)
 		}
 
-		return b, nil
-	default:
-		return "", fmt.Errorf("address should be a Pair with a List of bytes in arity 2, given: %T", addressPair.Arg(1))
+		return []engine.Term{engine.NewAtom(b)}, nil
 	}
+	backwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+		b, err := prolog.AssertAtom(env, value[0])
+		if err != nil {
+			return nil, err
+		}
+		h, a, err := bech322.DecodeAndConvert(b.String())
+		if err != nil {
+			return nil, prolog.WithError(engine.DomainError(prolog.ValidEncoding("bech32"), value[0], env), err, env)
+		}
+		var r engine.Term = engine.NewAtom(h)
+		pair := prolog.AtomPair.Apply(r, prolog.BytesToByteListTerm(a))
+		return []engine.Term{pair}, nil
+	}
+	return prolog.UnifyFunctionalPredicate(
+		[]engine.Term{address}, []engine.Term{bech32}, prolog.AtomEmpty, forwardConverter, backwardConverter, cont, env)
 }

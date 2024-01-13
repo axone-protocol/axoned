@@ -3,13 +3,13 @@ package predicate
 import (
 	"context"
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 
 	"github.com/ichiban/prolog/engine"
 
 	"github.com/okp4/okp4d/x/logic/prolog"
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 // ReadString is a predicate that reads characters from the provided Stream and unifies them with String.
@@ -45,11 +45,11 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 		var s *engine.Stream
 		switch st := env.Resolve(stream).(type) {
 		case engine.Variable:
-			return engine.Error(fmt.Errorf("read_string/3: stream cannot be a variable"))
+			return engine.Error(engine.InstantiationError(env))
 		case *engine.Stream:
 			s = st
 		default:
-			return engine.Error(fmt.Errorf("read_string/3: invalid domain for given stream"))
+			return engine.Error(engine.TypeError(prolog.AtomTypeStream, stream, env))
 		}
 
 		var maxLength uint64
@@ -65,18 +65,19 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 				if errors.Is(err, io.EOF) || totalLen >= maxLength {
 					break
 				}
-				return engine.Error(fmt.Errorf("read_string/3: couldn't read stream: %w", err))
+				return engine.Error(prolog.SyntaxError(err, env))
 			}
 			totalLen += uint64(l)
 			_, err = builder.WriteRune(r)
 			if err != nil {
-				return engine.Error(fmt.Errorf("read_string/3: couldn't write string: %w", err))
+				return engine.Error(prolog.SyntaxError(err, env))
 			}
 		}
 
+		var r engine.Term = engine.NewAtom(builder.String())
 		return engine.Unify(
 			vm, prolog.Tuple(result, length),
-			prolog.Tuple(prolog.StringToTerm(builder.String()), engine.Integer(totalLen)), cont, env)
+			prolog.Tuple(r, engine.Integer(totalLen)), cont, env)
 	})
 }
 
@@ -95,7 +96,6 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 // Encoding can be one of the following:
 // - 'text' considers the string as a sequence of Unicode characters.
 // - 'octet' considers the string as a sequence of bytes.
-// - 'utf8' considers the string as a sequence of UTF-8 characters.
 // - '<encoding>' considers the string as a sequence of characters in the given encoding.
 //
 // At least one of String or Bytes must be instantiated.
@@ -108,44 +108,91 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 //	# Convert a list of bytes to a string.
 //	- string_bytes(String, [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100], octet).
 func StringBytes(
-	_ *engine.VM, str, bts, encoding engine.Term, cont engine.Cont, env *engine.Env,
+	_ *engine.VM, str, bts, encodingTerm engine.Term, cont engine.Cont, env *engine.Env,
 ) *engine.Promise {
-	encodingAtom, err := prolog.AssertAtom(env, encoding)
+	encoding, err := prolog.AssertAtom(env, encodingTerm)
 	if err != nil {
 		return engine.Error(err)
 	}
 	forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
-		bs, err := prolog.StringTermToBytes(value[0], encodingAtom, env)
+		str, err := prolog.TextTermToString(value[0], env)
 		if err != nil {
 			return nil, err
 		}
-		result, err := prolog.BytesToCodepointListTerm(bs, prolog.AtomText, env)
-		if err != nil {
-			return nil, err
+
+		switch encoding {
+		case prolog.AtomText:
+			return []engine.Term{prolog.StringToByteListTerm(str)}, nil
+		case prolog.AtomOctet:
+			term, err := prolog.StringToOctetListTerm(str, env)
+			if err != nil {
+				return nil, err
+			}
+			return []engine.Term{term}, nil
+		default:
+			bs, err := encode(value[0], str, encoding, env)
+			if err != nil {
+				return nil, err
+			}
+
+			return []engine.Term{prolog.BytesToByteListTerm(bs)}, nil
 		}
-		return []engine.Term{result}, nil
 	}
 	backwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
-		if _, err := prolog.AssertList(env, value[0]); err != nil {
-			return nil, err
+		var result string
+		switch encoding {
+		case prolog.AtomText:
+			bs, err := prolog.ByteListTermToBytes(value[0], env)
+			if err != nil {
+				return nil, err
+			}
+			result = string(bs)
+		case prolog.AtomOctet:
+			result, err = prolog.OctetListTermToString(value[0], env)
+			if err != nil {
+				return nil, err
+			}
+		default:
+			bs, err := prolog.ByteListTermToBytes(value[0], env)
+			if err != nil {
+				return nil, err
+			}
+			result, err = decode(value[0], bs, encoding, env)
+			if err != nil {
+				return nil, err
+			}
 		}
-		bs, err := prolog.StringTermToBytes(value[0], prolog.AtomText, env)
-		if err != nil {
-			return nil, err
-		}
-		result, err := prolog.BytesToAtomListTerm(bs, encodingAtom, env)
-		if err != nil {
-			return nil, err
-		}
-		return []engine.Term{result}, nil
+		return []engine.Term{prolog.StringToCharacterListTerm(result)}, nil
 	}
 
-	ok, env, err := prolog.UnifyFunctional([]engine.Term{str}, []engine.Term{bts}, encoding, forwardConverter, backwardConverter, env)
+	return prolog.UnifyFunctionalPredicate(
+		[]engine.Term{str}, []engine.Term{bts}, encoding, forwardConverter, backwardConverter, cont, env)
+}
+
+func decode(value engine.Term, bs []byte, encoding engine.Atom, env *engine.Env) (string, error) {
+	str, err := util.Decode(bs, encoding.String())
 	if err != nil {
-		return engine.Error(err)
+		switch {
+		case errors.Is(err, util.ErrInvalidCharset):
+			return "", engine.TypeError(prolog.AtomTypeCharset, encoding, env)
+		default:
+			return "", prolog.WithError(
+				engine.DomainError(prolog.ValidEncoding(encoding.String()), value, env), err, env)
+		}
 	}
-	if !ok {
-		return engine.Bool(false)
+	return str, nil
+}
+
+func encode(value engine.Term, str string, encoding engine.Atom, env *engine.Env) ([]byte, error) {
+	bs, err := util.Encode(str, encoding.String())
+	if err != nil {
+		switch {
+		case errors.Is(err, util.ErrInvalidCharset):
+			return nil, engine.TypeError(prolog.AtomTypeCharset, encoding, env)
+		default:
+			return nil, prolog.WithError(
+				engine.DomainError(prolog.ValidEncoding(encoding.String()), value, env), err, env)
+		}
 	}
-	return cont(env)
+	return bs, nil
 }

@@ -2,11 +2,10 @@ package predicate
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ichiban/prolog/engine"
 
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
 // BlockHeight is a predicate which unifies the given term with the current block height.
@@ -25,9 +24,9 @@ import (
 //	- block_height(Height).
 func BlockHeight(vm *engine.VM, height engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		sdkContext, err := util.UnwrapSDKContext(ctx)
+		sdkContext, err := prolog.UnwrapSDKContext(ctx, env)
 		if err != nil {
-			return engine.Error(fmt.Errorf("block_height/1: %w", err))
+			return engine.Error(err)
 		}
 
 		return engine.Unify(vm, height, engine.Integer(sdkContext.BlockHeight()), cont, env)
@@ -49,9 +48,9 @@ func BlockHeight(vm *engine.VM, height engine.Term, cont engine.Cont, env *engin
 //	- block_time(Time).
 func BlockTime(vm *engine.VM, time engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		sdkContext, err := util.UnwrapSDKContext(ctx)
+		sdkContext, err := prolog.UnwrapSDKContext(ctx, env)
 		if err != nil {
-			return engine.Error(fmt.Errorf("block_time/1: %w", err))
+			return engine.Error(err)
 		}
 
 		return engine.Unify(vm, time, engine.Integer(sdkContext.BlockTime().Unix()), cont, env)
