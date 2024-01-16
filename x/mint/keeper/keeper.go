@@ -21,7 +21,7 @@ type Keeper struct {
 	cdc          codec.BinaryCodec
 	storeService store.KVStoreService
 	// the address capable of executing a MsgUpdateParams message. Typically, this should be the x/gov module account.
-	authority        sdk.AccAddress
+	authority        string
 	stakingKeeper    types.StakingKeeper
 	bankKeeper       types.BankKeeper
 	feeCollectorName string
@@ -46,20 +46,11 @@ func NewKeeper(
 		panic("the mint module account has not been set")
 	}
 
-	// ensure gov module account is set and is not nil
-	addr, err := sdk.AccAddressFromBech32(authority)
-	if err != nil {
-		panic(err)
-	}
-	if err := sdk.VerifyAddressFormat(addr); err != nil {
-		panic(err)
-	}
-
 	sb := collections.NewSchemaBuilder(storeService)
 	k := Keeper{
 		cdc:              cdc,
 		storeService:     storeService,
-		authority:        addr,
+		authority:        authority,
 		stakingKeeper:    sk,
 		bankKeeper:       bk,
 		feeCollectorName: feeCollectorName,
@@ -78,7 +69,7 @@ func NewKeeper(
 
 // GetAuthority returns the x/mint module's authority.
 func (k Keeper) GetAuthority() string {
-	return k.authority.String()
+	return k.authority
 }
 
 // Logger returns a module-specific logger.

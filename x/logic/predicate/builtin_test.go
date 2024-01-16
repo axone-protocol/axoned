@@ -4,14 +4,16 @@ import (
 	"fmt"
 	"testing"
 
+	"cosmossdk.io/store/metrics"
+
 	"github.com/golang/mock/gomock"
 	"github.com/ichiban/prolog/engine"
 
 	. "github.com/smartystreets/goconvey/convey"
 
 	"cosmossdk.io/log"
-	tmdb "github.com/cometbft/cometbft-db"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
+	dbm "github.com/cosmos/cosmos-db"
 
 	"cosmossdk.io/store"
 	sdk "github.com/cosmos/cosmos-sdk/types"

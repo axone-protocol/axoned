@@ -3,6 +3,11 @@ package keeper_test
 import (
 	"testing"
 
+	"cosmossdk.io/collections"
+	"github.com/cosmos/cosmos-sdk/runtime"
+
+	"cosmossdk.io/math"
+
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 
@@ -36,8 +41,8 @@ func TestGenesisTestSuite(t *testing.T) {
 }
 
 func (s *GenesisTestSuite) SetupTest() {
-	key := sdk.NewKVStoreKey(types.StoreKey)
-	testCtx := testutil.DefaultContextWithDB(s.T(), key, sdk.NewTransientStoreKey("transient_test"))
+	key := storetypes.NewKVStoreKey(types.StoreKey)
+	testCtx := testutil.DefaultContextWithDB(s.T(), key, storetypes.NewTransientStoreKey("transient_test"))
 	encCfg := moduletestutil.MakeTestEncodingConfig(mint.AppModuleBasic{})
 
 	// gomock initializations
@@ -53,12 +58,12 @@ func (s *GenesisTestSuite) SetupTest() {
 	accountKeeper.EXPECT().GetModuleAddress(minterAcc.Name).Return(minterAcc.GetAddress())
 	accountKeeper.EXPECT().GetModuleAccount(s.sdkCtx, minterAcc.Name).Return(minterAcc)
 
-	s.keeper = keeper.NewKeeper(s.cdc, key, stakingKeeper, accountKeeper, bankKeeper, "", "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn")
+	s.keeper = keeper.NewKeeper(s.cdc, runtime.NewKVStoreService(key), stakingKeeper, accountKeeper, bankKeeper, "", "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn")
 }
 
 func (s *GenesisTestSuite) TestImportExportGenesis() {
 	genesisState := types.DefaultGenesisState()
-	genesisState.Minter = types.NewMinter(sdk.OneDec(), math.LegacyNewDecWithPrec(20, 2))
+	genesisState.Minter = types.NewMinter(math.LegacyOneDec(), math.LegacyNewDecWithPrec(20, 2))
 	genesisState.Params = types.NewParams(
 		"testDenom",
 		math.LegacyNewDecWithPrec(69, 2),
@@ -67,13 +72,17 @@ func (s *GenesisTestSuite) TestImportExportGenesis() {
 
 	s.keeper.InitGenesis(s.sdkCtx, s.accountKeeper, genesisState)
 
-	minter := s.keeper.GetMinter(s.sdkCtx)
+	minter, err := s.keeper.Minter.Get(s.sdkCtx)
 	s.Require().Equal(genesisState.Minter, minter)
+	s.Require().NoError(err)
 
-	invalidCtx := testutil.DefaultContextWithDB(s.T(), s.key, sdk.NewTransientStoreKey("transient_test"))
-	s.Require().Panics(func() { s.keeper.GetMinter(invalidCtx.Ctx) }, "stored minter should not have been nil")
-	params := s.keeper.GetParams(s.sdkCtx)
+	invalidCtx := testutil.DefaultContextWithDB(s.T(), s.key, storetypes.NewTransientStoreKey("transient_test"))
+	_, err = s.keeper.Minter.Get(invalidCtx.Ctx)
+	s.Require().ErrorIs(err, collections.ErrNotFound)
+
+	params, err := s.keeper.Params.Get(s.sdkCtx)
 	s.Require().Equal(genesisState.Params, params)
+	s.Require().NoError(err)
 
 	genesisState2 := s.keeper.ExportGenesis(s.sdkCtx)
 	s.Require().Equal(genesisState, genesisState2)

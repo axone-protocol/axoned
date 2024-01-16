@@ -77,13 +77,13 @@ func (suite *MintTestSuite) TestGRPCParams() {
 	suite.Require().NoError(err)
 	minter, err := suite.mintKeeper.Minter.Get(suite.ctx)
 	suite.Require().NoError(err)
-	suite.Require().Equal(inflation.Inflation, minter)
+	suite.Require().Equal(inflation.Inflation, minter.Inflation)
 
 	annualProvisions, err := suite.queryClient.AnnualProvisions(gocontext.Background(), &types.QueryAnnualProvisionsRequest{})
 	suite.Require().NoError(err)
 	minter, err = suite.mintKeeper.Minter.Get(suite.ctx)
 	suite.Require().NoError(err)
-	suite.Require().Equal(annualProvisions.AnnualProvisions, minter)
+	suite.Require().Equal(annualProvisions.AnnualProvisions, minter.AnnualProvisions)
 }
 
 func TestMintTestSuite(t *testing.T) {
