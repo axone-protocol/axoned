@@ -16,5 +16,9 @@ echo "Generating gogo proto code"
   done
 )
 
-cp -r github.com/okp4/okp4d/x/* x/
+DST="${PWD}/x"
+(
+  cd github.com/okp4/okp4d/x
+  find . -type f -name "*.go" -exec mv {} "${DST}/{}" \;
+)
 rm -rf github.com
