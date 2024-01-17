@@ -28,13 +28,13 @@ func TestGRPCAsk(t *testing.T) {
 		cases := []struct {
 			program        string
 			query          string
-			expectedAsnwer *types.Answer
-			expectedError  bool
+			expectedAnswer *types.Answer
+			expectedError  string
 		}{
 			{
 				program: "father(bob, alice).",
 				query:   "father(bob, X).",
-				expectedAsnwer: &types.Answer{
+				expectedAnswer: &types.Answer{
 					Success:   true,
 					HasMore:   false,
 					Variables: []string{"X"},
@@ -46,12 +46,27 @@ func TestGRPCAsk(t *testing.T) {
 						},
 					}}}},
 				},
-				expectedError: false,
+			},
+			{
+				program: `father("bob", "alice").`,
+				query:   `father("bob", X).`,
+				expectedAnswer: &types.Answer{
+					Success:   true,
+					HasMore:   false,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X",
+						Term: types.Term{
+							Name:      "[a,l,i,c,e]",
+							Arguments: nil,
+						},
+					}}}},
+				},
 			},
 			{
 				program: "father(bob, alice). father(bob, john).",
 				query:   "father(bob, X).",
-				expectedAsnwer: &types.Answer{
+				expectedAnswer: &types.Answer{
 					Success:   true,
 					HasMore:   true,
 					Variables: []string{"X"},
@@ -63,24 +78,74 @@ func TestGRPCAsk(t *testing.T) {
 						},
 					}}}},
 				},
-				expectedError: false,
 			},
 			{
 				program: "father(bob, alice).",
 				query:   "father(bob, john).",
-				expectedAsnwer: &types.Answer{
+				expectedAnswer: &types.Answer{
 					Success:   false,
 					HasMore:   false,
 					Variables: nil,
 					Results:   nil,
 				},
-				expectedError: false,
 			},
 			{
-				program:        "father(bob, alice).",
-				query:          "father(bob, X, O).",
-				expectedAsnwer: nil,
-				expectedError:  true,
+				program: "",
+				query:   "block_height(X).",
+				expectedAnswer: &types.Answer{
+					Success:   true,
+					HasMore:   false,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X",
+						Term: types.Term{
+							Name:      "0",
+							Arguments: nil,
+						},
+					}}}},
+				},
+			},
+			{
+				program: "father(bob, 'élodie').",
+				query:   "father(bob, X).",
+				expectedAnswer: &types.Answer{
+					Success:   true,
+					HasMore:   false,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X",
+						Term: types.Term{
+							Name:      "élodie",
+							Arguments: nil,
+						},
+					}}}},
+				},
+			},
+			{
+				program: "father(bob, alice).",
+				query:   "father(bob, X, O).",
+				expectedAnswer: &types.Answer{
+					Success:   false,
+					Error:     "error(existence_error(procedure,father/3),root)",
+					HasMore:   false,
+					Variables: nil,
+					Results:   nil,
+				},
+			},
+			{
+				program:       "father°(bob, alice).",
+				query:         "father(bob, X).",
+				expectedError: "error compiling query: unexpected token: invalid(°): invalid argument",
+			},
+			{
+				program:       "father(bob, alice).",
+				query:         "father°(bob, X).",
+				expectedError: "error executing query: unexpected token: invalid(°): invalid argument",
+			},
+			{
+				program:       `father("bob", "alice").`,
+				query:         `father("bob"", X).`,
+				expectedError: "error executing query: EOF: invalid argument",
 			},
 		}
 
@@ -128,13 +193,14 @@ func TestGRPCAsk(t *testing.T) {
 							result, err := queryClient.Ask(gocontext.Background(), &query)
 
 							Convey("Then it should return the expected answer", func() {
-								if tc.expectedError {
-									So(err, ShouldNotBeNil)
+								if tc.expectedError != "" {
+									So(err, ShouldNotEqual, nil)
+									So(err.Error(), ShouldEqual, tc.expectedError)
 									So(result, ShouldBeNil)
 								} else {
-									So(err, ShouldBeNil)
+									So(err, ShouldEqual, nil)
 									So(result, ShouldNotBeNil)
-									So(result.Answer, ShouldResemble, tc.expectedAsnwer)
+									So(result.Answer, ShouldResemble, tc.expectedAnswer)
 								}
 							})
 						})

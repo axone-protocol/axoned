@@ -2,9 +2,12 @@ package prolog
 
 import (
 	"strings"
+	"unicode/utf8"
 
 	"github.com/ichiban/prolog/engine"
 	"github.com/samber/lo"
+
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 // PredicateMatches returns a function that matches the given predicate against the given other predicate.
@@ -64,14 +67,14 @@ func IsCompound(term engine.Term) bool {
 	return ok
 }
 
-// IsFullyInstantiated returns true if the given term is fully instantiated.
-func IsFullyInstantiated(term engine.Term, env *engine.Env) bool {
+// IsGround returns true if the given term holds no free variables.
+func IsGround(term engine.Term, env *engine.Env) bool {
 	switch term := env.Resolve(term).(type) {
 	case engine.Variable:
 		return false
 	case engine.Compound:
 		for i := 0; i < term.Arity(); i++ {
-			if !IsFullyInstantiated(term.Arg(i), env) {
+			if !IsGround(term.Arg(i), env) {
 				return false
 			}
 		}
@@ -81,47 +84,122 @@ func IsFullyInstantiated(term engine.Term, env *engine.Env) bool {
 	}
 }
 
-func AreFullyInstantiated(terms []engine.Term, env *engine.Env) bool {
-	_, ok := lo.Find(terms, func(t engine.Term) bool {
-		return IsFullyInstantiated(t, env)
+func AreGround(terms []engine.Term, env *engine.Env) bool {
+	return lo.EveryBy(terms, func(t engine.Term) bool {
+		return IsGround(t, env)
 	})
+}
 
-	return ok
+// AssertIsGround resolves a term and returns it if it is ground.
+// If the term is not ground, the function returns nil and the instantiation error.
+func AssertIsGround(env *engine.Env, t engine.Term) (engine.Term, error) {
+	if IsGround(t, env) {
+		return t, nil
+	}
+	return nil, engine.InstantiationError(env)
 }
 
 // AssertAtom resolves a term and attempts to convert it into an engine.Atom if possible.
 // If conversion fails, the function returns the empty atom and the error.
 func AssertAtom(env *engine.Env, t engine.Term) (engine.Atom, error) {
-	if t, ok := env.Resolve(t).(engine.Atom); ok {
+	_, err := AssertIsGround(env, t)
+	if err != nil {
+		return AtomEmpty, err
+	}
+	if t, ok := t.(engine.Atom); ok {
 		return t, nil
 	}
-	return AtomEmpty, engine.TypeError(AtomAtom, t, env)
+	return AtomEmpty, engine.TypeError(AtomTypeAtom, t, env)
 }
 
-// AssertCharacterCode resolves a term and attempts to convert it into an engine.Integer if possible.
+// AssertCharacterCode resolves a term and attempts to convert it into a rune if possible.
 // If conversion fails, the function returns the zero value and the error.
-func AssertCharacterCode(env *engine.Env, t engine.Term) (engine.Integer, error) {
-	if t, ok := env.Resolve(t).(engine.Integer); ok {
-		return t, nil
+func AssertCharacterCode(env *engine.Env, t engine.Term) (rune, error) {
+	_, err := AssertIsGround(env, t)
+	if err != nil {
+		return 0, err
 	}
-	return 0, engine.TypeError(AtomCharacterCode, t, env)
+
+	if t, ok := t.(engine.Integer); ok {
+		if t >= 0 && t <= utf8.MaxRune {
+			return rune(t), nil
+		}
+	}
+
+	return 0, engine.TypeError(AtomTypeCharacterCode, t, env)
 }
 
 // AssertCharacter resolves a term and attempts to convert it into an engine.Atom if possible.
 // If conversion fails, the function returns the empty atom and the error.
-func AssertCharacter(env *engine.Env, t engine.Term) (engine.Atom, error) {
-	if t, ok := env.Resolve(t).(engine.Atom); ok {
-		return t, nil
+func AssertCharacter(env *engine.Env, t engine.Term) (rune, error) {
+	_, err := AssertIsGround(env, t)
+	if err != nil {
+		return utf8.RuneError, err
 	}
-	return AtomEmpty, engine.TypeError(AtomCharacter, t, env)
+	if t, ok := t.(engine.Atom); ok {
+		runes := []rune(t.String())
+		if len(runes) == 1 {
+			return runes[0], nil
+		}
+	}
+	return utf8.RuneError, engine.TypeError(AtomTypeCharacter, t, env)
+}
+
+// AssertByte resolves a term and attempts to convert it into a byte if possible.
+// If conversion fails, the function returns the zero value and the error.
+func AssertByte(env *engine.Env, t engine.Term) (byte, error) {
+	_, err := AssertIsGround(env, t)
+	if err != nil {
+		return 0, err
+	}
+	if t, ok := t.(engine.Integer); ok {
+		if t >= 0 && t <= 255 {
+			return byte(t), nil
+		}
+	}
+	return 0, engine.TypeError(AtomTypeByte, t, env)
 }
 
 // AssertList resolves a term as a list and returns it as a engine.Compound.
 // If conversion fails, the function returns nil and the error.
-func AssertList(env *engine.Env, t engine.Term) (engine.Compound, error) {
-	if t, ok := env.Resolve(t).(engine.Compound); ok && IsList(t) {
+func AssertList(env *engine.Env, t engine.Term) (engine.Term, error) {
+	_, err := AssertIsGround(env, t)
+	if err != nil {
+		return nil, err
+	}
+	if IsList(t) {
 		return t, nil
 	}
 
-	return nil, engine.TypeError(AtomList, t, env)
+	return nil, engine.TypeError(AtomTypeList, t, env)
+}
+
+// AssertPair resolves a term as a pair and returns the pair components.
+// If conversion fails, the function returns nil and the error.
+func AssertPair(env *engine.Env, t engine.Term) (engine.Term, engine.Term, error) {
+	_, err := AssertIsGround(env, t)
+	if err != nil {
+		return nil, nil, err
+	}
+	if t, ok := t.(engine.Compound); ok && t.Functor() == AtomPair && t.Arity() == 2 {
+		return t.Arg(0), t.Arg(1), nil
+	}
+
+	return nil, nil, engine.TypeError(AtomTypePair, t, env)
+}
+
+// AssertURIComponent resolves a term as a URI component and returns it as an URIComponent.
+func AssertURIComponent(env *engine.Env, t engine.Term) (util.URIComponent, error) {
+	switch v := env.Resolve(t); v {
+	case AtomQueryValue:
+		return util.QueryValueComponent, nil
+	case AtomFragment:
+		return util.FragmentComponent, nil
+	case AtomPath:
+		return util.PathComponent, nil
+	case AtomSegment:
+		return util.SegmentComponent, nil
+	default:
+		return 0, engine.TypeError(AtomTypeURIComponent, t, env)
+	}
 }

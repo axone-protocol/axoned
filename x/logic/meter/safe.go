@@ -7,7 +7,7 @@ import (
 )
 
 // safeMeterDecorater is a wrapper around sdk.GasMeter that provides go-routine-safe access to the underlying gas meter.
-// This is needed because the interpreter is uses multiple go-routines, and the gas meter is shared between multiple
+// This is needed because the interpreter uses multiple go-routines, and the gas meter is shared between multiple
 // goroutines.
 type safeMeterDecorater struct {
 	gasMeter sdk.GasMeter

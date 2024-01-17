@@ -1,9 +1,7 @@
 package predicate
 
 import (
-	"context"
 	"errors"
-	"fmt"
 	"io"
 	"strings"
 
@@ -41,43 +39,42 @@ import (
 //	String = 'Hello World'
 //	Length = 11
 func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		var s *engine.Stream
-		switch st := env.Resolve(stream).(type) {
-		case engine.Variable:
-			return engine.Error(fmt.Errorf("read_string/3: stream cannot be a variable"))
-		case *engine.Stream:
-			s = st
-		default:
-			return engine.Error(fmt.Errorf("read_string/3: invalid domain for given stream"))
-		}
+	var s *engine.Stream
+	switch st := env.Resolve(stream).(type) {
+	case engine.Variable:
+		return engine.Error(engine.InstantiationError(env))
+	case *engine.Stream:
+		s = st
+	default:
+		return engine.Error(engine.TypeError(prolog.AtomTypeStream, stream, env))
+	}
 
-		var maxLength uint64
-		if maxLen, ok := env.Resolve(length).(engine.Integer); ok {
-			maxLength = uint64(maxLen)
-		}
+	var maxLength uint64
+	if maxLen, ok := env.Resolve(length).(engine.Integer); ok {
+		maxLength = uint64(maxLen)
+	}
 
-		var builder strings.Builder
-		var totalLen uint64
-		for {
-			r, l, err := s.ReadRune()
-			if err != nil || (maxLength != 0 && totalLen >= maxLength) {
-				if errors.Is(err, io.EOF) || totalLen >= maxLength {
-					break
-				}
-				return engine.Error(fmt.Errorf("read_string/3: couldn't read stream: %w", err))
+	var builder strings.Builder
+	var totalLen uint64
+	for {
+		r, l, err := s.ReadRune()
+		if err != nil || (maxLength != 0 && totalLen >= maxLength) {
+			if errors.Is(err, io.EOF) || totalLen >= maxLength {
+				break
 			}
-			totalLen += uint64(l)
-			_, err = builder.WriteRune(r)
-			if err != nil {
-				return engine.Error(fmt.Errorf("read_string/3: couldn't write string: %w", err))
-			}
+			return engine.Error(prolog.SyntaxError(err, env))
 		}
+		totalLen += uint64(l)
+		_, err = builder.WriteRune(r)
+		if err != nil {
+			return engine.Error(prolog.SyntaxError(err, env))
+		}
+	}
 
-		return engine.Unify(
-			vm, prolog.Tuple(result, length),
-			prolog.Tuple(prolog.StringToTerm(builder.String()), engine.Integer(totalLen)), cont, env)
-	})
+	var r engine.Term = engine.NewAtom(builder.String())
+	return engine.Unify(
+		vm, prolog.Tuple(result, length),
+		prolog.Tuple(r, engine.Integer(totalLen)), cont, env)
 }
 
 // StringBytes is a predicate that unifies a string with a list of bytes, returning true when the (Unicode) String is
@@ -95,7 +92,6 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 // Encoding can be one of the following:
 // - 'text' considers the string as a sequence of Unicode characters.
 // - 'octet' considers the string as a sequence of bytes.
-// - 'utf8' considers the string as a sequence of UTF-8 characters.
 // - '<encoding>' considers the string as a sequence of characters in the given encoding.
 //
 // At least one of String or Bytes must be instantiated.
@@ -108,44 +104,63 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 //	# Convert a list of bytes to a string.
 //	- string_bytes(String, [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100], octet).
 func StringBytes(
-	_ *engine.VM, str, bts, encoding engine.Term, cont engine.Cont, env *engine.Env,
+	_ *engine.VM, str, bts, encodingTerm engine.Term, cont engine.Cont, env *engine.Env,
 ) *engine.Promise {
-	encodingAtom, err := prolog.AssertAtom(env, encoding)
+	encoding, err := prolog.AssertAtom(env, encodingTerm)
 	if err != nil {
 		return engine.Error(err)
 	}
 	forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
-		bs, err := prolog.StringTermToBytes(value[0], encodingAtom, env)
+		str, err := prolog.TextTermToString(value[0], env)
 		if err != nil {
 			return nil, err
 		}
-		result, err := prolog.BytesToCodepointListTerm(bs, prolog.AtomText, env)
-		if err != nil {
-			return nil, err
+
+		switch encoding {
+		case prolog.AtomText:
+			return []engine.Term{prolog.StringToByteListTerm(str)}, nil
+		case prolog.AtomOctet:
+			term, err := prolog.StringToOctetListTerm(str, env)
+			if err != nil {
+				return nil, err
+			}
+			return []engine.Term{term}, nil
+		default:
+			bs, err := prolog.Encode(value[0], str, encoding, env)
+			if err != nil {
+				return nil, err
+			}
+
+			return []engine.Term{prolog.BytesToByteListTerm(bs)}, nil
 		}
-		return []engine.Term{result}, nil
 	}
 	backwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
-		if _, err := prolog.AssertList(env, value[0]); err != nil {
-			return nil, err
+		var result string
+		switch encoding {
+		case prolog.AtomText:
+			bs, err := prolog.ByteListTermToBytes(value[0], env)
+			if err != nil {
+				return nil, err
+			}
+			result = string(bs)
+		case prolog.AtomOctet:
+			result, err = prolog.OctetListTermToString(value[0], env)
+			if err != nil {
+				return nil, err
+			}
+		default:
+			bs, err := prolog.ByteListTermToBytes(value[0], env)
+			if err != nil {
+				return nil, err
+			}
+			result, err = prolog.Decode(value[0], bs, encoding, env)
+			if err != nil {
+				return nil, err
+			}
 		}
-		bs, err := prolog.StringTermToBytes(value[0], prolog.AtomText, env)
-		if err != nil {
-			return nil, err
-		}
-		result, err := prolog.BytesToAtomListTerm(bs, encodingAtom, env)
-		if err != nil {
-			return nil, err
-		}
-		return []engine.Term{result}, nil
+		return []engine.Term{prolog.StringToCharacterListTerm(result)}, nil
 	}
 
-	ok, env, err := prolog.UnifyFunctional([]engine.Term{str}, []engine.Term{bts}, encoding, forwardConverter, backwardConverter, env)
-	if err != nil {
-		return engine.Error(err)
-	}
-	if !ok {
-		return engine.Bool(false)
-	}
-	return cont(env)
+	return prolog.UnifyFunctionalPredicate(
+		[]engine.Term{str}, []engine.Term{bts}, encoding, forwardConverter, backwardConverter, cont, env)
 }

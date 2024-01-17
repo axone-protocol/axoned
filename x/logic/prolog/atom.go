@@ -7,16 +7,6 @@ var (
 	AtomAs = engine.NewAtom("as")
 	// AtomAt are terms with principal functor (@)/1 used to represent special values in json objects.
 	AtomAt = engine.NewAtom("@")
-	// AtomAtom is the term used to indicate the atom atom.
-	AtomAtom = engine.NewAtom("atom")
-	// AtomCharacter is the term used to indicate the character type.
-	AtomCharacter = engine.NewAtom("character")
-	// AtomCharacterCode is the term used to indicate the character code type.
-	AtomCharacterCode = engine.NewAtom("character_code")
-	// AtomCharset is the term used to indicate the charset encoding type option.
-	AtomCharset = engine.NewAtom("charset")
-	// AtomCompound is the term used to indicate the atom compound.
-	AtomCompound = engine.NewAtom("compound")
 	// AtomDot is the term used to represent the dot in a list.
 	AtomDot = engine.NewAtom(".")
 	// AtomEmpty is the term used to represent empty.
@@ -31,12 +21,12 @@ var (
 	AtomError = engine.NewAtom("error")
 	// AtomFalse is the term false.
 	AtomFalse = engine.NewAtom("false")
+	// AtomFragment is the term used to indicate the fragment component.
+	AtomFragment = engine.NewAtom("fragment")
 	// AtomHex is the term used to indicate the hexadecimal encoding type option.
 	AtomHex = engine.NewAtom("hex")
 	// AtomJSON are terms with principal functor json/1 used to represent json objects.
 	AtomJSON = engine.NewAtom("json")
-	// AtomList is the term used to indicate the atom list.
-	AtomList = engine.NewAtom("list")
 	// AtomNull is the term null.
 	AtomNull = engine.NewAtom("null")
 	// AtomOctet is the term used to indicate the byte encoding type option.
@@ -46,6 +36,12 @@ var (
 	// AtomPair are terms with principal functor (-)/2.
 	// For example, the term -(A, B) denotes the pair of elements A and B.
 	AtomPair = engine.NewAtom("-")
+	// AtomPath is the term used to indicate the path component.
+	AtomPath = engine.NewAtom("path")
+	// AtomQueryValue is the term used to indicate the query value component.
+	AtomQueryValue = engine.NewAtom("query_value")
+	// AtomSegment is the term used to indicate the segment component.
+	AtomSegment = engine.NewAtom("segment")
 	// AtomText is the term used to indicate the atom text.
 	AtomText = engine.NewAtom("text")
 	// AtomTrue is the term true.

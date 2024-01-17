@@ -1,7 +1,6 @@
 package predicate
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"sort"
@@ -34,68 +33,82 @@ import (
 //	# JSON conversion to Prolog.
 //	- json_prolog('{"foo": "bar"}', json([foo-bar])).
 func JSONProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		var result engine.Term
+	var result engine.Term
 
-		switch t1 := env.Resolve(j).(type) {
-		case engine.Variable:
-		case engine.Atom:
-			terms, err := jsonStringToTerms(t1.String())
-			if err != nil {
-				return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
-			}
-			result = terms
-		default:
-			return engine.Error(fmt.Errorf("json_prolog/2: cannot unify json with %T", t1))
+	switch t1 := env.Resolve(j).(type) {
+	case engine.Variable:
+	case engine.Atom:
+		terms, err := jsonStringToTerms(t1, env)
+		if err != nil {
+			return engine.Error(err)
+		}
+		result = terms
+	default:
+		return engine.Error(engine.TypeError(prolog.AtomTypeAtom, j, env))
+	}
+
+	switch t2 := env.Resolve(term).(type) {
+	case engine.Variable:
+		if result == nil {
+			return engine.Error(engine.InstantiationError(env))
+		}
+		return engine.Unify(vm, term, result, cont, env)
+	default:
+		b, err := termsToJSON(t2, env)
+		if err != nil {
+			return engine.Error(err)
 		}
 
-		switch t2 := env.Resolve(term).(type) {
-		case engine.Variable:
-			if result == nil {
-				return engine.Error(fmt.Errorf("json_prolog/2: could not unify two variable"))
-			}
-			return engine.Unify(vm, term, result, cont, env)
-		default:
-			b, err := termsToJSON(t2, env)
-			if err != nil {
-				return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
-			}
-
-			b, err = sdk.SortJSON(b)
-			if err != nil {
-				return engine.Error(fmt.Errorf("json_prolog/2: %w", err))
-			}
-			return engine.Unify(vm, j, prolog.StringToTerm(string(b)), cont, env)
+		b, err = sdk.SortJSON(b)
+		if err != nil {
+			return engine.Error(
+				prolog.WithError(
+					engine.DomainError(prolog.ValidEncoding("json"), term, env), err, env))
 		}
-	})
+		var r engine.Term = engine.NewAtom(string(b))
+		return engine.Unify(vm, j, r, cont, env)
+	}
 }
 
-func jsonStringToTerms(j string) (engine.Term, error) {
+func jsonStringToTerms(j engine.Atom, env *engine.Env) (engine.Term, error) {
 	var values any
-	decoder := json.NewDecoder(strings.NewReader(j))
+	decoder := json.NewDecoder(strings.NewReader(j.String()))
 	decoder.UseNumber() // unmarshal a number into an interface{} as a Number instead of as a float64
 
 	if err := decoder.Decode(&values); err != nil {
-		return nil, err
+		return nil, prolog.WithError(
+			engine.DomainError(prolog.ValidEncoding("json"), j, env), err, env)
 	}
 
-	return jsonToTerms(values)
+	term, err := jsonToTerms(values)
+	if err != nil {
+		return nil, prolog.WithError(
+			engine.DomainError(prolog.ValidEncoding("json"), j, env), err, env)
+	}
+
+	return term, nil
 }
 
 func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
+	asDomainError := func(bs []byte, err error) ([]byte, error) {
+		if err != nil {
+			return bs, prolog.WithError(
+				engine.DomainError(prolog.ValidEncoding("json"), term, env), err, env)
+		}
+		return bs, err
+	}
 	switch t := term.(type) {
 	case engine.Atom:
-		return json.Marshal(t.String())
+		return asDomainError(json.Marshal(t.String()))
 	case engine.Integer:
-		return json.Marshal(t)
+		return asDomainError(json.Marshal(t))
 	case engine.Compound:
-		switch t.Functor().String() {
-		case ".": // Represent an engine.List
-			if t.Arity() != 2 {
-				return nil, fmt.Errorf("wrong term arity for array, give %d, expected %d", t.Arity(), 2)
+		switch {
+		case t.Functor() == prolog.AtomDot:
+			iter, err := prolog.ListIterator(t, env)
+			if err != nil {
+				return nil, err
 			}
-
-			iter := engine.ListIterator{List: t, Env: env}
 
 			elements := make([]json.RawMessage, 0)
 			for iter.Next() {
@@ -105,8 +118,8 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 				}
 				elements = append(elements, element)
 			}
-			return json.Marshal(elements)
-		case prolog.AtomJSON.String():
+			return asDomainError(json.Marshal(elements))
+		case t.Functor() == prolog.AtomJSON:
 			terms, err := prolog.ExtractJSONTerm(t, env)
 			if err != nil {
 				return nil, err
@@ -120,30 +133,30 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 				}
 				attributes[key] = raw
 			}
-			return json.Marshal(attributes)
-		}
-
-		switch {
+			return asDomainError(json.Marshal(attributes))
 		case prolog.JSONBool(true).Compare(t, env) == 0:
-			return json.Marshal(true)
+			return asDomainError(json.Marshal(true))
 		case prolog.JSONBool(false).Compare(t, env) == 0:
-			return json.Marshal(false)
+			return asDomainError(json.Marshal(false))
 		case prolog.JSONEmptyArray().Compare(t, env) == 0:
-			return json.Marshal([]json.RawMessage{})
+			return asDomainError(json.Marshal([]json.RawMessage{}))
 		case prolog.JSONNull().Compare(t, env) == 0:
-			return json.Marshal(nil)
+			return asDomainError(json.Marshal(nil))
+		default:
+			// no-op
 		}
-
-		return nil, fmt.Errorf("invalid functor %s", t.Functor())
 	default:
-		return nil, fmt.Errorf("could not convert %s {%T} to json", t, t)
+		// no-op
 	}
+
+	return nil, engine.TypeError(prolog.AtomTypeJSON, term, env)
 }
 
 func jsonToTerms(value any) (engine.Term, error) {
 	switch v := value.(type) {
 	case string:
-		return prolog.StringToTerm(v), nil
+		var r engine.Term = engine.NewAtom(v)
+		return r, nil
 	case json.Number:
 		r, ok := math.NewIntFromString(string(v))
 		if !ok {
@@ -185,6 +198,6 @@ func jsonToTerms(value any) (engine.Term, error) {
 		}
 		return engine.List(elements...), nil
 	default:
-		return nil, fmt.Errorf("could not convert %s (%T) to a prolog term", v, v)
+		return nil, fmt.Errorf("unsupported type: %T", v)
 	}
 }

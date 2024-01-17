@@ -2,7 +2,6 @@ package predicate
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ichiban/prolog/engine"
 
@@ -10,7 +9,6 @@ import (
 
 	"github.com/okp4/okp4d/x/logic/prolog"
 	"github.com/okp4/okp4d/x/logic/types"
-	"github.com/okp4/okp4d/x/logic/util"
 )
 
 // BankBalances is a predicate which unifies the given terms with the list of balances (coins) of the given account.
@@ -34,7 +32,7 @@ import (
 //	# Query the first balance of the given account by unifying the denomination and amount with the given terms.
 //	- bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
 func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances("bank_balances/2",
+	return fetchBalances(
 		account,
 		balances,
 		vm,
@@ -69,7 +67,7 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 //	# Query the first spendable balances of the given account by unifying the denomination and amount with the given terms.
 //	- bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
 func BankSpendableBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances("bank_spendable_balances/2",
+	return fetchBalances(
 		account,
 		balances,
 		vm,
@@ -101,7 +99,7 @@ func BankSpendableBalances(vm *engine.VM, account, balances engine.Term, cont en
 //	# Query the first locked balances of the given account by unifying the denomination and amount with the given terms.
 //	- bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
 func BankLockedBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances("bank_locked_balances/2",
+	return fetchBalances(
 		account,
 		balances,
 		vm,
@@ -116,15 +114,18 @@ func getBech32(env *engine.Env, account engine.Term) (sdk.AccAddress, error) {
 	switch acc := env.Resolve(account).(type) {
 	case engine.Variable:
 	case engine.Atom:
-		return sdk.AccAddressFromBech32(acc.String())
+		addr, err := sdk.AccAddressFromBech32(acc.String())
+		if err != nil {
+			return nil, prolog.WithError(prolog.ResourceError(prolog.ResourceModule("bank"), env), err, env)
+		}
+		return addr, nil
 	default:
-		return nil, fmt.Errorf("cannot unify account address with %T", acc)
+		return nil, engine.TypeError(prolog.AtomTypeAtom, account, env)
 	}
 	return sdk.AccAddress(nil), nil
 }
 
 func fetchBalances(
-	predicate string,
 	account, balances engine.Term,
 	vm *engine.VM,
 	env *engine.Env,
@@ -132,7 +133,7 @@ func fetchBalances(
 	coinsFn func(ctx sdk.Context, bankKeeper types.BankKeeper, coins sdk.Coins, address sdk.AccAddress) sdk.Coins,
 ) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		sdkContext, err := util.UnwrapSDKContext(ctx)
+		sdkContext, err := prolog.UnwrapSDKContext(ctx, env)
 		if err != nil {
 			return engine.Error(err)
 		}
@@ -140,7 +141,7 @@ func fetchBalances(
 
 		bech32Addr, err := getBech32(env, account)
 		if err != nil {
-			return engine.Error(fmt.Errorf("%s: %w", predicate, err))
+			return engine.Error(err)
 		}
 
 		if bech32Addr != nil {
@@ -154,7 +155,7 @@ func fetchBalances(
 			address := balance.Address
 			bech32Addr, err = sdk.AccAddressFromBech32(address)
 			if err != nil {
-				return engine.Error(fmt.Errorf("%s: %w", predicate, err))
+				return engine.Error(prolog.WithError(prolog.ResourceError(prolog.ResourceModule("bank"), env), err, env))
 			}
 			coins := coinsFn(sdkContext, bankKeeper, balance.Coins, bech32Addr)
 

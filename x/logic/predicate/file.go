@@ -2,12 +2,13 @@ package predicate
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"reflect"
 	"sort"
 
 	"github.com/ichiban/prolog/engine"
+
+	"github.com/okp4/okp4d/x/logic/prolog"
 )
 
 // SourceFile is a predicate that unify the given term with the currently loaded source file.
@@ -29,36 +30,35 @@ import (
 func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	loaded := getLoadedSources(vm)
 
-	inputFile, err := getFile(env, file)
-	if err != nil {
-		return engine.Error(fmt.Errorf("source_file/1: %w", err))
-	}
-
-	if inputFile != nil {
-		if _, ok := loaded[*inputFile]; ok {
-			return engine.Unify(vm, file, engine.NewAtom(*inputFile), cont, env)
+	switch file := env.Resolve(file).(type) {
+	case engine.Variable:
+		promises := make([]func(ctx context.Context) *engine.Promise, 0, len(loaded))
+		sortedSource := sortLoadedSources(loaded)
+		for i := range sortedSource {
+			term := engine.NewAtom(sortedSource[i])
+			promises = append(
+				promises,
+				func(ctx context.Context) *engine.Promise {
+					return engine.Unify(
+						vm,
+						file,
+						term,
+						cont,
+						env,
+					)
+				})
 		}
-		return engine.Delay()
-	}
 
-	promises := make([]func(ctx context.Context) *engine.Promise, 0, len(loaded))
-	sortedSource := sortLoadedSources(loaded)
-	for i := range sortedSource {
-		term := engine.NewAtom(sortedSource[i])
-		promises = append(
-			promises,
-			func(ctx context.Context) *engine.Promise {
-				return engine.Unify(
-					vm,
-					file,
-					term,
-					cont,
-					env,
-				)
-			})
+		return engine.Delay(promises...)
+	case engine.Atom:
+		inputFile := file.String()
+		if _, ok := loaded[inputFile]; !ok {
+			return engine.Bool(false)
+		}
+		return cont(env)
+	default:
+		return engine.Error(engine.TypeError(prolog.AtomTypeAtom, file, env))
 	}
-
-	return engine.Delay(promises...)
 }
 
 // ioMode describes what operations you can perform on the stream.
@@ -98,28 +98,28 @@ func (m ioMode) Term() engine.Term {
 //     that can be opened, such as a URI. The URI scheme determines the type of resource that is opened.
 //   - Mode is an atom representing the mode of the stream (read, write, append).
 //   - Stream is the stream to be opened.
-//   - Options is a list of options.
+//   - Options is a list of options. No options are currently defined, so the list should be empty.
 //
 // Examples:
 //
 //	# Open a stream from a cosmwasm query.
 //	# The Stream should be read as a string with a read_string/3 predicate, and then closed with the close/1 predicate.
-//	- open('cosmwasm:okp4-objectarium:okp412kgx?query=%7B%22object_data%22%3A%7B%...4dd539e3%22%7D%7D', 'read', Stream)
+//	- open('cosmwasm:okp4-objectarium:okp412kgx?query=%7B%22object_data%22%3A%7B%...4dd539e3%22%7D%7D', 'read', Stream, [])
 func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
 	var name string
 	switch s := env.Resolve(sourceSink).(type) {
 	case engine.Variable:
-		return engine.Error(fmt.Errorf("open/4: source cannot be a variable"))
+		return engine.Error(engine.InstantiationError(env))
 	case engine.Atom:
 		name = s.String()
 	default:
-		return engine.Error(fmt.Errorf("open/4: invalid domain for source, should be an atom, got %T", s))
+		return engine.Error(engine.TypeError(prolog.AtomTypeAtom, sourceSink, env))
 	}
 
 	var streamMode ioMode
 	switch m := env.Resolve(mode).(type) {
 	case engine.Variable:
-		return engine.Error(fmt.Errorf("open/4: streamMode cannot be a variable"))
+		return engine.Error(engine.InstantiationError(env))
 	case engine.Atom:
 		var ok bool
 		streamMode, ok = map[engine.Atom]ioMode{
@@ -128,29 +128,35 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 			atomAppend: ioModeAppend,
 		}[m]
 		if !ok {
-			return engine.Error(fmt.Errorf("open/4: invalid open mode (read | write | append)"))
+			return engine.Error(engine.TypeError(prolog.AtomTypeIOMode, mode, env))
 		}
 	default:
-		return engine.Error(fmt.Errorf("open/4: invalid domain for open mode, should be an atom, got %T", m))
+		return engine.Error(engine.TypeError(prolog.AtomTypeIOMode, mode, env))
 	}
 
 	if _, ok := env.Resolve(stream).(engine.Variable); !ok {
-		return engine.Error(fmt.Errorf("open/4: stream can only be a variable, got %T", env.Resolve(stream)))
+		// TODO: replace InstantiationError with uninstantiation_error(+Culprit) once it's implemented by ichiban/prolog.
+		return engine.Error(engine.InstantiationError(env))
 	}
 
 	if streamMode != ioModeRead {
-		return engine.Error(fmt.Errorf("open/4: only read mode is allowed here"))
+		return engine.Error(prolog.PermissionError(prolog.AtomOperationInput, prolog.AtomPermissionTypeStream, sourceSink, env))
 	}
 
 	f, err := vm.FS.Open(name)
 	if err != nil {
-		return engine.Error(fmt.Errorf("open/4: couldn't open stream: %w", err))
+		return engine.Error(prolog.ExistenceError(prolog.AtomObjectTypeSourceSink, sourceSink, env))
 	}
 	s := engine.NewInputTextStream(f)
 
-	iter := engine.ListIterator{List: options, Env: env}
-	for iter.Next() {
-		return engine.Error(fmt.Errorf("open/4: options is not allowed here"))
+	if prolog.IsGround(options, env) {
+		_, err = prolog.AssertList(env, options)
+		switch {
+		case err != nil:
+			return engine.Error(err)
+		case !prolog.IsEmptyList(options):
+			return engine.Error(engine.DomainError(prolog.ValidEmptyList(), options, env))
+		}
 	}
 
 	return engine.Unify(vm, stream, s, k, env)
@@ -176,17 +182,4 @@ func sortLoadedSources(sources map[string]struct{}) []string {
 	})
 
 	return result
-}
-
-//nolint:nilnil
-func getFile(env *engine.Env, term engine.Term) (*string, error) {
-	switch file := env.Resolve(term).(type) {
-	case engine.Variable:
-	case engine.Atom:
-		strFile := file.String()
-		return &strFile, nil
-	default:
-		return nil, fmt.Errorf("cannot unify file with %T", term)
-	}
-	return nil, nil
 }

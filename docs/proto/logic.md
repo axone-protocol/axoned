@@ -352,7 +352,8 @@ Answer represents the answer to a logic query.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `success` | [bool](#bool) |  | result is the result of the query. |
+| `success` | [bool](#bool) |  | success specifies if the query was successful. |
+| `error` | [string](#string) |  | error specifies the error message if the query caused an error. |
 | `has_more` | [bool](#bool) |  | has_more specifies if there are more solutions than the ones returned. |
 | `variables` | [string](#string) | repeated | variables represent all the variables in the query. |
 | `results` | [Result](#logic.v1beta2.Result) | repeated | results represent all the results of the query. |

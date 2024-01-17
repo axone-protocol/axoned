@@ -3,6 +3,7 @@ package predicate
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/ichiban/prolog/engine"
@@ -45,8 +46,8 @@ func TestBech32(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
-				query:       `bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), foo(bar)).`,
-				wantError:   fmt.Errorf("bech32_address/2: invalid Bech32 type: *engine.compound, should be Atom or Variable"),
+				query:       `bech32_address(-('okp4', X), foo(bar)).`,
+				wantError:   fmt.Errorf("error(type_error(atom,foo(bar)),bech32_address/2)"),
 				wantSuccess: false,
 			},
 			{
@@ -83,33 +84,39 @@ func TestBech32(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
-				query:       `bech32_address(foo(Bar), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: address should be a Pair '-(Hrp, Address)'"),
+				query:       `bech32_address(foo(bar), Bech32).`,
+				wantError:   fmt.Errorf("error(type_error(pair,foo(bar)),bech32_address/2)"),
 				wantSuccess: false,
 			},
 			{
-				query:       `bech32_address(-('okp4', ['8956',167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: failed to convert term to bytes list: error(domain_error(valid_character_code(8956),[8956,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]),bech32_address/2)"),
+				query:       `bech32_address(-('okp4', ['163',167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
+				wantError:   fmt.Errorf("error(type_error(byte,163),bech32_address/2)"),
+				wantSuccess: false,
+			},
+			{
+				query:       `bech32_address(-('okp4', [163,'x',23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
+				wantError:   fmt.Errorf("error(type_error(byte,x),bech32_address/2)"),
 				wantSuccess: false,
 			},
 			{
 				query:       `bech32_address(-(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: HRP should be instantiated"),
+				wantError:   fmt.Errorf("error(instantiation_error,bech32_address/2)"),
 				wantSuccess: false,
 			},
 			{
 				query:       `bech32_address(-('okp4', hey(2)), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: failed to convert term to bytes list: error(type_error(character_code,hey(2)),bech32_address/2)"),
+				wantError:   fmt.Errorf("error(type_error(list,hey(2)),bech32_address/2)"),
 				wantSuccess: false,
 			},
 			{
-				query:       `bech32_address(-('okp4', 'foo'), Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: address should be a Pair with a List of bytes in arity 2, given: engine.Atom"),
+				query: `bech32_address(-('okp4', X), foo).`,
+				wantError: fmt.Errorf("error(domain_error(encoding(bech32),foo),[%s],bech32_address/2)",
+					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 				wantSuccess: false,
 			},
 			{
 				query:       `bech32_address(Address, Bech32).`,
-				wantError:   fmt.Errorf("bech32_address/2: invalid address type: engine.Variable, should be Compound (Hrp, Address)"),
+				wantError:   fmt.Errorf("error(instantiation_error,bech32_address/2)"),
 				wantSuccess: false,
 			},
 		}
@@ -125,13 +132,13 @@ func TestBech32(t *testing.T) {
 						interpreter.Register2(engine.NewAtom("bech32_address"), Bech32Address)
 
 						err := interpreter.Compile(ctx, tc.program)
-						So(err, ShouldBeNil)
+						So(err, ShouldEqual, nil)
 
 						Convey("When the predicate is called", func() {
 							sols, err := interpreter.QueryContext(ctx, tc.query)
 
 							Convey("Then the error should be nil", func() {
-								So(err, ShouldBeNil)
+								So(err, ShouldEqual, nil)
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
@@ -139,15 +146,15 @@ func TestBech32(t *testing.T) {
 									for sols.Next() {
 										m := types.TermResults{}
 										err := sols.Scan(m)
-										So(err, ShouldBeNil)
+										So(err, ShouldEqual, nil)
 
 										got = append(got, m)
 									}
 									if tc.wantError != nil {
-										So(sols.Err(), ShouldNotBeNil)
+										So(sols.Err(), ShouldNotEqual, nil)
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 									} else {
-										So(sols.Err(), ShouldBeNil)
+										So(sols.Err(), ShouldEqual, nil)
 
 										if tc.wantSuccess {
 											So(len(got), ShouldBeGreaterThan, 0)

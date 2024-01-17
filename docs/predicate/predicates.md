@@ -100,7 +100,7 @@ bech32_address(+Address, +Bech32)
 
 where:
 
-- Address is a pair of the HRP \(Human\-Readable Part\) which holds the address prefix and a list of integers ranging from 0 to 255 that represent the base64 encoded bech32 address string.
+- Address is a pair of the HRP \(Human\-Readable Part\) which holds the address prefix and a list of numbers ranging from 0 to 255 that represent the base64 encoded bech32 address string.
 - Bech32 is an Atom or string representing the bech32 encoded string address
 
 Examples:
@@ -197,6 +197,7 @@ Where:
 For Format, the supported encodings are:
 
 - utf8 \(default\), the UTF\-8 encoding represented as an atom.
+- text, the plain text encoding represented as an atom.
 - hex, the hexadecimal encoding represented as an atom.
 - octet, the raw byte encoding depicted as a list of integers ranging from 0 to 255.
 
@@ -271,6 +272,8 @@ For Format, the supported encodings are:
 
 - hex \(default\), the hexadecimal encoding represented as an atom.
 - octet, the plain byte encoding depicted as a list of integers ranging from 0 to 255.
+- text, the plain text encoding represented as an atom.
+- utf8 \(default\), the UTF\-8 encoding represented as an atom.
 
 For Alg, the supported algorithms are:
 
@@ -308,6 +311,8 @@ For Format, the supported encodings are:
 
 - hex \(default\), the hexadecimal encoding represented as an atom.
 - octet, the plain byte encoding depicted as a list of integers ranging from 0 to 255.
+- text, the plain text encoding represented as an atom.
+- utf8 \(default\), the UTF\-8 encoding represented as an atom.
 
 For Alg, the supported algorithms are:
 
@@ -384,14 +389,14 @@ Where:
 - SourceSink is an atom representing the source or sink of the stream. The atom typically represents a resource that can be opened, such as a URI. The URI scheme determines the type of resource that is opened.
 - Mode is an atom representing the mode of the stream \(read, write, append\).
 - Stream is the stream to be opened.
-- Options is a list of options.
+- Options is a list of options. No options are currently defined, so the list should be empty.
 
 Examples:
 
 ```text
 # open/4 a stream from a cosmwasm query.
 # The Stream should be read as a string with a read_string/3 predicate, and then closed with the close/1 predicate.
-- open('cosmwasm:okp4-objectarium:okp412kgx?query=%7B%22object_data%22%3A%7B%...4dd539e3%22%7D%7D', 'read', Stream)
+- open('cosmwasm:okp4-objectarium:okp412kgx?query=%7B%22object_data%22%3A%7B%...4dd539e3%22%7D%7D', 'read', Stream, [])
 ```
 
 ## read_string/3
@@ -468,7 +473,7 @@ Where:
 - Bytes is the list of numbers between 0 and 255 that represent the sequence of bytes.
 - Encoding is the encoding to use for the conversion.
 
-Encoding can be one of the following: \- 'text' considers the string as a sequence of Unicode characters. \- 'octet' considers the string as a sequence of bytes. \- 'utf8' considers the string as a sequence of UTF\-8 characters. \- '\<encoding\>' considers the string as a sequence of characters in the given encoding.
+Encoding can be one of the following: \- 'text' considers the string as a sequence of Unicode characters. \- 'octet' considers the string as a sequence of bytes. \- '\<encoding\>' considers the string as a sequence of characters in the given encoding.
 
 At least one of String or Bytes must be instantiated.
 

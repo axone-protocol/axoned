@@ -121,7 +121,7 @@ func TestGetOption(t *testing.T) {
 				option:     engine.NewAtom("foo"),
 				options:    engine.NewAtom("foo"),
 				wantResult: nil,
-				wantError:  fmt.Errorf("invalid term 'foo' - expected engine.Compound but got engine.Atom"),
+				wantError:  fmt.Errorf("error(type_error(option,foo),root)"),
 			},
 			{
 				option: engine.NewAtom("foo"),
@@ -130,7 +130,7 @@ func TestGetOption(t *testing.T) {
 					engine.NewAtom("hey"),
 					engine.NewAtom("foo").Apply(engine.NewAtom("bar"))),
 				wantResult: nil,
-				wantError:  fmt.Errorf("invalid term 'hey' - expected engine.Compound but got engine.Atom"),
+				wantError:  fmt.Errorf("error(type_error(option,hey),root)"),
 			},
 			{
 				option: engine.NewAtom("foo"),
@@ -139,18 +139,18 @@ func TestGetOption(t *testing.T) {
 					engine.NewAtom("hey").Apply(engine.NewAtom("hoo")),
 					engine.NewAtom("foo").Apply(engine.NewAtom("bar1"), engine.NewAtom("bar2"))),
 				wantResult: nil,
-				wantError:  fmt.Errorf("invalid arity for compound 'foo': 2 but expected 1"),
+				wantError:  fmt.Errorf("error(type_error(option,foo(bar1,bar2)),root)"),
 			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the term option #%d: %s", nc, tc.option), func() {
 				Convey("when getting option", func() {
-					env := engine.Env{}
-					result, err := GetOption(tc.option, tc.options, &env)
+					env := engine.NewEnv()
+					result, err := GetOption(tc.option, tc.options, env)
 
 					if tc.wantError == nil {
 						Convey("then no error should be thrown", func() {
-							So(err, ShouldBeNil)
+							So(err, ShouldEqual, nil)
 
 							Convey("and result should be as expected", func() {
 								So(result, ShouldEqual, tc.wantResult)
@@ -161,10 +161,10 @@ func TestGetOption(t *testing.T) {
 							So(result, ShouldEqual, tc.wantResult)
 						})
 						Convey("then error should occurs", func() {
-							So(err, ShouldNotBeNil)
+							So(err, ShouldNotEqual, nil)
 
 							Convey("and should be as expected", func() {
-								So(err, ShouldBeError, tc.wantError)
+								So(err.Error(), ShouldEqual, tc.wantError.Error())
 							})
 						})
 					}

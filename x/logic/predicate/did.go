@@ -1,7 +1,6 @@
 package predicate
 
 import (
-	"fmt"
 	"net/url"
 	"strings"
 
@@ -49,28 +48,25 @@ func DIDComponents(vm *engine.VM, did, components engine.Term, cont engine.Cont,
 	case engine.Atom:
 		parsedDid, err := godid.ParseDIDURL(t1.String())
 		if err != nil {
-			return engine.Error(fmt.Errorf("did_components/2: %w", err))
+			return engine.Error(prolog.WithError(engine.DomainError(prolog.ValidEncoding("did"), did, env), err, env))
 		}
 
-		terms, err := didToTerms(parsedDid)
+		terms, err := didToTerms(parsedDid, env)
 		if err != nil {
-			return engine.Error(fmt.Errorf("did_components/2: %w", err))
+			return engine.Error(err)
 		}
 
 		return engine.Unify(vm, components, AtomDID.Apply(terms...), cont, env)
 	default:
-		return engine.Error(fmt.Errorf("did_components/2: cannot unify did with %T", t1))
+		return engine.Error(engine.TypeError(prolog.AtomTypeAtom, did, env))
 	}
 
 	switch t2 := env.Resolve(components).(type) {
 	case engine.Variable:
-		return engine.Error(fmt.Errorf("did_components/2: at least one argument must be instantiated"))
+		return engine.Error(engine.InstantiationError(env))
 	case engine.Compound:
-		if t2.Functor() != AtomDID {
-			return engine.Error(fmt.Errorf("did_components/2: invalid functor %s. Expected %s", t2.Functor().String(), AtomDID.String()))
-		}
-		if t2.Arity() != 5 {
-			return engine.Error(fmt.Errorf("did_components/2: invalid arity %d. Expected 5", t2.Arity()))
+		if t2.Functor() != AtomDID || t2.Arity() != 5 {
+			return engine.Error(engine.DomainError(AtomDID, components, env))
 		}
 
 		buf := strings.Builder{}
@@ -102,13 +98,13 @@ func DIDComponents(vm *engine.VM, did, components engine.Term, cont engine.Cont,
 
 		for i := 0; i < t2.Arity(); i++ {
 			if err := processSegment(t2, uint8(i), processors[i], env); err != nil {
-				return engine.Error(fmt.Errorf("did_components/2: %w", err))
+				return engine.Error(err)
 			}
 		}
 
 		return engine.Unify(vm, did, engine.NewAtom(buf.String()), cont, env)
 	default:
-		return engine.Error(fmt.Errorf("did_components/2: cannot unify did with %T", t2))
+		return engine.Error(engine.TypeError(AtomDID, components, env))
 	}
 }
 
@@ -120,7 +116,7 @@ func processSegment(segments engine.Compound, segmentNumber uint8, fn func(segme
 	}
 	segment, err := prolog.AssertAtom(env, segments.Arg(int(segmentNumber)))
 	if err != nil {
-		return fmt.Errorf("failed to resolve atom at segment %d: %w", segmentNumber, err)
+		return err
 	}
 
 	fn(segment)
@@ -131,16 +127,17 @@ func processSegment(segments engine.Compound, segmentNumber uint8, fn func(segme
 // didToTerms converts a DID to a "tuple" of terms (either an Atom or a Variable),
 // or returns an error if the conversion fails.
 // The returned atoms are url decoded.
-func didToTerms(did *godid.DID) ([]engine.Term, error) {
+func didToTerms(did *godid.DID, env *engine.Env) ([]engine.Term, error) {
 	components := []string{did.Method, did.ID, did.Path, did.Query, did.Fragment}
 	terms := make([]engine.Term, 0, len(components))
 
 	for _, component := range components {
 		r, err := url.PathUnescape(component)
 		if err != nil {
-			return nil, err
+			return nil, engine.DomainError(prolog.ValidEncoding("url_encoded"), engine.NewAtom(component), env)
 		}
-		terms = append(terms, prolog.StringToTerm(r))
+		var r2 engine.Term = engine.NewAtom(r)
+		terms = append(terms, r2)
 	}
 
 	return terms, nil

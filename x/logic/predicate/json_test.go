@@ -3,6 +3,7 @@ package predicate
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/ichiban/prolog/engine"
@@ -34,13 +35,13 @@ func TestJsonProlog(t *testing.T) {
 				description: "two variable",
 				query:       `json_prolog(Json, Term).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("json_prolog/2: could not unify two variable"),
+				wantError:   fmt.Errorf("error(instantiation_error,json_prolog/2)"),
 			},
 			{
 				description: "two variable",
 				query:       `json_prolog(ooo(r), Term).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("json_prolog/2: cannot unify json with *engine.compound"),
+				wantError:   fmt.Errorf("error(type_error(atom,ooo(r)),json_prolog/2)"),
 			},
 
 			// ** JSON -> Prolog **
@@ -109,13 +110,15 @@ func TestJsonProlog(t *testing.T) {
 				description: "convert large json number into prolog",
 				query:       `json_prolog('100000000000000000000', Term).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("json_prolog/2: could not convert number '100000000000000000000' into integer term, overflow"),
+				wantError: fmt.Errorf("error(domain_error(encoding(json),100000000000000000000),[%s],json_prolog/2)",
+					strings.Join(strings.Split("could not convert number '100000000000000000000' into integer term, overflow", ""), ",")),
 			},
 			{
 				description: "decimal number not compatible yet",
 				query:       `json_prolog('10.4', Term).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("json_prolog/2: could not convert number '10.4' into integer term, decimal number is not handled yet"),
+				wantError: fmt.Errorf("error(domain_error(encoding(json),10.4),[%s],json_prolog/2)",
+					strings.Join(strings.Split("could not convert number '10.4' into integer term, decimal number is not handled yet", ""), ",")),
 			},
 			// ** JSON -> Prolog **
 			// Bool
@@ -260,19 +263,19 @@ func TestJsonProlog(t *testing.T) {
 				description: "invalid json term compound",
 				query:       `json_prolog(Json, foo([a-b])).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("json_prolog/2: invalid functor foo"),
+				wantError:   fmt.Errorf("error(type_error(json,foo([-(a,b)])),json_prolog/2)"),
 			},
 			{
 				description: "convert json term object from prolog with error inside",
 				query:       `json_prolog(Json, ['string with space',json('toto')]).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("json_prolog/2: json compound should contains one list, give engine.Atom"),
+				wantError:   fmt.Errorf("error(type_error(list,toto),json_prolog/2)"),
 			},
 			{
 				description: "convert json term object from prolog with error inside another object",
 				query:       `json_prolog(Json, ['string with space',json([key-json(error)])]).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("json_prolog/2: json compound should contains one list, give engine.Atom"),
+				wantError:   fmt.Errorf("error(type_error(list,error),json_prolog/2)"),
 			},
 			// ** Prolog -> JSON **
 			// Number
@@ -288,7 +291,7 @@ func TestJsonProlog(t *testing.T) {
 				description: "decimal number not compatible yet",
 				query:       `json_prolog(Json, 10.4).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("json_prolog/2: could not convert %%!s(engine.Float=10.4) {engine.Float} to json"),
+				wantError:   fmt.Errorf("error(type_error(json,10.4),json_prolog/2)"),
 			},
 			// ** Prolog -> Json **
 			// Array
@@ -328,7 +331,7 @@ func TestJsonProlog(t *testing.T) {
 				description: "convert json string array from prolog with error inside",
 				query:       `json_prolog(Json, ['string with space',hey('toto')]).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("json_prolog/2: invalid functor hey"),
+				wantError:   fmt.Errorf("error(type_error(json,hey(toto)),json_prolog/2)"),
 			},
 			// ** Prolog -> JSON **
 			// Bool
@@ -371,29 +374,29 @@ func TestJsonProlog(t *testing.T) {
 						interpreter.Register2(engine.NewAtom("json_prolog"), JSONProlog)
 
 						err := interpreter.Compile(ctx, tc.program)
-						So(err, ShouldBeNil)
+						So(err, ShouldEqual, nil)
 
 						Convey("When the predicate is called", func() {
 							sols, err := interpreter.QueryContext(ctx, tc.query)
 
 							Convey("Then the error should be nil", func() {
-								So(err, ShouldBeNil)
-								So(sols, ShouldNotBeNil)
+								So(err, ShouldEqual, nil)
+								So(sols, ShouldNotEqual, nil)
 
 								Convey("and the bindings should be as expected", func() {
 									var got []types.TermResults
 									for sols.Next() {
 										m := types.TermResults{}
 										err := sols.Scan(m)
-										So(err, ShouldBeNil)
+										So(err, ShouldEqual, nil)
 
 										got = append(got, m)
 									}
 									if tc.wantError != nil {
-										So(sols.Err(), ShouldNotBeNil)
+										So(sols.Err(), ShouldNotEqual, nil)
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 									} else {
-										So(sols.Err(), ShouldBeNil)
+										So(sols.Err(), ShouldEqual, nil)
 
 										if tc.wantSuccess {
 											So(len(got), ShouldEqual, len(tc.wantResult))
@@ -481,7 +484,7 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 								sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(%s, Term).", tc.json))
 
 								Convey("Then the error should be nil", func() {
-									So(err, ShouldBeNil)
+									So(err, ShouldEqual, nil)
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the bindings should be as expected", func() {
@@ -489,15 +492,15 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 										for sols.Next() {
 											m := types.TermResults{}
 											err := sols.Scan(m)
-											So(err, ShouldBeNil)
+											So(err, ShouldEqual, nil)
 
 											got = append(got, m)
 										}
 										if tc.wantError != nil {
-											So(sols.Err(), ShouldNotBeNil)
+											So(sols.Err(), ShouldNotEqual, nil)
 											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 										} else {
-											So(sols.Err(), ShouldBeNil)
+											So(sols.Err(), ShouldEqual, nil)
 
 											if tc.wantSuccess {
 												So(len(got), ShouldBeGreaterThan, 0)
@@ -520,7 +523,7 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 								sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(Json, %s).", tc.term))
 
 								Convey("Then the error should be nil", func() {
-									So(err, ShouldBeNil)
+									So(err, ShouldEqual, nil)
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the bindings should be as expected", func() {
@@ -528,15 +531,15 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 										for sols.Next() {
 											m := types.TermResults{}
 											err := sols.Scan(m)
-											So(err, ShouldBeNil)
+											So(err, ShouldEqual, nil)
 
 											got = append(got, m)
 										}
 										if tc.wantError != nil {
-											So(sols.Err(), ShouldNotBeNil)
+											So(sols.Err(), ShouldNotEqual, nil)
 											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 										} else {
-											So(sols.Err(), ShouldBeNil)
+											So(sols.Err(), ShouldEqual, nil)
 
 											if tc.wantSuccess {
 												So(len(got), ShouldBeGreaterThan, 0)
@@ -560,14 +563,14 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 							sols, err := interpreter.QueryContext(ctx, fmt.Sprintf("json_prolog(%s, %s).", tc.json, tc.term))
 
 							Convey("Then the error should be nil", func() {
-								So(err, ShouldBeNil)
+								So(err, ShouldEqual, nil)
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
 									So(sols.Next(), ShouldEqual, tc.wantSuccess)
 
 									if tc.wantError != nil {
-										So(sols.Err(), ShouldNotBeNil)
+										So(sols.Err(), ShouldNotEqual, nil)
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 									}
 								})
