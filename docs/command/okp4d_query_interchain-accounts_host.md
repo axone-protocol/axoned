@@ -8,12 +8,6 @@ IBC interchain accounts host query subcommands
   -h, --help   help for host
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d query interchain-accounts](okp4d_query_interchain-accounts.md)	 - IBC interchain accounts query subcommands

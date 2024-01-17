@@ -17,20 +17,18 @@ Want to lean more about OKP4 network? Complete documentation is available at [ht
 
 ### SEE ALSO
 
-* [okp4d add-genesis-account](okp4d_add-genesis-account.md)	 - Add a genesis account to genesis.json
-* [okp4d collect-gentxs](okp4d_collect-gentxs.md)	 - Collect genesis txs and output a genesis.json file
-* [okp4d config](okp4d_config.md)	 - Create or query an application CLI configuration file
+* [okp4d comet](okp4d_comet.md)	 - CometBFT subcommands
+* [okp4d config](okp4d_config.md)	 - Utilities for managing application configuration
 * [okp4d debug](okp4d_debug.md)	 - Tool for helping with debugging your application
 * [okp4d export](okp4d_export.md)	 - Export state to JSON
-* [okp4d gentx](okp4d_gentx.md)	 - Generate a genesis tx carrying a self delegation
+* [okp4d genesis](okp4d_genesis.md)	 - Application's genesis-related subcommands
 * [okp4d init](okp4d_init.md)	 - Initialize private validator, p2p, genesis, and application configuration files
 * [okp4d keys](okp4d_keys.md)	 - Manage your application's keys
-* [okp4d migrate](okp4d_migrate.md)	 - Migrate genesis to a specified target version
+* [okp4d prune](okp4d_prune.md)	 - Prune app history states by keeping the recent heights and deleting old heights
 * [okp4d query](okp4d_query.md)	 - Querying subcommands
-* [okp4d rollback](okp4d_rollback.md)	 - rollback cosmos-sdk and tendermint state by one height
+* [okp4d rollback](okp4d_rollback.md)	 - rollback Cosmos SDK and CometBFT state by one height
+* [okp4d snapshots](okp4d_snapshots.md)	 - Manage local snapshots
 * [okp4d start](okp4d_start.md)	 - Run the full node
 * [okp4d status](okp4d_status.md)	 - Query remote node for status
-* [okp4d tendermint](okp4d_tendermint.md)	 - Tendermint subcommands
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
-* [okp4d validate-genesis](okp4d_validate-genesis.md)	 - validates the genesis file at the default location or at the location passed as an arg
 * [okp4d version](okp4d_version.md)	 - Print the application binary version information

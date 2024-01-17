@@ -12,12 +12,6 @@ okp4d query ibc client [flags]
   -h, --help   help for client
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d query ibc](okp4d_query_ibc.md)	 - Querying commands for the IBC module

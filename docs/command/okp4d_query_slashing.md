@@ -12,12 +12,6 @@ okp4d query slashing [flags]
   -h, --help   help for slashing
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d query](okp4d_query.md)	 - Querying subcommands

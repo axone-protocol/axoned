@@ -8,12 +8,6 @@ IBC relayer incentivization query subcommands
   -h, --help   help for ibc-fee
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d query](okp4d_query.md)	 - Querying subcommands

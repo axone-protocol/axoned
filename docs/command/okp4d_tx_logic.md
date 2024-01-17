@@ -1,6 +1,6 @@
 ## okp4d tx logic
 
-logic transactions subcommands
+Transactions commands for the logic module
 
 ```
 okp4d tx logic [flags]
@@ -12,12 +12,7 @@ okp4d tx logic [flags]
   -h, --help   help for logic
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
+* [okp4d tx logic update-params](okp4d_tx_logic_update-params.md)	 - Execute the UpdateParams RPC method

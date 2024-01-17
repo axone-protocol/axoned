@@ -12,12 +12,6 @@ okp4d tx staking [flags]
   -h, --help   help for staking
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d tx](okp4d_tx.md)	 - Transactions subcommands
