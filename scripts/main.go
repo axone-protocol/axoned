@@ -3,9 +3,9 @@ package main
 import (
 	"os"
 
-	"cosmossdk.io/log"
-
 	"github.com/spf13/cobra"
+
+	"cosmossdk.io/log"
 )
 
 func main() {

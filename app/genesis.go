@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"testing"
 
+	dbm "github.com/cosmos/cosmos-db"
+
 	"cosmossdk.io/log"
 
-	dbm "github.com/cosmos/cosmos-db"
-	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
-
 	"github.com/cosmos/cosmos-sdk/codec"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 )
 
 // The genesis state of the blockchain is represented here as a map of raw json

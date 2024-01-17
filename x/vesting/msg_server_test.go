@@ -4,10 +4,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/cosmos/cosmos-sdk/runtime"
-
-	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
-
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 
@@ -15,9 +11,12 @@ import (
 	tmtime "github.com/cometbft/cometbft/types/time"
 
 	storetypes "cosmossdk.io/store/types"
+
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 

@@ -7,6 +7,7 @@ import (
 	"sigs.k8s.io/yaml"
 
 	"cosmossdk.io/math"
+
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -16,7 +17,7 @@ import (
 
 // Compile-time type assertions.
 var (
-	_ authtypes.AccountI          = (*BaseVestingAccount)(nil)
+	_ sdk.AccountI                = (*BaseVestingAccount)(nil)
 	_ vestexported.VestingAccount = (*ContinuousVestingAccount)(nil)
 	_ vestexported.VestingAccount = (*PeriodicVestingAccount)(nil)
 	_ vestexported.VestingAccount = (*DelayedVestingAccount)(nil)

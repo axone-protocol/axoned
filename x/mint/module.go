@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 
-	"github.com/okp4/okp4d/x/mint/client/cli"
+	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 	"github.com/spf13/cobra"
 
 	"cosmossdk.io/core/appmodule"
@@ -16,8 +16,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
-	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
+	"github.com/okp4/okp4d/x/mint/client/cli"
 	"github.com/okp4/okp4d/x/mint/keeper"
 	"github.com/okp4/okp4d/x/mint/simulation"
 	"github.com/okp4/okp4d/x/mint/types"

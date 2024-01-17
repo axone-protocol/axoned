@@ -3,16 +3,15 @@ package keeper_test
 import (
 	"testing"
 
-	"cosmossdk.io/collections"
-	"github.com/cosmos/cosmos-sdk/runtime"
-
-	"cosmossdk.io/math"
-
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 
+	"cosmossdk.io/collections"
+	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
+
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
@@ -58,7 +57,15 @@ func (s *GenesisTestSuite) SetupTest() {
 	accountKeeper.EXPECT().GetModuleAddress(minterAcc.Name).Return(minterAcc.GetAddress())
 	accountKeeper.EXPECT().GetModuleAccount(s.sdkCtx, minterAcc.Name).Return(minterAcc)
 
-	s.keeper = keeper.NewKeeper(s.cdc, runtime.NewKVStoreService(key), stakingKeeper, accountKeeper, bankKeeper, "", "cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn")
+	s.keeper = keeper.NewKeeper(
+		s.cdc,
+		runtime.NewKVStoreService(key),
+		stakingKeeper,
+		accountKeeper,
+		bankKeeper,
+		"",
+		"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn",
+	)
 }
 
 func (s *GenesisTestSuite) TestImportExportGenesis() {

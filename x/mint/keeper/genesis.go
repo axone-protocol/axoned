@@ -6,7 +6,7 @@ import (
 	"github.com/okp4/okp4d/x/mint/types"
 )
 
-// InitGenesis new mint genesis
+// InitGenesis new mint genesis.
 func (keeper Keeper) InitGenesis(ctx sdk.Context, ak types.AccountKeeper, data *types.GenesisState) {
 	if err := keeper.Minter.Set(ctx, data.Minter); err != nil {
 		panic(err)

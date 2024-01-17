@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 )
 
-// RegisterLegacyAminoCodec registers concrete types on the LegacyAmino codec
+// RegisterLegacyAminoCodec registers concrete types on the LegacyAmino codec.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(Params{}, "okp4/logic/Params", nil)
 	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "okp4/logic/MsgUpdateParams")

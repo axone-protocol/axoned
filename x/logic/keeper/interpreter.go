@@ -4,13 +4,12 @@ import (
 	goctx "context"
 	"math"
 
-	storetypes "cosmossdk.io/store/types"
-
 	"github.com/ichiban/prolog"
 	"github.com/samber/lo"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -64,7 +63,7 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 	if userOutputBuffer != nil {
 		userOutput = userOutputBuffer.String()
 	}
-	answer, err := k.solsToAnswer(sdkCtx, sols) //nolint:contextcheck
+	answer, err := k.solsToAnswer(sdkCtx, sols)
 	if err != nil {
 		return nil, err
 	}

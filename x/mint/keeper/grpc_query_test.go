@@ -4,13 +4,13 @@ import (
 	gocontext "context"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/runtime"
-
 	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/suite"
 
 	storetypes "cosmossdk.io/store/types"
+
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
@@ -69,9 +69,9 @@ func (suite *MintTestSuite) SetupTest() {
 func (suite *MintTestSuite) TestGRPCParams() {
 	params, err := suite.queryClient.Params(gocontext.Background(), &types.QueryParamsRequest{})
 	suite.Require().NoError(err)
-	kParams, err := suite.mintKeeper.Params.Get(suite.ctx)
+	keeperParams, err := suite.mintKeeper.Params.Get(suite.ctx)
 	suite.Require().NoError(err)
-	suite.Require().Equal(params.Params, kParams)
+	suite.Require().Equal(params.Params, keeperParams)
 
 	inflation, err := suite.queryClient.Inflation(gocontext.Background(), &types.QueryInflationRequest{})
 	suite.Require().NoError(err)

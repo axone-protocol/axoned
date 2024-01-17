@@ -3,9 +3,8 @@ package keeper
 import (
 	goctx "context"
 
-	storetypes "cosmossdk.io/store/types"
-
 	errorsmod "cosmossdk.io/errors"
+	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -41,7 +40,6 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 	}()
 	sdkCtx.GasMeter().ConsumeGas(sdkCtx.GasMeter().GasConsumed(), types.ModuleName)
 
-	//nolint:contextcheck
 	return k.execute(
 		sdkCtx,
 		req.Program,

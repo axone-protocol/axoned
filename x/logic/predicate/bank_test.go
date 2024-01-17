@@ -6,21 +6,19 @@ import (
 	"strings"
 	"testing"
 
-	"cosmossdk.io/math"
-
-	"cosmossdk.io/store/metrics"
-
 	dbm "github.com/cosmos/cosmos-db"
-
 	"github.com/golang/mock/gomock"
 	"github.com/ichiban/prolog/engine"
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"cosmossdk.io/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
+	"cosmossdk.io/log"
+	"cosmossdk.io/math"
 	"cosmossdk.io/store"
+	"cosmossdk.io/store/metrics"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 
