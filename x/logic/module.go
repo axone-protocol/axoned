@@ -115,23 +115,6 @@ func (am AppModule) IsAppModule() {}
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServiceServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServiceServer(cfg.QueryServer(), am.keeper)
-
-	migrator := keeper.NewMigrator(am.keeper, am.legacySubspace)
-
-	migrations := []struct {
-		fromVersion uint64
-		migrator    func(ctx sdk.Context) error
-	}{
-		{1, migrator.Migrate1to2},
-		{2, migrator.Migrate2to3},
-	}
-
-	for _, migration := range migrations {
-		if err := cfg.RegisterMigration(types.ModuleName, migration.fromVersion, migration.migrator); err != nil {
-			panic(fmt.Errorf("failed to migrate %s from version %d to v%d: %w",
-				types.ModuleName, migration.fromVersion, migration.fromVersion+1, err))
-		}
-	}
 }
 
 // InitGenesis performs the module's genesis initialization. It returns no validator updates.
