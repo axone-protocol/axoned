@@ -3,6 +3,7 @@
 set -eo pipefail
 
 echo "Generating gogo proto code"
+
 (
   cd proto
   proto_dirs=$(find . -path -prune -o -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq)
@@ -16,9 +17,5 @@ echo "Generating gogo proto code"
   done
 )
 
-DST="${PWD}/x"
-(
-  cd github.com/okp4/okp4d/x
-  find . -type f -name "*.go" -exec mv {} "${DST}/{}" \;
-)
+cp -r github.com/okp4/okp4d/* ./
 rm -rf github.com
