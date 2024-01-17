@@ -2,13 +2,11 @@ module github.com/okp4/okp4d/starship/tests
 
 go 1.21
 
-replace github.com/strangelove-ventures/lens => github.com/Anmol1696/lens v0.1.1-0.20230705212610-c00628a886a0
+replace github.com/strangelove-ventures/lens => github.com/Anmol1696/lens v0.1.1-0.20230331154219-5027f163133a
 
 require (
-	github.com/cosmology-tech/starship/clients/go/client v0.0.0-20230715183507-198fb2b3ee2e
 	github.com/cosmos/cosmos-sdk v0.50.1
 	github.com/cosmos/ibc-go/v8 v8.0.0
-	github.com/strangelove-ventures/lens v0.0.0-00010101000000-000000000000
 	github.com/stretchr/testify v1.8.4
 	go.uber.org/zap v1.24.0
 	gopkg.in/yaml.v3 v3.0.1

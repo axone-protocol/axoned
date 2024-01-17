@@ -4,6 +4,8 @@ import (
 	"context"
 	"testing"
 
+	"cosmossdk.io/math"
+
 	"github.com/stretchr/testify/suite"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -45,7 +47,7 @@ func (s *TestSuite) TestChainTokenTransfer() {
 	// Assert correct transfers
 	s.Assert().Len(balance, 1)
 	s.Assert().Equal(balance.Denoms(), []string{denom})
-	s.Assert().Equal(balance[0].Amount, sdk.NewInt(2345000))
+	s.Assert().Equal(balance[0].Amount, math.NewInt(2345000))
 }
 
 func (s *TestSuite) TestChainIBCTransfer() {

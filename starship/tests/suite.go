@@ -8,10 +8,29 @@ import (
 	"os"
 	"time"
 
+	"github.com/cosmos/cosmos-sdk/x/mint"
+
+	feegrant "cosmossdk.io/x/feegrant/module"
+	"cosmossdk.io/x/upgrade"
+
+	"github.com/cosmos/cosmos-sdk/x/auth"
+	authz "github.com/cosmos/cosmos-sdk/x/authz/module"
+	"github.com/cosmos/cosmos-sdk/x/bank"
+	"github.com/cosmos/cosmos-sdk/x/crisis"
+	"github.com/cosmos/cosmos-sdk/x/distribution"
+	"github.com/cosmos/cosmos-sdk/x/gov"
+	"github.com/cosmos/cosmos-sdk/x/gov/client"
+	"github.com/cosmos/cosmos-sdk/x/params"
+	paramsclient "github.com/cosmos/cosmos-sdk/x/params/client"
+	"github.com/cosmos/cosmos-sdk/x/slashing"
+	"github.com/cosmos/cosmos-sdk/x/staking"
+	"github.com/cosmos/ibc-go/modules/capability"
+	"github.com/cosmos/ibc-go/v8/modules/apps/transfer"
+	ibc "github.com/cosmos/ibc-go/v8/modules/core"
+
 	"cosmossdk.io/math"
 
 	starship "github.com/cosmology-tech/starship/clients/go/client"
-	lens "github.com/strangelove-ventures/lens/client"
 	"github.com/stretchr/testify/suite"
 	"go.uber.org/zap"
 	"gopkg.in/yaml.v3"
@@ -47,7 +66,27 @@ func (s *TestSuite) SetupTest() {
 	// create chain clients
 	modulesBasicMap := map[string][]module.AppModuleBasic{}
 	for _, chain := range config.Chains {
-		modulesBasicMap[chain.Name] = lens.ModuleBasics
+		modulesBasicMap[chain.Name] = []module.AppModuleBasic{
+			auth.AppModuleBasic{},
+			authz.AppModuleBasic{},
+			bank.AppModuleBasic{},
+			capability.AppModuleBasic{},
+			gov.NewAppModuleBasic(
+				[]client.ProposalHandler{
+					paramsclient.ProposalHandler,
+				},
+			),
+			crisis.AppModuleBasic{},
+			distribution.AppModuleBasic{},
+			feegrant.AppModuleBasic{},
+			mint.AppModuleBasic{},
+			params.AppModuleBasic{},
+			slashing.AppModuleBasic{},
+			staking.AppModuleBasic{},
+			upgrade.AppModuleBasic{},
+			transfer.AppModuleBasic{},
+			ibc.AppModuleBasic{},
+		}
 	}
 	chainClients, err := starship.NewChainClients(zap.L(), config, modulesBasicMap)
 	s.Require().NoError(err)
