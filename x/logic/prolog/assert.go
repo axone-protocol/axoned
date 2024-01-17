@@ -6,6 +6,8 @@ import (
 
 	"github.com/ichiban/prolog/engine"
 	"github.com/samber/lo"
+
+	"github.com/okp4/okp4d/x/logic/util"
 )
 
 // PredicateMatches returns a function that matches the given predicate against the given other predicate.
@@ -184,4 +186,20 @@ func AssertPair(env *engine.Env, t engine.Term) (engine.Term, engine.Term, error
 	}
 
 	return nil, nil, engine.TypeError(AtomTypePair, t, env)
+}
+
+// AssertURIComponent resolves a term as a URI component and returns it as an URIComponent.
+func AssertURIComponent(env *engine.Env, t engine.Term) (util.URIComponent, error) {
+	switch v := env.Resolve(t); v {
+	case AtomQueryValue:
+		return util.QueryValueComponent, nil
+	case AtomFragment:
+		return util.FragmentComponent, nil
+	case AtomPath:
+		return util.PathComponent, nil
+	case AtomSegment:
+		return util.SegmentComponent, nil
+	default:
+		return 0, engine.TypeError(AtomTypeURIComponent, t, env)
+	}
 }

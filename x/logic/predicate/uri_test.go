@@ -3,6 +3,7 @@ package predicate
 
 import (
 	"fmt"
+	"strings"
 	"testing"
 
 	"github.com/ichiban/prolog/engine"
@@ -32,7 +33,7 @@ func TestURIEncoded(t *testing.T) {
 			{
 				query:       `uri_encoded(hey, foo, Decoded).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("uri_encoded/3: invalid component name hey, expected `query`, `fragment`, `path` or `segment`"),
+				wantError:   fmt.Errorf("error(type_error(uri_component,hey),uri_encoded/3)"),
 			},
 			{
 				query:       `uri_encoded(path, Decoded, foo).`,
@@ -56,14 +57,14 @@ func TestURIEncoded(t *testing.T) {
 				}},
 			},
 			{
-				query:       `uri_encoded(query, 'foo bar', Encoded).`,
+				query:       `uri_encoded(query_value, 'foo bar', Encoded).`,
 				wantSuccess: true,
 				wantResult: []types.TermResults{{
 					"Encoded": "'foo%20bar'",
 				}},
 			},
 			{
-				query:       "uri_encoded(query, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', Encoded).",
+				query:       "uri_encoded(query_value, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', Encoded).",
 				wantSuccess: true,
 				wantResult: []types.TermResults{{
 					"Encoded": "'%20!%22%23$%25%26\\'()*%2B,-./0123456789%3A%3B%3C%3D%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~'",
@@ -91,7 +92,7 @@ func TestURIEncoded(t *testing.T) {
 				}},
 			},
 			{
-				query:       "uri_encoded(query, Decoded, '%20!%22%23$%25%26\\'()*%2B,-./0123456789%3A%3B%3C%3D%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~+').",
+				query:       "uri_encoded(query_value, Decoded, '%20!%22%23$%25%26\\'()*%2B,-./0123456789%3A%3B%3C%3D%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~+').",
 				wantSuccess: true,
 				wantResult: []types.TermResults{{
 					"Decoded": "' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~+'",
@@ -119,7 +120,7 @@ func TestURIEncoded(t *testing.T) {
 				}},
 			},
 			{
-				query:       "uri_encoded(query, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~+', '%20!%22%23$%25%26\\'()*%2B,-./0123456789%3A%3B%3C%3D%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~+').",
+				query:       "uri_encoded(query_value, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~+', '%20!%22%23$%25%26\\'()*%2B,-./0123456789%3A%3B%3C%3D%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~%2B').",
 				wantSuccess: true,
 				wantResult:  []types.TermResults{{}},
 			},
@@ -145,22 +146,28 @@ func TestURIEncoded(t *testing.T) {
 			{
 				query:       "uri_encoded(Var, 'foo bar', 'bar%20foo').",
 				wantSuccess: false,
-				wantError:   fmt.Errorf("uri_encoded/3: invalid component type: engine.Variable, should be Atom"),
+				wantError:   fmt.Errorf("error(instantiation_error,uri_encoded/3)"),
 			},
 			{
 				query:       "uri_encoded(path, compound(2), 'bar%20foo').",
 				wantSuccess: false,
-				wantError:   fmt.Errorf("uri_encoded/3: invalid decoded type: *engine.compound, should be Variable or Atom"),
+				wantError:   fmt.Errorf("error(type_error(text,compound(2)),uri_encoded/3)"),
 			},
 			{
 				query:       "uri_encoded(path, 'foo', compound(2)).",
 				wantSuccess: false,
-				wantError:   fmt.Errorf("uri_encoded/3: invalid encoded type: *engine.compound, should be Variable or Atom"),
+				wantResult:  []types.TermResults{{}},
+			},
+			{
+				query:       "uri_encoded(path, X, compound(2)).",
+				wantSuccess: false,
+				wantError:   fmt.Errorf("error(type_error(text,compound(2)),uri_encoded/3)"),
 			},
 			{
 				query:       "uri_encoded(path, Decoded, 'bar%%3foo').",
 				wantSuccess: false,
-				wantError:   fmt.Errorf("uri_encoded/3: invalid URL escape \"%%%%3\""),
+				wantError: fmt.Errorf("error(domain_error(encoding(uri),bar%%%%3foo),[%s],uri_encoded/3)",
+					strings.Join(strings.Split("invalid URL escape \"%%3\"", ""), ",")),
 			},
 		}
 		for nc, tc := range cases {
@@ -194,7 +201,7 @@ func TestURIEncoded(t *testing.T) {
 										got = append(got, m)
 									}
 									if tc.wantError != nil {
-										So(sols.Err(), ShouldNotBeNil)
+										So(sols.Err(), ShouldNotEqual, nil)
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 									} else {
 										So(sols.Err(), ShouldBeNil)

@@ -45,6 +45,8 @@ var (
 	AtomTypePair = engine.NewAtom("pair")
 	// AtomTypeJSON is the term used to indicate the json type.
 	AtomTypeJSON = AtomJSON
+	// AtomTypeURIComponent is the term used to represent the URI component type.
+	AtomTypeURIComponent = engine.NewAtom("uri_component")
 )
 
 var (
