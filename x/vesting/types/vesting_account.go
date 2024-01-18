@@ -6,6 +6,8 @@ import (
 
 	"sigs.k8s.io/yaml"
 
+	"cosmossdk.io/math"
+
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -15,7 +17,7 @@ import (
 
 // Compile-time type assertions.
 var (
-	_ authtypes.AccountI          = (*BaseVestingAccount)(nil)
+	_ sdk.AccountI                = (*BaseVestingAccount)(nil)
 	_ vestexported.VestingAccount = (*ContinuousVestingAccount)(nil)
 	_ vestexported.VestingAccount = (*PeriodicVestingAccount)(nil)
 	_ vestexported.VestingAccount = (*DelayedVestingAccount)(nil)
@@ -71,7 +73,7 @@ func (bva *BaseVestingAccount) TrackDelegation(balance, vestingCoins, amount sdk
 		// compute x and y per the specification, where:
 		// X := min(max(V - DV, 0), D)
 		// Y := D - X
-		x := sdk.MinInt(sdk.MaxInt(vestingAmt.Sub(delVestingAmt), sdk.ZeroInt()), coin.Amount)
+		x := math.MinInt(math.MaxInt(vestingAmt.Sub(delVestingAmt), math.ZeroInt()), coin.Amount)
 		y := coin.Amount.Sub(x)
 
 		if !x.IsZero() {
@@ -108,8 +110,8 @@ func (bva *BaseVestingAccount) TrackUndelegation(amount sdk.Coins) {
 		// compute x and y per the specification, where:
 		// X := min(DF, D)
 		// Y := min(DV, D - X)
-		x := sdk.MinInt(delegatedFree, coin.Amount)
-		y := sdk.MinInt(delegatedVesting, coin.Amount.Sub(x))
+		x := math.MinInt(delegatedFree, coin.Amount)
+		y := math.MinInt(delegatedVesting, coin.Amount.Sub(x))
 
 		if !x.IsZero() {
 			xCoin := sdk.NewCoin(coin.Denom, x)
@@ -243,10 +245,10 @@ func (cva ContinuousVestingAccount) GetVestedCoins(blockTime time.Time) sdk.Coin
 	// calculate the vesting scalar
 	x := blockTime.Unix() - cva.StartTime
 	y := cva.EndTime - cva.StartTime
-	s := sdk.NewDec(x).Quo(sdk.NewDec(y))
+	s := math.LegacyNewDec(x).Quo(math.LegacyNewDec(y))
 
 	for _, ovc := range cva.OriginalVesting {
-		vestedAmt := sdk.NewDecFromInt(ovc.Amount).Mul(s).RoundInt()
+		vestedAmt := math.LegacyNewDecFromInt(ovc.Amount).Mul(s).RoundInt()
 		vestedCoins = append(vestedCoins, sdk.NewCoin(ovc.Denom, vestedAmt))
 	}
 
@@ -429,7 +431,7 @@ func (pva PeriodicVestingAccount) Validate() error {
 	if endTime != pva.EndTime {
 		return errors.New("vesting end time does not match length of all vesting periods")
 	}
-	if !originalVesting.IsEqual(pva.OriginalVesting) {
+	if !originalVesting.Equal(pva.OriginalVesting) {
 		return errors.New("original vesting coins does not match the sum of all coins in vesting periods")
 	}
 
@@ -652,10 +654,10 @@ func (cva CliffVestingAccount) GetVestedCoins(blockTime time.Time) sdk.Coins {
 	// calculate the vesting scalar
 	x := blockTime.Unix() - cva.StartTime
 	y := cva.EndTime - cva.StartTime
-	s := sdk.NewDec(x).Quo(sdk.NewDec(y))
+	s := math.LegacyNewDec(x).Quo(math.LegacyNewDec(y))
 
 	for _, ovc := range cva.OriginalVesting {
-		vestedAmt := sdk.NewDecFromInt(ovc.Amount).Mul(s).RoundInt()
+		vestedAmt := math.LegacyNewDecFromInt(ovc.Amount).Mul(s).RoundInt()
 		vestedCoins = append(vestedCoins, sdk.NewCoin(ovc.Denom, vestedAmt))
 	}
 

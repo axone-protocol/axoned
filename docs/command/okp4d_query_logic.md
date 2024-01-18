@@ -12,14 +12,8 @@ okp4d query logic [flags]
   -h, --help   help for logic
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d query](okp4d_query.md)	 - Querying subcommands
-* [okp4d query logic ask](okp4d_query_logic_ask.md)	 - executes a logic query and returns the solutions found.
-* [okp4d query logic params](okp4d_query_logic_params.md)	 - shows the parameters of the module
+* [okp4d query logic ask](okp4d_query_logic_ask.md)	 - Execute the Ask RPC method
+* [okp4d query logic params](okp4d_query_logic_params.md)	 - Execute the Params RPC method

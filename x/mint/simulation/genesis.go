@@ -7,6 +7,8 @@ import (
 	"fmt"
 	"math/rand"
 
+	"cosmossdk.io/math"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
@@ -20,13 +22,13 @@ const (
 )
 
 // GenInflation randomized Inflation.
-func GenInflation(r *rand.Rand) sdk.Dec {
-	return sdk.NewDecWithPrec(int64(r.Intn(99)), 2)
+func GenInflation(r *rand.Rand) math.LegacyDec {
+	return math.LegacyNewDecWithPrec(int64(r.Intn(99)), 2)
 }
 
 // GenInflationCoefMax randomized AnnualReductionFactor.
-func GenInflationCoefMax(_ *rand.Rand) sdk.Dec {
-	return sdk.NewDecWithPrec(73, 3)
+func GenInflationCoefMax(_ *rand.Rand) math.LegacyDec {
+	return math.LegacyNewDecWithPrec(73, 3)
 }
 
 // RandomizedGenState generates a random GenesisState for mint.
@@ -34,17 +36,17 @@ func GenInflationCoefMax(_ *rand.Rand) sdk.Dec {
 //nolint:forbidigo
 func RandomizedGenState(simState *module.SimulationState) {
 	// minter
-	var inflation sdk.Dec
+	var inflation math.LegacyDec
 	simState.AppParams.GetOrGenerate(
-		simState.Cdc, Inflation, &inflation, simState.Rand,
+		Inflation, &inflation, simState.Rand,
 		func(r *rand.Rand) { inflation = GenInflation(r) },
 	)
 
 	// params
 
-	var inflationCoef sdk.Dec
+	var inflationCoef math.LegacyDec
 	simState.AppParams.GetOrGenerate(
-		simState.Cdc, InflationCoef, &inflationCoef, simState.Rand,
+		InflationCoef, &inflationCoef, simState.Rand,
 		func(r *rand.Rand) { inflationCoef = GenInflationCoefMax(r) },
 	)
 

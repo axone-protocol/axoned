@@ -1,6 +1,7 @@
 package mint
 
 import (
+	"context"
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
@@ -11,22 +12,30 @@ import (
 )
 
 // BeginBlocker mints new tokens for the previous block.
-func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
+func BeginBlocker(ctx context.Context, k keeper.Keeper) error {
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
 
 	// fetch stored params
-	params := k.GetParams(ctx)
+	params, err := k.Params.Get(ctx)
+	if err != nil {
+		return err
+	}
 
 	// recalculate inflation rate
 	totalSupply := k.TokenSupply(ctx, params.MintDenom)
-	bondedRatio := k.BondedRatio(ctx)
+	bondedRatio, err := k.BondedRatio(ctx)
+	if err != nil {
+		return err
+	}
 
 	minter, err := types.NewMinterWithInflationCoef(params.InflationCoef, bondedRatio, totalSupply)
 	if err != nil {
 		panic(err)
 	}
 
-	k.SetMinter(ctx, minter)
+	if err = k.Minter.Set(ctx, minter); err != nil {
+		return err
+	}
 
 	// mint coins, update supply
 	mintedCoin := minter.BlockProvision(params)
@@ -47,7 +56,8 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 		defer telemetry.ModuleSetGauge(types.ModuleName, float32(mintedCoin.Amount.Int64()), "minted_tokens")
 	}
 
-	ctx.EventManager().EmitEvent(
+	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	sdkCtx.EventManager().EmitEvent(
 		sdk.NewEvent(
 			types.EventTypeMint,
 			sdk.NewAttribute(types.AttributeKeyBondedRatio, bondedRatio.String()),
@@ -56,4 +66,6 @@ func BeginBlocker(ctx sdk.Context, k keeper.Keeper) {
 			sdk.NewAttribute(sdk.AttributeKeyAmount, mintedCoin.Amount.String()),
 		),
 	)
+
+	return nil
 }

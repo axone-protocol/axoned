@@ -5,14 +5,12 @@
 package testutil
 
 import (
+	context "context"
 	reflect "reflect"
 
-	gomock "github.com/golang/mock/gomock"
-
 	math "cosmossdk.io/math"
-
 	types "github.com/cosmos/cosmos-sdk/types"
-	types0 "github.com/cosmos/cosmos-sdk/x/auth/types"
+	gomock "github.com/golang/mock/gomock"
 )
 
 // MockStakingKeeper is a mock of StakingKeeper interface.
@@ -39,11 +37,12 @@ func (m *MockStakingKeeper) EXPECT() *MockStakingKeeperMockRecorder {
 }
 
 // BondedRatio mocks base method.
-func (m *MockStakingKeeper) BondedRatio(ctx types.Context) types.Dec {
+func (m *MockStakingKeeper) BondedRatio(ctx context.Context) (math.LegacyDec, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "BondedRatio", ctx)
-	ret0, _ := ret[0].(types.Dec)
-	return ret0
+	ret0, _ := ret[0].(math.LegacyDec)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // BondedRatio indicates an expected call of BondedRatio.
@@ -53,11 +52,12 @@ func (mr *MockStakingKeeperMockRecorder) BondedRatio(ctx interface{}) *gomock.Ca
 }
 
 // StakingTokenSupply mocks base method.
-func (m *MockStakingKeeper) StakingTokenSupply(ctx types.Context) math.Int {
+func (m *MockStakingKeeper) StakingTokenSupply(ctx context.Context) (math.Int, error) {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "StakingTokenSupply", ctx)
 	ret0, _ := ret[0].(math.Int)
-	return ret0
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
 }
 
 // StakingTokenSupply indicates an expected call of StakingTokenSupply.
@@ -90,10 +90,10 @@ func (m *MockAccountKeeper) EXPECT() *MockAccountKeeperMockRecorder {
 }
 
 // GetModuleAccount mocks base method.
-func (m *MockAccountKeeper) GetModuleAccount(ctx types.Context, moduleName string) types0.ModuleAccountI {
+func (m *MockAccountKeeper) GetModuleAccount(ctx context.Context, moduleName string) types.ModuleAccountI {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetModuleAccount", ctx, moduleName)
-	ret0, _ := ret[0].(types0.ModuleAccountI)
+	ret0, _ := ret[0].(types.ModuleAccountI)
 	return ret0
 }
 
@@ -118,7 +118,7 @@ func (mr *MockAccountKeeperMockRecorder) GetModuleAddress(name interface{}) *gom
 }
 
 // SetModuleAccount mocks base method.
-func (m *MockAccountKeeper) SetModuleAccount(arg0 types.Context, arg1 types0.ModuleAccountI) {
+func (m *MockAccountKeeper) SetModuleAccount(arg0 context.Context, arg1 types.ModuleAccountI) {
 	m.ctrl.T.Helper()
 	m.ctrl.Call(m, "SetModuleAccount", arg0, arg1)
 }
@@ -153,7 +153,7 @@ func (m *MockBankKeeper) EXPECT() *MockBankKeeperMockRecorder {
 }
 
 // GetSupply mocks base method.
-func (m *MockBankKeeper) GetSupply(ctx types.Context, denom string) types.Coin {
+func (m *MockBankKeeper) GetSupply(ctx context.Context, denom string) types.Coin {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "GetSupply", ctx, denom)
 	ret0, _ := ret[0].(types.Coin)
@@ -167,7 +167,7 @@ func (mr *MockBankKeeperMockRecorder) GetSupply(ctx, denom interface{}) *gomock.
 }
 
 // MintCoins mocks base method.
-func (m *MockBankKeeper) MintCoins(ctx types.Context, name string, amt types.Coins) error {
+func (m *MockBankKeeper) MintCoins(ctx context.Context, name string, amt types.Coins) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "MintCoins", ctx, name, amt)
 	ret0, _ := ret[0].(error)
@@ -181,7 +181,7 @@ func (mr *MockBankKeeperMockRecorder) MintCoins(ctx, name, amt interface{}) *gom
 }
 
 // SendCoinsFromModuleToAccount mocks base method.
-func (m *MockBankKeeper) SendCoinsFromModuleToAccount(ctx types.Context, senderModule string, recipientAddr types.AccAddress, amt types.Coins) error {
+func (m *MockBankKeeper) SendCoinsFromModuleToAccount(ctx context.Context, senderModule string, recipientAddr types.AccAddress, amt types.Coins) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendCoinsFromModuleToAccount", ctx, senderModule, recipientAddr, amt)
 	ret0, _ := ret[0].(error)
@@ -195,7 +195,7 @@ func (mr *MockBankKeeperMockRecorder) SendCoinsFromModuleToAccount(ctx, senderMo
 }
 
 // SendCoinsFromModuleToModule mocks base method.
-func (m *MockBankKeeper) SendCoinsFromModuleToModule(ctx types.Context, senderModule, recipientModule string, amt types.Coins) error {
+func (m *MockBankKeeper) SendCoinsFromModuleToModule(ctx context.Context, senderModule, recipientModule string, amt types.Coins) error {
 	m.ctrl.T.Helper()
 	ret := m.ctrl.Call(m, "SendCoinsFromModuleToModule", ctx, senderModule, recipientModule, amt)
 	ret0, _ := ret[0].(error)

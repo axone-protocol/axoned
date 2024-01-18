@@ -1,12 +1,12 @@
 name: Test E2E
 
-on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+on: {}
+#  push:
+#    branches:
+#      - main
+#  pull_request:
+#    branches:
+#      - main
 
 concurrency:
   group: e2e-test-${{ github.ref }}

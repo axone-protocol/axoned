@@ -3,7 +3,7 @@ package vesting
 import (
 	"context"
 
-	"github.com/armon/go-metrics"
+	"github.com/hashicorp/go-metrics"
 
 	errorsmod "cosmossdk.io/errors"
 
@@ -61,7 +61,7 @@ func (s msgServer) CreateVestingAccount(goCtx context.Context,
 	baseAccount = ak.NewAccount(ctx, baseAccount).(*authtypes.BaseAccount)
 	baseVestingAccount := types.NewBaseVestingAccount(baseAccount, msg.Amount.Sort(), msg.EndTime)
 
-	var vestingAccount authtypes.AccountI
+	var vestingAccount sdk.AccountI
 	if msg.Delayed {
 		vestingAccount = types.NewDelayedVestingAccountRaw(baseVestingAccount)
 	} else {

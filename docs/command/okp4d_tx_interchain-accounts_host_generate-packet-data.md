@@ -1,12 +1,14 @@
 ## okp4d tx interchain-accounts host generate-packet-data
 
-Generates ICA packet data.
+Generates protobuf or proto3 JSON encoded ICA packet data.
 
 ### Synopsis
 
-generate-packet-data accepts a message string and serializes it
-into packet data which is outputted to stdout. It can be used in conjunction with send-tx"
-which submits pre-built packet data containing messages to be executed on the host chain.
+generate-packet-data accepts a message string and serializes it (depending on the
+encoding parameter) using protobuf or proto3 JSON into packet data which is outputted to stdout.
+It can be used in conjunction with send-tx which submits pre-built packet data containing messages
+to be executed on the host chain. The default encoding format is protobuf if none is specified;
+otherwise the encoding flag can be used in combination with either "proto3" or "proto3json".
 
 ```
 okp4d tx interchain-accounts host generate-packet-data [message] [flags]
@@ -25,7 +27,7 @@ okp4d tx interchain-accounts host generate-packet-data '{
             "amount": "1000"
         }
     ]
-}' --memo memo
+}' --memo memo --encoding proto3json
 
 
 okp4d tx interchain-accounts host generate-packet-data '[{
@@ -53,14 +55,9 @@ okp4d tx interchain-accounts host generate-packet-data '[{
 ### Options
 
 ```
-  -h, --help          help for generate-packet-data
-      --memo string   an optional memo to be included in the interchain account packet data
-```
-
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
+      --encoding string   optional encoding format of the messages in the interchain accounts packet data
+  -h, --help              help for generate-packet-data
+      --memo string       optional memo to be included in the interchain accounts packet data
 ```
 
 ### SEE ALSO

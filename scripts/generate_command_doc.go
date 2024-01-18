@@ -14,7 +14,7 @@ func GenerateCommandDocumentation() error {
 	}
 
 	targetPath := "docs/command"
-	rootCmd, _ := cmd.NewRootCmd()
+	rootCmd := cmd.NewRootCmd()
 	rootCmd.DisableAutoGenTag = true
 
 	err := os.Mkdir(targetPath, 0o750)

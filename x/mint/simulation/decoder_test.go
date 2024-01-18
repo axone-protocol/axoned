@@ -6,7 +6,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	"cosmossdk.io/math"
+
 	"github.com/cosmos/cosmos-sdk/types/kv"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 
@@ -20,7 +21,7 @@ func TestDecodeStore(t *testing.T) {
 
 	dec := simulation.NewDecodeStore(encCfg.Codec)
 
-	minter := types.NewMinter(sdk.OneDec(), sdk.NewDec(15))
+	minter := types.NewMinter(math.LegacyOneDec(), math.LegacyNewDec(15))
 
 	kvPairs := kv.Pairs{
 		Pairs: []kv.Pair{

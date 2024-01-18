@@ -8,12 +8,6 @@ IBC connection query subcommands
   -h, --help   help for connection
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d query ibc](okp4d_query_ibc.md)	 - Querying commands for the IBC module

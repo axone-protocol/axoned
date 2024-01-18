@@ -16,12 +16,6 @@ okp4d query wasm libwasmvm-version [flags]
   -h, --help   help for libwasmvm-version
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d query wasm](okp4d_query_wasm.md)	 - Querying commands for the wasm module

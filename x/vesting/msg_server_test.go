@@ -10,9 +10,13 @@ import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	tmtime "github.com/cometbft/cometbft/types/time"
 
+	storetypes "cosmossdk.io/store/types"
+
+	"github.com/cosmos/cosmos-sdk/runtime"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
+	authcodec "github.com/cosmos/cosmos-sdk/x/auth/codec"
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
@@ -40,8 +44,9 @@ type VestingTestSuite struct {
 }
 
 func (s *VestingTestSuite) SetupTest() {
-	key := sdk.NewKVStoreKey(authtypes.StoreKey)
-	testCtx := testutil.DefaultContextWithDB(s.T(), key, sdk.NewTransientStoreKey("transient_test"))
+	key := storetypes.NewKVStoreKey(authtypes.StoreKey)
+	storeService := runtime.NewKVStoreService(key)
+	testCtx := testutil.DefaultContextWithDB(s.T(), key, storetypes.NewTransientStoreKey("transient_test"))
 	s.ctx = testCtx.Ctx.WithBlockHeader(tmproto.Header{Time: tmtime.Now()})
 	encCfg := moduletestutil.MakeTestEncodingConfig()
 
@@ -51,9 +56,10 @@ func (s *VestingTestSuite) SetupTest() {
 	s.bankKeeper = vestingtestutil.NewMockBankKeeper(ctrl)
 	s.accountKeeper = authkeeper.NewAccountKeeper(
 		encCfg.Codec,
-		key,
+		storeService,
 		authtypes.ProtoBaseAccount,
 		maccPerms,
+		authcodec.NewBech32Codec("cosmos"),
 		"cosmos",
 		authtypes.NewModuleAddress("gov").String(),
 	)

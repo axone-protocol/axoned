@@ -6,9 +6,8 @@ import (
 	"fmt"
 
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
-	"github.com/spf13/cobra"
 
-	abci "github.com/cometbft/cometbft/abci/types"
+	"cosmossdk.io/core/appmodule"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
@@ -16,14 +15,16 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/okp4/okp4d/x/logic/client/cli"
 	"github.com/okp4/okp4d/x/logic/exported"
 	"github.com/okp4/okp4d/x/logic/keeper"
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
 var (
-	_ module.AppModule      = AppModule{}
+	_ module.HasGenesis  = AppModule{}
+	_ module.HasServices = AppModule{}
+
+	_ appmodule.AppModule   = AppModule{}
 	_ module.AppModuleBasic = AppModuleBasic{}
 )
 
@@ -48,7 +49,7 @@ func (AppModuleBasic) Name() string {
 // RegisterLegacyAminoCodec registers the amino codec for the module, which is used to marshal and unmarshal structs
 // to/from []byte in order to persist them in the module's KVStore.
 func (AppModuleBasic) RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	types.RegisterCodec(cdc)
+	types.RegisterLegacyAminoCodec(cdc)
 }
 
 // RegisterInterfaces registers a module's interface types and their concrete implementations as proto.Message.
@@ -74,18 +75,6 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodingCo
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
 	_ = types.RegisterQueryServiceHandlerClient(context.Background(), mux, types.NewQueryServiceClient(clientCtx))
-}
-
-// GetTxCmd returns the root Tx command for the module. The subcommands of this root command are used by end-users to
-// generate new transactions containing messages defined in the module.
-func (a AppModuleBasic) GetTxCmd() *cobra.Command {
-	return cli.GetTxCmd()
-}
-
-// GetQueryCmd returns the root query command for the module. The subcommands of this root command are used by end-users
-// to generate new queries to the subset of the state defined by the module.
-func (AppModuleBasic) GetQueryCmd() *cobra.Command {
-	return cli.GetQueryCmd(types.StoreKey)
 }
 
 // ----------------------------------------------------------------------------
@@ -119,42 +108,23 @@ func NewAppModule(
 	}
 }
 
+func (am AppModule) IsOnePerModuleType() {}
+
+func (am AppModule) IsAppModule() {}
+
 // RegisterServices registers a gRPC query service to respond to the module-specific gRPC queries.
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServiceServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServiceServer(cfg.QueryServer(), am.keeper)
-
-	migrator := keeper.NewMigrator(am.keeper, am.legacySubspace)
-
-	migrations := []struct {
-		fromVersion uint64
-		migrator    func(ctx sdk.Context) error
-	}{
-		{1, migrator.Migrate1to2},
-		{2, migrator.Migrate2to3},
-	}
-
-	for _, migration := range migrations {
-		if err := cfg.RegisterMigration(types.ModuleName, migration.fromVersion, migration.migrator); err != nil {
-			panic(fmt.Errorf("failed to migrate %s from version %d to v%d: %w",
-				types.ModuleName, migration.fromVersion, migration.fromVersion+1, err))
-		}
-	}
 }
 
-// RegisterInvariants registers the invariants of the module. If an invariant deviates from its predicted value,
-// the InvariantRegistry triggers appropriate logic (most often the chain will be halted).
-func (am AppModule) RegisterInvariants(_ sdk.InvariantRegistry) {}
-
 // InitGenesis performs the module's genesis initialization. It returns no validator updates.
-func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) []abci.ValidatorUpdate {
+func (am AppModule) InitGenesis(ctx sdk.Context, cdc codec.JSONCodec, gs json.RawMessage) {
 	var genState types.GenesisState
 	// Initialize global index to index in genesis state
 	cdc.MustUnmarshalJSON(gs, &genState)
 
 	InitGenesis(ctx, am.keeper, genState)
-
-	return []abci.ValidatorUpdate{}
 }
 
 // ExportGenesis returns the module's exported genesis state as raw JSON bytes.
@@ -168,9 +138,6 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 func (AppModule) ConsensusVersion() uint64 { return 3 }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block.
-func (am AppModule) BeginBlock(_ sdk.Context, _ abci.RequestBeginBlock) {}
-
-// EndBlock contains the logic that is automatically triggered at the end of each block.
-func (am AppModule) EndBlock(_ sdk.Context, _ abci.RequestEndBlock) []abci.ValidatorUpdate {
-	return []abci.ValidatorUpdate{}
+func (am AppModule) BeginBlock(_ context.Context) error {
+	return nil
 }

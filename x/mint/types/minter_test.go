@@ -9,48 +9,46 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 
 	"cosmossdk.io/math"
-
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func TestNextInflation(t *testing.T) {
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			name                     string
-			inflationRatio           sdk.Dec
-			bondedRatio              sdk.Dec
+			inflationRatio           math.LegacyDec
+			bondedRatio              math.LegacyDec
 			totalSupply              math.Int
-			expectedInflation        sdk.Dec
-			expectedAnnualProvisions sdk.Dec
+			expectedInflation        math.LegacyDec
+			expectedAnnualProvisions math.LegacyDec
 			expectedErr              error
 		}{
 			{
 				name:                     "inflation ratio is 0",
-				inflationRatio:           sdk.NewDec(0),
-				bondedRatio:              sdk.NewDecWithPrec(20, 2),
+				inflationRatio:           math.LegacyNewDec(0),
+				bondedRatio:              math.LegacyNewDecWithPrec(20, 2),
 				totalSupply:              math.NewInt(1000),
-				expectedInflation:        sdk.NewDec(0),
-				expectedAnnualProvisions: sdk.NewDec(0),
+				expectedInflation:        math.LegacyNewDec(0),
+				expectedAnnualProvisions: math.LegacyNewDec(0),
 			},
 			{
 				name:                     "inflation ratio is 0.03",
-				inflationRatio:           sdk.NewDecWithPrec(3, 2),
-				bondedRatio:              sdk.NewDecWithPrec(2, 1),
+				inflationRatio:           math.LegacyNewDecWithPrec(3, 2),
+				bondedRatio:              math.LegacyNewDecWithPrec(2, 1),
 				totalSupply:              math.NewInt(1000),
-				expectedInflation:        sdk.NewDecWithPrec(15, 2),
-				expectedAnnualProvisions: sdk.NewDec(150),
+				expectedInflation:        math.LegacyNewDecWithPrec(15, 2),
+				expectedAnnualProvisions: math.LegacyNewDec(150),
 			},
 			{
 				name:           "bonded ratio is 0",
-				inflationRatio: sdk.NewDecWithPrec(3, 2),
-				bondedRatio:    sdk.NewDec(0),
+				inflationRatio: math.LegacyNewDecWithPrec(3, 2),
+				bondedRatio:    math.LegacyNewDec(0),
 				totalSupply:    math.NewInt(1000),
 				expectedErr:    fmt.Errorf("bonded ratio is zero"),
 			},
 			{
 				name:           "negative inflation ratio",
-				inflationRatio: sdk.NewDecWithPrec(3, 2),
-				bondedRatio:    sdk.NewDecWithPrec(-2, 1),
+				inflationRatio: math.LegacyNewDecWithPrec(3, 2),
+				bondedRatio:    math.LegacyNewDecWithPrec(-2, 1),
 				totalSupply:    math.NewInt(1000),
 				expectedErr:    fmt.Errorf("mint parameter Inflation should be positive, is -0.150000000000000000"),
 			},
@@ -83,16 +81,16 @@ func TestNextInflation(t *testing.T) {
 // previously using math.Int operations:
 // BenchmarkBlockProvision-4 5000000 220 ns/op
 //
-// using sdk.Dec operations: (current implementation)
+// using math.LegacyDec operations: (current implementation)
 // BenchmarkBlockProvision-4 3000000 429 ns/op.
 func BenchmarkBlockProvision(b *testing.B) {
 	b.ReportAllocs()
-	minter := NewMinterWithInitialInflation(sdk.NewDecWithPrec(1, 1))
+	minter := NewMinterWithInitialInflation(math.LegacyNewDecWithPrec(1, 1))
 	params := DefaultParams()
 
 	s1 := rand.NewSource(100)
 	r1 := rand.New(s1)
-	minter.AnnualProvisions = sdk.NewDec(r1.Int63n(1000000))
+	minter.AnnualProvisions = math.LegacyNewDec(r1.Int63n(1000000))
 
 	// run the BlockProvision function b.N times
 	for n := 0; n < b.N; n++ {
@@ -106,8 +104,8 @@ func BenchmarkNextInflation(b *testing.B) {
 	b.ReportAllocs()
 
 	params := DefaultParams()
-	bondedRatio := sdk.NewDecWithPrec(66, 2)
-	totalSupply := sdk.NewInt(100000000000000)
+	bondedRatio := math.LegacyNewDecWithPrec(66, 2)
+	totalSupply := math.NewInt(100000000000000)
 
 	// run the NextInflationRate function b.N times
 	for n := 0; n < b.N; n++ {

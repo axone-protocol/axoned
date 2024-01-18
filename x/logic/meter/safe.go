@@ -3,19 +3,19 @@ package meter
 import (
 	"sync"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
+	storetypes "cosmossdk.io/store/types"
 )
 
-// safeMeterDecorater is a wrapper around sdk.GasMeter that provides go-routine-safe access to the underlying gas meter.
+// safeMeterDecorater is a wrapper around storetypes.GasMeter that provides go-routine-safe access to the underlying gas meter.
 // This is needed because the interpreter uses multiple go-routines, and the gas meter is shared between multiple
 // goroutines.
 type safeMeterDecorater struct {
-	gasMeter sdk.GasMeter
+	gasMeter storetypes.GasMeter
 	mutex    sync.RWMutex
 }
 
-// WithSafeMeter returns a new instance of sdk.GasMeter that is go-routine-safe.
-func WithSafeMeter(gasMeter sdk.GasMeter) sdk.GasMeter {
+// WithSafeMeter returns a new instance of storetypes.GasMeter that is go-routine-safe.
+func WithSafeMeter(gasMeter storetypes.GasMeter) storetypes.GasMeter {
 	return &safeMeterDecorater{
 		gasMeter: gasMeter,
 	}

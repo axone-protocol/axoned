@@ -9,6 +9,7 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -62,7 +63,7 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 	if userOutputBuffer != nil {
 		userOutput = userOutputBuffer.String()
 	}
-	answer, err := k.solsToAnswer(sdkCtx, sols) //nolint:contextcheck
+	answer, err := k.solsToAnswer(sdkCtx, sols)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +99,7 @@ func (k Keeper) solsToAnswer(sdkCtx sdk.Context, sols *prolog.Solutions) (*types
 
 	if err := sols.Err(); err != nil {
 		if sdkCtx.GasMeter().IsOutOfGas() {
-			panic(sdk.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
+			panic(storetypes.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
 		}
 		solError = sols.Err().Error()
 	}

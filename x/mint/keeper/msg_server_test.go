@@ -1,6 +1,8 @@
 package keeper_test
 
 import (
+	"cosmossdk.io/math"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/mint/types"
@@ -25,7 +27,7 @@ func (s *IntegrationTestSuite) TestUpdateParams() {
 				Authority: s.mintKeeper.GetAuthority(),
 				Params: types.Params{
 					MintDenom:     sdk.DefaultBondDenom,
-					InflationCoef: sdk.NewDecWithPrec(-73, 2),
+					InflationCoef: math.LegacyNewDecWithPrec(-73, 2),
 					BlocksPerYear: uint64(60 * 60 * 8766 / 5),
 				},
 			},
@@ -37,7 +39,7 @@ func (s *IntegrationTestSuite) TestUpdateParams() {
 				Authority: s.mintKeeper.GetAuthority(),
 				Params: types.Params{
 					MintDenom:     sdk.DefaultBondDenom,
-					InflationCoef: sdk.NewDecWithPrec(73, 2),
+					InflationCoef: math.LegacyNewDecWithPrec(73, 2),
 					BlocksPerYear: uint64(60 * 60 * 8766 / 5),
 				},
 			},

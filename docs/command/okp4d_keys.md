@@ -5,7 +5,7 @@ Manage your application's keys
 ### Synopsis
 
 Keyring management commands. These keys may be in any format supported by the
-Tendermint crypto library and can be used by light-clients, full nodes, or any other application
+CometBFT crypto library and can be used by light-clients, full nodes, or any other application
 that needs to sign with a private key.
 
 The keyring supports the following backends:
@@ -30,7 +30,6 @@ The pass backend requires GnuPG: [https://gnupg.org/](https://gnupg.org/)
 
 ```
   -h, --help                     help for keys
-      --home string              The application home directory (default "/home/john/.okp4d")
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --output string            Output format (text|json) (default "text")
@@ -43,6 +42,7 @@ The pass backend requires GnuPG: [https://gnupg.org/](https://gnupg.org/)
 * [okp4d keys delete](okp4d_keys_delete.md)	 - Delete the given keys
 * [okp4d keys export](okp4d_keys_export.md)	 - Export private keys
 * [okp4d keys import](okp4d_keys_import.md)	 - Import private keys into the local keybase
+* [okp4d keys import-hex](okp4d_keys_import-hex.md)	 - Import private keys into the local keybase
 * [okp4d keys list](okp4d_keys_list.md)	 - List all keys
 * [okp4d keys list-key-types](okp4d_keys_list-key-types.md)	 - List all key types
 * [okp4d keys migrate](okp4d_keys_migrate.md)	 - Migrate keys from amino to proto serialization format

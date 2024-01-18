@@ -5,16 +5,18 @@ import (
 	"strings"
 	"testing"
 
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	tmdb "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/cosmos/cosmos-sdk/store"
+	"cosmossdk.io/log"
+	"cosmossdk.io/store"
+	"cosmossdk.io/store/metrics"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
@@ -76,8 +78,8 @@ func TestHexBytesPredicate(t *testing.T) {
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
 				Convey("and a context", func() {
-					db := tmdb.NewMemDB()
-					stateStore := store.NewCommitMultiStore(db)
+					db := dbm.NewMemDB()
+					stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 					Convey("and a vm", func() {

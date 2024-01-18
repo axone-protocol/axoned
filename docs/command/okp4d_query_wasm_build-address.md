@@ -15,12 +15,6 @@ okp4d query wasm build-address [code-hash] [creator-address] [salt-hex-encoded] 
       --hex     hex encoded salt
 ```
 
-### Options inherited from parent commands
-
-```
-      --chain-id string   The network chain ID (default "okp4d")
-```
-
 ### SEE ALSO
 
 * [okp4d query wasm](okp4d_query_wasm.md)	 - Querying commands for the wasm module

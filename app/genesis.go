@@ -2,8 +2,14 @@ package app
 
 import (
 	"encoding/json"
+	"testing"
+
+	dbm "github.com/cosmos/cosmos-db"
+
+	"cosmossdk.io/log"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 )
 
 // The genesis state of the blockchain is represented here as a map of raw json
@@ -15,7 +21,8 @@ import (
 // object provided to it during init.
 type GenesisState map[string]json.RawMessage
 
-// NewDefaultGenesisState generates the default state for the application.
-func NewDefaultGenesisState(cdc codec.JSONCodec) GenesisState {
-	return ModuleBasics.DefaultGenesis(cdc)
+// NewDefaultGenesisState generates the default state for the application, for testing purpose.
+func NewDefaultGenesisState(t testing.TB, cdc codec.JSONCodec) GenesisState {
+	tempApp := New(log.NewNopLogger(), dbm.NewMemDB(), nil, true, simtestutil.NewAppOptionsWithFlagHome(t.TempDir()))
+	return tempApp.BasicModuleManager.DefaultGenesis(cdc)
 }

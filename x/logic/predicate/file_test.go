@@ -9,17 +9,19 @@ import (
 	"testing"
 	"time"
 
+	dbm "github.com/cosmos/cosmos-db"
 	"github.com/golang/mock/gomock"
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	tmdb "github.com/cometbft/cometbft-db"
-	"github.com/cometbft/cometbft/libs/log"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
-	"github.com/cosmos/cosmos-sdk/store"
+	"cosmossdk.io/log"
+	"cosmossdk.io/store"
+	"cosmossdk.io/store/metrics"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/fs"
@@ -132,8 +134,8 @@ func TestSourceFile(t *testing.T) {
 					), nil)
 
 					Convey("and a context", func() {
-						db := tmdb.NewMemDB()
-						stateStore := store.NewCommitMultiStore(db)
+						db := dbm.NewMemDB()
+						stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 						ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 						Convey("and a vm", func() {
@@ -322,8 +324,8 @@ func TestOpen(t *testing.T) {
 						}
 					})
 					Convey("and a context", func() {
-						db := tmdb.NewMemDB()
-						stateStore := store.NewCommitMultiStore(db)
+						db := dbm.NewMemDB()
+						stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 						ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 						Convey("and a vm", func() {

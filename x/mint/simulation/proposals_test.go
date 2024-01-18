@@ -8,6 +8,8 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
+	"cosmossdk.io/math"
+
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/address"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
@@ -40,6 +42,6 @@ func TestProposalMsgs(t *testing.T) {
 
 	assert.Equal(t, sdk.AccAddress(address.Module("gov")).String(), msgUpdateParams.Authority)
 	assert.Equal(t, uint64(122877), msgUpdateParams.Params.BlocksPerYear)
-	assert.DeepEqual(t, sdk.NewDecWithPrec(95, 2), msgUpdateParams.Params.InflationCoef)
+	assert.DeepEqual(t, math.LegacyNewDecWithPrec(95, 2), msgUpdateParams.Params.InflationCoef)
 	assert.Equal(t, "eAerqyNEUz", msgUpdateParams.Params.MintDenom)
 }

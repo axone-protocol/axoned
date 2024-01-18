@@ -21,7 +21,7 @@ okp4d tx distribution withdraw-rewards [validator-addr] [flags]
   -a, --account-number uint      The account number of the signing account (offline mode only)
       --aux                      Generate aux signer data instead of sending a tx
   -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
-      --chain-id string          The network chain ID (default "okp4d")
+      --chain-id string          The network chain ID
       --commission               Withdraw the validator's commission in addition to the rewards
       --dry-run                  ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
       --fee-granter string       Fee granter grants fees for the transaction
@@ -33,15 +33,15 @@ okp4d tx distribution withdraw-rewards [validator-addr] [flags]
       --gas-prices string        Gas prices in decimal format to determine the transaction fee (e.g. 0.1uatom)
       --generate-only            Build an unsigned transaction and write it to STDOUT (when enabled, the local Keybase only accessed when providing a key name)
   -h, --help                     help for withdraw-rewards
-      --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
+      --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "os")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
-      --node string              <host>:<port> to tendermint rpc interface for this chain (default "tcp://localhost:26657")
+      --node string              <host>:<port> to CometBFT rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
   -o, --output string            Output format (text|json) (default "json")
   -s, --sequence uint            The sequence number of the signing account (offline mode only)
-      --sign-mode string         Choose sign mode (direct|amino-json|direct-aux), this is an advanced feature
+      --sign-mode string         Choose sign mode (direct|amino-json|direct-aux|textual), this is an advanced feature
       --timeout-height uint      Set a block timeout height to prevent the tx from being committed past a certain height
       --tip string               Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator
   -y, --yes                      Skip tx broadcasting prompt confirmation
