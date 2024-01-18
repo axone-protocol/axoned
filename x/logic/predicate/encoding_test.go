@@ -87,13 +87,13 @@ func TestHexBytesPredicate(t *testing.T) {
 						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
 
 						err := interpreter.Compile(ctx, tc.program)
-						So(err, ShouldEqual, nil)
+						So(err, ShouldBeNil)
 
 						Convey("When the predicate is called", func() {
 							sols, err := interpreter.QueryContext(ctx, tc.query)
 
 							Convey("Then the error should be nil", func() {
-								So(err, ShouldEqual, nil)
+								So(err, ShouldBeNil)
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
@@ -113,15 +113,15 @@ func checkSolutions(sols *prolog.Solutions, wantResult []types.TermResults, want
 	for sols.Next() {
 		m := types.TermResults{}
 		err := sols.Scan(m)
-		So(err, ShouldEqual, nil)
+		So(err, ShouldBeNil)
 
 		got = append(got, m)
 	}
 	if wantError != nil {
-		So(sols.Err(), ShouldNotEqual, nil)
+		So(sols.Err(), ShouldNotBeNil)
 		So(sols.Err().Error(), ShouldEqual, wantError.Error())
 	} else {
-		So(sols.Err(), ShouldEqual, nil)
+		So(sols.Err(), ShouldBeNil)
 
 		if wantSuccess {
 			So(len(got), ShouldEqual, len(wantResult))

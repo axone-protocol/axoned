@@ -154,13 +154,13 @@ func TestReadString(t *testing.T) {
 						interpreter.SetUserInput(engine.NewInputTextStream(strings.NewReader(tc.input)))
 
 						err := interpreter.Compile(ctx, tc.program)
-						So(err, ShouldEqual, nil)
+						So(err, ShouldBeNil)
 
 						Convey("When the predicate is called", func() {
 							sols, err := interpreter.QueryContext(ctx, tc.query)
 
 							Convey("Then the error should be nil", func() {
-								So(err, ShouldEqual, nil)
+								So(err, ShouldBeNil)
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
@@ -173,10 +173,10 @@ func TestReadString(t *testing.T) {
 										got = append(got, m)
 									}
 									if tc.wantError != nil {
-										So(sols.Err(), ShouldNotEqual, nil)
+										So(sols.Err(), ShouldNotBeNil)
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 									} else {
-										So(sols.Err(), ShouldEqual, nil)
+										So(sols.Err(), ShouldBeNil)
 
 										if tc.wantSuccess {
 											So(len(got), ShouldBeGreaterThan, 0)
@@ -347,13 +347,13 @@ func TestStringBytes(t *testing.T) {
 								})
 
 								Convey("Then the error should be nil", func() {
-									So(err, ShouldEqual, nil)
+									So(err, ShouldBeNil)
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the result should be as expected", func() {
 										if tc.wantError != nil {
 											sols.Next()
-											So(sols.Err(), ShouldNotEqual, nil)
+											So(sols.Err(), ShouldNotBeNil)
 											So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 										} else {
 											nb := 0
@@ -362,7 +362,7 @@ func TestStringBytes(t *testing.T) {
 												So(sols.Scan(m), ShouldBeNil)
 												nb++
 											}
-											So(sols.Err(), ShouldEqual, nil)
+											So(sols.Err(), ShouldBeNil)
 											if tc.wantSuccess {
 												So(nb, ShouldEqual, 1)
 											} else {

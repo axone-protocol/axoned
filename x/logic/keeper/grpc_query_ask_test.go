@@ -195,11 +195,11 @@ func TestGRPCAsk(t *testing.T) {
 
 							Convey("Then it should return the expected answer", func() {
 								if tc.expectedError != "" {
-									So(err, ShouldNotEqual, nil)
+									So(err, ShouldNotBeNil)
 									So(err.Error(), ShouldEqual, tc.expectedError)
 									So(result, ShouldBeNil)
 								} else {
-									So(err, ShouldEqual, nil)
+									So(err, ShouldBeNil)
 									So(result, ShouldNotBeNil)
 									So(result.Answer, ShouldResemble, tc.expectedAnswer)
 								}

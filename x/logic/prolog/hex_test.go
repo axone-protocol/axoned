@@ -45,7 +45,7 @@ func TestTermHexToBytes(t *testing.T) {
 						})
 					} else {
 						Convey("then error should occurs", func() {
-							So(err, ShouldNotEqual, nil)
+							So(err, ShouldNotBeNil)
 
 							Convey("and should be as expected", func() {
 								So(err.Error(), ShouldEqual, tc.wantError.Error())
