@@ -31,7 +31,7 @@ require (
 	github.com/golang/mock v1.6.0
 	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
-	github.com/hashicorp/go-metrics v0.5.1
+	github.com/hashicorp/go-metrics v0.5.3
 	github.com/ichiban/prolog v1.1.0
 	github.com/ignite/cli v0.27.1
 	github.com/nuts-foundation/go-did v0.4.0
