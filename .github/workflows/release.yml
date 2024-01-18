@@ -29,21 +29,26 @@ jobs:
         with:
           token: ${{ secrets.OKP4_TOKEN }}
 
+      - name: Setup node
+        uses: actions/setup-node@v3
+        with:
+          node-version: 20
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
       - name: Release project
         uses: cycjimmy/semantic-release-action@v4
         with:
-          semantic_version: 19.0.2
+          semantic_version: 22.0.5
           branch: main
           extra_plugins: |
             @semantic-release/changelog
             @semantic-release/exec
             @semantic-release/git
-            @google/semantic-release-replace-plugin
+            semantic-release-replace-plugin@1.2.7
           extends: |
-            conventional-changelog-conventionalcommits
+            conventional-changelog-conventionalcommits@7.0.1
         env:
           GITHUB_TOKEN: ${{ secrets.OKP4_TOKEN }}
           GIT_AUTHOR_NAME: ${{ secrets.OKP4_BOT_GIT_AUTHOR_NAME }}
