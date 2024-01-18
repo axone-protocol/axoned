@@ -203,7 +203,7 @@ func TestURIEncoded(t *testing.T) {
 										got = append(got, m)
 									}
 									if tc.wantError != nil {
-										So(sols.Err(), ShouldNotEqual, nil)
+										So(sols.Err(), ShouldNotBeNil)
 										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
 									} else {
 										So(sols.Err(), ShouldBeNil)

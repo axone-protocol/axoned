@@ -67,7 +67,7 @@ func TestExtractJsonTerm(t *testing.T) {
 						})
 					} else {
 						Convey("then error should occurs", func() {
-							So(err, ShouldNotEqual, nil)
+							So(err, ShouldNotBeNil)
 							So(tc.wantError, ShouldNotBeNil)
 
 							Convey("and should be as expected", func() {

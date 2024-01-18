@@ -150,7 +150,7 @@ func TestGetOption(t *testing.T) {
 
 					if tc.wantError == nil {
 						Convey("then no error should be thrown", func() {
-							So(err, ShouldEqual, nil)
+							So(err, ShouldBeNil)
 
 							Convey("and result should be as expected", func() {
 								So(result, ShouldEqual, tc.wantResult)
@@ -161,7 +161,7 @@ func TestGetOption(t *testing.T) {
 							So(result, ShouldEqual, tc.wantResult)
 						})
 						Convey("then error should occurs", func() {
-							So(err, ShouldNotEqual, nil)
+							So(err, ShouldNotBeNil)
 
 							Convey("and should be as expected", func() {
 								So(err.Error(), ShouldEqual, tc.wantError.Error())
