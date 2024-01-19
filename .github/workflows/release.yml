@@ -29,6 +29,15 @@ jobs:
         with:
           token: ${{ secrets.OKP4_TOKEN }}
 
+      - name: Import GPG key
+        uses: crazy-max/ghaction-import-gpg@v6
+        with:
+          gpg_private_key: ${{ secrets.OKP4_BOT_GPG_PRIVATE_KEY }}
+          passphrase: ${{ secrets.OKP4_BOT_GPG_PASSPHRASE }}
+          git_config_global: true
+          git_user_signingkey: true
+          git_commit_gpgsign: true
+
       - name: Setup node
         uses: actions/setup-node@v3
         with:
