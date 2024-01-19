@@ -1,9 +1,25 @@
 ## okp4d query logic ask
 
-Execute the Ask RPC method
+Executes a logic query and returns the solution(s) found.
+
+### Synopsis
+
+Executes the [query] and return the solution(s) found.
+
+Optionally, a program can be transmitted, which will be compiled before the query is processed.
+
+Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee
+is charged for this, but the execution is constrained by the current limits configured in the module (that you can
+query).
 
 ```
-okp4d query logic ask [flags]
+okp4d query logic ask [query] [flags]
+```
+
+### Examples
+
+```
+$ okp4d query logic ask "chain_id(X)." # returns the chain-id
 ```
 
 ### Options
@@ -16,8 +32,7 @@ okp4d query logic ask [flags]
       --no-indent          Do not indent JSON output
       --node string        <host>:<port> to CometBFT RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string      Output format (text|json) (default "text")
-      --program string     
-      --query string       
+  -p, --program string     The program to compile before the query.
 ```
 
 ### SEE ALSO
