@@ -1,5 +1,79 @@
 # ØKP4 protocol changelog
 
+## [6.0.0](https://github.com/okp4/okp4d/compare/v5.0.0...v6.0.0) (2024-01-19)
+
+
+### ⚠ BREAKING CHANGES
+
+* remove upgrades
+* **app:** update app for v0.50.x sdk changes
+* **logic:** standardize uri_encoded/3 errors
+* **logic:** add error field to anwser proto type
+* **logic:** standardize predicates errors
+* **logic:** standardize error messages for some predicates
+* **logic:** remove sha_hash/2 predicate
+* **DIDComponents:** restrict type-checking for expected atom components
+
+### Features
+
+* **app:** re implement app state export ([85362d4](https://github.com/okp4/okp4d/commit/85362d4851d68efef88b8bfcaab155e2798d7270))
+* **app:** update app for v0.50.x sdk changes ([8a39efc](https://github.com/okp4/okp4d/commit/8a39efc27918d44a091b491920df5008ddf8041d))
+* **app:** update old migrations ([ab068fc](https://github.com/okp4/okp4d/commit/ab068fc2039ff63c6e84e49aa0770e4f4f98ee19))
+* **cmd:** update cmd wiring ([dca3eb2](https://github.com/okp4/okp4d/commit/dca3eb2103e751f23c0bd27e05d6af6296214a94))
+* **logic:** add crypto_data_hash/3 predicate with SHA-256 support ([edb3d55](https://github.com/okp4/okp4d/commit/edb3d55efb280c46111edaa308f8f62ae815d5e1))
+* **logic:** add MD5 algorithm to crypto_data_hash/3 ([7e17001](https://github.com/okp4/okp4d/commit/7e17001873be050c17d1f7be5e63ab89e6ba7672))
+* **logic:** add Secp256k1 support ([d612819](https://github.com/okp4/okp4d/commit/d61281999cb19e67ee493823077f0fcbc105cb85))
+* **logic:** add Secp256k1 support for ECDSAVerify predicate ([b9f930b](https://github.com/okp4/okp4d/commit/b9f930bab5627d4c8ad111d20c93538755ee10f6))
+* **logic:** add SHA-512 algorithm to crypto_data_hash/3 ([93b2d59](https://github.com/okp4/okp4d/commit/93b2d59cbffcec95ee590f50e550fc1b30d3f47b))
+* **logic:** add string_bytes/3 predicate ([2e2bac2](https://github.com/okp4/okp4d/commit/2e2bac26069fb7cf17d071c460948f1d4056539d))
+* **logic:** add universal Hash function ([157ff21](https://github.com/okp4/okp4d/commit/157ff21a1491dda9e3034882a28d7373d54d5f57))
+* **logic:** add utf8 encoding option for TermToBytes ([3b3ca89](https://github.com/okp4/okp4d/commit/3b3ca89a961ab7d5ee8dc4d7bda84e7ddc364aae))
+* **logic:** deprecate sha_hash/2 predicate ([9be1b56](https://github.com/okp4/okp4d/commit/9be1b562d34e6a7c0c8c30bcbb4956357a29ec64))
+* **logic:** handle encoding option ([d83b5d3](https://github.com/okp4/okp4d/commit/d83b5d37ca7d3167db33534ebc1a5b1e8b2fa563))
+* **logic:** implement crypto signature verification ([a92ec86](https://github.com/okp4/okp4d/commit/a92ec86ca74594755547818a7ae9e95617222624))
+* **logic:** manage ecda secp256k1 key for secp_verify/4 ([268e493](https://github.com/okp4/okp4d/commit/268e493f41a561e1578216e22dc9280f36d5ee14))
+* **logic:** migrate logic module ([a2b5286](https://github.com/okp4/okp4d/commit/a2b5286729f0c95064783a9883528385e3d09eab))
+* **logic:** reigster eddsa_verify/4 predicate ([2a19e91](https://github.com/okp4/okp4d/commit/2a19e9160871b7a631b53f096f84aecc6c80aa8a))
+* **logic:** remove sha_hash/2 predicate ([605d0cd](https://github.com/okp4/okp4d/commit/605d0cd1ccc98210a2cc6a97501eba698abbbab0))
+* **mint:** add new mint function calculation ([a2bc105](https://github.com/okp4/okp4d/commit/a2bc105de2898a23e743b33c51138a6387328677))
+* **mint:** create migration for v3 ([3df4557](https://github.com/okp4/okp4d/commit/3df45574c96cca5b753e465bcea2991459c9b80a))
+* **mint:** implement token model v2 ([473221d](https://github.com/okp4/okp4d/commit/473221d1fbd0d2c9b0a536b294cb52d5354f8458))
+* **mint:** instantiate default new mint params ([6484ce4](https://github.com/okp4/okp4d/commit/6484ce4a6f9dc90baa8f11a54bf6c0704b06dea7))
+* **mint:** migrate mint module ([ca000b2](https://github.com/okp4/okp4d/commit/ca000b29e68a0a9cf531c05c68eb37c4c62f9454))
+* **mint:** migrate minter params by removing not used key ([e62215a](https://github.com/okp4/okp4d/commit/e62215aa4bdec783d047c0f17373b4e707d6bbd3))
+* **mint:** new mint params ([90456d0](https://github.com/okp4/okp4d/commit/90456d035830368fb33008f1ae58d5bdcbb67c96))
+* **mint:** register migration handler ([e38ae03](https://github.com/okp4/okp4d/commit/e38ae03fea72b3715593287766c08a7d68940d77))
+* **mint:** remove legacy store migration ([83bfc00](https://github.com/okp4/okp4d/commit/83bfc0089e199755363c819e75503349b4b6d892))
+* **mint:** specify token model v2 schemas ([36a965f](https://github.com/okp4/okp4d/commit/36a965f0c0a4adc8257f66fd1ab023edb8056d2b))
+* **prolog:** add default value support to GetOption func ([9a2dee9](https://github.com/okp4/okp4d/commit/9a2dee961e76f0397ee021e1001ddd0d9e417d43))
+* remove upgrades ([be741a3](https://github.com/okp4/okp4d/commit/be741a3672fa6c4fadbda843666c2ef0a322972e))
+* **vesting:** update module ([96f970c](https://github.com/okp4/okp4d/commit/96f970cdf1483e2beefcd00653b27edf52208f88))
+* **wasm:** upgrade lib wasmvm in docker build ([5c01946](https://github.com/okp4/okp4d/commit/5c019469da6e7d146615ec58679c2858524be56f))
+
+
+### Bug Fixes
+
+* **app:** do not try to migrate consensus params ([61c6ddf](https://github.com/okp4/okp4d/commit/61c6ddfe491abfa5c33825caa490cfb3a716a9ca))
+* **build:** update chain-upgrade makefile task to make it work with latest version ([3ea9694](https://github.com/okp4/okp4d/commit/3ea9694788438a7256235ebdd804937c1bf3a7bb))
+* **lint:** fix unused linter directive ([49c1202](https://github.com/okp4/okp4d/commit/49c1202ebd634a0c3ec31d9e50d70d03f75582c7))
+* **logic:** add return statement for hash errors ([9996654](https://github.com/okp4/okp4d/commit/9996654f59416cd6f5fc284f9c142016a1c9139b))
+* **logic:** fix incorrect handling of empty list ([25e476d](https://github.com/okp4/okp4d/commit/25e476d898563f87967fda0accdbb758631b2f80))
+* **logic:** fix some typos in naming and description ([e966ad6](https://github.com/okp4/okp4d/commit/e966ad6116a4dc583457c637cbf31f6d0baaa967))
+* **mint:** calculate inflation in percent instead of permille ([c555990](https://github.com/okp4/okp4d/commit/c555990962ce4dcc8fdb0a3f54c59c678604df76))
+* **mint:** migration get old mint denom ([8bae962](https://github.com/okp4/okp4d/commit/8bae96245500965027871f6968dfe02cd867e771))
+* **store:** add ibcfee type storekey to kv store keys ([#419](https://github.com/okp4/okp4d/issues/419)) ([56a5f92](https://github.com/okp4/okp4d/commit/56a5f92f97db86e861778ab44158184a9cf8be13))
+* **test:** allow default genesis creation in testutil ([bb35f38](https://github.com/okp4/okp4d/commit/bb35f38b473a0b9ea4025bf7a7fe9b85056d0a39))
+* **wasm:** bump wasmvm to fixed version ([77c58cb](https://github.com/okp4/okp4d/commit/77c58cbae401958e0cb8ba38b1af2e68dfc9fd29))
+
+
+### Code Refactoring
+
+* **DIDComponents:** restrict type-checking for expected atom components ([ba5b2a3](https://github.com/okp4/okp4d/commit/ba5b2a357e7891ab91ecc64b2e9ead5bfdfbd72b))
+* **logic:** add error field to anwser proto type ([b70ecc9](https://github.com/okp4/okp4d/commit/b70ecc97fbb68570145c06439753aea5f3482ab6))
+* **logic:** standardize error messages for some predicates ([864b059](https://github.com/okp4/okp4d/commit/864b05998435c776d8111a9a2875887e977120ef))
+* **logic:** standardize predicates errors ([ea7b38d](https://github.com/okp4/okp4d/commit/ea7b38defedf647c538c1378e8ae860a65535036))
+* **logic:** standardize uri_encoded/3 errors ([b8d8133](https://github.com/okp4/okp4d/commit/b8d8133b4a2c20f11831b3e441f26b588a7e7776))
+
 ## [5.0.0](https://github.com/okp4/okp4d/compare/v4.1.0...v5.0.0) (2023-06-27)
 
 
