@@ -14,19 +14,9 @@ import (
 	"github.com/dustinxie/ecc"
 )
 
-const (
-	Secp256k1 KeyAlg = "secp256k1"
-	Secp256r1 KeyAlg = "secp256r1"
-	Ed25519   KeyAlg = "ed25519"
-)
-
 // KeyAlg is the type of key algorithm supported by the crypto util functions.
-type KeyAlg string
-
-// String returns the string representation of the key algorithm.
-func (a KeyAlg) String() string {
-	return string(a)
-}
+// ENUM(secp256k1,secp256r1,ed25519).
+type KeyAlg int
 
 // HashAlg is the type of hash algorithm supported by the crypto util functions.
 // ENUM(md5,sha256,sha512).
@@ -56,11 +46,11 @@ func VerifySignature(alg KeyAlg, pubKey []byte, msg, sig []byte) (_ bool, err er
 	}()
 
 	switch alg {
-	case Ed25519:
+	case KeyAlgEd25519:
 		return ed25519.Verify(pubKey, msg, sig), nil
-	case Secp256r1:
+	case KeyAlgSecp256r1:
 		return verifySignatureWithCurve(elliptic.P256(), pubKey, msg, sig)
-	case Secp256k1:
+	case KeyAlgSecp256k1:
 		return verifySignatureWithCurve(ecc.P256k1(), pubKey, msg, sig)
 	default:
 		return false, fmt.Errorf("algo %s not supported", alg)

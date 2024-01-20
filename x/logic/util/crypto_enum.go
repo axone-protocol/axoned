@@ -71,3 +71,64 @@ func ParseHashAlg(name string) (HashAlg, error) {
 	}
 	return HashAlg(0), fmt.Errorf("%s is %w", name, ErrInvalidHashAlg)
 }
+
+const (
+	// KeyAlgSecp256k1 is a KeyAlg of type Secp256k1.
+	KeyAlgSecp256k1 KeyAlg = iota
+	// KeyAlgSecp256r1 is a KeyAlg of type Secp256r1.
+	KeyAlgSecp256r1
+	// KeyAlgEd25519 is a KeyAlg of type Ed25519.
+	KeyAlgEd25519
+)
+
+var ErrInvalidKeyAlg = fmt.Errorf("not a valid KeyAlg, try [%s]", strings.Join(_KeyAlgNames, ", "))
+
+const _KeyAlgName = "secp256k1secp256r1ed25519"
+
+var _KeyAlgNames = []string{
+	_KeyAlgName[0:9],
+	_KeyAlgName[9:18],
+	_KeyAlgName[18:25],
+}
+
+// KeyAlgNames returns a list of possible string values of KeyAlg.
+func KeyAlgNames() []string {
+	tmp := make([]string, len(_KeyAlgNames))
+	copy(tmp, _KeyAlgNames)
+	return tmp
+}
+
+var _KeyAlgMap = map[KeyAlg]string{
+	KeyAlgSecp256k1: _KeyAlgName[0:9],
+	KeyAlgSecp256r1: _KeyAlgName[9:18],
+	KeyAlgEd25519:   _KeyAlgName[18:25],
+}
+
+// String implements the Stringer interface.
+func (x KeyAlg) String() string {
+	if str, ok := _KeyAlgMap[x]; ok {
+		return str
+	}
+	return fmt.Sprintf("KeyAlg(%d)", x)
+}
+
+// IsValid provides a quick way to determine if the typed value is
+// part of the allowed enumerated values
+func (x KeyAlg) IsValid() bool {
+	_, ok := _KeyAlgMap[x]
+	return ok
+}
+
+var _KeyAlgValue = map[string]KeyAlg{
+	_KeyAlgName[0:9]:   KeyAlgSecp256k1,
+	_KeyAlgName[9:18]:  KeyAlgSecp256r1,
+	_KeyAlgName[18:25]: KeyAlgEd25519,
+}
+
+// ParseKeyAlg attempts to convert a string to a KeyAlg.
+func ParseKeyAlg(name string) (KeyAlg, error) {
+	if x, ok := _KeyAlgValue[name]; ok {
+		return x, nil
+	}
+	return KeyAlg(0), fmt.Errorf("%s is %w", name, ErrInvalidKeyAlg)
+}
