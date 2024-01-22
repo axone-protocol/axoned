@@ -163,7 +163,6 @@ func initRootCmd(
 		confixcmd.ConfigCommand(),
 		pruning.Cmd(newApp, app.DefaultNodeHome),
 		snapshot.Cmd(newApp),
-		// did.Cmd(),
 	)
 
 	// add server commands
@@ -182,7 +181,7 @@ func initRootCmd(
 		genesisCommand(encodingConfig.TxConfig, basicManager),
 		queryCommand(),
 		txCommand(),
-		okp4keys.Enhance(keys.Commands()),
+		okp4keys.Install(keys.Commands()),
 	)
 }
 

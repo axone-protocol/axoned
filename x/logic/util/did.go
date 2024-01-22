@@ -11,8 +11,8 @@ import (
 )
 
 const (
-	ED25519PubKeyMultiCodec  = 0xed
-	SECP256k1ubKeyMultiCodec = 0xe7
+	ED25519PubKeyMultiCodec   = 0xed
+	SECP256k1PubKeyMultiCodec = 0xe7
 )
 
 // CreateDIDKeyByPubKey creates a did:key ID using the given public key.
@@ -24,7 +24,7 @@ func CreateDIDKeyByPubKey(pubKey cryptotypes.PubKey) (string, error) {
 	case *ed25519.PubKey:
 		code = ED25519PubKeyMultiCodec
 	case *secp256k1.PubKey:
-		code = SECP256k1ubKeyMultiCodec
+		code = SECP256k1PubKeyMultiCodec
 	default:
 		return "", fmt.Errorf("unsupported key type: %s", pubKey.Type())
 	}

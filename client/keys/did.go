@@ -18,9 +18,7 @@ import (
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
-var (
-	flagPubKeyType = "type"
-)
+var flagPubKeyType = "type"
 
 func DIDCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -61,7 +59,7 @@ $ %s keys did 02d0fe99b214aaeeb5e46ae4d65a1623a95d9d0cecd57d673f7e4c9a19ac0752bc
 			return nil
 		},
 	}
-	cmd.Flags().StringP(flagPubKeyType, "t", util.KeyAlgSecp256r1.String(),
+	cmd.Flags().StringP(flagPubKeyType, "t", util.KeyAlgSecp256k1.String(),
 		fmt.Sprintf("Pubkey type to decode (oneof %s, %s)", util.KeyAlgEd25519, util.KeyAlgSecp256k1))
 	return cmd
 }
