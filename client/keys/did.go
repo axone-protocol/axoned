@@ -27,8 +27,9 @@ func DIDCmd() *cobra.Command {
 		Long: fmt.Sprintf(`Give the did:key from a %s or %s pubkey given as hex or base64 encoded string.
 
 Example:
-$ %s keys did "AtD+mbIUqu615Grk1loWI6ldnQzs1X1nP35MmhmsB1K8" -t %s
-$ %s keys did 02d0fe99b214aaeeb5e46ae4d65a1623a95d9d0cecd57d673f7e4c9a19ac0752bc -t %s
+
+    $ %s keys did "AtD+mbIUqu615Grk1loWI6ldnQzs1X1nP35MmhmsB1K8" -t %s
+    $ %s keys did 02d0fe99b214aaeeb5e46ae4d65a1623a95d9d0cecd57d673f7e4c9a19ac0752bc -t %s
 			`, util.KeyAlgEd25519, util.KeyAlgSecp256k1, version.AppName, util.KeyAlgSecp256k1, version.AppName, util.KeyAlgSecp256k1),
 		Args: cobra.ExactArgs(1),
 		RunE: func(cmd *cobra.Command, args []string) error {
@@ -45,7 +46,7 @@ $ %s keys did 02d0fe99b214aaeeb5e46ae4d65a1623a95d9d0cecd57d673f7e4c9a19ac0752bc
 			if err != nil {
 				return err
 			}
-			pubKey, err := bytesToPubkey(bs, pubkeyAlgo)
+			pubKey, err := bytesToPubKey(bs, pubkeyAlgo)
 			if err != nil {
 				return err
 			}
@@ -77,7 +78,7 @@ func getBytesFromString(pubKey string) ([]byte, error) {
 		"pubkey '%s' invalid; expected hex or base64 encoding of correct size", pubKey)
 }
 
-func bytesToPubkey(bz []byte, keytype util.KeyAlg) (cryptotypes.PubKey, error) {
+func bytesToPubKey(bz []byte, keytype util.KeyAlg) (cryptotypes.PubKey, error) {
 	switch keytype {
 	case util.KeyAlgEd25519:
 		if len(bz) != ed25519.PubKeySize {

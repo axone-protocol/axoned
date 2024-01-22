@@ -5,7 +5,7 @@ List all keys
 ### Synopsis
 
 Return a list of all public keys stored by this key manager
-along with their associated name and address.
+along with their associated name, address and decentralized identifier (for supported public key algorithms)
 
 ```
 okp4d keys list [flags]
