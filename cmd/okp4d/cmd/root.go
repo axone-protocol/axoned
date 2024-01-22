@@ -42,6 +42,7 @@ import (
 
 	"github.com/okp4/okp4d/app"
 	appparams "github.com/okp4/okp4d/app/params"
+	okp4keys "github.com/okp4/okp4d/client/keys"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application.
@@ -162,6 +163,7 @@ func initRootCmd(
 		confixcmd.ConfigCommand(),
 		pruning.Cmd(newApp, app.DefaultNodeHome),
 		snapshot.Cmd(newApp),
+		// did.Cmd(),
 	)
 
 	// add server commands
@@ -180,7 +182,7 @@ func initRootCmd(
 		genesisCommand(encodingConfig.TxConfig, basicManager),
 		queryCommand(),
 		txCommand(),
-		keys.Commands(),
+		okp4keys.Enhance(keys.Commands()),
 	)
 }
 
