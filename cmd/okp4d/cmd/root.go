@@ -181,7 +181,7 @@ func initRootCmd(
 		genesisCommand(encodingConfig.TxConfig, basicManager),
 		queryCommand(),
 		txCommand(),
-		okp4keys.Install(keys.Commands()),
+		okp4keys.Enhance(keys.Commands()),
 	)
 }
 

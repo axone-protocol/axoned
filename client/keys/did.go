@@ -9,9 +9,6 @@ import (
 
 	errorsmod "cosmossdk.io/errors"
 
-	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
-	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
-	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/version"
 
@@ -46,9 +43,9 @@ Example:
 			if err != nil {
 				return err
 			}
-			pubKey, err := bytesToPubKey(bs, pubkeyAlgo)
+			pubKey, err := util.BytesToPubKey(bs, pubkeyAlgo)
 			if err != nil {
-				return err
+				return errorsmod.Wrapf(errors.ErrInvalidPubKey, "failed to make pubkey from %s; %s", args[0], err)
 			}
 			did, err := util.CreateDIDKeyByPubKey(pubKey)
 			if err != nil {
@@ -76,25 +73,4 @@ func getBytesFromString(pubKey string) ([]byte, error) {
 
 	return nil, errorsmod.Wrapf(errors.ErrInvalidPubKey,
 		"pubkey '%s' invalid; expected hex or base64 encoding of correct size", pubKey)
-}
-
-func bytesToPubKey(bz []byte, keytype util.KeyAlg) (cryptotypes.PubKey, error) {
-	switch keytype {
-	case util.KeyAlgEd25519:
-		if len(bz) != ed25519.PubKeySize {
-			return nil, errorsmod.Wrapf(errors.ErrInvalidPubKey,
-				"invalid pubkey size; expected %d, got %d", ed25519.PubKeySize, len(bz))
-		}
-		return &ed25519.PubKey{Key: bz}, nil
-	case util.KeyAlgSecp256k1:
-		if len(bz) != secp256k1.PubKeySize {
-			return nil, errorsmod.Wrapf(errors.ErrInvalidPubKey,
-				"invalid pubkey size; expected %d, got %d", secp256k1.PubKeySize, len(bz))
-		}
-		return &secp256k1.PubKey{Key: bz}, nil
-	case util.KeyAlgSecp256r1:
-	}
-
-	return nil, errorsmod.Wrapf(errors.ErrInvalidType,
-		"invalid pubkey type; expected oneof %+q", []util.KeyAlg{util.KeyAlgSecp256k1, util.KeyAlgEd25519})
 }

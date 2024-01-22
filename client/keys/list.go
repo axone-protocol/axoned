@@ -21,8 +21,8 @@ const (
 	ListCmdName   = "list"
 )
 
-// KeyOutput defines a structure wrapping around an Info object used for output
-// functionality.
+// KeyOutput is the output format for keys when listing them.
+// It is an improved copy of the KeyOutput from the keys module (github.com/cosmos/cosmos-sdk/client/keys/types.go).
 type KeyOutput struct {
 	keys.KeyOutput
 	DID string `json:"did,omitempty" yaml:"did"`
