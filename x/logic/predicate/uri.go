@@ -10,7 +10,8 @@ import (
 //
 // The signature is as follows:
 //
-//	uri_encoded(+Component, +Decoded, -Encoded)
+//	uri_encoded(+Component, +Value, -Encoded) is det
+//	uri_encoded(+Component, -Value, +Encoded) is det
 //
 // Where:
 //   - Component represents the component of the URI to be escaped. It can be the atom query, fragment, path or

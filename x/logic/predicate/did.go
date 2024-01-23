@@ -23,8 +23,8 @@ const DIDPrefix = "did"
 // where:
 //   - DID represent DID URI, given as an Atom, compliant with [W3C DID] specification.
 //   - Components is a compound Term in the format did(Method, ID, Path, Query, Fragment), aligned with the [DID syntax],
-//     where: Method is The method name, ID is The method-specific identifier, Path is the path component, Query is the
-//     query component and Fragment is The fragment component. Values are given as an Atom and are url encoded.
+//     where: Method is the method name, ID is the method-specific identifier, Path is the path component, Query is the
+//     query component and Fragment is the fragment component. Values are given as an Atom and are url encoded.
 //     For any component not present, its value will be null and thus will be left as an uninstantiated variable.
 //
 // Examples:
