@@ -32,36 +32,40 @@ func TestDID(t *testing.T) {
 			wantError  error
 		}{
 			{
-				query:      `did_components('did:example:123456',did(X,Y,_,_,_)).`,
+				query:      `did_components('did:example:123456',did_components(X,Y,_,_,_)).`,
 				wantResult: []types.TermResults{{"X": "example", "Y": "'123456'"}},
 			},
 			{
-				query:      `did_components('did:example:123456',did(X,Y,Z,_,_)).`,
-				wantResult: []types.TermResults{{"X": "example", "Y": "'123456'", "Z": "''"}},
+				query:      `did_components('did:example:123456',did_components(X,Y,Z,_,_)).`,
+				wantResult: []types.TermResults{{"X": "example", "Y": "'123456'", "Z": "_1"}},
 			},
 			{
 				query:      `did_components('did:example:123456/path', X).`,
-				wantResult: []types.TermResults{{"X": "did(example,'123456',path,'','')"}},
+				wantResult: []types.TermResults{{"X": "did_components(example,'123456',path,_1,_2)"}},
 			},
 			{
 				query:      `did_components('did:example:123456?versionId=1', X).`,
-				wantResult: []types.TermResults{{"X": "did(example,'123456','','versionId=1','')"}},
+				wantResult: []types.TermResults{{"X": "did_components(example,'123456',_1,'versionId=1',_2)"}},
 			},
 			{
 				query:      `did_components('did:example:123456/path%20with/space', X).`,
-				wantResult: []types.TermResults{{"X": "did(example,'123456','path with/space','','')"}},
+				wantResult: []types.TermResults{{"X": "did_components(example,'123456','path%20with/space',_1,_2)"}},
 			},
 			{
-				query:      `did_components(X,did(example,'123456',_,'versionId=1',_)).`,
+				query:      `did_components(X,did_components(example,'123456',_,'versionId=1',_)).`,
 				wantResult: []types.TermResults{{"X": "'did:example:123456?versionId=1'"}},
 			},
 			{
-				query:      `did_components(X,did(example,'123456','/foo/bar','versionId=1','test')).`,
+				query:      `did_components(X,did_components(example,'123456','/foo/bar','versionId=1','test')).`,
 				wantResult: []types.TermResults{{"X": "'did:example:123456/foo/bar?versionId=1#test'"}},
 			},
 			{
-				query:      `did_components(X,did(example,'123456','path with/space',_,test)).`,
+				query:      `did_components(X,did_components(example,'123456','path%20with/space',_,test)).`,
 				wantResult: []types.TermResults{{"X": "'did:example:123456/path%20with/space#test'"}},
+			},
+			{
+				query:      `did_components(X,did_components(example,'123456','/foo/bar','version%20Id=1','test')).`,
+				wantResult: []types.TermResults{{"X": "'did:example:123456/foo/bar?version%20Id=1#test'"}},
 			},
 			{
 				query:      `did_components(X,Y).`,
@@ -72,7 +76,7 @@ func TestDID(t *testing.T) {
 				query:      `did_components('foo',X).`,
 				wantResult: []types.TermResults{},
 				wantError: fmt.Errorf("error(domain_error(encoding(did),foo),[%s],did_components/2)",
-					strings.Join(strings.Split("invalid DID: input length is less than 7", ""), ",")),
+					strings.Join(strings.Split("invalid DID", ""), ",")),
 			},
 			{
 				query:      `did_components(123,X).`,
@@ -82,20 +86,20 @@ func TestDID(t *testing.T) {
 			{
 				query:      `did_components(X, 123).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("error(type_error(did,123),did_components/2)"),
+				wantError:  fmt.Errorf("error(type_error(did_components,123),did_components/2)"),
 			},
 			{
 				query:      `did_components(X,foo('bar')).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("error(domain_error(did,foo(bar)),did_components/2)"),
+				wantError:  fmt.Errorf("error(domain_error(did_components,foo(bar)),did_components/2)"),
 			},
 			{
-				query:      `did_components(X,did('bar')).`,
+				query:      `did_components(X,did_components('bar')).`,
 				wantResult: []types.TermResults{},
-				wantError:  fmt.Errorf("error(domain_error(did,did(bar)),did_components/2)"),
+				wantError:  fmt.Errorf("error(domain_error(did_components,did_components(bar)),did_components/2)"),
 			},
 			{
-				query:      `did_components(X,did(example,'123456','path with/space',5,test)).`,
+				query:      `did_components(X,did_components(example,'123456','path with/space',5,test)).`,
 				wantResult: []types.TermResults{},
 				wantError:  fmt.Errorf("error(type_error(atom,5),did_components/2)"),
 			},

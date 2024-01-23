@@ -7,6 +7,8 @@ var (
 	AtomAs = engine.NewAtom("as")
 	// AtomAt are terms with principal functor (@)/1 used to represent special values in json objects.
 	AtomAt = engine.NewAtom("@")
+	// AtomDIDComponents is a term which represents a DID as a compound term `did_components(Method, ID, Path, Query, Fragment)`.
+	AtomDIDComponents = engine.NewAtom("did_components")
 	// AtomDot is the term used to represent the dot in a list.
 	AtomDot = engine.NewAtom(".")
 	// AtomEmpty is the term used to represent empty.
