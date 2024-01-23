@@ -36,7 +36,7 @@ require (
 	github.com/ignite/cli v0.27.2
 	github.com/nuts-foundation/go-did v0.4.0
 	github.com/princjef/gomarkdoc v1.1.0
-	github.com/prometheus/client_golang v1.17.0
+	github.com/prometheus/client_golang v1.18.0
 	github.com/samber/lo v1.39.0
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/spf13/cast v1.6.0
