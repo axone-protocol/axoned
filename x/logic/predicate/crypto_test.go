@@ -217,7 +217,7 @@ func TestXVerify(t *testing.T) {
 				query:       `verify.`,
 				wantSuccess: false,
 			},
-			{ // Unsupported algo
+			{ // Incorrect algo
 				program: `verify :-
 				hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
 				hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
@@ -226,6 +226,16 @@ func TestXVerify(t *testing.T) {
 				query:       `verify.`,
 				wantSuccess: false,
 				wantError:   fmt.Errorf("error(type_error(cryptographic_algorithm,foo),eddsa_verify/4)"),
+			},
+			{ // Unsupported algo
+				program: `verify :-
+				hex_bytes('53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5a', PubKey),
+				hex_bytes('9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Msg),
+				hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
+				eddsa_verify(PubKey, Msg, Sig, [encoding(octet), type(secp256k1)]).`,
+				query:       `verify.`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("error(type_error(cryptographic_algorithm,secp256k1),eddsa_verify/4)"),
 			},
 			// ECDSA - secp256r1
 			{

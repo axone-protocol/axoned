@@ -111,7 +111,7 @@ func CryptoDataHash(
 //	# Verify a signature for binary data.
 //	- eddsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(ed25519)])
 func EDDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return xVerify(key, data, sig, options, util.Ed25519, []util.KeyAlg{util.Ed25519}, cont, env)
+	return xVerify(key, data, sig, options, util.KeyAlgEd25519, []util.KeyAlg{util.KeyAlgEd25519}, cont, env)
 }
 
 // ECDSAVerify determines if a given signature is valid as per the ECDSA algorithm for the provided data, using the
@@ -153,7 +153,7 @@ func EDDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.
 //	# Verify a signature for binary data using the ECDSA secp256k1 algorithm.
 //	- ecdsa_verify([127, ...], [56, 90, ..], [23, 56, ...], [encoding(octet), type(secp256k1)])
 func ECDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return xVerify(key, data, sig, options, util.Secp256r1, []util.KeyAlg{util.Secp256r1, util.Secp256k1}, cont, env)
+	return xVerify(key, data, sig, options, util.KeyAlgSecp256r1, []util.KeyAlg{util.KeyAlgSecp256r1, util.KeyAlgSecp256k1}, cont, env)
 }
 
 // xVerify return `true` if the Signature can be verified as the signature for Data, using the given PubKey for a
@@ -171,8 +171,11 @@ func xVerify(key, data, sig, options engine.Term, defaultAlgo util.KeyAlg,
 	if err != nil {
 		return engine.Error(err)
 	}
-
-	if idx := slices.IndexFunc(algos, func(a util.KeyAlg) bool { return a.String() == typeAtom.String() }); idx == -1 {
+	keyAlgo, err := util.ParseKeyAlg(typeAtom.String())
+	if err != nil {
+		return engine.Error(engine.TypeError(prolog.AtomTypeCryptographicAlgorithm, typeTerm, env))
+	}
+	if idx := slices.IndexFunc(algos, func(a util.KeyAlg) bool { return a == keyAlgo }); idx == -1 {
 		return engine.Error(engine.TypeError(prolog.AtomTypeCryptographicAlgorithm, typeTerm, env))
 	}
 
@@ -191,7 +194,7 @@ func xVerify(key, data, sig, options engine.Term, defaultAlgo util.KeyAlg,
 		return engine.Error(err)
 	}
 
-	r, err := util.VerifySignature(util.KeyAlg(typeAtom.String()), decodedKey, decodedData, decodedSignature)
+	r, err := util.VerifySignature(keyAlgo, decodedKey, decodedData, decodedSignature)
 	if err != nil {
 		return engine.Error(prolog.SyntaxError(err, env))
 	}
