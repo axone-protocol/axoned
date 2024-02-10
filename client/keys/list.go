@@ -5,18 +5,22 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
-	"github.com/cosmos/cosmos-sdk/client/keys"
 )
 
 const (
 	flagListNames = "list-names"
+	listKeysCmd   = "list"
 )
 
-// KeyOutput is the output format for keys when listing them.
-// It is an improved copy of the KeyOutput from the keys module (github.com/cosmos/cosmos-sdk/client/keys/types.go).
-type KeyOutput struct {
-	keys.KeyOutput
-	DID string `json:"did,omitempty" yaml:"did"`
+// EnhanceListCmd replaces the original 'list' command implementation with our own 'list' command which
+// will allow us to list did:key of the keys as well as the original keys.
+func EnhanceListCmd(cmd *cobra.Command) {
+	for _, c := range cmd.Commands() {
+		if c.Name() == listKeysCmd {
+			c.RunE = runListCmd
+			break
+		}
+	}
 }
 
 // runListCmd retrieves all keys from the keyring and prints them to the console.

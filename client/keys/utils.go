@@ -14,10 +14,18 @@ import (
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
-type bechKeyOutFn func(k *cryptokeyring.Record) (keys.KeyOutput, error)
+// KeyOutput is the output format for keys when listing them.
+// It is an improved copy of the KeyOutput from the keys module (github.com/cosmos/cosmos-sdk/client/keys/types.go).
+type KeyOutput struct {
+	keys.KeyOutput
+	DID string `json:"did,omitempty" yaml:"did"`
+}
+
+// bechKeyOutFn is a function that converts a record into a KeyOutput and returns an error if it fails.
+type bechKeyOutFn func(k *cryptokeyring.Record) (KeyOutput, error)
 
 func printKeyringRecord(w io.Writer, k *cryptokeyring.Record, bechKeyOut bechKeyOutFn, output string) error {
-	ko, err := mkKeyOutput(k, bechKeyOut)
+	ko, err := bechKeyOut(k)
 	if err != nil {
 		return err
 	}
@@ -83,9 +91,9 @@ func printTextRecords(w io.Writer, kos []KeyOutput) error {
 
 func mkKeysOutput(records []*cryptokeyring.Record) ([]KeyOutput, error) {
 	kos := make([]KeyOutput, len(records))
-
+	bechKeyOut := toBechKeyOutFn(keys.MkAccKeyOutput)
 	for i, r := range records {
-		kko, err := mkKeyOutput(r, keys.MkAccKeyOutput)
+		kko, err := bechKeyOut(r)
 		if err != nil {
 			return nil, err
 		}
@@ -96,19 +104,24 @@ func mkKeysOutput(records []*cryptokeyring.Record) ([]KeyOutput, error) {
 	return kos, nil
 }
 
-func mkKeyOutput(record *cryptokeyring.Record, bechKeyOut bechKeyOutFn) (KeyOutput, error) {
-	kko, err := bechKeyOut(record)
-	if err != nil {
-		return KeyOutput{}, err
-	}
-	pk, err := record.GetPubKey()
-	if err != nil {
-		return KeyOutput{}, err
-	}
-	did, _ := util.CreateDIDKeyByPubKey(pk)
+// toBechKeyOutFn converts a function that returns a KeyOutput and an error into a function that returns
+// an extended KeyOutput and an error.
+func toBechKeyOutFn(in func(k *cryptokeyring.Record) (keys.KeyOutput, error)) bechKeyOutFn {
+	return func(k *cryptokeyring.Record) (KeyOutput, error) {
+		ko, err := in(k)
+		if err != nil {
+			return KeyOutput{}, err
+		}
 
-	return KeyOutput{
-		KeyOutput: kko,
-		DID:       did,
-	}, nil
+		pk, err := k.GetPubKey()
+		if err != nil {
+			return KeyOutput{}, err
+		}
+		did, _ := util.CreateDIDKeyByPubKey(pk)
+
+		return KeyOutput{
+			KeyOutput: ko,
+			DID:       did,
+		}, nil
+	}
 }

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/samber/lo"
 	"github.com/spf13/cobra"
 
 	errorsmod "cosmossdk.io/errors"
@@ -20,8 +21,24 @@ import (
 )
 
 const (
+	flagDID               = "did"
 	flagMultiSigThreshold = "multisig-threshold"
+	showKeysCmd           = "show"
 )
+
+// EnhanceShowCmd replaces the original 'show' command implementation with our own 'show' command which
+// will allow us to display the did:key of the key as well as the original key.
+func EnhanceShowCmd(cmd *cobra.Command) {
+	for _, c := range cmd.Commands() {
+		if c.Name() == showKeysCmd {
+			c.RunE = runShowCmd
+
+			f := c.Flags()
+			f.BoolP(flagDID, "k", false, "Output the did:key only (overrides --output)")
+			break
+		}
+	}
+}
 
 func runShowCmd(cmd *cobra.Command, args []string) error {
 	clientCtx, err := client.GetClientQueryContext(cmd)
@@ -52,11 +69,7 @@ func runShowCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	if err := processOutput(cmd, clientCtx, keyRecord, bechKeyOut); err != nil {
-		return err
-	}
-
-	return nil
+	return processOutput(cmd, clientCtx, keyRecord, bechKeyOut)
 }
 
 func fetchMultiSigKey(cmd *cobra.Command, clientCtx client.Context, args []string) (*keyring.Record, error) {
@@ -85,12 +98,16 @@ func fetchMultiSigKey(cmd *cobra.Command, clientCtx client.Context, args []strin
 func checkFlagCompatibility(cmd *cobra.Command) error {
 	isShowAddr, _ := cmd.Flags().GetBool(keys.FlagAddress)
 	isShowPubKey, _ := cmd.Flags().GetBool(keys.FlagPublicKey)
-	if isShowAddr && isShowPubKey {
-		return errors.New("cannot use both --address and --pubkey at once")
+	isShowDid, _ := cmd.Flags().GetBool(flagDID)
+
+	nbFlags := lo.Count([]bool{isShowAddr, isShowPubKey, isShowDid}, true)
+
+	if nbFlags > 1 {
+		return errors.New("cannot use --address, --pubkey and --did at the same time")
 	}
 
 	isOutputSet := cmd.Flag(flags.FlagOutput) != nil && cmd.Flag(flags.FlagOutput).Changed
-	if isOutputSet && (isShowAddr || isShowPubKey) {
+	if isOutputSet && nbFlags > 0 {
 		return errors.New("cannot use --output with --address or --pubkey")
 	}
 
@@ -100,27 +117,34 @@ func checkFlagCompatibility(cmd *cobra.Command) error {
 func processOutput(cmd *cobra.Command, clientCtx client.Context, k *keyring.Record, bechKeyOut bechKeyOutFn) error {
 	isShowAddr, _ := cmd.Flags().GetBool(keys.FlagAddress)
 	isShowPubKey, _ := cmd.Flags().GetBool(keys.FlagPublicKey)
+	isShowDid, _ := cmd.Flags().GetBool(flagDID)
 	isShowDevice, _ := cmd.Flags().GetBool(keys.FlagDevice)
 
-	if isShowDevice {
+	switch {
+	case isShowDevice:
 		return handleDeviceOutput(k)
-	}
-
-	if isShowAddr || isShowPubKey {
+	case isShowAddr || isShowPubKey || isShowDid:
 		ko, err := bechKeyOut(k)
 		if err != nil {
 			return err
 		}
-		out := ko.Address
-		if isShowPubKey {
+		out := ""
+		switch {
+		case isShowAddr:
+			out = ko.Address
+		case isShowPubKey:
 			out = ko.PubKey
+		case isShowDid:
+			out = ko.DID
 		}
+
 		_, err = fmt.Fprintln(cmd.OutOrStdout(), out)
 		return err
-	}
 
-	outputFormat := clientCtx.OutputFormat
-	return printKeyringRecord(cmd.OutOrStdout(), k, bechKeyOut, outputFormat)
+	default:
+		outputFormat := clientCtx.OutputFormat
+		return printKeyringRecord(cmd.OutOrStdout(), k, bechKeyOut, outputFormat)
+	}
 }
 
 func handleDeviceOutput(k *keyring.Record) error {
@@ -169,11 +193,11 @@ func validateMultisigThreshold(k, nKeys int) error {
 func getBechKeyOut(bechPrefix string) (bechKeyOutFn, error) {
 	switch bechPrefix {
 	case sdk.PrefixAccount:
-		return keys.MkAccKeyOutput, nil
+		return toBechKeyOutFn(keys.MkAccKeyOutput), nil
 	case sdk.PrefixValidator:
-		return keys.MkValKeyOutput, nil
+		return toBechKeyOutFn(keys.MkValKeyOutput), nil
 	case sdk.PrefixConsensus:
-		return keys.MkConsKeyOutput, nil
+		return toBechKeyOutFn(keys.MkConsKeyOutput), nil
 	}
 
 	return nil, fmt.Errorf("invalid Bech32 prefix encoding provided: %s", bechPrefix)
