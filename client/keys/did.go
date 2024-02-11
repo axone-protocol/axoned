@@ -29,37 +29,41 @@ Example:
     $ %s keys did 02d0fe99b214aaeeb5e46ae4d65a1623a95d9d0cecd57d673f7e4c9a19ac0752bc -t %s
 			`, util.KeyAlgEd25519, util.KeyAlgSecp256k1, version.AppName, util.KeyAlgSecp256k1, version.AppName, util.KeyAlgSecp256k1),
 		Args: cobra.ExactArgs(1),
-		RunE: func(cmd *cobra.Command, args []string) error {
-			pubkeyType, err := cmd.Flags().GetString(flagPubKeyType)
-			if err != nil {
-				return err
-			}
-			pubkeyAlgo, err := util.ParseKeyAlg(pubkeyType)
-			if err != nil {
-				return errorsmod.Wrapf(errors.ErrInvalidType,
-					"invalid pubkey type; expected oneof %+q", []util.KeyAlg{util.KeyAlgSecp256k1, util.KeyAlgEd25519})
-			}
-			bs, err := getBytesFromString(args[0])
-			if err != nil {
-				return err
-			}
-			pubKey, err := util.BytesToPubKey(bs, pubkeyAlgo)
-			if err != nil {
-				return errorsmod.Wrapf(errors.ErrInvalidPubKey, "failed to make pubkey from %s; %s", args[0], err)
-			}
-			did, err := util.CreateDIDKeyByPubKey(pubKey)
-			if err != nil {
-				return errorsmod.Wrapf(errors.ErrInvalidPubKey, "failed to make did:key from %s; %s", args[0], err)
-			}
-
-			cmd.Println(did)
-
-			return nil
-		},
+		RunE: runDidCmd(),
 	}
 	cmd.Flags().StringP(flagPubKeyType, "t", util.KeyAlgSecp256k1.String(),
 		fmt.Sprintf("Pubkey type to decode (oneof %s, %s)", util.KeyAlgEd25519, util.KeyAlgSecp256k1))
 	return cmd
+}
+
+func runDidCmd() func(cmd *cobra.Command, args []string) error {
+	return func(cmd *cobra.Command, args []string) error {
+		pubkeyType, err := cmd.Flags().GetString(flagPubKeyType)
+		if err != nil {
+			return err
+		}
+		pubkeyAlgo, err := util.ParseKeyAlg(pubkeyType)
+		if err != nil {
+			return errorsmod.Wrapf(errors.ErrInvalidType,
+				"invalid pubkey type; expected oneof %+q", []util.KeyAlg{util.KeyAlgSecp256k1, util.KeyAlgEd25519})
+		}
+		bs, err := getBytesFromString(args[0])
+		if err != nil {
+			return err
+		}
+		pubKey, err := util.BytesToPubKey(bs, pubkeyAlgo)
+		if err != nil {
+			return errorsmod.Wrapf(errors.ErrInvalidPubKey, "failed to make pubkey from %s; %s", args[0], err)
+		}
+		did, err := util.CreateDIDKeyByPubKey(pubKey)
+		if err != nil {
+			return errorsmod.Wrapf(errors.ErrInvalidPubKey, "failed to make did:key from %s; %s", args[0], err)
+		}
+
+		cmd.Println(did)
+
+		return nil
+	}
 }
 
 func getBytesFromString(pubKey string) ([]byte, error) {
