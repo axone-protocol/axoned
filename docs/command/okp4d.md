@@ -19,6 +19,7 @@ Want to lean more about OKP4 network? Complete documentation is available at [ht
 
 * [okp4d comet](okp4d_comet.md)	 - CometBFT subcommands
 * [okp4d config](okp4d_config.md)	 - Utilities for managing application configuration
+* [okp4d credential](okp4d_credential.md)	 - W3C Verifiable Credential
 * [okp4d debug](okp4d_debug.md)	 - Tool for helping with debugging your application
 * [okp4d export](okp4d_export.md)	 - Export state to JSON
 * [okp4d genesis](okp4d_genesis.md)	 - Application's genesis-related subcommands
