@@ -30,10 +30,10 @@ import (
 
 var (
 	flagOverwrite = "overwrite"
+	flagDate      = "date"
 )
-var (
-	valueDash = "-"
-)
+
+var valueDash = "-"
 
 func SignCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -48,6 +48,7 @@ It will read a verifiable credential from a file (or stdin), sign it, and print 
 	}
 	cmd.Flags().String(flags.FlagFrom, "", "Name or address of private key with which to sign")
 	cmd.Flags().Bool(flagOverwrite, false, "Overwrite existing signatures with a new one. If disabled, new signature will be appended")
+	cmd.Flags().String(flagDate, "", "Date of the signature provided in RFC3339 format. If not provided, current time will be used")
 	_ = cmd.MarkFlagRequired(flags.FlagFrom)
 
 	flags.AddKeyringFlags(cmd.Flags())
@@ -92,7 +93,11 @@ func runSignCmd(cmd *cobra.Command, args []string) error {
 		vc.Proofs = nil
 	}
 
-	err = signVerifiableCredential(vc, signer)
+	date, err := getFlagAsDate(cmd, flagDate)
+	if err != nil {
+		return err
+	}
+	err = signVerifiableCredential(vc, signer, date)
 	if err != nil {
 		return errorsmod.Wrapf(sdkerr.ErrInvalidRequest, "failed to sign: %v", err)
 	}
@@ -187,19 +192,29 @@ func loadVerifiableCredential(bs []byte) (*verifiable.Credential, error) {
 		verifiable.WithJSONLDDocumentLoader(documentLoader))
 }
 
-func signVerifiableCredential(vc *verifiable.Credential, signer KeyringSigner) error {
+func signVerifiableCredential(vc *verifiable.Credential, signer KeyringSigner, date time.Time) error {
 	documentLoader := ld.NewDefaultDocumentLoader(nil)
 	didKeyID, err := signer.DIDKeyID()
 	if err != nil {
 		return err
 	}
 
-	now := time.Now()
 	return vc.AddLinkedDataProof(&verifiable.LinkedDataProofContext{
-		Created:                 &now,
+		Created:                 &date,
 		SignatureType:           "Ed25519Signature2018",
 		Suite:                   ed25519signature2018.New(suite.WithSigner(signer)),
 		SignatureRepresentation: verifiable.SignatureProofValue,
 		VerificationMethod:      didKeyID,
 	}, jsonld.WithDocumentLoader(documentLoader))
+}
+
+func getFlagAsDate(cmd *cobra.Command, flag string) (time.Time, error) {
+	dateStr, err := cmd.Flags().GetString(flag)
+	if err != nil {
+		return time.Time{}, fmt.Errorf("%s: %w", flag, err)
+	}
+	if dateStr == "" {
+		return time.Now(), nil
+	}
+	return time.Parse(time.RFC3339, dateStr)
 }
