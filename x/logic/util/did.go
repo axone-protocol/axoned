@@ -43,6 +43,32 @@ func BytesToPubKey(bz []byte, keytype KeyAlg) (cryptotypes.PubKey, error) {
 // The multicodec key fingerprint is determined by the key type and complies with the did:key format spec found at:
 // https://w3c-ccg.github.io/did-method-key/#format.
 func CreateDIDKeyByPubKey(pubKey cryptotypes.PubKey) (string, error) {
+	code, err := multicodecFromPubKey(pubKey)
+	if err != nil {
+		return "", err
+	}
+
+	didKey, _ := fingerprint.CreateDIDKeyByCode(code, pubKey.Bytes())
+	return didKey, nil
+}
+
+// CreateDIDKeyIDByPubKey creates a DID key ID using the given public key.
+// The function is similar to CreateDIDKeyByPubKey but returns the DID with the key ID as hash fragment.
+// The multicodec key fingerprint is determined by the key type and complies with the did:key format spec found at:
+// https://w3c-ccg.github.io/did-method-key/#format.
+func CreateDIDKeyIDByPubKey(pubKey cryptotypes.PubKey) (string, error) {
+	code, err := multicodecFromPubKey(pubKey)
+	if err != nil {
+		return "", err
+	}
+
+	_, keyID := fingerprint.CreateDIDKeyByCode(code, pubKey.Bytes())
+	return keyID, nil
+}
+
+// multicodecFromPubKey returns the multicodec and the error message for the given public key.
+// Supported key types: secp256k1, ed25519.
+func multicodecFromPubKey(pubKey cryptotypes.PubKey) (uint64, error) {
 	var code uint64
 	switch pubKey.(type) {
 	case *ed25519.PubKey:
@@ -50,10 +76,8 @@ func CreateDIDKeyByPubKey(pubKey cryptotypes.PubKey) (string, error) {
 	case *secp256k1.PubKey:
 		code = SECP256k1PubKeyMultiCodec
 	default:
-		return "", fmt.Errorf("invalid pubkey type: %s; expected oneof %+q",
+		return 0, fmt.Errorf("invalid pubkey type: %s; expected oneof %+q",
 			pubKey.Type(), []string{(&ed25519.PubKey{}).Type(), (&secp256k1.PubKey{}).Type()})
 	}
-
-	did, _ := fingerprint.CreateDIDKeyByCode(code, pubKey.Bytes())
-	return did, nil
+	return code, nil
 }

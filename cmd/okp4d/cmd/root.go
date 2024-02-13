@@ -42,6 +42,7 @@ import (
 
 	"github.com/okp4/okp4d/app"
 	appparams "github.com/okp4/okp4d/app/params"
+	"github.com/okp4/okp4d/client/credential"
 	okp4keys "github.com/okp4/okp4d/client/keys"
 )
 
@@ -182,6 +183,7 @@ func initRootCmd(
 		queryCommand(),
 		txCommand(),
 		okp4keys.Enhance(keys.Commands()),
+		credential.Commands(),
 	)
 }
 
