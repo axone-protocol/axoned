@@ -20,7 +20,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestDID(t *testing.T) {
@@ -28,84 +27,84 @@ func TestDID(t *testing.T) {
 		cases := []struct {
 			program    string
 			query      string
-			wantResult []types.TermResults
+			wantResult []testutil.TermResults
 			wantError  error
 		}{
 			{
 				query:      `did_components('did:example:123456',did_components(X,Y,_,_,_)).`,
-				wantResult: []types.TermResults{{"X": "example", "Y": "'123456'"}},
+				wantResult: []testutil.TermResults{{"X": "example", "Y": "'123456'"}},
 			},
 			{
 				query:      `did_components('did:example:123456',did_components(X,Y,Z,_,_)).`,
-				wantResult: []types.TermResults{{"X": "example", "Y": "'123456'", "Z": "_1"}},
+				wantResult: []testutil.TermResults{{"X": "example", "Y": "'123456'", "Z": "_1"}},
 			},
 			{
 				query:      `did_components('did:example:123456/path', X).`,
-				wantResult: []types.TermResults{{"X": "did_components(example,'123456',path,_1,_2)"}},
+				wantResult: []testutil.TermResults{{"X": "did_components(example,'123456',path,_1,_2)"}},
 			},
 			{
 				query:      `did_components('did:example:123456?versionId=1', X).`,
-				wantResult: []types.TermResults{{"X": "did_components(example,'123456',_1,'versionId=1',_2)"}},
+				wantResult: []testutil.TermResults{{"X": "did_components(example,'123456',_1,'versionId=1',_2)"}},
 			},
 			{
 				query:      `did_components('did:example:123456/path%20with/space', X).`,
-				wantResult: []types.TermResults{{"X": "did_components(example,'123456','path%20with/space',_1,_2)"}},
+				wantResult: []testutil.TermResults{{"X": "did_components(example,'123456','path%20with/space',_1,_2)"}},
 			},
 			{
 				query:      `did_components(X,did_components(example,'123456',_,'versionId=1',_)).`,
-				wantResult: []types.TermResults{{"X": "'did:example:123456?versionId=1'"}},
+				wantResult: []testutil.TermResults{{"X": "'did:example:123456?versionId=1'"}},
 			},
 			{
 				query:      `did_components(X,did_components(example,'123456','/foo/bar','versionId=1','test')).`,
-				wantResult: []types.TermResults{{"X": "'did:example:123456/foo/bar?versionId=1#test'"}},
+				wantResult: []testutil.TermResults{{"X": "'did:example:123456/foo/bar?versionId=1#test'"}},
 			},
 			{
 				query:      `did_components(X,did_components(example,'123456','path%20with/space',_,test)).`,
-				wantResult: []types.TermResults{{"X": "'did:example:123456/path%20with/space#test'"}},
+				wantResult: []testutil.TermResults{{"X": "'did:example:123456/path%20with/space#test'"}},
 			},
 			{
 				query:      `did_components(X,did_components(example,'123456','/foo/bar','version%20Id=1','test')).`,
-				wantResult: []types.TermResults{{"X": "'did:example:123456/foo/bar?version%20Id=1#test'"}},
+				wantResult: []testutil.TermResults{{"X": "'did:example:123456/foo/bar?version%20Id=1#test'"}},
 			},
 			{
 				query:      `did_components(X,Y).`,
-				wantResult: []types.TermResults{},
+				wantResult: []testutil.TermResults{},
 				wantError:  fmt.Errorf("error(instantiation_error,did_components/2)"),
 			},
 			{
 				query:      `did_components('foo',X).`,
-				wantResult: []types.TermResults{},
+				wantResult: []testutil.TermResults{},
 				wantError: fmt.Errorf("error(domain_error(encoding(did),foo),[%s],did_components/2)",
 					strings.Join(strings.Split("invalid DID", ""), ",")),
 			},
 			{
 				query:      `did_components(123,X).`,
-				wantResult: []types.TermResults{},
+				wantResult: []testutil.TermResults{},
 				wantError:  fmt.Errorf("error(type_error(atom,123),did_components/2)"),
 			},
 			{
 				query:      `did_components(X, 123).`,
-				wantResult: []types.TermResults{},
+				wantResult: []testutil.TermResults{},
 				wantError:  fmt.Errorf("error(type_error(did_components,123),did_components/2)"),
 			},
 			{
 				query:      `did_components(X,foo('bar')).`,
-				wantResult: []types.TermResults{},
+				wantResult: []testutil.TermResults{},
 				wantError:  fmt.Errorf("error(domain_error(did_components,foo(bar)),did_components/2)"),
 			},
 			{
 				query:      `did_components(X,did_components('bar')).`,
-				wantResult: []types.TermResults{},
+				wantResult: []testutil.TermResults{},
 				wantError:  fmt.Errorf("error(domain_error(did_components,did_components(bar)),did_components/2)"),
 			},
 			{
 				query:      `did_components(X,did_components(example,'123456','path with/space',5,test)).`,
-				wantResult: []types.TermResults{},
+				wantResult: []testutil.TermResults{},
 				wantError:  fmt.Errorf("error(type_error(atom,5),did_components/2)"),
 			},
 			{
 				query:      `did_components('did:example:123456',foo(X)).`,
-				wantResult: []types.TermResults{},
+				wantResult: []testutil.TermResults{},
 			},
 		}
 		for nc, tc := range cases {
@@ -130,9 +129,9 @@ func TestDID(t *testing.T) {
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
-									var got []types.TermResults
+									var got []testutil.TermResults
 									for sols.Next() {
-										m := types.TermResults{}
+										m := testutil.TermResults{}
 										err := sols.Scan(m)
 										So(err, ShouldBeNil)
 

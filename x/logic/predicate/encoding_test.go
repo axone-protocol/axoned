@@ -20,7 +20,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestHexBytesPredicate(t *testing.T) {
@@ -28,19 +27,19 @@ func TestHexBytesPredicate(t *testing.T) {
 		cases := []struct {
 			program     string
 			query       string
-			wantResult  []types.TermResults
+			wantResult  []testutil.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
 			{
 				query: `hex_bytes(Hex,
 				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantResult:  []types.TermResults{{"Hex": "'2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae'"}},
+				wantResult:  []testutil.TermResults{{"Hex": "'2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae'"}},
 				wantSuccess: true,
 			},
 			{
 				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae', Bytes).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Bytes": "[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]",
 				}},
 				wantSuccess: true,
@@ -48,7 +47,7 @@ func TestHexBytesPredicate(t *testing.T) {
 			{
 				query: `hex_bytes('2c26b46b68ffc68ff99b453c1d30413413422d706483bfa0f98a5e886266e7ae',
 				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
@@ -108,10 +107,10 @@ func TestHexBytesPredicate(t *testing.T) {
 	})
 }
 
-func checkSolutions(sols *prolog.Solutions, wantResult []types.TermResults, wantSuccess bool, wantError error) {
-	var got []types.TermResults
+func checkSolutions(sols *prolog.Solutions, wantResult []testutil.TermResults, wantSuccess bool, wantError error) {
+	var got []testutil.TermResults
 	for sols.Next() {
-		m := types.TermResults{}
+		m := testutil.TermResults{}
 		err := sols.Scan(m)
 		So(err, ShouldBeNil)
 

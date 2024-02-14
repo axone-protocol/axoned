@@ -20,7 +20,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestBech32(t *testing.T) {
@@ -28,13 +27,13 @@ func TestBech32(t *testing.T) {
 		cases := []struct {
 			program     string
 			query       string
-			wantResult  []types.TermResults
+			wantResult  []testutil.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
 			{
 				query: `bech32_address(-(Hrp, Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Hrp":     "okp4",
 					"Address": "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]",
 				}},
@@ -42,7 +41,7 @@ func TestBech32(t *testing.T) {
 			},
 			{
 				query: `bech32_address(Address, 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Address": "okp4-[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]",
 				}},
 				wantSuccess: true,
@@ -54,7 +53,7 @@ func TestBech32(t *testing.T) {
 			},
 			{
 				query: `bech32_address(-('okp4', Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Address": "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]",
 				}},
 				wantSuccess: true,
@@ -65,24 +64,24 @@ func TestBech32(t *testing.T) {
 			},
 			{
 				query: `bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Bech32": "okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn",
 				}},
 				wantSuccess: true,
 			},
 			{
 				query:       `bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
 				query:       `bech32_address(-(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
-				wantResult:  []types.TermResults{{"Hrp": "okp4"}},
+				wantResult:  []testutil.TermResults{{"Hrp": "okp4"}},
 				wantSuccess: true,
 			},
 			{
 				query:       `bech32_address(-(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
-				wantResult:  []types.TermResults{{"Hrp": "okp4"}},
+				wantResult:  []testutil.TermResults{{"Hrp": "okp4"}},
 				wantSuccess: true,
 			},
 			{
@@ -144,9 +143,9 @@ func TestBech32(t *testing.T) {
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
-									var got []types.TermResults
+									var got []testutil.TermResults
 									for sols.Next() {
-										m := types.TermResults{}
+										m := testutil.TermResults{}
 										err := sols.Scan(m)
 										So(err, ShouldBeNil)
 

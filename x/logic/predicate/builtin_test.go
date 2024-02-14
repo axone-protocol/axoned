@@ -19,7 +19,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
@@ -59,7 +58,7 @@ func TestWrite(t *testing.T) {
 									So(err, ShouldBeNil)
 									So(sols, ShouldNotBeNil)
 
-									m := types.TermResults{}
+									m := testutil.TermResults{}
 									for sols.Next() {
 										err := sols.Scan(m)
 										So(err, ShouldBeNil)

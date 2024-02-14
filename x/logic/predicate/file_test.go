@@ -26,7 +26,6 @@ import (
 
 	"github.com/okp4/okp4d/x/logic/fs"
 	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestSourceFile(t *testing.T) {
@@ -37,7 +36,7 @@ func TestSourceFile(t *testing.T) {
 		cases := []struct {
 			interpreter func(ctx goctx.Context) (i *prolog.Interpreter)
 			query       string
-			wantResult  []types.TermResults
+			wantResult  []testutil.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
@@ -49,13 +48,13 @@ func TestSourceFile(t *testing.T) {
 			{
 				interpreter: testutil.NewLightInterpreterMust,
 				query:       "consult(file1), consult(file2), source_file(file1).",
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
 				interpreter: testutil.NewLightInterpreterMust,
 				query:       "consult(file1), consult(file2), consult(file3), source_file(file2).",
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
@@ -71,19 +70,19 @@ func TestSourceFile(t *testing.T) {
 			{
 				interpreter: testutil.NewLightInterpreterMust,
 				query:       "consult(file1), consult(file2), source_file(X).",
-				wantResult:  []types.TermResults{{"X": "file1"}, {"X": "file2"}},
+				wantResult:  []testutil.TermResults{{"X": "file1"}, {"X": "file2"}},
 				wantSuccess: true,
 			},
 			{
 				interpreter: testutil.NewLightInterpreterMust,
 				query:       "consult(file2), consult(file3), consult(file1), source_file(X).",
-				wantResult:  []types.TermResults{{"X": "file1"}, {"X": "file2"}, {"X": "file3"}},
+				wantResult:  []testutil.TermResults{{"X": "file1"}, {"X": "file2"}, {"X": "file3"}},
 				wantSuccess: true,
 			},
 			{
 				interpreter: testutil.NewLightInterpreterMust,
 				query:       "source_file(foo(bar)).",
-				wantResult:  []types.TermResults{},
+				wantResult:  []testutil.TermResults{},
 				wantError:   fmt.Errorf("error(type_error(atom,foo(bar)),source_file/1)"),
 			},
 
@@ -95,7 +94,7 @@ func TestSourceFile(t *testing.T) {
 			{
 				interpreter: testutil.NewComprehensiveInterpreterMust,
 				query:       "consult(file1), consult(file2), source_files([file1, file2]).",
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
@@ -111,13 +110,13 @@ func TestSourceFile(t *testing.T) {
 			{
 				interpreter: testutil.NewComprehensiveInterpreterMust,
 				query:       "consult(file2), consult(file1), source_files(X).",
-				wantResult:  []types.TermResults{{"X": "[file1,file2]"}},
+				wantResult:  []testutil.TermResults{{"X": "[file1,file2]"}},
 				wantSuccess: true,
 			},
 			{
 				interpreter: testutil.NewComprehensiveInterpreterMust,
 				query:       "consult(file2), consult(file1), source_files([file1, X]).",
-				wantResult:  []types.TermResults{{"X": "file2"}},
+				wantResult:  []testutil.TermResults{{"X": "file2"}},
 				wantSuccess: true,
 			},
 		}
@@ -151,9 +150,9 @@ func TestSourceFile(t *testing.T) {
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the bindings should be as expected", func() {
-										var got []types.TermResults
+										var got []testutil.TermResults
 										for sols.Next() {
-											m := types.TermResults{}
+											m := testutil.TermResults{}
 											err := sols.Scan(m)
 											So(err, ShouldBeNil)
 
@@ -198,7 +197,7 @@ func TestOpen(t *testing.T) {
 			files       map[string][]byte
 			program     string
 			query       string
-			wantResult  []types.TermResults
+			wantResult  []testutil.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
@@ -208,7 +207,7 @@ func TestOpen(t *testing.T) {
 				},
 				program: "get_first_char(C) :- open(file, read, Stream, _), get_char(Stream, C).",
 				query:   `get_first_char(C).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"C": "d",
 				}},
 				wantSuccess: true,
@@ -219,7 +218,7 @@ func TestOpen(t *testing.T) {
 				},
 				program: "get_first_char(C) :- open(file, read, Stream, []), get_char(Stream, C).",
 				query:   `get_first_char(C).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"C": "'H'",
 				}},
 				wantSuccess: true,
@@ -344,9 +343,9 @@ func TestOpen(t *testing.T) {
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the bindings should be as expected", func() {
-										var got []types.TermResults
+										var got []testutil.TermResults
 										for sols.Next() {
-											m := types.TermResults{}
+											m := testutil.TermResults{}
 											err := sols.Scan(m)
 											So(err, ShouldBeNil)
 
