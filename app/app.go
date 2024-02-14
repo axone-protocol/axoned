@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 
@@ -20,6 +21,8 @@ import (
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 	"github.com/prometheus/client_golang/prometheus"
 	"github.com/spf13/cast"
+	"google.golang.org/protobuf/reflect/protodesc"
+	"google.golang.org/protobuf/types/descriptorpb"
 
 	abci "github.com/cometbft/cometbft/abci/types"
 	tmos "github.com/cometbft/cometbft/libs/os"
@@ -858,8 +861,17 @@ func New(
 	app.setPostHandler()
 
 	// At startup, after all modules have been registered, check that all proto
-	// annotations are correct.
-	protoFiles, err := proto.MergedRegistry()
+	// annotations are correct, ignoring `google.crypto.tink`.
+	fds, err := proto.MergedGlobalFileDescriptors()
+	if err != nil {
+		panic(err)
+	}
+	fds = &descriptorpb.FileDescriptorSet{
+		File: slices.DeleteFunc(fds.File, func(e *descriptorpb.FileDescriptorProto) bool {
+			return e.GetPackage() == "google.crypto.tink"
+		}),
+	}
+	protoFiles, err := protodesc.NewFiles(fds)
 	if err != nil {
 		panic(err)
 	}
