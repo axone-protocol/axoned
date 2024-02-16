@@ -37,7 +37,7 @@ func TestBank(t *testing.T) {
 			lockedCoins    []bank.Balance
 			program        string
 			query          string
-			wantResult     []types.TermResults
+			wantResult     []testutil.TermResults
 			wantError      error
 		}{
 			{
@@ -48,7 +48,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
-				wantResult: []types.TermResults{{"X": "[uknow-100]"}},
+				wantResult: []testutil.TermResults{{"X": "[uknow-100]"}},
 			},
 			{
 				balances: []bank.Balance{
@@ -58,7 +58,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
-				wantResult: []types.TermResults{{"X": "uatom-100"}},
+				wantResult: []testutil.TermResults{{"X": "uatom-100"}},
 			},
 			{
 				balances: []bank.Balance{
@@ -68,7 +68,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
-				wantResult: []types.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
+				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
 			},
 			{
 				balances: []bank.Balance{
@@ -78,7 +78,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
-				wantResult: []types.TermResults{{"D": "uatom", "A": "589"}},
+				wantResult: []testutil.TermResults{{"D": "uatom", "A": "589"}},
 			},
 			{
 				balances: []bank.Balance{
@@ -92,7 +92,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_balances('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
-				wantResult: []types.TermResults{{"X": "uknow-589"}},
+				wantResult: []testutil.TermResults{{"X": "uknow-589"}},
 			},
 			{
 				balances: []bank.Balance{
@@ -107,7 +107,7 @@ func TestBank(t *testing.T) {
 				},
 				program:    `bank_balances_has_coin(A, D, V) :- bank_balances(A, R), member(D-V, R).`,
 				query:      `bank_balances_has_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', 'uknow', V).`,
-				wantResult: []types.TermResults{{"V": "589"}},
+				wantResult: []testutil.TermResults{{"V": "589"}},
 			},
 			{
 				balances: []bank.Balance{
@@ -125,7 +125,7 @@ func TestBank(t *testing.T) {
 				},
 				program:    `bank_balances_has_sufficient_coin(A, C, S) :- bank_balances(A, R), member(C, R), -(_, V) = C, compare(>, V, S).`,
 				query:      `bank_balances_has_sufficient_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', C, 600).`,
-				wantResult: []types.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
+				wantResult: []testutil.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
 			},
 			{
 				balances: []bank.Balance{
@@ -139,7 +139,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query: `bank_balances(Accounts, Balances).`,
-				wantResult: []types.TermResults{
+				wantResult: []testutil.TermResults{
 					{"Accounts": "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm", "Balances": "[uknow-420]"},
 					{"Accounts": "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38", "Balances": "[uatom-589]"},
 				},
@@ -147,7 +147,7 @@ func TestBank(t *testing.T) {
 			{
 				balances:   []bank.Balance{},
 				query:      `bank_balances('foo', X).`,
-				wantResult: []types.TermResults{{"X": "[uknow-100]"}},
+				wantResult: []testutil.TermResults{{"X": "[uknow-100]"}},
 				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],unknown)",
 					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
@@ -165,7 +165,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
-				wantResult: []types.TermResults{{"X": "[uknow-100]"}},
+				wantResult: []testutil.TermResults{{"X": "[uknow-100]"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
@@ -175,7 +175,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
-				wantResult: []types.TermResults{{"X": "uatom-100"}},
+				wantResult: []testutil.TermResults{{"X": "uatom-100"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
@@ -185,7 +185,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
-				wantResult: []types.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
+				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
@@ -195,7 +195,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
-				wantResult: []types.TermResults{{"D": "uatom", "A": "589"}},
+				wantResult: []testutil.TermResults{{"D": "uatom", "A": "589"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
@@ -209,7 +209,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_spendable_balances('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
-				wantResult: []types.TermResults{{"X": "uknow-589"}},
+				wantResult: []testutil.TermResults{{"X": "uknow-589"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
@@ -224,7 +224,7 @@ func TestBank(t *testing.T) {
 				},
 				program:    `bank_spendable_has_coin(A, D, V) :- bank_spendable_balances(A, R), member(D-V, R).`,
 				query:      `bank_spendable_has_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', 'uknow', V).`,
-				wantResult: []types.TermResults{{"V": "589"}},
+				wantResult: []testutil.TermResults{{"V": "589"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
@@ -243,7 +243,7 @@ func TestBank(t *testing.T) {
 				program: `bank_spendable_has_sufficient_coin(A, C, S) :- bank_spendable_balances(A, R), member(C, R),
 -(_, V) = C, compare(>, V, S).`,
 				query:      `bank_spendable_has_sufficient_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', C, 600).`,
-				wantResult: []types.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
+				wantResult: []testutil.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
 			},
 			{
 				balances: []bank.Balance{
@@ -267,7 +267,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query: `bank_spendable_balances(Accounts, SpendableCoins).`,
-				wantResult: []types.TermResults{
+				wantResult: []testutil.TermResults{
 					{"Accounts": "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm", "SpendableCoins": "[uknow-420]"},
 					{"Accounts": "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38", "SpendableCoins": "[uatom-589]"},
 				},
@@ -275,7 +275,7 @@ func TestBank(t *testing.T) {
 			{
 				spendableCoins: []bank.Balance{},
 				query:          `bank_spendable_balances('foo', X).`,
-				wantResult:     []types.TermResults{{"X": "[uknow-100]"}},
+				wantResult:     []testutil.TermResults{{"X": "[uknow-100]"}},
 				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],unknown)",
 					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
@@ -300,7 +300,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
-				wantResult: []types.TermResults{{"X": "[uknow-900]"}},
+				wantResult: []testutil.TermResults{{"X": "[uknow-900]"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
@@ -310,7 +310,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
-				wantResult: []types.TermResults{{"X": "uatom-100"}},
+				wantResult: []testutil.TermResults{{"X": "uatom-100"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
@@ -320,7 +320,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
-				wantResult: []types.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
+				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
@@ -330,7 +330,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
-				wantResult: []types.TermResults{{"D": "uatom", "A": "589"}},
+				wantResult: []testutil.TermResults{{"D": "uatom", "A": "589"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
@@ -344,7 +344,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query:      `bank_locked_balances('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
-				wantResult: []types.TermResults{{"X": "uknow-589"}},
+				wantResult: []testutil.TermResults{{"X": "uknow-589"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
@@ -359,7 +359,7 @@ func TestBank(t *testing.T) {
 				},
 				program:    `bank_locked_has_coin(A, D, V) :- bank_locked_balances(A, R), member(D-V, R).`,
 				query:      `bank_locked_has_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', 'uknow', V).`,
-				wantResult: []types.TermResults{{"V": "589"}},
+				wantResult: []testutil.TermResults{{"V": "589"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
@@ -378,7 +378,7 @@ func TestBank(t *testing.T) {
 				program: `bank_locked_has_sufficient_coin(A, C, S) :- bank_locked_balances(A, R), member(C, R),
 -(_, V) = C, compare(>, V, S).`,
 				query:      `bank_locked_has_sufficient_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', C, 600).`,
-				wantResult: []types.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
+				wantResult: []testutil.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
 			},
 			{
 				balances: []bank.Balance{
@@ -412,7 +412,7 @@ func TestBank(t *testing.T) {
 					},
 				},
 				query: `bank_locked_balances(Accounts, LockedCoins).`,
-				wantResult: []types.TermResults{
+				wantResult: []testutil.TermResults{
 					{"Accounts": "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm", "LockedCoins": "[uknow-800]"},
 					{"Accounts": "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38", "LockedCoins": "[uatom-7411]"},
 				},
@@ -420,7 +420,7 @@ func TestBank(t *testing.T) {
 			{
 				lockedCoins: []bank.Balance{},
 				query:       `bank_locked_balances('foo', X).`,
-				wantResult:  []types.TermResults{{"X": "[uknow-100]"}},
+				wantResult:  []testutil.TermResults{{"X": "[uknow-100]"}},
 				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],unknown)",
 					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
@@ -481,9 +481,9 @@ func TestBank(t *testing.T) {
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the bindings should be as expected", func() {
-										var got []types.TermResults
+										var got []testutil.TermResults
 										for sols.Next() {
-											m := types.TermResults{}
+											m := testutil.TermResults{}
 											err := sols.Scan(m)
 											So(err, ShouldBeNil)
 

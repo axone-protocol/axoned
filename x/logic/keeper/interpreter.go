@@ -1,15 +1,16 @@
 package keeper
 
 import (
-	goctx "context"
+	"context"
 	"math"
+	"strings"
 
 	"github.com/ichiban/prolog"
+	"github.com/ichiban/prolog/engine"
 	"github.com/samber/lo"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
-	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -27,21 +28,22 @@ const (
 	defaultWeightFactor  = uint64(1)
 )
 
-func (k Keeper) limits(ctx goctx.Context) types.Limits {
+func (k Keeper) limits(ctx context.Context) types.Limits {
 	params := k.GetParams(sdk.UnwrapSDKContext(ctx))
 	return params.GetLimits()
 }
 
-func (k Keeper) enhanceContext(ctx goctx.Context) goctx.Context {
+func (k Keeper) enhanceContext(ctx context.Context) context.Context {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	sdkCtx = sdkCtx.WithValue(types.AuthKeeperContextKey, k.authKeeper)
 	sdkCtx = sdkCtx.WithValue(types.BankKeeperContextKey, k.bankKeeper)
 	return sdkCtx
 }
 
-func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryServiceAskResponse, error) {
+func (k Keeper) execute(ctx context.Context, program, query string) (*types.QueryServiceAskResponse, error) {
 	ctx = k.enhanceContext(ctx)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
+	limits := k.limits(sdkCtx)
 
 	i, userOutputBuffer, err := k.newInterpreter(ctx)
 	if err != nil {
@@ -51,21 +53,14 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 		return nil, errorsmod.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
 	}
 
-	sols, err := i.QueryContext(ctx, query)
+	answer, err := k.queryInterpreter(ctx, i, query, *limits.MaxResultCount)
 	if err != nil {
 		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
 	}
-	defer func() {
-		_ = sols.Close()
-	}()
 
 	var userOutput string
 	if userOutputBuffer != nil {
 		userOutput = userOutputBuffer.String()
-	}
-	answer, err := k.solsToAnswer(sdkCtx, sols)
-	if err != nil {
-		return nil, err
 	}
 
 	return &types.QueryServiceAskResponse{
@@ -76,55 +71,47 @@ func (k Keeper) execute(ctx goctx.Context, program, query string) (*types.QueryS
 	}, nil
 }
 
-// solsToAnswer consumes the given prolog solutions and convert it to an answer.
-func (k Keeper) solsToAnswer(sdkCtx sdk.Context, sols *prolog.Solutions) (*types.Answer, error) {
-	solSuccess := false
-	solError := ""
-	limits := k.limits(sdkCtx)
-	var variables []string
-	results := make([]types.Result, 0)
-	for nb := sdkmath.ZeroUint(); nb.LT(*limits.MaxResultCount) && sols.Next(); nb = nb.Incr() {
-		solSuccess = true
-
-		m := types.TermResults{}
-		if err := sols.Scan(m); err != nil {
-			return nil, errorsmod.Wrapf(types.Internal, "error scanning solution: %v", err.Error())
-		}
-		if nb.IsZero() {
-			variables = m.ToVariables()
-		}
-
-		results = append(results, types.Result{Substitutions: m.ToSubstitutions()})
+// queryInterpreter executes the given query on the given interpreter and returns the answer.
+func (k Keeper) queryInterpreter(ctx context.Context, i *prolog.Interpreter, query string, limit sdkmath.Uint) (*types.Answer, error) {
+	p := engine.NewParser(&i.VM, strings.NewReader(query))
+	t, err := p.Term()
+	if err != nil {
+		return nil, err
 	}
 
-	if err := sols.Err(); err != nil {
-		if sdkCtx.GasMeter().IsOutOfGas() {
-			panic(storetypes.ErrorOutOfGas{Descriptor: "Prolog interpreter execution"})
+	var env *engine.Env
+	count := sdkmath.ZeroUint()
+	envs := make([]*engine.Env, 0, limit.Uint64())
+	_, callErr := engine.Call(&i.VM, t, func(env *engine.Env) *engine.Promise {
+		if count.LT(limit) {
+			envs = append(envs, env)
 		}
-		solError = sols.Err().Error()
+		count = count.Incr()
+		return engine.Bool(count.GT(limit))
+	}, env).Force(ctx)
+
+	answerErr := lo.IfF(callErr != nil, func() string {
+		return callErr.Error()
+	}).Else("")
+	success := len(envs) > 0
+	hasMore := count.GT(limit)
+	vars := parsedVarsToVars(p.Vars)
+	results, err := envsToResults(envs, p.Vars, i)
+	if err != nil {
+		return nil, err
 	}
 
 	return &types.Answer{
-		Success:   solSuccess,
-		Error:     solError,
-		HasMore:   sols.Next(),
-		Variables: variables,
+		Success:   success,
+		Error:     answerErr,
+		HasMore:   hasMore,
+		Variables: vars,
 		Results:   results,
 	}, nil
 }
 
-func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) error {
-	size := sdkmath.NewUint(uint64(len(request.GetQuery())))
-	limit := util.DerefOrDefault(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
-	if size.GT(limit) {
-		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size, limit)
-	}
-
-	return nil
-}
-
 // newInterpreter creates a new interpreter properly configured.
-func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.BoundedBuffer, error) {
+func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, *util.BoundedBuffer, error) {
 	sdkctx := sdk.UnwrapSDKContext(ctx)
 	params := k.GetParams(sdkctx)
 
@@ -173,6 +160,16 @@ func (k Keeper) newInterpreter(ctx goctx.Context) (*prolog.Interpreter, *util.Bo
 	return i, userOutputBuffer, err
 }
 
+func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) error {
+	size := sdkmath.NewUint(uint64(len(request.GetQuery())))
+	limit := util.DerefOrDefault(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
+	if size.GT(limit) {
+		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size, limit)
+	}
+
+	return nil
+}
+
 // toPredicate converts the given predicate costs to a function that returns the cost for the given predicate as
 // a pair of predicate name and cost.
 func toPredicate(defaultCost uint64, predicateCosts []types.PredicateCost) func(string, int) lo.Tuple2[string, uint64] {
@@ -195,4 +192,31 @@ func nonNilNorZeroOrDefaultUint64(v *sdkmath.Uint, defaultValue uint64) uint64 {
 	}
 
 	return v.Uint64()
+}
+
+func parsedVarsToVars(vars []engine.ParsedVariable) []string {
+	return lo.Map(vars, func(v engine.ParsedVariable, _ int) string {
+		return v.Name.String()
+	})
+}
+
+func envsToResults(envs []*engine.Env, vars []engine.ParsedVariable, i *prolog.Interpreter) ([]types.Result, error) {
+	results := make([]types.Result, 0, len(envs))
+	for _, rEnv := range envs {
+		substitutions := make([]types.Substitution, 0, len(vars))
+		for _, v := range vars {
+			var expression prolog.TermString
+			err := expression.Scan(&i.VM, v.Variable, rEnv)
+			if err != nil {
+				return nil, err
+			}
+			substitution := types.Substitution{
+				Variable:   v.Name.String(),
+				Expression: string(expression),
+			}
+			substitutions = append(substitutions, substitution)
+		}
+		results = append(results, types.Result{Substitutions: substitutions})
+	}
+	return results, nil
 }

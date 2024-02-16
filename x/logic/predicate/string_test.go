@@ -20,7 +20,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestReadString(t *testing.T) {
@@ -29,7 +28,7 @@ func TestReadString(t *testing.T) {
 			input       string
 			program     string
 			query       string
-			wantResult  []types.TermResults
+			wantResult  []testutil.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
@@ -37,7 +36,7 @@ func TestReadString(t *testing.T) {
 				input:   "foo",
 				program: "read_input(String) :- current_input(Stream), read_string(Stream, _, String).",
 				query:   `read_input(String).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"String": "foo",
 				}},
 				wantSuccess: true,
@@ -46,7 +45,7 @@ func TestReadString(t *testing.T) {
 				input:   "foo bar",
 				program: "read_input(String) :- current_input(Stream), read_string(Stream, _, String).",
 				query:   `read_input(String).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"String": "'foo bar'",
 				}},
 				wantSuccess: true,
@@ -55,7 +54,7 @@ func TestReadString(t *testing.T) {
 				input:   "foo bar",
 				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
 				query:   `read_input(String, Len).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"String": "'foo bar'",
 					"Len":    "7",
 				}},
@@ -65,7 +64,7 @@ func TestReadString(t *testing.T) {
 				input:   "foo bar",
 				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
 				query:   `read_input(String, 3).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"String": "foo",
 				}},
 				wantSuccess: true,
@@ -74,7 +73,7 @@ func TestReadString(t *testing.T) {
 				input:   "foo bar",
 				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
 				query:   `read_input(String, 7).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"String": "'foo bar'",
 				}},
 				wantSuccess: true,
@@ -83,7 +82,7 @@ func TestReadString(t *testing.T) {
 				input:   "foo bar 🧙",
 				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
 				query:   `read_input(String, _).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"String": "'foo bar 🧙'",
 				}},
 				wantSuccess: true,
@@ -92,7 +91,7 @@ func TestReadString(t *testing.T) {
 				input:   "foo bar 🧙",
 				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
 				query:   `read_input(String, Len).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"String": "'foo bar 🧙'",
 					"Len":    "12",
 				}},
@@ -102,7 +101,7 @@ func TestReadString(t *testing.T) {
 				input:   "🧙",
 				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
 				query:   `read_input(String, Len).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"String": "'🧙'",
 					"Len":    "4",
 				}},
@@ -112,7 +111,7 @@ func TestReadString(t *testing.T) {
 				input:   "🧙",
 				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
 				query:   `read_input(String, 1).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"String": "'🧙'",
 				}},
 				wantSuccess: false,
@@ -121,7 +120,7 @@ func TestReadString(t *testing.T) {
 				input:   "Hello World!",
 				program: "read_input(String, Len) :- current_input(Stream), read_string(Stream, Len, String).",
 				query:   `read_input(String, 15).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"String": "'Hello World!'",
 				}},
 				wantSuccess: false,
@@ -164,9 +163,9 @@ func TestReadString(t *testing.T) {
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
-									var got []types.TermResults
+									var got []testutil.TermResults
 									for sols.Next() {
-										m := types.TermResults{}
+										m := testutil.TermResults{}
 										err := sols.Scan(m)
 										So(err, ShouldBeNil)
 
@@ -358,7 +357,7 @@ func TestStringBytes(t *testing.T) {
 										} else {
 											nb := 0
 											for sols.Next() {
-												m := types.TermResults{}
+												m := testutil.TermResults{}
 												So(sols.Scan(m), ShouldBeNil)
 												nb++
 											}

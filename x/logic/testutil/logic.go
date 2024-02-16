@@ -11,6 +11,8 @@ import (
 	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
 )
 
+type TermResults map[string]prolog.TermString
+
 // NewLightInterpreterMust returns a new Interpreter with the given context or panics if it fails.
 // The Interpreter is configured with minimal settings to support testing.
 func NewLightInterpreterMust(ctx context.Context) (i *prolog.Interpreter) {

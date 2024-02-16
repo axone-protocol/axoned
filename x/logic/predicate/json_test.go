@@ -20,7 +20,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestJsonProlog(t *testing.T) {
@@ -29,7 +28,7 @@ func TestJsonProlog(t *testing.T) {
 			description string
 			program     string
 			query       string
-			wantResult  []types.TermResults
+			wantResult  []testutil.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
@@ -51,7 +50,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert direct string (valid json) into prolog",
 				query:       `json_prolog('"foo"', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "foo",
 				}},
 				wantSuccess: true,
@@ -59,7 +58,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert direct string with space (valid json) into prolog",
 				query:       `json_prolog('"a string with space"', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "'a string with space'",
 				}},
 				wantSuccess: true,
@@ -69,7 +68,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json object into prolog",
 				query:       `json_prolog('{"foo": "bar"}', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "json([foo-bar])",
 				}},
 				wantSuccess: true,
@@ -77,7 +76,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json object with multiple attribute into prolog",
 				query:       `json_prolog('{"foo": "bar", "foobar": "bar foo"}', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "json([foo-bar,foobar-'bar foo'])",
 				}},
 				wantSuccess: true,
@@ -85,7 +84,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json object with attribute with a space into prolog",
 				query:       `json_prolog('{"string with space": "bar"}', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "json(['string with space'-bar])",
 				}},
 				wantSuccess: true,
@@ -93,7 +92,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "ensure determinism on object attribute key sorted alphabetically",
 				query:       `json_prolog('{"b": "a", "a": "b"}', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "json([a-b,b-a])",
 				}},
 				wantSuccess: true,
@@ -103,7 +102,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json number into prolog",
 				query:       `json_prolog('10', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "10",
 				}},
 				wantSuccess: true,
@@ -127,7 +126,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json true boolean into prolog",
 				query:       `json_prolog('true', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "@(true)",
 				}},
 				wantSuccess: true,
@@ -135,7 +134,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json false boolean into prolog",
 				query:       `json_prolog('false', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "@(false)",
 				}},
 				wantSuccess: true,
@@ -145,7 +144,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json null value into prolog",
 				query:       `json_prolog('null', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "@(null)",
 				}},
 				wantSuccess: true,
@@ -155,7 +154,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert empty json array into prolog",
 				query:       `json_prolog('[]', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "@([])",
 				}},
 				wantSuccess: true,
@@ -163,7 +162,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json array into prolog",
 				query:       `json_prolog('["foo", "bar"]', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "[foo,bar]",
 				}},
 				wantSuccess: true,
@@ -171,7 +170,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json array with null element into prolog",
 				query:       `json_prolog('[null]', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "[@(null)]",
 				}},
 				wantSuccess: true,
@@ -179,7 +178,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json string array into prolog",
 				query:       `json_prolog('["string with space", "bar"]', Term).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Term": "['string with space',bar]",
 				}},
 				wantSuccess: true,
@@ -190,7 +189,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert string term to json",
 				query:       `json_prolog(Json, 'foo').`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'\"foo\"'",
 				}},
 				wantSuccess: true,
@@ -198,7 +197,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert atom term to json",
 				query:       `json_prolog(Json, foo).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'\"foo\"'",
 				}},
 				wantSuccess: true,
@@ -206,7 +205,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert string with space to json",
 				query:       `json_prolog(Json, 'foo bar').`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'\"foo bar\"'",
 				}},
 				wantSuccess: true,
@@ -214,7 +213,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert string with space to json",
 				query:       `json_prolog(Json, 'foo bar').`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'\"foo bar\"'",
 				}},
 				wantSuccess: true,
@@ -222,7 +221,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert empty-list atom term to json",
 				query:       `json_prolog(Json, []).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'\"[]\"'",
 				}},
 				wantSuccess: true,
@@ -232,7 +231,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json object from prolog",
 				query:       `json_prolog(Json, json([foo-bar])).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'{\"foo\":\"bar\"}'",
 				}},
 				wantSuccess: true,
@@ -240,7 +239,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json object with multiple attribute from prolog",
 				query:       `json_prolog(Json, json([foo-bar,foobar-'bar foo'])).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'{\"foo\":\"bar\",\"foobar\":\"bar foo\"}'",
 				}},
 				wantSuccess: true,
@@ -248,7 +247,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json object with attribute with a space into prolog",
 				query:       `json_prolog(Json, json(['string with space'-bar])).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'{\"string with space\":\"bar\"}'",
 				}},
 				wantSuccess: true,
@@ -256,7 +255,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "ensure determinism on object attribute key sorted alphabetically",
 				query:       `json_prolog(Json, json([b-a,a-b])).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'{\"a\":\"b\",\"b\":\"a\"}'",
 				}},
 				wantSuccess: true,
@@ -284,7 +283,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json number from prolog",
 				query:       `json_prolog(Json, 10).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'10'",
 				}},
 				wantSuccess: true,
@@ -300,7 +299,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert empty json array from prolog",
 				query:       `json_prolog(Json, @([])).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "[]",
 				}},
 				wantSuccess: true,
@@ -308,7 +307,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json array from prolog",
 				query:       `json_prolog(Json, [foo,bar]).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'[\"foo\",\"bar\"]'",
 				}},
 				wantSuccess: true,
@@ -316,7 +315,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json array with null element from prolog",
 				query:       `json_prolog(Json, [@(null)]).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'[null]'",
 				}},
 				wantSuccess: true,
@@ -324,7 +323,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json string array from prolog",
 				query:       `json_prolog(Json, ['string with space',bar]).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "'[\"string with space\",\"bar\"]'",
 				}},
 				wantSuccess: true,
@@ -340,7 +339,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert true boolean from prolog",
 				query:       `json_prolog(Json, @(true)).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "true",
 				}},
 				wantSuccess: true,
@@ -348,7 +347,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert false boolean from prolog",
 				query:       `json_prolog(Json, @(false)).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "false",
 				}},
 				wantSuccess: true,
@@ -358,7 +357,7 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json null value into prolog",
 				query:       `json_prolog(Json, @(null)).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Json": "null",
 				}},
 				wantSuccess: true,
@@ -386,9 +385,9 @@ func TestJsonProlog(t *testing.T) {
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
-									var got []types.TermResults
+									var got []testutil.TermResults
 									for sols.Next() {
-										m := types.TermResults{}
+										m := testutil.TermResults{}
 										err := sols.Scan(m)
 										So(err, ShouldBeNil)
 
@@ -490,9 +489,9 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the bindings should be as expected", func() {
-										var got []types.TermResults
+										var got []testutil.TermResults
 										for sols.Next() {
-											m := types.TermResults{}
+											m := testutil.TermResults{}
 											err := sols.Scan(m)
 											So(err, ShouldBeNil)
 
@@ -529,9 +528,9 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 									So(sols, ShouldNotBeNil)
 
 									Convey("and the bindings should be as expected", func() {
-										var got []types.TermResults
+										var got []testutil.TermResults
 										for sols.Next() {
-											m := types.TermResults{}
+											m := testutil.TermResults{}
 											err := sols.Scan(m)
 											So(err, ShouldBeNil)
 

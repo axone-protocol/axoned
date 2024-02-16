@@ -20,7 +20,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestCryptoOperations(t *testing.T) {
@@ -28,14 +27,14 @@ func TestCryptoOperations(t *testing.T) {
 		cases := []struct {
 			program     string
 			query       string
-			wantResult  []types.TermResults
+			wantResult  []testutil.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
 			{
 				program: `test(Hex) :- crypto_data_hash('hello world', Hash, []), hex_bytes(Hex, Hash).`,
 				query:   `test(Hex).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Hex": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
 				}},
 				wantSuccess: true,
@@ -43,13 +42,13 @@ func TestCryptoOperations(t *testing.T) {
 			{
 				program:     `test :- crypto_data_hash('hello world', Hash, []), hex_bytes('b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9', Hash).`,
 				query:       `test.`,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
 				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [algorithm(sha256)]), hex_bytes(Hex, Hash).`,
 				query:   `test(Hex).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Hex": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
 				}},
 				wantSuccess: true,
@@ -57,7 +56,7 @@ func TestCryptoOperations(t *testing.T) {
 			{
 				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [encoding(utf8)]), hex_bytes(Hex, Hash).`,
 				query:   `test(Hex).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Hex": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
 				}},
 				wantSuccess: true,
@@ -65,7 +64,7 @@ func TestCryptoOperations(t *testing.T) {
 			{
 				program: `test(Hex) :- crypto_data_hash('68656c6c6f20776f726c64', Hash, [encoding(hex)]), hex_bytes(Hex, Hash).`,
 				query:   `test(Hex).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Hex": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
 				}},
 				wantSuccess: true,
@@ -73,7 +72,7 @@ func TestCryptoOperations(t *testing.T) {
 			{
 				program: `test(Hex) :- crypto_data_hash([104, 101, 108, 108, 111, 32, 119, 111, 114, 108, 100], Hash, [algorithm(sha256),encoding(octet)]), hex_bytes(Hex, Hash).`,
 				query:   `test(Hex).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Hex": "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9",
 				}},
 				wantSuccess: true,
@@ -86,7 +85,7 @@ func TestCryptoOperations(t *testing.T) {
 			{
 				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [algorithm(sha512)]), hex_bytes(Hex, Hash).`,
 				query:   `test(Hex).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Hex": "'309ecc489c12d6eb4cc40f50c902f2b4d0ed77ee511a7c7a9bcd3ca86d4cd86f989dd35bc5ff499670da34255b45b0cfd830e81f605dcf7dc5542e93ae9cd76f'",
 				}},
 				wantSuccess: true,
@@ -94,7 +93,7 @@ func TestCryptoOperations(t *testing.T) {
 			{
 				program: `test(Hex) :- crypto_data_hash('hello world', Hash, [algorithm(md5)]), hex_bytes(Hex, Hash).`,
 				query:   `test(Hex).`,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Hex": "'5eb63bbbe01eeed093cb22bb8f5acdc3'",
 				}},
 				wantSuccess: true,
@@ -123,9 +122,9 @@ func TestCryptoOperations(t *testing.T) {
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
-									var got []types.TermResults
+									var got []testutil.TermResults
 									for sols.Next() {
-										m := types.TermResults{}
+										m := testutil.TermResults{}
 										err := sols.Scan(m)
 										So(err, ShouldBeNil)
 
@@ -164,7 +163,7 @@ func TestXVerify(t *testing.T) {
 		cases := []struct {
 			program     string
 			query       string
-			wantResult  []types.TermResults
+			wantResult  []testutil.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
@@ -176,7 +175,7 @@ func TestXVerify(t *testing.T) {
 			hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
 			eddsa_verify(PubKey, Msg, Sig, [encoding(octet), type(ed25519)]).`,
 				query:       `verify.`,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
 			{ // All good with hex encoding
@@ -185,7 +184,7 @@ func TestXVerify(t *testing.T) {
 				hex_bytes('889bcfd331e8e43b5ebf430301dffb6ac9e2fce69f6227b43552fe3dc8cc1ee00c1cc53452a8712e9d5f80086dff8cf4999c1b93ed6c6e403c09334cb61ddd0b', Sig),
 				eddsa_verify(PubKey, '9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d', Sig, encoding(hex)).`,
 				query:       `verify.`,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
 			{ // Wrong Msg
@@ -246,7 +245,7 @@ func TestXVerify(t *testing.T) {
 				hex_bytes('30450220099e6f9dd218e0e304efa7a4224b0058a8e3aec73367ec239bee4ed8ed7d85db022100b504d3d0d2e879b04705c0e5a2b40b0521a5ab647ea207bd81134e1a4eb79e47', Sig),
 				ecdsa_verify(PubKey, Msg, Sig, [encoding(octet), type(secp256r1)]).`,
 				query:       `verify.`,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
 			{ // Invalid secp signature
@@ -278,7 +277,7 @@ func TestXVerify(t *testing.T) {
 				hex_bytes('30450220099e6f9dd218e0e304efa7a4224b0058a8e3aec73367ec239bee4ed8ed7d85db022100b504d3d0d2e879b04705c0e5a2b40b0521a5ab647ea207bd81134e1a4eb79e47', Sig),
 				ecdsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: false,
 			},
 			{
@@ -289,7 +288,7 @@ func TestXVerify(t *testing.T) {
 				hex_bytes('30450220099e6f9dd218e0e304efa7a4224b0058a8e3aec73367ec239bee4ed8ed7d85db022100b504d3d0d2e879b04705c0e5a2b40b0521a5ab647ea207bd81134e1a4eb79e48', Sig),
 				ecdsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: false,
 			},
 			// ECDSA - secp256k1
@@ -301,7 +300,7 @@ func TestXVerify(t *testing.T) {
 				hex_bytes('304402201448201bb4408549b0997f4b9ad9ed36f3cf8bb9c433fc7f3ba48c6b6e39476e022053f7d056f7ffeab9a79f3a36bc2ba969ddd530a3a1495d1ed7bba00039820223', Sig),
 				ecdsa_verify(PubKey, Msg, Sig, [encoding(octet), type(secp256k1)]).`,
 				query:       `verify.`,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
 			{
@@ -312,7 +311,7 @@ func TestXVerify(t *testing.T) {
 				hex_bytes('304402201448201bb4408549b0997f4b9ad9ed36f3cf8bb9c433fc7f3ba48c6b6e39476e022053f7d056f7ffeab9a79f3a36bc2ba969ddd530a3a1495d1ed7bba00039820223', Sig),
 				ecdsa_verify(PubKey, Msg, Sig, [encoding(octet), type(secp256k1)]).`,
 				query:       `verify.`,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: false,
 			},
 		}
@@ -340,9 +339,9 @@ func TestXVerify(t *testing.T) {
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
-									var got []types.TermResults
+									var got []testutil.TermResults
 									for sols.Next() {
-										m := types.TermResults{}
+										m := testutil.TermResults{}
 										err := sols.Scan(m)
 										So(err, ShouldBeNil)
 

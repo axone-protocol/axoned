@@ -211,7 +211,6 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
   - [Answer](#logic.v1beta2.Answer)
   - [Result](#logic.v1beta2.Result)
   - [Substitution](#logic.v1beta2.Substitution)
-  - [Term](#logic.v1beta2.Term)
   
 - [logic/v1beta2/query.proto](#logic/v1beta2/query.proto)
   - [QueryServiceAskRequest](#logic.v1beta2.QueryServiceAskRequest)
@@ -377,18 +376,7 @@ Substitution represents a substitution made to the variables in the query to obt
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `variable` | [string](#string) |  | variable is the name of the variable. |
-| `term` | [Term](#logic.v1beta2.Term) |  | term is the term that the variable is substituted with. |
-
-<a name="logic.v1beta2.Term"></a>
-
-### Term
-
-Term is the representation of a piece of data and can be a constant, a variable, or an atom.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `name` | [string](#string) |  | name is the name of the term. |
-| `arguments` | [Term](#logic.v1beta2.Term) | repeated | arguments are the arguments of the term, which can be constants, variables, or atoms. |
+| `expression` | [string](#string) |  | expression is the value substituted for the variable, represented directly as a Prolog term (e.g., atom, number, compound). |
 
  [//]: # (end messages)
 

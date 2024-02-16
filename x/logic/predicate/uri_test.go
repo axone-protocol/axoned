@@ -20,7 +20,6 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/types"
 )
 
 func TestURIEncoded(t *testing.T) {
@@ -28,7 +27,7 @@ func TestURIEncoded(t *testing.T) {
 		cases := []struct {
 			program     string
 			query       string
-			wantResult  []types.TermResults
+			wantResult  []testutil.TermResults
 			wantError   error
 			wantSuccess bool
 		}{
@@ -40,106 +39,106 @@ func TestURIEncoded(t *testing.T) {
 			{
 				query:       `uri_encoded(path, Decoded, foo).`,
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Decoded": "foo",
 				}},
 			},
 			{
 				query:       `uri_encoded(path, Decoded, 'foo%20bar').`,
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Decoded": "'foo bar'",
 				}},
 			},
 			{
 				query:       `uri_encoded(path, foo, Encoded).`,
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Encoded": "foo",
 				}},
 			},
 			{
 				query:       `uri_encoded(query_value, 'foo bar', Encoded).`,
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Encoded": "'foo%20bar'",
 				}},
 			},
 			{
 				query:       "uri_encoded(query_value, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', Encoded).",
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Encoded": "'%20!%22%23$%25%26\\'()*%2B,-./0123456789%3A%3B%3C%3D%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~'",
 				}},
 			},
 			{
 				query:       "uri_encoded(path, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', Encoded).",
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Encoded": "'%20!%22%23$%25&\\'()*+,-./0123456789%3A;%3C=%3E%3F@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~'",
 				}},
 			},
 			{
 				query:       "uri_encoded(segment, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', Encoded).",
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Encoded": "'%20!%22%23$%25&\\'()*+,-.%2F0123456789%3A;%3C=%3E%3F@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~'",
 				}},
 			},
 			{
 				query:       "uri_encoded(fragment, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', Encoded).",
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Encoded": "'%20!%22%23$%25&\\'()*+,-./0123456789:;%3C=%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~'",
 				}},
 			},
 			{
 				query:       "uri_encoded(query_value, Decoded, '%20!%22%23$%25%26\\'()*%2B,-./0123456789%3A%3B%3C%3D%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~+').",
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Decoded": "' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~+'",
 				}},
 			},
 			{
 				query:       "uri_encoded(path, Decoded, '%20!%22%23$%25&\\'()*+,-./0123456789%3A;%3C=%3E%3F@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~').",
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Decoded": "' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'",
 				}},
 			},
 			{
 				query:       "uri_encoded(segment, Decoded, '%20!%22%23$%25&\\'()*+,-.%2F0123456789%3A;%3C=%3E%3F@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~').",
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Decoded": "' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'",
 				}},
 			},
 			{
 				query:       "uri_encoded(fragment, Decoded, '%20!%22%23$%25&\\'()*+,-./0123456789:;%3C=%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~').",
 				wantSuccess: true,
-				wantResult: []types.TermResults{{
+				wantResult: []testutil.TermResults{{
 					"Decoded": "' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~'",
 				}},
 			},
 			{
 				query:       "uri_encoded(query_value, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~+', '%20!%22%23$%25%26\\'()*%2B,-./0123456789%3A%3B%3C%3D%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~%2B').",
 				wantSuccess: true,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 			},
 			{
 				query:       "uri_encoded(path, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', '%20!%22%23$%25&\\'()*+,-./0123456789%3A;%3C=%3E%3F@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~').",
 				wantSuccess: true,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 			},
 			{
 				query:       "uri_encoded(segment, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', '%20!%22%23$%25&\\'()*+,-.%2F0123456789%3A;%3C=%3E%3F@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~').",
 				wantSuccess: true,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 			},
 			{
 				query:       "uri_encoded(fragment, ' !\"#$%&\\'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\\\]^_`abcdefghijklmnopqrstuvwxyz{|}~', '%20!%22%23$%25&\\'()*+,-./0123456789:;%3C=%3E?@ABCDEFGHIJKLMNOPQRSTUVWXYZ%5B%5C%5D%5E_%60abcdefghijklmnopqrstuvwxyz%7B%7C%7D~').",
 				wantSuccess: true,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 			},
 			{
 				query:       "uri_encoded(fragment, 'foo bar', 'bar%20foo').",
@@ -158,7 +157,7 @@ func TestURIEncoded(t *testing.T) {
 			{
 				query:       "uri_encoded(path, 'foo', compound(2)).",
 				wantSuccess: false,
-				wantResult:  []types.TermResults{{}},
+				wantResult:  []testutil.TermResults{{}},
 			},
 			{
 				query:       "uri_encoded(path, X, compound(2)).",
@@ -194,9 +193,9 @@ func TestURIEncoded(t *testing.T) {
 								So(sols, ShouldNotBeNil)
 
 								Convey("and the bindings should be as expected", func() {
-									var got []types.TermResults
+									var got []testutil.TermResults
 									for sols.Next() {
-										m := types.TermResults{}
+										m := testutil.TermResults{}
 										err := sols.Scan(m)
 										So(err, ShouldBeNil)
 

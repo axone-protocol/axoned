@@ -13,9 +13,10 @@ type AskQuery struct {
 // AskResponse implements the Ask query response JSON schema in a wasm custom query purpose, it redefines the existing
 // generated type from proto to ensure a dedicated serialization logic.
 type AskResponse struct {
-	Height  uint64  `json:"height"`
-	GasUsed uint64  `json:"gas_used"`
-	Answer  *Answer `json:"answer,omitempty"`
+	Height     uint64  `json:"height"`
+	GasUsed    uint64  `json:"gas_used"`
+	Answer     *Answer `json:"answer,omitempty"`
+	UserOutput string  `json:"user_output,omitempty"`
 }
 
 func (to *AskResponse) from(from types.QueryServiceAskResponse) {
@@ -27,12 +28,14 @@ func (to *AskResponse) from(from types.QueryServiceAskResponse) {
 		answer.from(*from.Answer)
 		to.Answer = answer
 	}
+	to.UserOutput = from.UserOutput
 }
 
 // Answer denotes the Answer element JSON representation in an AskResponse for wasm custom query purpose, it redefines
 // the existing generated type from proto to ensure a dedicated serialization logic.
 type Answer struct {
 	Success   bool     `json:"success"`
+	Error     string   `json:"error,omitempty"`
 	HasMore   bool     `json:"has_more"`
 	Variables []string `json:"variables"`
 	Results   []Result `json:"results"`
@@ -40,6 +43,7 @@ type Answer struct {
 
 func (to *Answer) from(from types.Answer) {
 	to.Success = from.Success
+	to.Error = from.Error
 	to.HasMore = from.HasMore
 	to.Variables = from.Variables
 	if to.Variables == nil {
@@ -71,30 +75,11 @@ func (to *Result) from(from types.Result) {
 // Substitution denotes the Substitution element JSON representation in an AskResponse for wasm custom query purpose, it redefines
 // the existing generated type from proto to ensure a dedicated serialization logic.
 type Substitution struct {
-	Variable string `json:"variable"`
-	Term     Term   `json:"term"`
+	Variable   string `json:"variable"`
+	Expression string `json:"expression"`
 }
 
 func (to *Substitution) from(from types.Substitution) {
 	to.Variable = from.Variable
-	term := new(Term)
-	term.from(from.Term)
-	to.Term = *term
-}
-
-// Term denotes the Term element JSON representation in an AskResponse for wasm custom query purpose, it redefines
-// the existing generated type from proto to ensure a dedicated serialization logic.
-type Term struct {
-	Name      string `json:"name"`
-	Arguments []Term `json:"arguments"`
-}
-
-func (to *Term) from(from types.Term) {
-	to.Name = from.Name
-	to.Arguments = make([]Term, 0, len(from.Arguments))
-	for _, fromTerm := range from.Arguments {
-		term := new(Term)
-		term.from(fromTerm)
-		to.Arguments = append(to.Arguments, *term)
-	}
+	to.Expression = from.Expression
 }
