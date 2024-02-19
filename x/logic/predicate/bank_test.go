@@ -148,7 +148,7 @@ func TestBank(t *testing.T) {
 				balances:   []bank.Balance{},
 				query:      `bank_balances('foo', X).`,
 				wantResult: []testutil.TermResults{{"X": "[uknow-100]"}},
-				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],unknown)",
+				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],bank_balances/2)",
 					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
 			{
@@ -276,7 +276,7 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{},
 				query:          `bank_spendable_balances('foo', X).`,
 				wantResult:     []testutil.TermResults{{"X": "[uknow-100]"}},
-				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],unknown)",
+				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],bank_spendable_balances/2)",
 					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
 
@@ -421,7 +421,7 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{},
 				query:       `bank_locked_balances('foo', X).`,
 				wantResult:  []testutil.TermResults{{"X": "[uknow-100]"}},
-				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],unknown)",
+				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],bank_locked_balances/2)",
 					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
 		}
