@@ -33,7 +33,7 @@ require (
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/hyperledger/aries-framework-go v0.3.2
-	github.com/ichiban/prolog v1.1.3
+	github.com/ichiban/prolog v1.2.0
 	github.com/ignite/cli v0.27.2
 	github.com/nuts-foundation/go-did v0.12.0
 	github.com/piprate/json-gold v0.5.0
