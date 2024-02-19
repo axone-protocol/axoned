@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/user"
 	"path/filepath"
+	"strings"
 	"time"
 
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/jsonld"
@@ -28,12 +29,17 @@ import (
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
-var (
+const (
 	flagOverwrite = "overwrite"
 	flagDate      = "date"
+	flagSchemaMap = "schema-map"
 )
 
-var valueDash = "-"
+const (
+	symbolStdIn             = "-"
+	symbolKeyValueSeparator = "="
+	symbolHome              = "~"
+)
 
 func SignCmd() *cobra.Command {
 	cmd := &cobra.Command{
@@ -49,6 +55,14 @@ It will read a verifiable credential from a file (or stdin), sign it, and print 
 	cmd.Flags().String(flags.FlagFrom, "", "Name or address of private key with which to sign")
 	cmd.Flags().Bool(flagOverwrite, false, "Overwrite existing signatures with a new one. If disabled, new signature will be appended")
 	cmd.Flags().String(flagDate, "", "Date of the signature provided in RFC3339 format. If not provided, current time will be used")
+	cmd.Flags().StringSlice(flagSchemaMap, []string{}, fmt.Sprintf(
+		"Map original URIs to alternative URIs for resolving JSON-LD schemas. "+
+			"Useful for redirecting network-based URIs to local filesystem paths or "+
+			"other URIs. Each mapping should be in the format 'originalURI=alternativeURI'. "+
+			"Multiple mappings can be provided by repeating the flag. Example usage: "+
+			"--%[1]s originalURI1=alternativeURI1 --%[1]s originalURI2=alternativeURI2",
+		flagSchemaMap))
+
 	_ = cmd.MarkFlagRequired(flags.FlagFrom)
 
 	flags.AddKeyringFlags(cmd.Flags())
@@ -71,7 +85,7 @@ func runSignCmd(cmd *cobra.Command, args []string) error {
 	}
 	signer := mkKeyringSigner(clientCtx.Keyring, k.Name)
 
-	filename, err := expand(args[0])
+	filename, err := expandPath(args[0])
 	if err != nil {
 		return errorsmod.Wrapf(sdkerr.ErrInvalidRequest, "failed to expand filename: %v", err)
 	}
@@ -80,7 +94,13 @@ func runSignCmd(cmd *cobra.Command, args []string) error {
 		return errorsmod.Wrapf(sdkerr.ErrIO, "failed to read file: %v", err)
 	}
 
-	vc, err := loadVerifiableCredential(bs)
+	schemaMap, err := parseStringSliceAsMap(cmd, flagSchemaMap)
+	if err != nil {
+		return err
+	}
+	documentLoader := newDocumentLoader(schemaMap)
+
+	vc, err := loadVerifiableCredential(documentLoader, bs)
 	if err != nil {
 		return errorsmod.Wrapf(sdkerr.ErrInvalidRequest, "failed to load verifiable credential: %v", err)
 	}
@@ -93,11 +113,11 @@ func runSignCmd(cmd *cobra.Command, args []string) error {
 		vc.Proofs = nil
 	}
 
-	date, err := getFlagAsDate(cmd, flagDate)
+	date, err := parseStringAsDate(cmd, flagDate)
 	if err != nil {
 		return err
 	}
-	err = signVerifiableCredential(vc, signer, date)
+	err = signVerifiableCredential(documentLoader, vc, signer, date)
 	if err != nil {
 		return errorsmod.Wrapf(sdkerr.ErrInvalidRequest, "failed to sign: %v", err)
 	}
@@ -144,21 +164,51 @@ func (m KeyringSigner) DIDKeyID() (string, error) {
 	return util.CreateDIDKeyIDByPubKey(pk)
 }
 
+// mappedDocumentLoader customizes the JSON-LD document loading process
+// by mapping URIs to alternative URIs, utilizing a delegate loader for the actual loading.
+type mappedDocumentLoader struct {
+	schemaMap map[string]string
+	delegate  ld.DocumentLoader
+}
+
+func (m mappedDocumentLoader) LoadDocument(url string) (*ld.RemoteDocument, error) {
+	if mapped, ok := m.schemaMap[url]; ok {
+		expanded, err := expandPath(mapped)
+		if err != nil {
+			return nil, fmt.Errorf("failed to expand mapped URI: %w", err)
+		}
+		url = expanded
+	}
+
+	return m.delegate.LoadDocument(url)
+}
+
+// newDocumentLoader returns a JSON-LD document loader that can be used to load schemas, with the provided schema map.
+// The loader will first find schemas in the provided map for a given URI, and use it if found. In any case it will
+// use the default document loader to load the schema given the URI.
+func newDocumentLoader(schemaMap map[string]string) ld.DocumentLoader {
+	return &mappedDocumentLoader{
+		schemaMap: schemaMap,
+		delegate:  ld.NewDefaultDocumentLoader(nil),
+	}
+}
+
 func mkKeyringSigner(keyring keyring.Keyring, uid string) KeyringSigner {
 	return KeyringSigner{keyring: keyring, uid: uid}
 }
 
 // readFromFileOrStdin reads content from the given filename or from stdin if "-" is passed as the filename.
 func readFromFileOrStdin(filename string) ([]byte, error) {
-	if filename == valueDash {
+	if filename == symbolStdIn {
 		return io.ReadAll(os.Stdin)
 	}
 
 	return os.ReadFile(filename)
 }
 
-func expand(path string) (string, error) {
-	if len(path) == 0 || path[0] != '~' {
+// expandPath expands the given path, replacing the "~" symbol with the user's home directory.
+func expandPath(path string) (string, error) {
+	if len(path) == 0 || strings.HasPrefix(path, symbolHome) {
 		return path, nil
 	}
 
@@ -183,8 +233,7 @@ func fetchKey(kb keyring.Keyring, keyref string) (*keyring.Record, error) {
 	return kb.KeyByAddress(accAddr)
 }
 
-func loadVerifiableCredential(bs []byte) (*verifiable.Credential, error) {
-	documentLoader := ld.NewDefaultDocumentLoader(nil)
+func loadVerifiableCredential(documentLoader ld.DocumentLoader, bs []byte) (*verifiable.Credential, error) {
 	return verifiable.ParseCredential(
 		bs,
 		verifiable.WithDisabledProofCheck(),
@@ -192,8 +241,9 @@ func loadVerifiableCredential(bs []byte) (*verifiable.Credential, error) {
 		verifiable.WithJSONLDDocumentLoader(documentLoader))
 }
 
-func signVerifiableCredential(vc *verifiable.Credential, signer KeyringSigner, date time.Time) error {
-	documentLoader := ld.NewDefaultDocumentLoader(nil)
+func signVerifiableCredential(
+	documentLoader ld.DocumentLoader, vc *verifiable.Credential, signer KeyringSigner, date time.Time,
+) error {
 	didKeyID, err := signer.DIDKeyID()
 	if err != nil {
 		return err
@@ -208,7 +258,7 @@ func signVerifiableCredential(vc *verifiable.Credential, signer KeyringSigner, d
 	}, jsonld.WithDocumentLoader(documentLoader))
 }
 
-func getFlagAsDate(cmd *cobra.Command, flag string) (time.Time, error) {
+func parseStringAsDate(cmd *cobra.Command, flag string) (time.Time, error) {
 	dateStr, err := cmd.Flags().GetString(flag)
 	if err != nil {
 		return time.Time{}, fmt.Errorf("%s: %w", flag, err)
@@ -217,4 +267,23 @@ func getFlagAsDate(cmd *cobra.Command, flag string) (time.Time, error) {
 		return time.Now(), nil
 	}
 	return time.Parse(time.RFC3339, dateStr)
+}
+
+func parseStringSliceAsMap(cmd *cobra.Command, flag string) (map[string]string, error) {
+	mappings, err := cmd.Flags().GetStringSlice(flag)
+	if err != nil {
+		return nil, fmt.Errorf("%s: %w", flag, err)
+	}
+
+	schemaMap := make(map[string]string, len(mappings))
+	for _, mapping := range mappings {
+		parts := strings.SplitN(mapping, symbolKeyValueSeparator, 2)
+		if len(parts) != 2 {
+			return nil, fmt.Errorf("invalid mapping: %s", mapping)
+		}
+		key, value := strings.TrimSpace(parts[0]), strings.TrimSpace(parts[1])
+		schemaMap[key] = value
+	}
+
+	return schemaMap, nil
 }

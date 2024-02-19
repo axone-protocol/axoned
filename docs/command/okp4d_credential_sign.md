@@ -21,6 +21,7 @@ okp4d credential sign [file] [flags]
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "test")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --overwrite                Overwrite existing signatures with a new one. If disabled, new signature will be appended
+      --schema-map strings       Map original URIs to alternative URIs for resolving JSON-LD schemas. Useful for redirecting network-based URIs to local filesystem paths or other URIs. Each mapping should be in the format 'originalURI=alternativeURI'. Multiple mappings can be provided by repeating the flag. Example usage: --schema-map originalURI1=alternativeURI1 --schema-map originalURI2=alternativeURI2
 ```
 
 ### SEE ALSO
