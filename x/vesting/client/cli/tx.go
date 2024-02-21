@@ -129,8 +129,8 @@ type VestingData struct {
 }
 
 type InputPeriod struct {
-	Coins  string `json:"coins"`
-	Length int64  `json:"length_seconds"`
+	Coins         string `json:"coins"`
+	LengthSeconds int64  `json:"length_seconds"`
 }
 
 // NewMsgCreatePeriodicVestingAccountCmd returns a CLI command handler for creating a
@@ -190,10 +190,10 @@ func NewMsgCreatePeriodicVestingAccountCmd() *cobra.Command {
 					return err
 				}
 
-				if p.Length < 0 {
-					return fmt.Errorf("invalid period length of %d in period %d, length must be greater than 0", p.Length, i)
+				if p.LengthSeconds < 0 {
+					return fmt.Errorf("invalid period length of %d in period %d, length must be greater than 0", p.LengthSeconds, i)
 				}
-				period := types.Period{Length: p.Length, Amount: amount}
+				period := types.Period{Length: p.LengthSeconds, Amount: amount}
 				periods = append(periods, period)
 			}
 

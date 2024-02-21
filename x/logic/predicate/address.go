@@ -34,7 +34,7 @@ import (
 // [bech32]: https://docs.cosmos.network/main/build/spec/addresses/bech32#hrp-table
 // [base64]: https://fr.wikipedia.org/wiki/Base64
 func Bech32Address(_ *engine.VM, address, bech32 engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+	forwardConverter := func(value []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
 		hrpTerm, dataTerm, err := prolog.AssertPair(env, value[0])
 		if err != nil {
 			return nil, err
@@ -55,7 +55,7 @@ func Bech32Address(_ *engine.VM, address, bech32 engine.Term, cont engine.Cont, 
 
 		return []engine.Term{engine.NewAtom(b)}, nil
 	}
-	backwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+	backwardConverter := func(value []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
 		b, err := prolog.AssertAtom(env, value[0])
 		if err != nil {
 			return nil, err

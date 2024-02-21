@@ -12,7 +12,7 @@ func main() {
 	rootCmd := &cobra.Command{
 		Use:   "gendoc",
 		Short: "Simple CLI to generate documentation for the project",
-		PersistentPreRun: func(cmd *cobra.Command, args []string) {
+		PersistentPreRun: func(cmd *cobra.Command, _ []string) {
 			cmd.SetOut(cmd.OutOrStdout())
 			cmd.SetErr(cmd.ErrOrStderr())
 		},
@@ -31,7 +31,7 @@ func generateCommandDocumentationCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "command",
 		Short: "Generate command documentation",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return GenerateCommandDocumentation()
 		},
 	}
@@ -42,7 +42,7 @@ func generatePredicateDocumentationCommand() *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "predicate",
 		Short: "Generate predicate documentation",
-		RunE: func(cmd *cobra.Command, args []string) error {
+		RunE: func(_ *cobra.Command, _ []string) error {
 			return GeneratePredicateDocumentation()
 		},
 	}

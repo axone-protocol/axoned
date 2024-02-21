@@ -38,7 +38,7 @@ func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.E
 			term := engine.NewAtom(sortedSource[i])
 			promises = append(
 				promises,
-				func(ctx context.Context) *engine.Promise {
+				func(_ context.Context) *engine.Promise {
 					return engine.Unify(
 						vm,
 						file,

@@ -130,7 +130,7 @@ func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, *util.
 			toPredicate(
 				nonNilNorZeroOrDefaultUint64(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
 				gasPolicy.GetPredicateCosts())),
-		func(agg interpreter.Predicates, item lo.Tuple2[string, uint64], index int) interpreter.Predicates {
+		func(agg interpreter.Predicates, item lo.Tuple2[string, uint64], _ int) interpreter.Predicates {
 			agg[item.A] = item.B
 			return agg
 		},
