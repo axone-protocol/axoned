@@ -44,6 +44,7 @@ linters:
     - revive
     - staticcheck
     - stylecheck
+    - tagliatelle
     - tenv
     - tparallel
     - typecheck
@@ -76,6 +77,12 @@ linters-settings:
     scope: declarations # comments to be checked: `declarations` (default), `toplevel`, or `all`
   lll:
     line-length: 135
+  tagliatelle:
+    case:
+      use-field-name: true
+      rules:
+        json: snake
+        yaml: snake
 output:
   uniq-by-line: false
 
