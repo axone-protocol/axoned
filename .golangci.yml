@@ -4,25 +4,19 @@ run:
 linters:
   disable-all: true
   enable:
-    - errcheck
-    - gosimple
-    - govet
-    - ineffassign
-    - staticcheck
-    - typecheck
-    - unused
     - asciicheck
     - bidichk
     - bodyclose
     - cyclop
     - dupl
     - durationcheck
+    - errcheck
     - errname
     - errorlint
     - exhaustive
     - exportloopref
-    - funlen
     - forbidigo
+    - funlen
     - gci
     - gocognit
     - goconst
@@ -33,6 +27,9 @@ linters:
     - gomodguard
     - goprintffuncname
     - gosec
+    - gosimple
+    - govet
+    - ineffassign
     - lll
     - makezero
     - nakedret
@@ -45,11 +42,14 @@ linters:
     - predeclared
     - promlinter
     - revive
+    - staticcheck
     - stylecheck
     - tenv
     - tparallel
+    - typecheck
     - unconvert
     - unparam
+    - unused
     - whitespace
 
 linters-settings:
@@ -97,10 +97,9 @@ issues:
         - errorlint
     - path: "_test\\.go"
       linters:
-        - bodyclose
         - dupl
         - funlen
-        - goconst
-        - noctx
-        - unused
-        - wrapcheck
+    - path: "_test\\.go"
+      linters:
+        - revive
+      text: "dot-imports:"
