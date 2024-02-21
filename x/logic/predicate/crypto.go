@@ -69,7 +69,7 @@ func CryptoDataHash(
 
 	result, err := util.Hash(algorithm, decodedData)
 	if err != nil {
-		return engine.Error(prolog.SyntaxError(err, env))
+		return engine.Error(engine.SyntaxError(prolog.ErrorTerm(err), env))
 	}
 
 	return engine.Unify(vm, hash, prolog.BytesToByteListTerm(result), cont, env)
@@ -196,7 +196,7 @@ func xVerify(key, data, sig, options engine.Term, defaultAlgo util.KeyAlg,
 
 	r, err := util.VerifySignature(keyAlgo, decodedKey, decodedData, decodedSignature)
 	if err != nil {
-		return engine.Error(prolog.SyntaxError(err, env))
+		return engine.Error(engine.SyntaxError(prolog.ErrorTerm(err), env))
 	}
 
 	if !r {

@@ -116,7 +116,7 @@ func getBech32(env *engine.Env, account engine.Term) (sdk.AccAddress, error) {
 	case engine.Atom:
 		addr, err := sdk.AccAddressFromBech32(acc.String())
 		if err != nil {
-			return nil, prolog.WithError(prolog.ResourceError(prolog.ResourceModule("bank"), env), err, env)
+			return nil, prolog.WithError(engine.ResourceError(prolog.ResourceModule("bank"), env), err, env)
 		}
 		return addr, nil
 	default:
@@ -155,7 +155,7 @@ func fetchBalances(
 			address := balance.Address
 			bech32Addr, err = sdk.AccAddressFromBech32(address)
 			if err != nil {
-				return engine.Error(prolog.WithError(prolog.ResourceError(prolog.ResourceModule("bank"), env), err, env))
+				return engine.Error(prolog.WithError(engine.ResourceError(prolog.ResourceModule("bank"), env), err, env))
 			}
 			coins := coinsFn(sdkContext, bankKeeper, balance.Coins, bech32Addr)
 

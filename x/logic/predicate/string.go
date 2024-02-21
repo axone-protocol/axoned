@@ -62,12 +62,12 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 			if errors.Is(err, io.EOF) || totalLen >= maxLength {
 				break
 			}
-			return engine.Error(prolog.SyntaxError(err, env))
+			return engine.Error(engine.SyntaxError(prolog.ErrorTerm(err), env))
 		}
 		totalLen += uint64(l)
 		_, err = builder.WriteRune(r)
 		if err != nil {
-			return engine.Error(prolog.SyntaxError(err, env))
+			return engine.Error(engine.SyntaxError(prolog.ErrorTerm(err), env))
 		}
 	}
 

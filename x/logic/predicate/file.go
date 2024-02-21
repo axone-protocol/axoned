@@ -140,12 +140,12 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 	}
 
 	if streamMode != ioModeRead {
-		return engine.Error(prolog.PermissionError(prolog.AtomOperationInput, prolog.AtomPermissionTypeStream, sourceSink, env))
+		return engine.Error(engine.PermissionError(prolog.AtomOperationInput, prolog.AtomPermissionTypeStream, sourceSink, env))
 	}
 
 	f, err := vm.FS.Open(name)
 	if err != nil {
-		return engine.Error(prolog.ExistenceError(prolog.AtomObjectTypeSourceSink, sourceSink, env))
+		return engine.Error(engine.ExistenceError(prolog.AtomObjectTypeSourceSink, sourceSink, env))
 	}
 	s := engine.NewInputTextStream(f)
 

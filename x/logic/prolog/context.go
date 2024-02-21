@@ -18,5 +18,5 @@ func UnwrapSDKContext(ctx context.Context, env *engine.Env) (sdk.Context, error)
 		return sdkCtx, nil
 	}
 
-	return sdk.Context{}, ResourceError(ResourceContext(), env)
+	return sdk.Context{}, engine.ResourceError(ResourceContext(), env)
 }

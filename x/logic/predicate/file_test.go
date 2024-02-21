@@ -274,7 +274,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(my_file, write, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("error(permission_error(input,stream,my_file),unknown)"),
+				wantError:   fmt.Errorf("error(permission_error(input,stream,my_file),open/4)"),
 				wantSuccess: false,
 			},
 			{
@@ -283,7 +283,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(my_file, append, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("error(permission_error(input,stream,my_file),unknown)"),
+				wantError:   fmt.Errorf("error(permission_error(input,stream,my_file),open/4)"),
 				wantSuccess: false,
 			},
 			{
@@ -292,7 +292,7 @@ func TestOpen(t *testing.T) {
 				},
 				program:     "get_first_char(C) :- open(file2, read, Stream, _), get_char(Stream, C).",
 				query:       `get_first_char(C).`,
-				wantError:   fmt.Errorf("error(existence_error(source_sink,file2),unknown)"),
+				wantError:   fmt.Errorf("error(existence_error(source_sink,file2),open/4)"),
 				wantSuccess: false,
 			},
 			{

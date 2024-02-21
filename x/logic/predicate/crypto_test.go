@@ -204,7 +204,7 @@ func TestXVerify(t *testing.T) {
 				eddsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError: fmt.Errorf("error(syntax_error([%s]),unknown)",
+				wantError: fmt.Errorf("error(syntax_error([%s]),eddsa_verify/4)",
 					strings.Join(strings.Split("ed25519: bad public key length: 33", ""), ",")),
 			},
 			{ // Wrong signature
@@ -256,7 +256,7 @@ func TestXVerify(t *testing.T) {
 				ecdsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError: fmt.Errorf("error(syntax_error([%s]),unknown)",
+				wantError: fmt.Errorf("error(syntax_error([%s]),ecdsa_verify/4)",
 					strings.Join(strings.Split("failed to parse compressed public key (first 10 bytes): 0213c8426be471e55506", ""), ",")),
 			},
 			{ // Unsupported algo

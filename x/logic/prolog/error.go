@@ -1,6 +1,8 @@
 package prolog
 
-import "github.com/ichiban/prolog/engine"
+import (
+	"github.com/ichiban/prolog/engine"
+)
 
 var (
 	// AtomTypeAtom is the term used to represent the atom type.
@@ -68,15 +70,6 @@ func ValidEmptyList() engine.Term {
 	return AtomValidEmptyList
 }
 
-// ResourceError creates a new resource error exception.
-// TODO: to remove once engine.resourceError() is public.
-func ResourceError(resource engine.Term, env *engine.Env) engine.Exception {
-	return engine.NewException(
-		AtomError.Apply(
-			engine.NewAtom("resource_error").Apply(resource),
-			engine.NewAtom("unknown")), env)
-}
-
 var (
 	// AtomResourceContext is the atom denoting the "context" resource.
 	// The context resource is a contextual data that contains all information needed to
@@ -96,41 +89,17 @@ func ResourceModule(module string) engine.Term {
 	return AtomResourceModule.Apply(engine.NewAtom(module))
 }
 
-// PermissionError creates a new permission error exception.
-// TODO: to remove once engine.permissionError() is public.
-func PermissionError(operation, permissionType, culprit engine.Term, env *engine.Env) engine.Exception {
-	return engine.NewException(
-		AtomError.Apply(
-			engine.NewAtom("permission_error").Apply(
-				operation, permissionType, culprit,
-			),
-			engine.NewAtom("unknown")), env)
-}
-
 var AtomOperationInput = engine.NewAtom("input")
 
 var AtomPermissionTypeStream = engine.NewAtom("stream")
 
-// ExistenceError creates a new existence error exception.
-// TODO: to remove once engine.existenceError() is public.
-func ExistenceError(objectType, culprit engine.Term, env *engine.Env) engine.Exception {
-	return engine.NewException(
-		AtomError.Apply(
-			engine.NewAtom("existence_error").Apply(
-				objectType, culprit,
-			),
-			engine.NewAtom("unknown")), env)
-}
-
 var AtomObjectTypeSourceSink = engine.NewAtom("source_sink")
 
-// UnexpectedError creates a new unexpected error exception.
-// TODO: to remove once engine.syntaxError() is public.
-func SyntaxError(err error, env *engine.Env) engine.Exception {
-	return engine.NewException(
-		AtomError.Apply(
-			engine.NewAtom("syntax_error").Apply(StringToCharacterListTerm(err.Error())),
-			engine.NewAtom("unknown")), env)
+// ErrorTerm returns a term representing the given error, suitable for use in the
+// syntax_error/2 predicate.
+// TODO: to be improved with specific error types.
+func ErrorTerm(err error) engine.Term {
+	return StringToCharacterListTerm(err.Error())
 }
 
 // WithError adds the error term to the exception term if possible.
