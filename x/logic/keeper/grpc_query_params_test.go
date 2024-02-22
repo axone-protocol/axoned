@@ -69,7 +69,7 @@ func TestGRPCParams(t *testing.T) {
 						authtypes.NewModuleAddress(govtypes.ModuleName),
 						accountKeeper,
 						bankKeeper,
-						func(ctx gocontext.Context) fs.FS {
+						func(_ gocontext.Context) fs.FS {
 							return fsProvider
 						},
 					)

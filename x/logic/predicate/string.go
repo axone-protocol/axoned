@@ -110,7 +110,7 @@ func StringBytes(
 	if err != nil {
 		return engine.Error(err)
 	}
-	forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+	forwardConverter := func(value []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
 		str, err := prolog.TextTermToString(value[0], env)
 		if err != nil {
 			return nil, err
@@ -134,7 +134,7 @@ func StringBytes(
 			return []engine.Term{prolog.BytesToByteListTerm(bs)}, nil
 		}
 	}
-	backwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+	backwardConverter := func(value []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
 		var result string
 		switch encoding {
 		case prolog.AtomText:

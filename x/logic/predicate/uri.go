@@ -39,7 +39,7 @@ func URIEncoded(_ *engine.VM, component, decoded, encoded engine.Term, cont engi
 	if err != nil {
 		return engine.Error(err)
 	}
-	forwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+	forwardConverter := func(value []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
 		in, err := prolog.TextTermToString(value[0], env)
 		if err != nil {
 			return nil, err
@@ -47,7 +47,7 @@ func URIEncoded(_ *engine.VM, component, decoded, encoded engine.Term, cont engi
 		out := uriComponent.Escape(in)
 		return []engine.Term{engine.NewAtom(out)}, nil
 	}
-	backwardConverter := func(value []engine.Term, options engine.Term, env *engine.Env) ([]engine.Term, error) {
+	backwardConverter := func(value []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
 		in, err := prolog.TextTermToString(value[0], env)
 		if err != nil {
 			return nil, err

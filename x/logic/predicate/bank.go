@@ -73,7 +73,7 @@ func BankSpendableBalances(vm *engine.VM, account, balances engine.Term, cont en
 		vm,
 		env,
 		cont,
-		func(ctx sdk.Context, bankKeeper types.BankKeeper, coins sdk.Coins, address sdk.AccAddress) sdk.Coins {
+		func(ctx sdk.Context, bankKeeper types.BankKeeper, _ sdk.Coins, address sdk.AccAddress) sdk.Coins {
 			return SpendableCoinsSorted(ctx, bankKeeper, address)
 		})
 }
@@ -105,7 +105,7 @@ func BankLockedBalances(vm *engine.VM, account, balances engine.Term, cont engin
 		vm,
 		env,
 		cont,
-		func(ctx sdk.Context, bankKeeper types.BankKeeper, coins sdk.Coins, address sdk.AccAddress) sdk.Coins {
+		func(ctx sdk.Context, bankKeeper types.BankKeeper, _ sdk.Coins, address sdk.AccAddress) sdk.Coins {
 			return LockedCoinsSorted(ctx, bankKeeper, address)
 		})
 }
@@ -161,7 +161,7 @@ func fetchBalances(
 
 			promises = append(
 				promises,
-				func(ctx context.Context) *engine.Promise {
+				func(_ context.Context) *engine.Promise {
 					return engine.Unify(
 						vm,
 						prolog.Tuple(engine.NewAtom(address), CoinsToTerm(coins)),

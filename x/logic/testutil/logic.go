@@ -84,7 +84,7 @@ func CompileMust(ctx context.Context, i *prolog.Interpreter, s string, args ...i
 func ReindexUnknownVariables(s prolog.TermString) prolog.TermString {
 	re := regexp.MustCompile("_([0-9]+)")
 	var index int
-	return prolog.TermString(re.ReplaceAllStringFunc(string(s), func(m string) string {
+	return prolog.TermString(re.ReplaceAllStringFunc(string(s), func(_ string) string {
 		index++
 		return fmt.Sprintf("_%d", index)
 	}))

@@ -157,7 +157,7 @@ func (bva BaseVestingAccount) Validate() error {
 
 type vestingAccountYAML struct {
 	Address          sdk.AccAddress `json:"address"`
-	PubKey           string         `json:"public_key"`
+	PublicKey        string         `json:"public_key"`
 	AccountNumber    uint64         `json:"account_number"`
 	Sequence         uint64         `json:"sequence"`
 	OriginalVesting  sdk.Coins      `json:"original_vesting"`
@@ -186,7 +186,7 @@ func (bva BaseVestingAccount) MarshalYAML() (interface{}, error) {
 	out := vestingAccountYAML{
 		Address:          accAddr,
 		AccountNumber:    bva.AccountNumber,
-		PubKey:           getPKString(bva),
+		PublicKey:        getPKString(bva),
 		Sequence:         bva.Sequence,
 		OriginalVesting:  bva.OriginalVesting,
 		DelegatedFree:    bva.DelegatedFree,
@@ -304,7 +304,7 @@ func (cva ContinuousVestingAccount) MarshalYAML() (interface{}, error) {
 	out := vestingAccountYAML{
 		Address:          accAddr,
 		AccountNumber:    cva.AccountNumber,
-		PubKey:           getPKString(cva),
+		PublicKey:        getPKString(cva),
 		Sequence:         cva.Sequence,
 		OriginalVesting:  cva.OriginalVesting,
 		DelegatedFree:    cva.DelegatedFree,
@@ -453,7 +453,7 @@ func (pva PeriodicVestingAccount) MarshalYAML() (interface{}, error) {
 	out := vestingAccountYAML{
 		Address:          accAddr,
 		AccountNumber:    pva.AccountNumber,
-		PubKey:           getPKString(pva),
+		PublicKey:        getPKString(pva),
 		Sequence:         pva.Sequence,
 		OriginalVesting:  pva.OriginalVesting,
 		DelegatedFree:    pva.DelegatedFree,
@@ -725,7 +725,7 @@ func (cva CliffVestingAccount) MarshalYAML() (interface{}, error) {
 	out := vestingAccountYAML{
 		Address:          accAddr,
 		AccountNumber:    cva.AccountNumber,
-		PubKey:           getPKString(cva),
+		PublicKey:        getPKString(cva),
 		Sequence:         cva.Sequence,
 		OriginalVesting:  cva.OriginalVesting,
 		DelegatedFree:    cva.DelegatedFree,
