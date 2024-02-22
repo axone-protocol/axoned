@@ -5,6 +5,9 @@ import (
 	"encoding/json"
 	"fmt"
 
+	"github.com/okp4/okp4d/x/logic/client/cli"
+	"github.com/spf13/cobra"
+
 	"github.com/grpc-ecosystem/grpc-gateway/runtime"
 
 	"cosmossdk.io/core/appmodule"
@@ -75,6 +78,12 @@ func (AppModuleBasic) ValidateGenesis(cdc codec.JSONCodec, _ client.TxEncodingCo
 // RegisterGRPCGatewayRoutes registers the gRPC Gateway routes for the module.
 func (AppModuleBasic) RegisterGRPCGatewayRoutes(clientCtx client.Context, mux *runtime.ServeMux) {
 	_ = types.RegisterQueryServiceHandlerClient(context.Background(), mux, types.NewQueryServiceClient(clientCtx))
+}
+
+// GetQueryCmd returns the root query command for the module. The subcommands of this root command are used by end-users
+// to generate new queries to the subset of the state defined by the module.
+func (AppModuleBasic) GetQueryCmd() *cobra.Command {
+	return cli.GetQueryCmd()
 }
 
 // ----------------------------------------------------------------------------
