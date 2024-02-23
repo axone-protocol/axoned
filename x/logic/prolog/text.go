@@ -8,12 +8,12 @@ import (
 )
 
 // AtomToString try to convert a given atom to a string.
-func AtomToString(atom engine.Term, env *engine.Env) (string, error) {
-	v, err := AssertAtom(env, atom)
+func AtomToString(term engine.Term, env *engine.Env) (string, error) {
+	atom, err := AssertAtom(term, env)
 	if err != nil {
 		return "", err
 	}
-	return v.String(), nil
+	return atom.String(), nil
 }
 
 // listTermToString try to convert a given list to a string using the provided
@@ -22,7 +22,7 @@ func AtomToString(atom engine.Term, env *engine.Env) (string, error) {
 // to return a rune.
 func listTermToString(
 	term engine.Term,
-	converter func(*engine.Env, engine.Term) (rune, error),
+	converter func(engine.Term, *engine.Env) (rune, error),
 	env *engine.Env,
 ) (string, error) {
 	iter, err := ListIterator(term, env)
@@ -32,7 +32,7 @@ func listTermToString(
 	var sb strings.Builder
 
 	for iter.Next() {
-		r, err := converter(env, iter.Current())
+		r, err := converter(iter.Current(), env)
 		if err != nil {
 			return sb.String(), err
 		}
@@ -57,8 +57,8 @@ func CharacterCodeListTermToString(term engine.Term, env *engine.Env) (string, e
 // It's the same as CharacterCodeListTermToString, but expects the list to contain bytes.
 // It's equivalent to the prolog encoding 'octet'.
 func OctetListTermToString(term engine.Term, env *engine.Env) (string, error) {
-	return listTermToString(term, func(env *engine.Env, term engine.Term) (rune, error) {
-		b, err := AssertByte(env, term)
+	return listTermToString(term, func(term engine.Term, env *engine.Env) (rune, error) {
+		b, err := AssertByte(term, env)
 		if err != nil {
 			return utf8.RuneError, err
 		}
@@ -73,7 +73,7 @@ func TextTermToString(term engine.Term, env *engine.Env) (string, error) {
 	case engine.Atom:
 		return AtomToString(v, env)
 	case engine.Compound:
-		if IsList(v) {
+		if IsList(v, env) {
 			head := ListHead(v, env)
 			if head == nil {
 				return "", nil
@@ -93,7 +93,7 @@ func TextTermToString(term engine.Term, env *engine.Env) (string, error) {
 }
 
 // StringToAtom converts a string to an atom.
-func StringToAtom(s string) engine.Term {
+func StringToAtom(s string) engine.Atom {
 	return engine.NewAtom(s)
 }
 

@@ -150,11 +150,11 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 	s := engine.NewInputTextStream(f)
 
 	if prolog.IsGround(options, env) {
-		_, err = prolog.AssertList(env, options)
+		_, err = prolog.AssertList(options, env)
 		switch {
 		case err != nil:
 			return engine.Error(err)
-		case !prolog.IsEmptyList(options):
+		case !prolog.IsEmptyList(options, env):
 			return engine.Error(engine.DomainError(prolog.ValidEmptyList(), options, env))
 		}
 	}

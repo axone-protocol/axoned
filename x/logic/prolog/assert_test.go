@@ -9,6 +9,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	"github.com/okp4/okp4d/x/logic/testutil"
 	"github.com/okp4/okp4d/x/logic/util"
 )
 
@@ -183,12 +184,10 @@ func TestWhitelistBlacklistMatches(t *testing.T) {
 }
 
 func TestAreGround(t *testing.T) {
-	groundTerm := func(value string) engine.Term {
-		return engine.NewAtom(value)
-	}
-	nonGroundTerm := func() engine.Term {
-		return engine.NewVariable()
-	}
+	X := engine.NewVariable()
+	Y := engine.NewVariable()
+	foo := engine.NewAtom("foo")
+	fortyTwo := engine.Integer(42)
 
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
@@ -198,12 +197,22 @@ func TestAreGround(t *testing.T) {
 		}{
 			{
 				name:     "all terms are ground",
-				terms:    []engine.Term{groundTerm("a"), groundTerm("b")},
+				terms:    []engine.Term{X, foo, foo.Apply(X), fortyTwo, engine.List(X, fortyTwo)},
 				expected: true,
 			},
 			{
-				name:     "one term is not ground",
-				terms:    []engine.Term{groundTerm("a"), nonGroundTerm()},
+				name:     "one term is a variable",
+				terms:    []engine.Term{X, foo, Y, foo.Apply(X)},
+				expected: false,
+			},
+			{
+				name:     "one term is a list containing a variable",
+				terms:    []engine.Term{X, foo, engine.List(X, Y, foo), fortyTwo},
+				expected: false,
+			},
+			{
+				name:     "one term is a compound containing a variable",
+				terms:    []engine.Term{X, foo, foo.Apply(X, foo.Apply(X, Y, fortyTwo)), fortyTwo},
 				expected: false,
 			},
 			{
@@ -219,8 +228,7 @@ func TestAreGround(t *testing.T) {
 		}
 
 		Convey("and an environment", func() {
-			env := engine.NewEnv()
-
+			env, _ := engine.NewEnv().Unify(X, engine.NewAtom("x"))
 			for nc, tc := range cases {
 				Convey(
 					fmt.Sprintf("Given the test case %s (#%d)", tc.name, nc), func() {
@@ -229,6 +237,76 @@ func TestAreGround(t *testing.T) {
 
 							Convey("Then it should return the expected output", func() {
 								So(result, ShouldEqual, tc.expected)
+							})
+						})
+					})
+			}
+		})
+	})
+}
+
+func TestAssertIsGround(t *testing.T) {
+	X := engine.NewVariable()
+	Y := engine.NewVariable()
+	foo := engine.NewAtom("foo")
+	fortyTwo := engine.Integer(42)
+
+	Convey("Given a test cases", t, func() {
+		cases := []struct {
+			name     string
+			term     engine.Term
+			expected error
+		}{
+			{
+				name: "A variable unified",
+				term: X,
+			},
+			{
+				name: "an atom",
+				term: foo,
+			},
+			{
+				name: "an integer",
+				term: fortyTwo,
+			},
+			{
+				name: "a grounded list",
+				term: engine.List(foo, X, fortyTwo),
+			},
+			{
+				name: "a grounded compound",
+				term: foo.Apply(X, foo.Apply(foo, X, fortyTwo)),
+			},
+			{
+				name:     "a variable",
+				term:     Y,
+				expected: engine.InstantiationError(engine.NewEnv()),
+			},
+			{
+				name:     "a list containing a variable",
+				term:     engine.List(foo, X, Y, fortyTwo),
+				expected: engine.InstantiationError(engine.NewEnv()),
+			},
+			{
+				name:     "a compound containing a variable",
+				term:     foo.Apply(X, foo.Apply(X, Y, fortyTwo)),
+				expected: engine.InstantiationError(engine.NewEnv()),
+			},
+		}
+
+		Convey("and an environment", func() {
+			env, _ := engine.NewEnv().Unify(X, engine.NewAtom("x"))
+			for nc, tc := range cases {
+				Convey(
+					fmt.Sprintf("Given the test case %s (#%d)", tc.name, nc), func() {
+						Convey("When the function AreGround() is called", func() {
+							result, err := AssertIsGround(tc.term, env)
+							Convey("Then it should return the expected output", func() {
+								if tc.expected == nil {
+									So(result, testutil.ShouldBeGrounded)
+								} else {
+									So(err, ShouldBeError, tc.expected)
+								}
 							})
 						})
 					})

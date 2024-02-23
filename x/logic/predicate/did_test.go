@@ -35,6 +35,11 @@ func TestDID(t *testing.T) {
 				wantResult: []testutil.TermResults{{"X": "example", "Y": "'123456'"}},
 			},
 			{
+				program:    `is_did_key(DID) :- did_components(DID, Components), Components = did_components('key',_,_,_,_).`,
+				query:      `is_did_key('did:key:123456').`,
+				wantResult: []testutil.TermResults{{}},
+			},
+			{
 				query:      `did_components('did:example:123456',did_components(X,Y,Z,_,_)).`,
 				wantResult: []testutil.TermResults{{"X": "example", "Y": "'123456'", "Z": "_1"}},
 			},

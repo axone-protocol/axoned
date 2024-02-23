@@ -31,11 +31,11 @@ import (
 //
 // [RFC 3986]: https://datatracker.ietf.org/doc/html/rfc3986#section-2.1
 func URIEncoded(_ *engine.VM, component, decoded, encoded engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	_, err := prolog.AssertIsGround(env, component)
+	_, err := prolog.AssertIsGround(component, env)
 	if err != nil {
 		return engine.Error(err)
 	}
-	uriComponent, err := prolog.AssertURIComponent(env, component)
+	uriComponent, err := prolog.AssertURIComponent(component, env)
 	if err != nil {
 		return engine.Error(err)
 	}

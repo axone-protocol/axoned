@@ -89,3 +89,35 @@ func ReindexUnknownVariables(s prolog.TermString) prolog.TermString {
 		return fmt.Sprintf("_%d", index)
 	}))
 }
+
+// ShouldBeGrounded is a goconvey assertion that asserts that the given term does not hold any
+// uninstantiated variables.
+func ShouldBeGrounded(actual any, expected ...any) string {
+	if len(expected) != 0 {
+		return fmt.Sprintf("This assertion requires exactly %d comparison values (you provided %d).", 0, len(expected))
+	}
+
+	var containsVariable func(engine.Term) bool
+	containsVariable = func(term engine.Term) bool {
+		switch t := term.(type) {
+		case engine.Variable:
+			return true
+		case engine.Compound:
+			for i := 0; i < t.Arity(); i++ {
+				if containsVariable(t.Arg(i)) {
+					return true
+				}
+			}
+		}
+		return false
+	}
+	if t, ok := actual.(engine.Term); ok {
+		if containsVariable(t) {
+			return "Expected term to NOT hold a free variable (but it was)."
+		}
+
+		return ""
+	}
+
+	return fmt.Sprintf("The argument to this assertion must be a term (you provided %v).", actual)
+}

@@ -87,7 +87,7 @@ func DIDComponents(vm *engine.VM, did, components engine.Term, cont engine.Cont,
 			switch segment := env.Resolve(t2.Arg(i)).(type) {
 			case engine.Variable:
 			default:
-				atom, err := prolog.AssertAtom(env, segment)
+				atom, err := prolog.AssertAtom(segment, env)
 				if err != nil {
 					return engine.Error(err)
 				}

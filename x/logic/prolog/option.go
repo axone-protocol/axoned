@@ -11,7 +11,7 @@ import (
 // If no option is found nil is returned.
 func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.Term, error) {
 	extractOption := func(opt engine.Term) (engine.Term, error) {
-		switch v := opt.(type) {
+		switch v := env.Resolve(opt).(type) {
 		case engine.Compound:
 			if v.Functor() == name {
 				if v.Arity() != 1 {
@@ -31,13 +31,8 @@ func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.T
 		return nil, engine.TypeError(AtomTypeOption, opt, env)
 	}
 
-	resolvedTerm := env.Resolve(options)
-	if resolvedTerm == nil {
-		return nil, nil
-	}
-
-	if IsList(resolvedTerm) {
-		iter, err := ListIterator(resolvedTerm, env)
+	if IsList(options, env) {
+		iter, err := ListIterator(options, env)
 		if err != nil {
 			return nil, err
 		}
@@ -56,7 +51,7 @@ func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.T
 		}
 	}
 
-	return extractOption(resolvedTerm)
+	return extractOption(options)
 }
 
 // GetOptionWithDefault returns the value of the first option with the given name in the given options, or the given
@@ -81,7 +76,7 @@ func GetOptionAsAtomWithDefault(
 	if err != nil {
 		return AtomEmpty, err
 	}
-	atom, err := AssertAtom(env, term)
+	atom, err := AssertAtom(term, env)
 	if err != nil {
 		return AtomEmpty, err
 	}

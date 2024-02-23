@@ -35,7 +35,7 @@ import (
 // [base64]: https://fr.wikipedia.org/wiki/Base64
 func Bech32Address(_ *engine.VM, address, bech32 engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	forwardConverter := func(value []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
-		hrpTerm, dataTerm, err := prolog.AssertPair(env, value[0])
+		hrpTerm, dataTerm, err := prolog.AssertPair(value[0], env)
 		if err != nil {
 			return nil, err
 		}
@@ -43,7 +43,7 @@ func Bech32Address(_ *engine.VM, address, bech32 engine.Term, cont engine.Cont, 
 		if err != nil {
 			return nil, err
 		}
-		hrp, err := prolog.AssertAtom(env, hrpTerm)
+		hrp, err := prolog.AssertAtom(hrpTerm, env)
 		if err != nil {
 			return nil, err
 		}
@@ -56,7 +56,7 @@ func Bech32Address(_ *engine.VM, address, bech32 engine.Term, cont engine.Cont, 
 		return []engine.Term{engine.NewAtom(b)}, nil
 	}
 	backwardConverter := func(value []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
-		b, err := prolog.AssertAtom(env, value[0])
+		b, err := prolog.AssertAtom(value[0], env)
 		if err != nil {
 			return nil, err
 		}
