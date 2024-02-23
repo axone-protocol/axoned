@@ -40,6 +40,12 @@ func TestBech32(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
+				program:     `okp4_addr(Addr) :- bech32_address(-('okp4', _), Addr).`,
+				query:       `okp4_addr('okp41p8u47en82gmzfm259y6z93r9qe63l25dfwwng6').`,
+				wantResult:  []testutil.TermResults{{}},
+				wantSuccess: true,
+			},
+			{
 				query: `bech32_address(Address, 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').`,
 				wantResult: []testutil.TermResults{{
 					"Address": "okp4-[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]",
