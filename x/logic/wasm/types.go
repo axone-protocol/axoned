@@ -34,16 +34,12 @@ func (to *AskResponse) from(from types.QueryServiceAskResponse) {
 // Answer denotes the Answer element JSON representation in an AskResponse for wasm custom query purpose, it redefines
 // the existing generated type from proto to ensure a dedicated serialization logic.
 type Answer struct {
-	Success   bool     `json:"success"`
-	Error     string   `json:"error,omitempty"`
 	HasMore   bool     `json:"has_more"`
 	Variables []string `json:"variables"`
 	Results   []Result `json:"results"`
 }
 
 func (to *Answer) from(from types.Answer) {
-	to.Success = from.Success
-	to.Error = from.Error
 	to.HasMore = from.HasMore
 	to.Variables = from.Variables
 	if to.Variables == nil {
@@ -60,10 +56,12 @@ func (to *Answer) from(from types.Answer) {
 // Result denotes the Result element JSON representation in an AskResponse for wasm custom query purpose, it redefines
 // the existing generated type from proto to ensure a dedicated serialization logic.
 type Result struct {
+	Error         string         `json:"error,omitempty"`
 	Substitutions []Substitution `json:"substitutions"`
 }
 
 func (to *Result) from(from types.Result) {
+	to.Error = from.Error
 	to.Substitutions = make([]Substitution, 0, len(from.Substitutions))
 	for _, fromSubstitution := range from.Substitutions {
 		substitution := new(Substitution)
