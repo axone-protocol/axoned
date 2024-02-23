@@ -22,7 +22,7 @@ import (
 //     ranging from 0 to 255 that represent the base64 encoded bech32 address string.
 //   - Bech32 is an Atom or string representing the bech32 encoded string address
 //
-// Examples:
+// # Examples:
 //
 //	# Convert the given bech32 address into base64 encoded byte by unify the prefix of given address (Hrp) and the
 //	base64 encoded value (Address).

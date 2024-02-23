@@ -39,7 +39,7 @@ import (
 // Note: Due to the principles of the hash algorithm (pre-image resistance), this predicate can only compute the hash
 // value from input data, and cannot compute the original input data from the hash value.
 //
-// Examples:
+// # Examples:
 //
 //	# Compute the SHA-256 hash of the given data and unify it with the given Hash.
 //	- crypto_data_hash('Hello OKP4', Hash).
@@ -103,7 +103,7 @@ func CryptoDataHash(
 //
 //   - ed25519 (default): The EdDSA signature scheme using SHA-512 (SHA-2) and Curve25519.
 //
-// Examples:
+// # Examples:
 //
 //	# Verify a signature for a given hexadecimal data.
 //	- eddsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56b...', [23, 56, ...], [encoding(hex), type(ed25519)])
@@ -145,7 +145,7 @@ func EDDSAVerify(_ *engine.VM, key, data, sig, options engine.Term, cont engine.
 //   - secp256r1 (default): Also known as P-256 and prime256v1.
 //   - secp256k1: The Koblitz elliptic curve used in Bitcoin's public-key cryptography.
 //
-// Examples:
+// # Examples:
 //
 //	# Verify a signature for hexadecimal data using the ECDSA secp256r1 algorithm.
 //	- ecdsa_verify([127, ...], '9b038f8ef6918cbb56040dfda401b56b...', [23, 56, ...], encoding(hex))

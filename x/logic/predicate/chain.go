@@ -17,7 +17,7 @@ import (
 // where:
 //   - ID represents the current chain ID at the time of the query.
 //
-// Examples:
+// # Examples:
 //
 //	# Query the current chain ID.
 //	- chain_id(ID).
