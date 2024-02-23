@@ -106,7 +106,7 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 func StringBytes(
 	_ *engine.VM, str, bts, encodingTerm engine.Term, cont engine.Cont, env *engine.Env,
 ) *engine.Promise {
-	encoding, err := prolog.AssertAtom(env, encodingTerm)
+	encoding, err := prolog.AssertAtom(encodingTerm, env)
 	if err != nil {
 		return engine.Error(err)
 	}

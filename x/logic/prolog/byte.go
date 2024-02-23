@@ -13,7 +13,7 @@ func ByteListTermToBytes(term engine.Term, env *engine.Env) ([]byte, error) {
 	var bs []byte
 
 	for iter.Next() {
-		b, err := AssertByte(env, iter.Current())
+		b, err := AssertByte(iter.Current(), env)
 		if err != nil {
 			return nil, err
 		}

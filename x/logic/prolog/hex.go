@@ -8,7 +8,7 @@ import (
 
 // TermHexToBytes try to convert an hexadecimal encoded atom to native golang []byte.
 func TermHexToBytes(term engine.Term, env *engine.Env) ([]byte, error) {
-	v, err := AssertAtom(env, term)
+	v, err := AssertAtom(term, env)
 	if err != nil {
 		return nil, err
 	}

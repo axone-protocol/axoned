@@ -167,7 +167,7 @@ func xVerify(key, data, sig, options engine.Term, defaultAlgo util.KeyAlg,
 	if err != nil {
 		return engine.Error(err)
 	}
-	typeAtom, err := prolog.AssertAtom(env, typeTerm)
+	typeAtom, err := prolog.AssertAtom(typeTerm, env)
 	if err != nil {
 		return engine.Error(err)
 	}
@@ -211,7 +211,7 @@ func termToBytes(term, options, defaultEncoding engine.Term, env *engine.Env) ([
 	if err != nil {
 		return nil, err
 	}
-	encodingAtom, err := prolog.AssertAtom(env, encodingTerm)
+	encodingAtom, err := prolog.AssertAtom(encodingTerm, env)
 	if err != nil {
 		return nil, err
 	}

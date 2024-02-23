@@ -13,7 +13,7 @@ func ListHead(list engine.Term, env *engine.Env) engine.Term {
 
 // ListIterator returns a list iterator.
 func ListIterator(list engine.Term, env *engine.Env) (engine.ListIterator, error) {
-	if !IsList(env.Resolve(list)) {
+	if !IsList(list, env) {
 		return engine.ListIterator{}, engine.TypeError(AtomTypeList, list, env)
 	}
 	return engine.ListIterator{List: list, Env: env}, nil
