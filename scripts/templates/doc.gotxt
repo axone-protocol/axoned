@@ -4,7 +4,7 @@
     {{- else if eq .Entry.Kind "code" -}}
         {{- codeBlock "text" (include "text" .Entry.Spans) -}}
     {{- else if eq .Entry.Kind "header" -}}
-        {{- header .Entry.Level (include "text" .Entry.Spans) -}}
+        {{- header (sub .Entry.Level 1 | int) (include "text" .Entry.Spans) -}}
     {{- else if eq .Entry.Kind "list" -}}
         {{- template "list" .Entry.List -}}
     {{- end -}}

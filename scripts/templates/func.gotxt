@@ -1,19 +1,13 @@
-{{- $name := snakecase .Name -}}
-{{- $arity := sub (countSubstr "," .Signature) 2 -}}
-{{- $predicate := print $name "/" $arity -}}
+---
+sidebar_position: {{ index (index globalCtx "frontmatter") "sidebar_position" }}
+---
+[//]: # (This file is auto-generated. Please do not modify it yourself.)
+{{- $predicate := functorName . -}}
 {{- $_ := set globalCtx "funcName" .Name -}}
-{{- $_ := set globalCtx "predicate" $predicate -}}
+{{- $_ := set globalCtx "predicate" $predicate }}
 
-## {{ $predicate -}}
-{{- spacer -}}
+# {{ $predicate }}
 
-{{- template "doc" .Doc -}}
+## Description
 
-{{- if len .Examples -}}
-	{{- spacer -}}
-
-	{{- range (iter .Examples) -}}
-		{{- template "example" .Entry -}}
-		{{- if (not .Last) -}}{{- spacer -}}{{- end -}}
-	{{- end -}}
-{{- end -}}
+{{ template "doc" .Doc -}}
