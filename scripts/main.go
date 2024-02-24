@@ -32,7 +32,7 @@ func generateCommandDocumentationCommand() *cobra.Command {
 		Use:   "command",
 		Short: "Generate command documentation",
 		RunE: func(_ *cobra.Command, _ []string) error {
-			return GenerateCommandDocumentation()
+			return generateCommandDocumentation()
 		},
 	}
 	return cmd
@@ -43,7 +43,7 @@ func generatePredicateDocumentationCommand() *cobra.Command {
 		Use:   "predicate",
 		Short: "Generate predicate documentation",
 		RunE: func(_ *cobra.Command, _ []string) error {
-			return GeneratePredicateDocumentation()
+			return generatePredicateDocumentation()
 		},
 	}
 	return cmd

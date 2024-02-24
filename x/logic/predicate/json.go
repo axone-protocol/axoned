@@ -28,7 +28,7 @@ import (
 //
 // In addition, when passing Json and Term, this predicate return true if both result match.
 //
-// Examples:
+// # Examples:
 //
 //	# JSON conversion to Prolog.
 //	- json_prolog('{"foo": "bar"}', json([foo-bar])).

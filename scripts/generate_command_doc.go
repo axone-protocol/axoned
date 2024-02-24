@@ -8,7 +8,7 @@ import (
 	"github.com/okp4/okp4d/cmd/okp4d/cmd"
 )
 
-func GenerateCommandDocumentation() error {
+func generateCommandDocumentation() error {
 	if err := os.Setenv("DAEMON_NAME", "okp4d"); err != nil {
 		return err
 	}

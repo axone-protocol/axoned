@@ -23,7 +23,7 @@ import (
 //   - Length is the optional maximum number of characters to read from the Stream. If unbound, denotes the full length of Stream.
 //   - String is the resultant string after reading from the Stream.
 //
-// Examples:
+// # Examples:
 //
 //	# Given a file `foo.txt` that contains `Hello World`:
 //
@@ -96,7 +96,7 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 //
 // At least one of String or Bytes must be instantiated.
 //
-// Examples:
+// # Examples:
 //
 //	# Convert a string to a list of bytes.
 //	- string_bytes('Hello World', Bytes, octet).

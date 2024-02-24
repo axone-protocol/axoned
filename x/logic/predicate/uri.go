@@ -21,7 +21,7 @@ import (
 //
 // For more information on URI encoding, refer to [RFC 3986].
 //
-// Examples:
+// # Examples:
 //
 //	# Escape the given string to be used in the path component.
 //	- uri_encoded(path, "foo/bar", Encoded).

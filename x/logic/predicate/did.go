@@ -27,7 +27,7 @@ const DIDPrefix = "did"
 //     query component and Fragment is the fragment component. Values are given as an Atom and are url encoded.
 //     For any component not present, its value will be null and thus will be left as an uninstantiated variable.
 //
-// Examples:
+// # Examples:
 //
 //	# Decompose a DID into its components.
 //	- did_components('did:example:123456?versionId=1', did_components(Method, ID, Path, Query, Fragment)).
