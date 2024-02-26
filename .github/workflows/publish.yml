@@ -64,7 +64,7 @@ jobs:
 
       - name: Find change in readme file
         id: readme-change
-        uses: tj-actions/changed-files@v42.0.4
+        uses: tj-actions/changed-files@v42.0.5
         with:
           files: |
             README.md
