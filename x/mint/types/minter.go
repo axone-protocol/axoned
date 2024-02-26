@@ -26,7 +26,11 @@ func NewMinterWithInitialInflation(inflation math.LegacyDec) Minter {
 }
 
 // NewMinterWithInflationCoef returns a new Minter with updated inflation and annual provisions values.
-func NewMinterWithInflationCoef(inflationCoef, bondedRatio math.LegacyDec, minBound, maxBound *math.LegacyDec, totalSupply math.Int) (Minter, error) {
+func NewMinterWithInflationCoef(
+	inflationCoef, bondedRatio math.LegacyDec,
+	minBound, maxBound *math.LegacyDec,
+	totalSupply math.Int,
+) (Minter, error) {
 	inflationRate, err := inflationRate(inflationCoef, bondedRatio, minBound, maxBound)
 	if err != nil {
 		return Minter{}, err

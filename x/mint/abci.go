@@ -28,7 +28,13 @@ func BeginBlocker(ctx context.Context, k keeper.Keeper) error {
 		return err
 	}
 
-	minter, err := types.NewMinterWithInflationCoef(params.InflationCoef, bondedRatio, params.InflationMin, params.InflationMax, totalSupply)
+	minter, err := types.NewMinterWithInflationCoef(
+		params.InflationCoef,
+		bondedRatio,
+		params.InflationMin,
+		params.InflationMax,
+		totalSupply,
+	)
 	if err != nil {
 		panic(err)
 	}
@@ -66,6 +72,5 @@ func BeginBlocker(ctx context.Context, k keeper.Keeper) error {
 			sdk.NewAttribute(sdk.AttributeKeyAmount, mintedCoin.Amount.String()),
 		),
 	)
-
 	return nil
 }
