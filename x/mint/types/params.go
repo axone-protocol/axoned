@@ -25,10 +25,13 @@ func NewParams(
 
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
+	infMax := math.LegacyNewDecWithPrec(20, 2)
 	return Params{
 		MintDenom:     sdk.DefaultBondDenom,
 		InflationCoef: math.LegacyNewDecWithPrec(3, 2),
 		BlocksPerYear: uint64(60 * 60 * 8766 / 5), // assuming 5-second block times
+		InflationMax:  &infMax,
+		InflationMin:  nil,
 	}
 }
 
@@ -38,6 +41,9 @@ func (p Params) Validate() error {
 		return err
 	}
 	if err := validateInflationCoef(p.InflationCoef); err != nil {
+		return err
+	}
+	if err := validateBounds(p.InflationMin, p.InflationMax); err != nil {
 		return err
 	}
 
@@ -76,6 +82,29 @@ func validateInflationCoef(i interface{}) error {
 		// while there's no theoretical limit to the inflation rate, a coefficient of
 		// 1 or more would lead to hyper-hyperinflation.
 		return fmt.Errorf("inflation coefficient too large: %s", v)
+	}
+
+	return nil
+}
+
+func validateBounds(min, max interface{}) error {
+	vmin, ok := min.(*math.LegacyDec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", min)
+	}
+	vmax, ok := max.(*math.LegacyDec)
+	if !ok {
+		return fmt.Errorf("invalid parameter type: %T", max)
+	}
+
+	for _, v := range []*math.LegacyDec{vmin, vmax} {
+		if v != nil && v.IsNegative() {
+			return fmt.Errorf("inflation bound cannot be negative: %s", v)
+		}
+	}
+
+	if vmin != nil && vmax != nil && vmin.GT(*vmax) {
+		return fmt.Errorf("inflation min cannot greater than inflation max")
 	}
 
 	return nil
