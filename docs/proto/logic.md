@@ -111,7 +111,6 @@ Gives:
   "height": "7235",
   "gas_used": "9085",
   "answer": {
-    "success": true,
     "has_more": false,
     "variables": [
       "X"
@@ -121,10 +120,7 @@ Gives:
         "substitutions": [
           {
             "variable": "X",
-            "term": {
-              "name": "john",
-              "arguments": []
-            }
+            "expression": "john"
           }
         ]
       }
@@ -151,13 +147,12 @@ The response is an object that contains the following fields:
 - `height`: the height of the block at which the query was evaluated.
 - `gas_used`: the amount of gas used to evaluate the query.
 - `answer`: the result of the query. It is an object that contains the following fields:
-  - `success`: a boolean that indicates whether the query was successful or not. Successful means that solutions were
-    found, i.e. the query was satisfiable.
   - `has_more`: a boolean that indicates whether there are more results to be retrieved. It's just informative since no
     more results can be retrieved.
   - `variables`: an array of strings that contains the names of the variables that were used in the query.
-  - `results`: an array of objects that contains the results of the query. Each result is an object that contains the
+  - `results`: an array of objects that contains the solutions of the query. Each result is an object that contains the
     following fields:
+    - `error`: an optional string that contains an error message if the query failed for the current solution.
     - `substitutions`: an array of objects that contains the substitutions that were made to satisfy the query. A
       substitution is a set of variable-value pairs that is used to replace variables with constants. A substitution
       is the result of unification. A substitution is used to replace variables with constants when evaluating a rule.
@@ -351,8 +346,6 @@ Answer represents the answer to a logic query.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `success` | [bool](#bool) |  | success specifies if the query was successful. |
-| `error` | [string](#string) |  | error specifies the error message if the query caused an error. |
 | `has_more` | [bool](#bool) |  | has_more specifies if there are more solutions than the ones returned. |
 | `variables` | [string](#string) | repeated | variables represent all the variables in the query. |
 | `results` | [Result](#logic.v1beta2.Result) | repeated | results represent all the results of the query. |
@@ -365,6 +358,7 @@ Result represents the result of a query.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| `error` | [string](#string) |  | error specifies the error message if the query caused an error. |
 | `substitutions` | [Substitution](#logic.v1beta2.Substitution) | repeated | substitutions represent all the substitutions made to the variables in the query to obtain the answer. |
 
 <a name="logic.v1beta2.Substitution"></a>
