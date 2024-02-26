@@ -9,6 +9,11 @@ import (
 )
 
 func (s *IntegrationTestSuite) TestUpdateParams() {
+	validInfMin := math.LegacyNewDecWithPrec(3, 2)
+	validInfMax := math.LegacyNewDecWithPrec(20, 2)
+	invalidInfMin := math.LegacyNewDecWithPrec(-3, 2)
+	invalidInfMax := math.LegacyNewDecWithPrec(-20, 2)
+
 	testCases := []struct {
 		name      string
 		request   *types.MsgUpdateParams
@@ -34,12 +39,70 @@ func (s *IntegrationTestSuite) TestUpdateParams() {
 			expectErr: true,
 		},
 		{
-			name: "set full valid params",
+			name: "set invalid params for inflation max (negative value)",
 			request: &types.MsgUpdateParams{
 				Authority: s.mintKeeper.GetAuthority(),
 				Params: types.Params{
 					MintDenom:     sdk.DefaultBondDenom,
 					InflationCoef: math.LegacyNewDecWithPrec(73, 2),
+					InflationMax:  &invalidInfMax,
+					InflationMin:  nil,
+					BlocksPerYear: uint64(60 * 60 * 8766 / 5),
+				},
+			},
+			expectErr: true,
+		},
+		{
+			name: "set invalid params for inflation min (negative value)",
+			request: &types.MsgUpdateParams{
+				Authority: s.mintKeeper.GetAuthority(),
+				Params: types.Params{
+					MintDenom:     sdk.DefaultBondDenom,
+					InflationCoef: math.LegacyNewDecWithPrec(73, 2),
+					InflationMax:  nil,
+					InflationMin:  &invalidInfMin,
+					BlocksPerYear: uint64(60 * 60 * 8766 / 5),
+				},
+			},
+			expectErr: true,
+		},
+		{
+			name: "set invalid params for inflation min & max (min > max)",
+			request: &types.MsgUpdateParams{
+				Authority: s.mintKeeper.GetAuthority(),
+				Params: types.Params{
+					MintDenom:     sdk.DefaultBondDenom,
+					InflationCoef: math.LegacyNewDecWithPrec(73, 2),
+					InflationMax:  &validInfMin,
+					InflationMin:  &validInfMax,
+					BlocksPerYear: uint64(60 * 60 * 8766 / 5),
+				},
+			},
+			expectErr: true,
+		},
+		{
+			name: "set full valid params with boundaries",
+			request: &types.MsgUpdateParams{
+				Authority: s.mintKeeper.GetAuthority(),
+				Params: types.Params{
+					MintDenom:     sdk.DefaultBondDenom,
+					InflationCoef: math.LegacyNewDecWithPrec(73, 2),
+					InflationMax:  &validInfMax,
+					InflationMin:  &validInfMin,
+					BlocksPerYear: uint64(60 * 60 * 8766 / 5),
+				},
+			},
+			expectErr: false,
+		},
+		{
+			name: "set full valid params without boundaries",
+			request: &types.MsgUpdateParams{
+				Authority: s.mintKeeper.GetAuthority(),
+				Params: types.Params{
+					MintDenom:     sdk.DefaultBondDenom,
+					InflationCoef: math.LegacyNewDecWithPrec(73, 2),
+					InflationMax:  nil,
+					InflationMin:  nil,
 					BlocksPerYear: uint64(60 * 60 * 8766 / 5),
 				},
 			},
