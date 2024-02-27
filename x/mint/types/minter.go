@@ -26,8 +26,12 @@ func NewMinterWithInitialInflation(inflation math.LegacyDec) Minter {
 }
 
 // NewMinterWithInflationCoef returns a new Minter with updated inflation and annual provisions values.
-func NewMinterWithInflationCoef(inflationCoef math.LegacyDec, bondedRatio math.LegacyDec, totalSupply math.Int) (Minter, error) {
-	inflationRate, err := inflationRate(inflationCoef, bondedRatio)
+func NewMinterWithInflationCoef(
+	inflationCoef, bondedRatio math.LegacyDec,
+	minBound, maxBound *math.LegacyDec,
+	totalSupply math.Int,
+) (Minter, error) {
+	inflationRate, err := inflationRate(inflationCoef, bondedRatio, minBound, maxBound)
 	if err != nil {
 		return Minter{}, err
 	}
@@ -55,12 +59,20 @@ func (m Minter) Validate() error {
 
 // inflationRate returns the inflation rate computed from the current bonded ratio
 // and the inflation parameter.
-func inflationRate(inflationCoef math.LegacyDec, bondedRatio math.LegacyDec) (math.LegacyDec, error) {
+func inflationRate(inflationCoef, bondedRatio math.LegacyDec, minBound, maxBound *math.LegacyDec) (math.LegacyDec, error) {
 	if bondedRatio.IsZero() {
 		return math.LegacyZeroDec(), ErrBondedRatioIsZero
 	}
 
-	return inflationCoef.Quo(bondedRatio), nil
+	rate := inflationCoef.Quo(bondedRatio)
+	if minBound != nil {
+		rate = math.LegacyMaxDec(rate, *minBound)
+	}
+	if maxBound != nil {
+		rate = math.LegacyMinDec(rate, *maxBound)
+	}
+
+	return rate, nil
 }
 
 // BlockProvision returns the provisions for a block based on the annual

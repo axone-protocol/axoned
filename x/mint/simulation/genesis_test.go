@@ -45,7 +45,7 @@ func TestRandomizedGenState(t *testing.T) {
 
 	inflationCoef := math.LegacyNewDecWithPrec(3, 2)
 	bondedRatio := math.LegacyNewDecWithPrec(2, 1)
-	minter, _ := types.NewMinterWithInflationCoef(inflationCoef, bondedRatio, simState.InitialStake)
+	minter, _ := types.NewMinterWithInflationCoef(inflationCoef, bondedRatio, nil, nil, simState.InitialStake)
 
 	require.Equal(t, uint64(6311520), mintGenesis.Params.BlocksPerYear)
 	require.Equal(t, "0.073000000000000000", mintGenesis.Params.InflationCoef.String())

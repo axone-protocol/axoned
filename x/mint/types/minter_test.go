@@ -12,11 +12,16 @@ import (
 )
 
 func TestNextInflation(t *testing.T) {
+	infMin := math.LegacyNewDecWithPrec(7, 2)
+	infMax := math.LegacyNewDecWithPrec(10, 2)
+
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			name                     string
 			inflationRatio           math.LegacyDec
 			bondedRatio              math.LegacyDec
+			minBound                 *math.LegacyDec
+			maxBound                 *math.LegacyDec
 			totalSupply              math.Int
 			expectedInflation        math.LegacyDec
 			expectedAnnualProvisions math.LegacyDec
@@ -26,6 +31,8 @@ func TestNextInflation(t *testing.T) {
 				name:                     "inflation ratio is 0",
 				inflationRatio:           math.LegacyNewDec(0),
 				bondedRatio:              math.LegacyNewDecWithPrec(20, 2),
+				minBound:                 nil,
+				maxBound:                 nil,
 				totalSupply:              math.NewInt(1000),
 				expectedInflation:        math.LegacyNewDec(0),
 				expectedAnnualProvisions: math.LegacyNewDec(0),
@@ -34,14 +41,38 @@ func TestNextInflation(t *testing.T) {
 				name:                     "inflation ratio is 0.03",
 				inflationRatio:           math.LegacyNewDecWithPrec(3, 2),
 				bondedRatio:              math.LegacyNewDecWithPrec(2, 1),
+				minBound:                 nil,
+				maxBound:                 nil,
 				totalSupply:              math.NewInt(1000),
 				expectedInflation:        math.LegacyNewDecWithPrec(15, 2),
 				expectedAnnualProvisions: math.LegacyNewDec(150),
 			},
 			{
+				name:                     "inflation max is 0.1",
+				inflationRatio:           math.LegacyNewDecWithPrec(3, 2),
+				bondedRatio:              math.LegacyNewDecWithPrec(2, 1),
+				minBound:                 nil,
+				maxBound:                 &infMax,
+				totalSupply:              math.NewInt(1000),
+				expectedInflation:        math.LegacyNewDecWithPrec(10, 2),
+				expectedAnnualProvisions: math.LegacyNewDec(100),
+			},
+			{
+				name:                     "inflation min is 0.07",
+				inflationRatio:           math.LegacyNewDecWithPrec(3, 2),
+				bondedRatio:              math.LegacyNewDecWithPrec(7, 1),
+				minBound:                 &infMin,
+				maxBound:                 &infMax,
+				totalSupply:              math.NewInt(1000),
+				expectedInflation:        math.LegacyNewDecWithPrec(7, 2),
+				expectedAnnualProvisions: math.LegacyNewDec(70),
+			},
+			{
 				name:           "bonded ratio is 0",
 				inflationRatio: math.LegacyNewDecWithPrec(3, 2),
 				bondedRatio:    math.LegacyNewDec(0),
+				minBound:       nil,
+				maxBound:       nil,
 				totalSupply:    math.NewInt(1000),
 				expectedErr:    fmt.Errorf("bonded ratio is zero"),
 			},
@@ -49,6 +80,8 @@ func TestNextInflation(t *testing.T) {
 				name:           "negative inflation ratio",
 				inflationRatio: math.LegacyNewDecWithPrec(3, 2),
 				bondedRatio:    math.LegacyNewDecWithPrec(-2, 1),
+				minBound:       nil,
+				maxBound:       nil,
 				totalSupply:    math.NewInt(1000),
 				expectedErr:    fmt.Errorf("mint parameter Inflation should be positive, is -0.150000000000000000"),
 			},
@@ -58,7 +91,7 @@ func TestNextInflation(t *testing.T) {
 			Convey(
 				fmt.Sprintf("Given test case #%d: %v", nc, tc.name), func() {
 					Convey("when calling NewMinterWithInflationCoef function", func() {
-						minter, err := NewMinterWithInflationCoef(tc.inflationRatio, tc.bondedRatio, tc.totalSupply)
+						minter, err := NewMinterWithInflationCoef(tc.inflationRatio, tc.bondedRatio, tc.minBound, tc.maxBound, tc.totalSupply)
 						if tc.expectedErr != nil {
 							Convey("then an error should occur", func() {
 								So(err, ShouldNotBeNil)
@@ -109,7 +142,7 @@ func BenchmarkNextInflation(b *testing.B) {
 
 	// run the NextInflationRate function b.N times
 	for n := 0; n < b.N; n++ {
-		_, err := NewMinterWithInflationCoef(params.InflationCoef, bondedRatio, totalSupply)
+		_, err := NewMinterWithInflationCoef(params.InflationCoef, bondedRatio, nil, nil, totalSupply)
 		if err != nil {
 			panic(err)
 		}

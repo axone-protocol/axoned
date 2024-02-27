@@ -74,6 +74,8 @@ Params defines the parameters for the mint module.
 | `mint_denom` | [string](#string) |  | Denomination of the coin to be minted. |
 | `inflation_coef` | [string](#string) |  | Annual inflation coefficient, influencing the inflation rate based on the bonded ratio. Values range from 0 to 1, with higher values indicating higher inflation. |
 | `blocks_per_year` | [uint64](#uint64) |  | Estimated number of blocks per year. |
+| `inflation_max` | [string](#string) |  | Maximum annual inflation rate. |
+| `inflation_min` | [string](#string) |  | Minimum annual inflation rate. |
 
  [//]: # (end messages)
 
