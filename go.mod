@@ -32,7 +32,7 @@ require (
 	github.com/golang/protobuf v1.5.3
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/hashicorp/go-metrics v0.5.3
-	github.com/huandu/xstrings v1.3.3
+	github.com/huandu/xstrings v1.4.0
 	github.com/hyperledger/aries-framework-go v0.3.2
 	github.com/ichiban/prolog v1.2.0
 	github.com/ignite/cli v0.27.2
