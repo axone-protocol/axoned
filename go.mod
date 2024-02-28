@@ -39,6 +39,7 @@ require (
 	github.com/hyperledger/aries-framework-go v0.3.2
 	github.com/ichiban/prolog v1.2.0
 	github.com/ignite/cli v0.27.2
+	github.com/muesli/reflow v0.3.0
 	github.com/nuts-foundation/go-did v0.12.0
 	github.com/piprate/json-gold v0.5.0
 	github.com/princjef/gomarkdoc v1.1.0
@@ -120,8 +121,6 @@ require (
 	github.com/cpuguy83/go-md2man/v2 v2.0.3 // indirect
 	github.com/creachadair/atomicfile v0.3.1 // indirect
 	github.com/creachadair/tomledit v0.0.24 // indirect
-	github.com/cucumber/gherkin/go/v26 v26.2.0 // indirect
-	github.com/cucumber/messages/go/v21 v21.0.1 // indirect
 	github.com/cyphar/filepath-securejoin v0.2.4 // indirect
 	github.com/danieljoos/wincred v1.1.2 // indirect
 	github.com/davecgh/go-spew v1.1.2-0.20180830191138-d8f796af33cc // indirect
