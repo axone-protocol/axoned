@@ -7,9 +7,11 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+	"github.com/samber/lo"
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -25,10 +27,12 @@ import (
 )
 
 func TestGRPCAsk(t *testing.T) {
+	emptySolution := types.Result{}
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			program        string
 			query          string
+			limit          int
 			expectedAnswer *types.Answer
 			expectedError  string
 		}{
@@ -36,22 +40,21 @@ func TestGRPCAsk(t *testing.T) {
 				program: "foo.",
 				query:   "foo.",
 				expectedAnswer: &types.Answer{
-					Success:   true,
-					HasMore:   false,
-					Variables: nil,
-					Results:   []types.Result{{Substitutions: nil}},
+					Results: []types.Result{emptySolution},
 				},
+			},
+			{
+				program:        "father(bob, alice).",
+				query:          "father(bob, john).",
+				expectedAnswer: &types.Answer{},
 			},
 			{
 				program: "father(bob, alice).",
 				query:   "father(bob, X).",
 				expectedAnswer: &types.Answer{
-					Success:   true,
-					HasMore:   false,
 					Variables: []string{"X"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
-						Variable:   "X",
-						Expression: "alice",
+						Variable: "X", Expression: "alice",
 					}}}},
 				},
 			},
@@ -59,12 +62,9 @@ func TestGRPCAsk(t *testing.T) {
 				program: `father("bob", "alice").`,
 				query:   `father("bob", X).`,
 				expectedAnswer: &types.Answer{
-					Success:   true,
-					HasMore:   false,
 					Variables: []string{"X"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
-						Variable:   "X",
-						Expression: "[a,l,i,c,e]",
+						Variable: "X", Expression: "[a,l,i,c,e]",
 					}}}},
 				},
 			},
@@ -72,35 +72,33 @@ func TestGRPCAsk(t *testing.T) {
 				program: "father(bob, alice). father(bob, john).",
 				query:   "father(bob, X).",
 				expectedAnswer: &types.Answer{
-					Success:   true,
 					HasMore:   true,
 					Variables: []string{"X"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
-						Variable:   "X",
-						Expression: "alice",
+						Variable: "X", Expression: "alice",
 					}}}},
 				},
 			},
 			{
-				program: "father(bob, alice).",
-				query:   "father(bob, john).",
+				program: "father(bob, alice). father(bob, john).",
+				query:   "father(bob, X).",
+				limit:   5,
 				expectedAnswer: &types.Answer{
-					Success:   false,
-					HasMore:   false,
-					Variables: nil,
-					Results:   nil,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X", Expression: "alice",
+					}}}, {Substitutions: []types.Substitution{{
+						Variable: "X", Expression: "john",
+					}}}},
 				},
 			},
 			{
 				program: "",
 				query:   "block_height(X).",
 				expectedAnswer: &types.Answer{
-					Success:   true,
-					HasMore:   false,
 					Variables: []string{"X"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
-						Variable:   "X",
-						Expression: "0",
+						Variable: "X", Expression: "0",
 					}}}},
 				},
 			},
@@ -108,12 +106,9 @@ func TestGRPCAsk(t *testing.T) {
 				program: "father(bob, 'élodie').",
 				query:   "father(bob, X).",
 				expectedAnswer: &types.Answer{
-					Success:   true,
-					HasMore:   false,
 					Variables: []string{"X"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
-						Variable:   "X",
-						Expression: "élodie",
+						Variable: "X", Expression: "élodie",
 					}}}},
 				},
 			},
@@ -121,12 +116,9 @@ func TestGRPCAsk(t *testing.T) {
 				program: "foo(foo(bar)).",
 				query:   "foo(X).",
 				expectedAnswer: &types.Answer{
-					Success:   true,
-					HasMore:   false,
 					Variables: []string{"X"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
-						Variable:   "X",
-						Expression: "foo(bar)",
+						Variable: "X", Expression: "foo(bar)",
 					}}}},
 				},
 			},
@@ -134,15 +126,11 @@ func TestGRPCAsk(t *testing.T) {
 				program: "father(bob, alice).",
 				query:   "father(A, B).",
 				expectedAnswer: &types.Answer{
-					Success:   true,
-					HasMore:   false,
 					Variables: []string{"A", "B"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
-						Variable:   "A",
-						Expression: "bob",
+						Variable: "A", Expression: "bob",
 					}, {
-						Variable:   "B",
-						Expression: "alice",
+						Variable: "B", Expression: "alice",
 					}}}},
 				},
 			},
@@ -150,15 +138,11 @@ func TestGRPCAsk(t *testing.T) {
 				program: "father(bob, alice).",
 				query:   "father(B, A).",
 				expectedAnswer: &types.Answer{
-					Success:   true,
-					HasMore:   false,
 					Variables: []string{"B", "A"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
-						Variable:   "B",
-						Expression: "bob",
+						Variable: "B", Expression: "bob",
 					}, {
-						Variable:   "A",
-						Expression: "alice",
+						Variable: "A", Expression: "alice",
 					}}}},
 				},
 			},
@@ -166,11 +150,8 @@ func TestGRPCAsk(t *testing.T) {
 				program: "father(bob, alice).",
 				query:   "father(bob, X, O).",
 				expectedAnswer: &types.Answer{
-					Success:   false,
-					Error:     "error(existence_error(procedure,father/3),root)",
-					HasMore:   false,
 					Variables: []string{"X", "O"},
-					Results:   nil,
+					Results:   []types.Result{{Error: "error(existence_error(procedure,father/3),root)"}},
 				},
 			},
 			{
@@ -187,6 +168,77 @@ func TestGRPCAsk(t *testing.T) {
 				program:       `father("bob", "alice").`,
 				query:         `father("bob"", X).`,
 				expectedError: "error executing query: EOF: invalid argument",
+			},
+			{
+				program: `
+foo(a1).
+foo(a2).
+foo(a3) :- throw(error(resource_error(foo))).
+foo(a4).
+`,
+				query: `foo(X).`,
+				limit: 1,
+				expectedAnswer: &types.Answer{
+					HasMore:   true,
+					Variables: []string{"X"},
+					Results: []types.Result{
+						{Substitutions: []types.Substitution{{Variable: "X", Expression: "a1"}}},
+					},
+				},
+			},
+			{
+				program: `
+foo(a1).
+foo(a2).
+foo(a3) :- throw(error(resource_error(foo))).
+foo(a4).
+`,
+				query: `foo(X).`,
+				limit: 2,
+				expectedAnswer: &types.Answer{
+					HasMore:   true,
+					Variables: []string{"X"},
+					Results: []types.Result{
+						{Substitutions: []types.Substitution{{Variable: "X", Expression: "a1"}}},
+						{Substitutions: []types.Substitution{{Variable: "X", Expression: "a2"}}},
+					},
+				},
+			},
+			{
+				program: `
+foo(a1).
+foo(a2).
+foo(a3) :- throw(error(resource_error(foo))).
+foo(a4).
+`,
+				query: `foo(X).`,
+				limit: 3,
+				expectedAnswer: &types.Answer{
+					Variables: []string{"X"},
+					Results: []types.Result{
+						{Substitutions: []types.Substitution{{Variable: "X", Expression: "a1"}}},
+						{Substitutions: []types.Substitution{{Variable: "X", Expression: "a2"}}},
+						{Error: "error(resource_error(foo))"},
+					},
+				},
+			},
+			{
+				program: `
+foo(a1).
+foo(a2).
+foo(a3) :- throw(error(resource_error(foo))).
+foo(a4).
+`,
+				query: `foo(X).`,
+				limit: 5,
+				expectedAnswer: &types.Answer{
+					Variables: []string{"X"},
+					Results: []types.Result{
+						{Substitutions: []types.Substitution{{Variable: "X", Expression: "a1"}}},
+						{Substitutions: []types.Substitution{{Variable: "X", Expression: "a2"}}},
+						{Error: "error(resource_error(foo))"},
+					},
+				},
 			},
 		}
 
@@ -215,7 +267,10 @@ func TestGRPCAsk(t *testing.T) {
 							return fsProvider
 						},
 					)
-					err := logicKeeper.SetParams(testCtx.Ctx, types.DefaultParams())
+					limit := sdkmath.NewUint(uint64(lo.If(tc.limit == 0, 1).Else(tc.limit)))
+					params := types.DefaultParams()
+					params.Limits.MaxResultCount = &limit
+					err := logicKeeper.SetParams(testCtx.Ctx, params)
 
 					So(err, ShouldBeNil)
 

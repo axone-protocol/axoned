@@ -20,8 +20,14 @@ message Substitution {
 message Result {
   option (gogoproto.goproto_stringer) = true;
 
+  // error specifies the error message if the query caused an error.
+  string error = 5 [
+    (gogoproto.nullable) = true,
+    (gogoproto.moretags) = "yaml:\"error\",omitempty"
+  ];
+
   // substitutions represent all the substitutions made to the variables in the query to obtain the answer.
-  repeated Substitution substitutions = 1 [
+  repeated Substitution substitutions = 2 [
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"substitutions\",omitempty"
   ];
@@ -31,18 +37,11 @@ message Result {
 message Answer {
   option (gogoproto.goproto_stringer) = true;
 
-  // success specifies if the query was successful.
-  bool success = 1 [(gogoproto.moretags) = "yaml:\"success\",omitempty"];
-  // error specifies the error message if the query caused an error.
-  string error = 5 [
-    (gogoproto.nullable) = true,
-    (gogoproto.moretags) = "yaml:\"error\",omitempty"
-  ];
   // has_more specifies if there are more solutions than the ones returned.
   bool has_more = 2 [(gogoproto.moretags) = "yaml:\"has_more\",omitempty"];
   // variables represent all the variables in the query.
   repeated string variables = 3 [
-    (gogoproto.nullable) = true,
+    (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"variables\",omitempty"
   ];
   // results represent all the results of the query.

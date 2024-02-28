@@ -13,6 +13,10 @@ import (
 	"github.com/okp4/okp4d/x/logic/types"
 )
 
+const (
+	defaultEnvCap = uint64(50)
+)
+
 // QueryInterpreter interprets a query and returns the solutions up to the given limit.
 func QueryInterpreter(
 	ctx context.Context, i *prolog.Interpreter, query string, limit sdkmath.Uint,
@@ -25,7 +29,7 @@ func QueryInterpreter(
 
 	var env *engine.Env
 	count := sdkmath.ZeroUint()
-	envs := make([]*engine.Env, 0, limit.Uint64())
+	envs := make([]*engine.Env, 0, sdkmath.MinUint(limit, sdkmath.NewUint(defaultEnvCap)).Uint64())
 	_, callErr := engine.Call(&i.VM, t, func(env *engine.Env) *engine.Promise {
 		if count.LT(limit) {
 			envs = append(envs, env)
@@ -34,21 +38,25 @@ func QueryInterpreter(
 		return engine.Bool(count.GT(limit))
 	}, env).Force(ctx)
 
-	answerErr := lo.IfF(callErr != nil, func() string {
-		return callErr.Error()
-	}).Else("")
-	success := len(envs) > 0
-	hasMore := count.GT(limit)
 	vars := parsedVarsToVars(p.Vars)
+
 	results, err := envsToResults(envs, p.Vars, i)
 	if err != nil {
 		return nil, err
 	}
 
+	if callErr != nil {
+		if sdkmath.NewUint(uint64(len(results))).LT(limit) {
+			// error is not part of the look-ahead and should be included in the solutions
+			results = append(results, types.Result{Error: callErr.Error()})
+		} else {
+			// error is part of the look-ahead, so let's consider that there's one more solution
+			count = count.Incr()
+		}
+	}
+
 	return &types.Answer{
-		Success:   success,
-		Error:     answerErr,
-		HasMore:   hasMore,
+		HasMore:   count.GT(limit),
 		Variables: vars,
 		Results:   results,
 	}, nil
