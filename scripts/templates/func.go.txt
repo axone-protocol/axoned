@@ -1,0 +1,39 @@
+---
+sidebar_position: {{ index (index globalCtx "frontmatter") "sidebar_position" }}
+---
+[//]: # (This file is auto-generated. Please do not modify it yourself.)
+{{- $predicate := functorName . -}}
+{{- $_ := set globalCtx "funcName" .Name -}}
+{{- $_ := set globalCtx "predicate" $predicate }}
+
+# {{ $predicate }}
+
+## Description
+
+{{ template "doc" .Doc }}
+
+{{- $feature := index globalCtx "feature" -}}
+{{- if $feature -}}
+{{- spacer -}}
+## Examples
+{{- range $feature.Children -}}
+{{- if .Scenario | tagged "@great_for_documentation" -}}
+{{- spacer -}}
+### {{ .Scenario.Name }}
+{{- spacer -}}
+{{ .Scenario.Description | dedent }}
+
+Here's the steps of the scenario:
+{{- spacer -}}
+{{- range .Scenario.Steps }}
+- **{{ .Keyword | trim }}** {{ .Text }}
+{{- if .DocString -}}
+{{- spacer -}}
+``` {{ .DocString.MediaType }}
+{{ .DocString.Content }}
+```
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end -}}
+{{- end }}
