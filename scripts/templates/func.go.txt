@@ -29,7 +29,7 @@ Here's the steps of the scenario:
 - **{{ .Keyword | trim }}** {{ .Text }}
 {{- if .DocString -}}
 {{- spacer -}}
-``` {{ .DocString.MediaType }}
+``` {{ .DocString.MediaType | default "text" }}
 {{ .DocString.Content }}
 ```
 {{- end -}}
