@@ -135,7 +135,7 @@ Here's the steps of the scenario:
 
 - **Given** the program:
 
-```
+```  prolog
 okp4_addr(Addr) :- bech32_address(-('okp4', _), Addr).
 ```
 

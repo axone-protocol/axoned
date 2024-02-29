@@ -86,7 +86,7 @@ Feature: bech32_address/2
     This scenario shows how to check if a bech32 address is part of the okp4 protocol.
 
     Given the program:
-      """
+      """ prolog
       okp4_addr(Addr) :- bech32_address(-('okp4', _), Addr).
       """
     Given the query:
@@ -104,7 +104,7 @@ Feature: bech32_address/2
     This scenario shows how to check if a bech32 address is part of the okp4 protocol.
 
     Given the program:
-      """
+      """ prolog
       okp4_addr(Addr) :- bech32_address(-('okp4', _), Addr).
       """
     Given the query:
