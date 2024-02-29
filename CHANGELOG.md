@@ -1,5 +1,47 @@
 # ØKP4 protocol changelog
 
+## [7.0.0](https://github.com/okp4/okp4d/compare/v6.0.0...v7.0.0) (2024-02-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* **logic:** improve predicate call policy (blacklist, gas)
+* **logic:** enhance answer responses for error cases
+* **logic:** adopt new exposed error terms from ichiban/prolog
+* **logic:** adopt unstructured expression for substitutions
+* **logic:** did_components/2 now returns encoded components
+
+### Features
+
+* **app:** register v7.0.0 software upgrade ([4358459](https://github.com/okp4/okp4d/commit/4358459650b186effc5754da8c1a69b139e5c5a8))
+* **cli:** add --date to credential sign command ([993bd68](https://github.com/okp4/okp4d/commit/993bd68c7d75a6cc8a4267695870fb75effec973))
+* **cli:** add credential sign command ([01083a4](https://github.com/okp4/okp4d/commit/01083a4b460260acbd541c6ae839b35e2012ca1c))
+* **cli:** add did output only to show key command ([7a6eee2](https://github.com/okp4/okp4d/commit/7a6eee24627390708f209f6eff36df1c03c157e3))
+* **cli:** add did:key to keys list command ([30a5615](https://github.com/okp4/okp4d/commit/30a5615ee462c8c48e82a0a31bc1f6575b04181c))
+* **cli:** add schema-map flag to credential sign command ([bdd93a3](https://github.com/okp4/okp4d/commit/bdd93a3a14865de1a6cf14abb5056ebe4aa63e7a))
+* **cli:** extend keys show command to display did:key info ([631a636](https://github.com/okp4/okp4d/commit/631a636f6bebefc14b7cbce21d8bb85b29d24a9d))
+* **cli:** introduce "keys did" command ([39c87b7](https://github.com/okp4/okp4d/commit/39c87b75a7b8a863076f87b4e449d9fe0537af40))
+* **mint:** add optional inflation bounds params ([fd77aab](https://github.com/okp4/okp4d/commit/fd77aaba811536fd3002fc5ecdb2ff2ba64b7035))
+* **wasm:** enable some cosmwasm features ([19f93e8](https://github.com/okp4/okp4d/commit/19f93e8e2c941867630445e6bb4f7a1955981c57))
+
+
+### Bug Fixes
+
+* **app:** ignore tink crypto proto from checks at app init ([aa36819](https://github.com/okp4/okp4d/commit/aa36819fb5f678e2807dd61f0adca28bd697d52d))
+* **cli:** go backwards by remvoving logic query autocli ([46d4b66](https://github.com/okp4/okp4d/commit/46d4b6649670242ae2b30621b411b606e2cc497e))
+* **logic:** fix variable resolution ([d1f0ee0](https://github.com/okp4/okp4d/commit/d1f0ee02bf825765aec68ce5df437bb6a783bbe0))
+* **logic:** re-introduce descriptor for CLI (lost with migration) ([060972d](https://github.com/okp4/okp4d/commit/060972dd38ce692aa180f310410dde1ba0c8a9da))
+* wire config options of transactions for autocli ([b95c89c](https://github.com/okp4/okp4d/commit/b95c89caa164d53afb87f7c1d7198b882f192513)), closes [#551](https://github.com/okp4/okp4d/issues/551)
+
+
+### Code Refactoring
+
+* **logic:** adopt new exposed error terms from ichiban/prolog ([fd4a231](https://github.com/okp4/okp4d/commit/fd4a231685a98a7c90f889a981179c6d25acc796))
+* **logic:** adopt unstructured expression for substitutions ([50f9d7f](https://github.com/okp4/okp4d/commit/50f9d7fc8d81b4c2a2a4a0b7bd99e412d87f2f57))
+* **logic:** did_components/2 now returns encoded components ([e6cd0fc](https://github.com/okp4/okp4d/commit/e6cd0fc9f94aeb46738352957224eb7882179f9d))
+* **logic:** enhance answer responses for error cases ([16698c3](https://github.com/okp4/okp4d/commit/16698c31bc3e9cee130241e62e83a5f317706a92))
+* **logic:** improve predicate call policy (blacklist, gas) ([17fdaed](https://github.com/okp4/okp4d/commit/17fdaede65ae7ccdb714624741336e2e9089fb54))
+
 ## [6.0.0](https://github.com/okp4/okp4d/compare/v5.0.0...v6.0.0) (2024-01-19)
 
 
