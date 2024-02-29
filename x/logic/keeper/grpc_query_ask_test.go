@@ -30,11 +30,14 @@ func TestGRPCAsk(t *testing.T) {
 	emptySolution := types.Result{}
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
-			program        string
-			query          string
-			limit          int
-			expectedAnswer *types.Answer
-			expectedError  string
+			program            string
+			query              string
+			limit              int
+			predicateBlacklist []string
+			maxGas             uint64
+			predicateCosts     map[string]uint64
+			expectedAnswer     *types.Answer
+			expectedError      string
 		}{
 			{
 				program: "foo.",
@@ -93,13 +96,28 @@ func TestGRPCAsk(t *testing.T) {
 				},
 			},
 			{
-				program: "",
-				query:   "block_height(X).",
+				query: "block_height(X).",
 				expectedAnswer: &types.Answer{
 					Variables: []string{"X"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
 						Variable: "X", Expression: "0",
 					}}}},
+				},
+			},
+			{
+				query:         "block_height(X).",
+				maxGas:        1000,
+				expectedError: "out of gas: logic <ReadPerByte> (1018/1000): limit exceeded",
+			},
+			{
+				query:  "block_height(X).",
+				maxGas: 3000,
+				predicateCosts: map[string]uint64{
+					"block_height/1": 10000,
+				},
+				expectedAnswer: &types.Answer{
+					Variables: []string{"X"},
+					Results:   []types.Result{{Error: "error(resource_error(gas(block_height/1,12353,3000)),block_height/1)"}},
 				},
 			},
 			{
@@ -152,6 +170,16 @@ func TestGRPCAsk(t *testing.T) {
 				expectedAnswer: &types.Answer{
 					Variables: []string{"X", "O"},
 					Results:   []types.Result{{Error: "error(existence_error(procedure,father/3),root)"}},
+				},
+			},
+			{
+				program:            "",
+				query:              "block_height(X).",
+				predicateBlacklist: []string{"block_height/1"},
+				expectedAnswer: &types.Answer{
+					HasMore:   false,
+					Variables: []string{"X"},
+					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_height/1),block_height/1)"}},
 				},
 			},
 			{
@@ -270,6 +298,24 @@ foo(a4).
 					limit := sdkmath.NewUint(uint64(lo.If(tc.limit == 0, 1).Else(tc.limit)))
 					params := types.DefaultParams()
 					params.Limits.MaxResultCount = &limit
+					if tc.predicateBlacklist != nil {
+						params.Interpreter.PredicatesFilter.Blacklist = tc.predicateBlacklist
+					}
+					if tc.maxGas != 0 {
+						maxGas := sdkmath.NewUint(tc.maxGas)
+						params.Limits.MaxGas = &maxGas
+					}
+					if tc.predicateCosts != nil {
+						predicateCosts := make([]types.PredicateCost, 0, len(tc.predicateCosts))
+						for predicate, cost := range tc.predicateCosts {
+							cost := sdkmath.NewUint(cost)
+							predicateCosts = append(predicateCosts, types.PredicateCost{
+								Predicate: predicate,
+								Cost:      &cost,
+							})
+						}
+						params.GasPolicy.PredicateCosts = predicateCosts
+					}
 					err := logicKeeper.SetParams(testCtx.Ctx, params)
 
 					So(err, ShouldBeNil)

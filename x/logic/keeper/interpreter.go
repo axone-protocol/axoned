@@ -5,10 +5,12 @@ import (
 	"math"
 
 	"github.com/ichiban/prolog"
+	"github.com/ichiban/prolog/engine"
 	"github.com/samber/lo"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
+	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -86,19 +88,31 @@ func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, *util.
 
 	whitelistPredicates := util.NonZeroOrDefault(interpreterParams.PredicatesFilter.Whitelist, interpreter.RegistryNames)
 	blacklistPredicates := interpreterParams.PredicatesFilter.Blacklist
-	predicates := lo.Reduce(
-		lo.Map(
-			lo.Filter(
-				interpreter.RegistryNames,
-				util.Indexed(util.WhitelistBlacklistMatches(whitelistPredicates, blacklistPredicates, prolog2.PredicateMatches))),
-			toPredicate(
-				nonNilNorZeroOrDefaultUint64(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
-				gasPolicy.GetPredicateCosts())),
-		func(agg interpreter.Predicates, item lo.Tuple2[string, uint64], _ int) interpreter.Predicates {
-			agg[item.A] = item.B
-			return agg
-		},
-		interpreter.Predicates{})
+
+	hook := func(predicate string) func(env *engine.Env) (err error) {
+		return func(env *engine.Env) (err error) {
+			if !util.WhitelistBlacklistMatches(whitelistPredicates, blacklistPredicates, prolog2.PredicateMatches)(predicate) {
+				return engine.PermissionError(
+					prolog2.AtomOperationExecute, prolog2.AtomPermissionForbiddenPredicate, engine.NewAtom(predicate), env)
+			}
+			cost := lookupCost(predicate, defaultPredicateCost, gasPolicy.PredicateCosts)
+
+			defer func() {
+				if r := recover(); r != nil {
+					if gasError, ok := r.(storetypes.ErrorOutOfGas); ok {
+						err = engine.ResourceError(prolog2.ResourceGas(gasError.Descriptor, gasMeter.GasConsumed(), gasMeter.Limit()), env)
+						return
+					}
+
+					panic(r)
+				}
+			}()
+
+			gasMeter.ConsumeGas(cost, predicate)
+
+			return err
+		}
+	}
 
 	whitelistUrls := lo.Map(
 		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
@@ -108,7 +122,7 @@ func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, *util.
 		util.Indexed(util.ParseURLMust))
 
 	options := []interpreter.Option{
-		interpreter.WithPredicates(ctx, predicates, gasMeter),
+		interpreter.WithPredicates(ctx, interpreter.RegistryNames, hook),
 		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
 		interpreter.WithFS(fs.NewFilteredFS(whitelistUrls, blacklistUrls, k.fsProvider(ctx))),
 	}
@@ -134,18 +148,14 @@ func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) err
 	return nil
 }
 
-// toPredicate converts the given predicate costs to a function that returns the cost for the given predicate as
-// a pair of predicate name and cost.
-func toPredicate(defaultCost uint64, predicateCosts []types.PredicateCost) func(string, int) lo.Tuple2[string, uint64] {
-	return func(predicate string, _ int) lo.Tuple2[string, uint64] {
-		for _, c := range predicateCosts {
-			if prolog2.PredicateMatches(predicate)(c.Predicate) {
-				return lo.T2(predicate, nonNilNorZeroOrDefaultUint64(c.Cost, defaultCost))
-			}
+func lookupCost(predicate string, defaultCost uint64, costs []types.PredicateCost) uint64 {
+	for _, c := range costs {
+		if prolog2.PredicateMatches(predicate)(c.Predicate) {
+			return nonNilNorZeroOrDefaultUint64(c.Cost, defaultCost)
 		}
-
-		return lo.T2(predicate, defaultCost)
 	}
+
+	return defaultCost
 }
 
 // nonNilNorZeroOrDefaultUint64 returns the value of the given sdkmath.Uint if it is not nil and not zero, otherwise it returns the
