@@ -2,6 +2,8 @@ package prolog
 
 import (
 	"github.com/ichiban/prolog/engine"
+
+	"cosmossdk.io/store/types"
 )
 
 var (
@@ -62,6 +64,7 @@ var (
 	AtomValidEmptyList = engine.NewAtom("empty_list")
 )
 
+// ValidEncoding returns a term representing the valid encoding with the given name.
 func ValidEncoding(encoding string) engine.Term {
 	return AtomValidEncoding.Apply(engine.NewAtom(encoding))
 }
@@ -79,19 +82,35 @@ var (
 	// The module resource is the representation of the module with which the interaction is made.
 	// The module resource is denoted as a compound with the name of the module.
 	AtomResourceModule = engine.NewAtom("resource_module")
+	// AtomResourceGas is the atom denoting the "gas" resource.
+	AtomResourceGas = engine.NewAtom("gas")
 )
 
+// ResourceContext returns a term representing the context resource.
 func ResourceContext() engine.Term {
 	return AtomResourceContext
 }
 
+// ResourceModule returns a term representing the module resource with the given name.
 func ResourceModule(module string) engine.Term {
 	return AtomResourceModule.Apply(engine.NewAtom(module))
 }
 
-var AtomOperationInput = engine.NewAtom("input")
+// ResourceGas returns a term representing the gas resource with the given descriptor, consumed and limit at the
+// given context.
+func ResourceGas(descriptor string, consumed types.Gas, limit types.Gas) engine.Term {
+	return AtomResourceGas.Apply(engine.NewAtom(descriptor), engine.Integer(int64(consumed)), engine.Integer(int64(limit)))
+}
 
-var AtomPermissionTypeStream = engine.NewAtom("stream")
+var (
+	AtomOperationInput   = engine.NewAtom("input")
+	AtomOperationExecute = engine.NewAtom("execute")
+)
+
+var (
+	AtomPermissionTypeStream         = engine.NewAtom("stream")
+	AtomPermissionForbiddenPredicate = engine.NewAtom("forbidden_predicate")
+)
 
 var AtomObjectTypeSourceSink = engine.NewAtom("source_sink")
 

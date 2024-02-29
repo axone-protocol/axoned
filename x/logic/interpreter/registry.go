@@ -8,8 +8,6 @@ import (
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
 
-	storetypes "cosmossdk.io/store/types"
-
 	"github.com/okp4/okp4d/x/logic/predicate"
 )
 
@@ -131,6 +129,8 @@ var RegistryNames = func() []string {
 	return names
 }()
 
+type Hook = func(functor string) func(env *engine.Env) error
+
 // Register registers a well-known predicate in the interpreter with support for consumption measurement.
 // name is the name of the predicate in the form of "atom/arity".
 // cost is the cost of executing the predicate.
@@ -138,7 +138,7 @@ var RegistryNames = func() []string {
 // executing the predicate(ctx).
 //
 //nolint:lll
-func Register(i *prolog.Interpreter, name string, cost uint64, meter storetypes.GasMeter) error {
+func Register(i *prolog.Interpreter, name string, hook Hook) error {
 	if p, ok := registry[name]; ok {
 		parts := strings.Split(name, "/")
 		if len(parts) == 2 {
@@ -148,31 +148,27 @@ func Register(i *prolog.Interpreter, name string, cost uint64, meter storetypes.
 				return err
 			}
 
-			hook := func() storetypes.Gas {
-				meter.ConsumeGas(cost, fmt.Sprintf("predicate %s", name))
-
-				return meter.GasRemaining()
-			}
+			invariant := hook(name)
 
 			switch arity {
 			case 0:
-				i.Register0(atom, Instrument0(hook, p.(func(*engine.VM, engine.Cont, *engine.Env) *engine.Promise)))
+				i.Register0(atom, Instrument0(invariant, p.(func(*engine.VM, engine.Cont, *engine.Env) *engine.Promise)))
 			case 1:
-				i.Register1(atom, Instrument1(hook, p.(func(*engine.VM, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
+				i.Register1(atom, Instrument1(invariant, p.(func(*engine.VM, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
 			case 2:
-				i.Register2(atom, Instrument2(hook, p.(func(*engine.VM, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
+				i.Register2(atom, Instrument2(invariant, p.(func(*engine.VM, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
 			case 3:
-				i.Register3(atom, Instrument3(hook, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
+				i.Register3(atom, Instrument3(invariant, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
 			case 4:
-				i.Register4(atom, Instrument4(hook, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
+				i.Register4(atom, Instrument4(invariant, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
 			case 5:
-				i.Register5(atom, Instrument5(hook, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
+				i.Register5(atom, Instrument5(invariant, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
 			case 6:
-				i.Register6(atom, Instrument6(hook, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
+				i.Register6(atom, Instrument6(invariant, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
 			case 7:
-				i.Register7(atom, Instrument7(hook, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
+				i.Register7(atom, Instrument7(invariant, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
 			case 8:
-				i.Register8(atom, Instrument8(hook, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
+				i.Register8(atom, Instrument8(invariant, p.(func(*engine.VM, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Term, engine.Cont, *engine.Env) *engine.Promise)))
 			default:
 				panic(fmt.Sprintf("unsupported arity: %s", name))
 			}

@@ -8,24 +8,33 @@ import (
 
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
-
-	storetypes "cosmossdk.io/store/types"
 )
-
-// Predicates is a map of predicate names to their execution costs.
-type Predicates map[string]uint64
 
 // Option is a function that configures an Interpreter.
 type Option func(*prolog.Interpreter) error
 
 // WithPredicates configures the interpreter to register the specified predicates.
-// The predicates names must be present in the registry, otherwise the function will return an error.
-func WithPredicates(_ goctx.Context, predicates Predicates, meter storetypes.GasMeter) Option {
+// See WithPredicate for more details.
+func WithPredicates(ctx goctx.Context, predicates []string, hook Hook) Option {
 	return func(i *prolog.Interpreter) error {
-		for predicate, cost := range predicates {
-			if err := Register(i, predicate, cost, meter); err != nil {
-				return fmt.Errorf("error registering predicate '%s': %w", predicate, err)
+		for _, predicate := range predicates {
+			if err := WithPredicate(ctx, predicate, hook)(i); err != nil {
+				return err
 			}
+		}
+		return nil
+	}
+}
+
+// WithPredicate configures the interpreter to register the specified predicate with the specified hook.
+// The hook is a function that is called before the predicate is executed and can be used to check some conditions,
+// like the gas consumption or the permission to execute the predicate.
+//
+// The predicates names must be present in the registry, otherwise the function will return an error.
+func WithPredicate(_ goctx.Context, predicate string, hook Hook) Option {
+	return func(i *prolog.Interpreter) error {
+		if err := Register(i, predicate, hook); err != nil {
+			return fmt.Errorf("error registering predicate '%s': %w", predicate, err)
 		}
 		return nil
 	}
