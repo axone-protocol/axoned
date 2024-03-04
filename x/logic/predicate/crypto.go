@@ -5,8 +5,8 @@ import (
 
 	"github.com/ichiban/prolog/engine"
 
-	"github.com/okp4/okp4d/x/logic/prolog"
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/v7/x/logic/prolog"
+	"github.com/okp4/okp4d/v7/x/logic/util"
 )
 
 // CryptoDataHash is a predicate that computes the Hash of the given Data using different algorithms.

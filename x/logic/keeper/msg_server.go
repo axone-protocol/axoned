@@ -8,7 +8,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/okp4/okp4d/x/logic/types"
+	"github.com/okp4/okp4d/v7/x/logic/types"
 )
 
 type msgServer struct {

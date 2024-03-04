@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 
-	"github.com/okp4/okp4d/x/logic/types"
+	"github.com/okp4/okp4d/v7/x/logic/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module.

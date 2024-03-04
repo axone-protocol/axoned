@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra/doc"
 
-	"github.com/okp4/okp4d/cmd/okp4d/cmd"
+	"github.com/okp4/okp4d/v7/cmd/okp4d/cmd"
 )
 
 func generateCommandDocumentation() error {

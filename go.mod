@@ -1,4 +1,4 @@
-module github.com/okp4/okp4d
+module github.com/okp4/okp4d/v7
 
 go 1.21
 
@@ -45,6 +45,7 @@ require (
 	github.com/princjef/gomarkdoc v1.1.0
 	github.com/prometheus/client_golang v1.18.0
 	github.com/samber/lo v1.39.0
+	github.com/sergi/go-diff v1.3.1
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/spf13/cast v1.6.0
 	github.com/spf13/cobra v1.8.0
@@ -249,7 +250,6 @@ require (
 	github.com/sagikazarmark/slog-shim v0.1.0 // indirect
 	github.com/sasha-s/go-deadlock v0.3.1 // indirect
 	github.com/segmentio/asm v1.2.0 // indirect
-	github.com/sergi/go-diff v1.3.1 // indirect
 	github.com/shengdoushi/base58 v1.0.0 // indirect
 	github.com/shopspring/decimal v1.2.0 // indirect
 	github.com/sirupsen/logrus v1.9.2 // indirect

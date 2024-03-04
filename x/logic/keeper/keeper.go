@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/x/logic/types"
+	"github.com/okp4/okp4d/v7/x/logic/types"
 )
 
 type FSProvider = func(ctx goctx.Context) fs.FS

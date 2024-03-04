@@ -12,8 +12,8 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/okp4/okp4d/x/logic/testutil"
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/v7/x/logic/testutil"
+	"github.com/okp4/okp4d/v7/x/logic/util"
 )
 
 func TestSourceFile(t *testing.T) {

@@ -7,7 +7,7 @@ import (
 
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/okp4/okp4d/x/mint/types"
+	"github.com/okp4/okp4d/v7/x/mint/types"
 )
 
 var _ types.MsgServer = msgServer{}
