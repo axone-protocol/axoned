@@ -33,6 +33,14 @@ Here's the steps of the scenario:
 {{ .DocString.Content }}
 ```
 {{- end -}}
+{{- if .DataTable -}}
+{{- spacer -}}
+| key | value |
+| --- | ----- |
+{{- range .DataTable.Rows }}
+| {{ (index .Cells 0).Value }} | {{ (index .Cells 1).Value }} |
+{{- end -}}
+{{- end -}}
 {{- end -}}
 {{- end -}}
 {{- end -}}

@@ -76,9 +76,17 @@ func givenABlockWithTheFollowingHeader(ctx context.Context, table *godog.Table) 
 	for _, row := range table.Rows {
 		switch row.Cells[0].Value {
 		case "Height":
-			header.Height = atoi64Must(row.Cells[1].Value)
+			height, err := atoi64(row.Cells[1].Value)
+			if err != nil {
+				return err
+			}
+			header.Height = height
 		case "Time":
-			header.Time = time.Unix(atoi64Must(row.Cells[1].Value), 0)
+			sec, err := atoi64(row.Cells[1].Value)
+			if err != nil {
+				return err
+			}
+			header.Time = time.Unix(sec, 0)
 		default:
 			return fmt.Errorf("unknown field: %s", row.Cells[0].Value)
 		}
@@ -201,10 +209,10 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 	return queryClient, nil
 }
 
-func atoi64Must(s string) int64 {
+func atoi64(s string) (int64, error) {
 	i, err := strconv.ParseInt(s, 10, 64)
 	if err != nil {
-		panic(err)
+		return 0, err
 	}
-	return i
+	return i, nil
 }
