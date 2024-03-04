@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -31,6 +32,8 @@ import (
 	"github.com/okp4/okp4d/v7/x/logic/types"
 )
 
+var key = storetypes.NewKVStoreKey(types.StoreKey)
+
 func TestFeatures(t *testing.T) {
 	suite := godog.TestSuite{
 		ScenarioInitializer: initializeScenario(t),
@@ -47,11 +50,10 @@ func TestFeatures(t *testing.T) {
 }
 
 type testCase struct {
-	ctx         sdktestutil.TestContext
-	encCfg      moduletestutil.TestEncodingConfig
-	queryClient types.QueryServiceClient
-	request     types.QueryServiceAskRequest
-	got         *types.Answer
+	t       testing.TB
+	ctx     sdktestutil.TestContext
+	request types.QueryServiceAskRequest
+	got     *types.Answer
 }
 
 type testCaseCtxKey struct{}
@@ -64,6 +66,23 @@ func testCaseFromContext(ctx context.Context) *testCase {
 	tc, _ := ctx.Value(testCaseCtxKey{}).(*testCase)
 
 	return tc
+}
+
+func givenABlockWithTheFollowingHeader(ctx context.Context, table *godog.Table) error {
+	tc := testCaseFromContext(ctx)
+
+	header := tc.ctx.Ctx.BlockHeader()
+	for _, row := range table.Rows {
+		switch row.Cells[0].Value {
+		case "Height":
+			header.Height = atoi64Must(row.Cells[1].Value)
+		default:
+			return fmt.Errorf("unknown field: %s", row.Cells[0].Value)
+		}
+	}
+	tc.ctx.Ctx = tc.ctx.Ctx.WithBlockHeader(header)
+
+	return nil
 }
 
 func givenTheProgram(ctx context.Context, program *godog.DocString) error {
@@ -79,11 +98,17 @@ func givenTheQuery(ctx context.Context, query *godog.DocString) error {
 }
 
 func whenTheQueryIsRun(ctx context.Context) error {
-	tc := testCaseFromContext(ctx)
-	got, err := tc.queryClient.Ask(context.Background(), &tc.request)
+	queryClient, err := newQueryClient(ctx)
 	if err != nil {
 		return err
 	}
+
+	tc := testCaseFromContext(ctx)
+	got, err := queryClient.Ask(context.Background(), &tc.request)
+	if err != nil {
+		return err
+	}
+
 	tc.got = got.Answer
 
 	return nil
@@ -125,47 +150,58 @@ func assert(actual any, assertion Assertion, expected ...any) error {
 func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 	return func(ctx *godog.ScenarioContext) {
 		ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
-			encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
-			key := storetypes.NewKVStoreKey(types.StoreKey)
 			testCtx := sdktestutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
 
-			ctrl := gomock.NewController(t)
-			accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
-			bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
-			fsProvider := logictestutil.NewMockFS(ctrl)
-
-			logicKeeper := keeper.NewKeeper(
-				encCfg.Codec,
-				key,
-				key,
-				authtypes.NewModuleAddress(govtypes.ModuleName),
-				accountKeeper,
-				bankKeeper,
-				func(_ context.Context) fs.FS {
-					return fsProvider
-				},
-			)
-			err := logicKeeper.SetParams(testCtx.Ctx, types.DefaultParams())
-			if err != nil {
-				return nil, err
-			}
-
-			queryHelper := baseapp.NewQueryServerTestHelper(testCtx.Ctx, encCfg.InterfaceRegistry)
-			types.RegisterQueryServiceServer(queryHelper, logicKeeper)
-			queryClient := types.NewQueryServiceClient(queryHelper)
-
 			tc := testCase{
-				ctx:         testCtx,
-				encCfg:      encCfg,
-				queryClient: queryClient,
+				t:   t,
+				ctx: testCtx,
 			}
 
 			return testCaseToContext(ctx, tc), nil
 		})
 
+		ctx.Given(`a block with the following header:`, givenABlockWithTheFollowingHeader)
 		ctx.Given(`the query:`, givenTheQuery)
 		ctx.Given(`the program:`, givenTheProgram)
 		ctx.When(`the query is run`, whenTheQueryIsRun)
 		ctx.Then(`the answer we get is:`, theAnswerWeGetIs)
 	}
+}
+
+func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
+	tc := testCaseFromContext(ctx)
+
+	ctrl := gomock.NewController(tc.t)
+	accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
+	bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
+	fsProvider := logictestutil.NewMockFS(ctrl)
+	encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
+
+	logicKeeper := keeper.NewKeeper(
+		encCfg.Codec,
+		key,
+		key,
+		authtypes.NewModuleAddress(govtypes.ModuleName),
+		accountKeeper,
+		bankKeeper,
+		func(_ context.Context) fs.FS {
+			return fsProvider
+		},
+	)
+	if err := logicKeeper.SetParams(tc.ctx.Ctx, types.DefaultParams()); err != nil {
+		return nil, err
+	}
+
+	queryHelper := baseapp.NewQueryServerTestHelper(tc.ctx.Ctx, encCfg.InterfaceRegistry)
+	types.RegisterQueryServiceServer(queryHelper, logicKeeper)
+	queryClient := types.NewQueryServiceClient(queryHelper)
+	return queryClient, nil
+}
+
+func atoi64Must(s string) int64 {
+	i, err := strconv.ParseInt(s, 10, 64)
+	if err != nil {
+		panic(err)
+	}
+	return i
 }
