@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/cucumber/godog"
 	"github.com/golang/mock/gomock"
@@ -76,6 +77,8 @@ func givenABlockWithTheFollowingHeader(ctx context.Context, table *godog.Table) 
 		switch row.Cells[0].Value {
 		case "Height":
 			header.Height = atoi64Must(row.Cells[1].Value)
+		case "Time":
+			header.Time = time.Unix(atoi64Must(row.Cells[1].Value), 0)
 		default:
 			return fmt.Errorf("unknown field: %s", row.Cells[0].Value)
 		}

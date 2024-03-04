@@ -24,7 +24,7 @@ Feature: block_height/1
       """
 
   @great_for_documentation
-  Scenario: Check that the block height is greater than 100.
+  Scenario: Check that the block height is greater than a certain value.
     This scenario demonstrates how to check that the block height is greater than 100. This predicate is useful for
     governance which requires a certain block height to be reached before a certain action is taken.
 
