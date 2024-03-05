@@ -1,5 +1,7 @@
 # ØKP4 protocol changelog
 
+## [7.0.1](https://github.com/okp4/okp4d/compare/v7.0.0...v7.0.1) (2024-03-05)
+
 ## [7.0.0](https://github.com/okp4/okp4d/compare/v6.0.0...v7.0.0) (2024-02-29)
 
 
