@@ -1,6 +1,6 @@
 package wasm
 
-import "github.com/okp4/okp4d/x/logic/types"
+import "github.com/okp4/okp4d/v7/x/logic/types"
 
 // AskQuery implements the wasm custom Ask query JSON schema, it basically redefined the Ask gRPC request parameters
 // to keep control in case of eventual breaking change in the logic module definition, and to decouple the

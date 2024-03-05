@@ -13,7 +13,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/x/logic/prolog"
+	"github.com/okp4/okp4d/v7/x/logic/prolog"
 )
 
 // JSONProlog is a predicate that will unify a JSON string into prolog terms and vice versa.

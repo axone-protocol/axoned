@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	cryptokeyring "github.com/cosmos/cosmos-sdk/crypto/keyring"
 
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/v7/x/logic/util"
 )
 
 // KeyOutput is the output format for keys when listing them.

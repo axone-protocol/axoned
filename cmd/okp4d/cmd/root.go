@@ -40,10 +40,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
-	"github.com/okp4/okp4d/app"
-	appparams "github.com/okp4/okp4d/app/params"
-	"github.com/okp4/okp4d/client/credential"
-	okp4keys "github.com/okp4/okp4d/client/keys"
+	"github.com/okp4/okp4d/v7/app"
+	appparams "github.com/okp4/okp4d/v7/app/params"
+	"github.com/okp4/okp4d/v7/client/credential"
+	okp4keys "github.com/okp4/okp4d/v7/client/keys"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application.

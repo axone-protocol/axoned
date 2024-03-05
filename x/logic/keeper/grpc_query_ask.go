@@ -8,8 +8,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/x/logic/meter"
-	"github.com/okp4/okp4d/x/logic/types"
+	"github.com/okp4/okp4d/v7/x/logic/meter"
+	"github.com/okp4/okp4d/v7/x/logic/types"
 )
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {

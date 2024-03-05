@@ -12,7 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	vestexported "github.com/okp4/okp4d/x/vesting/exported"
+	vestexported "github.com/okp4/okp4d/v7/x/vesting/exported"
 )
 
 // Compile-time type assertions.

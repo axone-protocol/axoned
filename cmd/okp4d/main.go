@@ -7,8 +7,8 @@ import (
 
 	svrcmd "github.com/cosmos/cosmos-sdk/server/cmd"
 
-	"github.com/okp4/okp4d/app"
-	"github.com/okp4/okp4d/cmd/okp4d/cmd"
+	"github.com/okp4/okp4d/v7/app"
+	"github.com/okp4/okp4d/v7/cmd/okp4d/cmd"
 )
 
 func main() {

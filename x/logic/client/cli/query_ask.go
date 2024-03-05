@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/okp4/okp4d/x/logic/types"
+	"github.com/okp4/okp4d/v7/x/logic/types"
 )
 
 var program string

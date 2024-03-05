@@ -14,13 +14,13 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/x/logic/fs"
-	"github.com/okp4/okp4d/x/logic/interpreter"
-	"github.com/okp4/okp4d/x/logic/interpreter/bootstrap"
-	"github.com/okp4/okp4d/x/logic/meter"
-	prolog2 "github.com/okp4/okp4d/x/logic/prolog"
-	"github.com/okp4/okp4d/x/logic/types"
-	"github.com/okp4/okp4d/x/logic/util"
+	"github.com/okp4/okp4d/v7/x/logic/fs"
+	"github.com/okp4/okp4d/v7/x/logic/interpreter"
+	"github.com/okp4/okp4d/v7/x/logic/interpreter/bootstrap"
+	"github.com/okp4/okp4d/v7/x/logic/meter"
+	prolog2 "github.com/okp4/okp4d/v7/x/logic/prolog"
+	"github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/okp4/okp4d/v7/x/logic/util"
 )
 
 const (

@@ -18,7 +18,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/x/logic/testutil"
+	"github.com/okp4/okp4d/v7/x/logic/testutil"
 )
 
 func TestBlock(t *testing.T) {

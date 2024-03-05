@@ -15,8 +15,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/okp4/okp4d/x/mint/simulation"
-	"github.com/okp4/okp4d/x/mint/types"
+	"github.com/okp4/okp4d/v7/x/mint/simulation"
+	"github.com/okp4/okp4d/v7/x/mint/types"
 )
 
 // TestRandomizedGenState tests the normal scenario of applying RandomizedGenState.

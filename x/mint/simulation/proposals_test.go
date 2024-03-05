@@ -14,8 +14,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/address"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/okp4/okp4d/x/mint/simulation"
-	"github.com/okp4/okp4d/x/mint/types"
+	"github.com/okp4/okp4d/v7/x/mint/simulation"
+	"github.com/okp4/okp4d/v7/x/mint/types"
 )
 
 func TestProposalMsgs(t *testing.T) {

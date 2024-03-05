@@ -137,17 +137,17 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 
-	okp4wasm "github.com/okp4/okp4d/app/wasm"
-	"github.com/okp4/okp4d/docs"
-	logicmodule "github.com/okp4/okp4d/x/logic"
-	logicfs "github.com/okp4/okp4d/x/logic/fs"
-	logicmodulekeeper "github.com/okp4/okp4d/x/logic/keeper"
-	logicmoduletypes "github.com/okp4/okp4d/x/logic/types"
-	"github.com/okp4/okp4d/x/mint"
-	mintkeeper "github.com/okp4/okp4d/x/mint/keeper"
-	minttypes "github.com/okp4/okp4d/x/mint/types"
-	"github.com/okp4/okp4d/x/vesting"
-	vestingtypes "github.com/okp4/okp4d/x/vesting/types"
+	okp4wasm "github.com/okp4/okp4d/v7/app/wasm"
+	"github.com/okp4/okp4d/v7/docs"
+	logicmodule "github.com/okp4/okp4d/v7/x/logic"
+	logicfs "github.com/okp4/okp4d/v7/x/logic/fs"
+	logicmodulekeeper "github.com/okp4/okp4d/v7/x/logic/keeper"
+	logicmoduletypes "github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/okp4/okp4d/v7/x/mint"
+	mintkeeper "github.com/okp4/okp4d/v7/x/mint/keeper"
+	minttypes "github.com/okp4/okp4d/v7/x/mint/types"
+	"github.com/okp4/okp4d/v7/x/vesting"
+	vestingtypes "github.com/okp4/okp4d/v7/x/vesting/types"
 )
 
 const (
