@@ -9,10 +9,10 @@ sidebar_position: 6
 
 `block_time/1` is a predicate which unifies the given term with the current block time.
 
-The signature is as follows:
+## Signature
 
 ```text
-block_time(?Time)
+block_time(?Time) is det
 ```
 
 where:
@@ -21,7 +21,65 @@ where:
 
 ## Examples
 
-```text
-# Query the current block time.
-- block_time(Time).
+### Retrieve the block time of the current block
+
+This scenario demonstrates how to retrieve the block time of the current block.
+
+Here's the steps of the scenario:
+
+- **Given** a block with the following header:
+
+| key | value |
+| --- | ----- |
+| Time | 1709550216 |
+
+- **Given** the query:
+
+```  prolog
+block_time(Time).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+has_more: false
+variables: ["Time"]
+results:
+- substitutions:
+  - variable: Time
+    expression: "1709550216"
+```
+
+### Check that the block time is greater than a certain time
+
+This scenario demonstrates how to check that the block time is greater than 1709550216 seconds (Monday 4 March 2024 11:03:36 GMT)
+using the `block_time/1` predicate. This predicate is useful for governance which requires a certain block time to be
+reached before a certain action is taken.
+
+Here's the steps of the scenario:
+
+- **Given** a block with the following header:
+
+| key | value |
+| --- | ----- |
+| Time | 1709550217 |
+
+- **Given** the query:
+
+```  prolog
+block_time(Time),
+Time > 1709550216.
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+has_more: false
+variables: ["Time"]
+results:
+- substitutions:
+  - variable: Time
+    expression: "1709550217"
 ```
