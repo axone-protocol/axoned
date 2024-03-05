@@ -4,6 +4,23 @@ branches:
 plugins:
   - - "@semantic-release/commit-analyzer"
     - preset: conventionalcommits
+      releaseRules:
+        - type: build
+          scope: deps
+          release: patch
+        - type: build
+          scope: deps-dev
+          release: patch
+        - type: refactor
+          release: patch
+        - type: style
+          release: patch
+        - type: ci
+          release: patch
+        - type: chore
+          release: patch
+        - type: docs
+          release: patch
   - - "@semantic-release/release-notes-generator"
     - preset: conventionalcommits
   - - "@semantic-release/changelog"
