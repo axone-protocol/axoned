@@ -213,7 +213,7 @@ func readFromFileOrStdin(filename string) ([]byte, error) {
 
 // expandPath expands the given path, replacing the "~" symbol with the user's home directory.
 func expandPath(path string) (string, error) {
-	if len(path) == 0 || strings.HasPrefix(path, symbolHome) {
+	if len(path) == 0 || !strings.HasPrefix(path, symbolHome) {
 		return path, nil
 	}
 
