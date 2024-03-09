@@ -11,7 +11,8 @@ import (
 
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/jsonld"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite"
-	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite/ed25519signature2018"
+	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite/ecdsasecp256k1signature2019"
+	"github.com/hyperledger/aries-framework-go/pkg/doc/signature/suite/ed25519signature2020"
 	"github.com/hyperledger/aries-framework-go/pkg/doc/verifiable"
 	"github.com/piprate/json-gold/ld"
 	"github.com/spf13/cobra"
@@ -21,6 +22,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/crypto/keyring"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/ed25519"
+	"github.com/cosmos/cosmos-sdk/crypto/keys/secp256k1"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerr "github.com/cosmos/cosmos-sdk/types/errors"
@@ -208,7 +211,7 @@ func readFromFileOrStdin(filename string) ([]byte, error) {
 
 // expandPath expands the given path, replacing the "~" symbol with the user's home directory.
 func expandPath(path string) (string, error) {
-	if len(path) == 0 || strings.HasPrefix(path, symbolHome) {
+	if len(path) == 0 || !strings.HasPrefix(path, symbolHome) {
 		return path, nil
 	}
 
@@ -249,13 +252,32 @@ func signVerifiableCredential(
 		return err
 	}
 
-	return vc.AddLinkedDataProof(&verifiable.LinkedDataProofContext{
-		Created:                 &date,
-		SignatureType:           "Ed25519Signature2018",
-		Suite:                   ed25519signature2018.New(suite.WithSigner(signer)),
-		SignatureRepresentation: verifiable.SignatureProofValue,
-		VerificationMethod:      didKeyID,
-	}, jsonld.WithDocumentLoader(documentLoader))
+	pubKey, err := signer.PubKey()
+	if err != nil {
+		return err
+	}
+
+	switch pubKey.(type) {
+	case *ed25519.PubKey:
+		return vc.AddLinkedDataProof(&verifiable.LinkedDataProofContext{
+			Created:                 &date,
+			SignatureType:           "Ed25519Signature2020",
+			Suite:                   ed25519signature2020.New(suite.WithSigner(signer)),
+			SignatureRepresentation: verifiable.SignatureProofValue,
+			VerificationMethod:      didKeyID,
+		}, jsonld.WithDocumentLoader(documentLoader))
+	case *secp256k1.PubKey:
+		return vc.AddLinkedDataProof(&verifiable.LinkedDataProofContext{
+			Created:                 &date,
+			SignatureType:           "EcdsaSecp256k1Signature2019",
+			Suite:                   ecdsasecp256k1signature2019.New(suite.WithSigner(signer)),
+			SignatureRepresentation: verifiable.SignatureJWS,
+			VerificationMethod:      didKeyID,
+		}, jsonld.WithDocumentLoader(documentLoader))
+	default:
+		return fmt.Errorf("invalid pubkey type: %s; expected oneof %+q",
+			pubKey.Type(), []string{(&ed25519.PubKey{}).Type(), (&secp256k1.PubKey{}).Type()})
+	}
 }
 
 func parseStringAsDate(cmd *cobra.Command, flag string) (time.Time, error) {
