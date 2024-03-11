@@ -40,7 +40,7 @@ func (k Keeper) enhanceContext(ctx context.Context) context.Context {
 	return sdkCtx
 }
 
-func (k Keeper) execute(ctx context.Context, program, query string) (*types.QueryServiceAskResponse, error) {
+func (k Keeper) execute(ctx context.Context, program, query string, limit sdkmath.Uint) (*types.QueryServiceAskResponse, error) {
 	ctx = k.enhanceContext(ctx)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	limits := k.limits(sdkCtx)
@@ -53,7 +53,7 @@ func (k Keeper) execute(ctx context.Context, program, query string) (*types.Quer
 		return nil, errorsmod.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
 	}
 
-	answer, err := k.queryInterpreter(ctx, i, query, *limits.MaxResultCount)
+	answer, err := k.queryInterpreter(ctx, i, query, sdkmath.MinUint(limit, *limits.MaxResultCount))
 	if err != nil {
 		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
 	}

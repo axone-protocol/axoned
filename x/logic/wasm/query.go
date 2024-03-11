@@ -27,6 +27,7 @@ func (querier LogicQuerier) Ask(ctx sdk.Context, query AskQuery) ([]byte, error)
 	grpcResp, err := querier.k.Ask(ctx, &types.QueryServiceAskRequest{
 		Program: query.Program,
 		Query:   query.Query,
+		Limit:   query.Limit,
 	})
 	if err != nil {
 		return nil, err
