@@ -395,6 +395,7 @@ QueryServiceAskRequest is request type for the QueryService/Ask RPC method.
 | ----- | ---- | ----- | ----------- |
 | `program` | [string](#string) |  | program is the logic program to be queried. |
 | `query` | [string](#string) |  | query is the query string to be executed. |
+| `limit` | [string](#string) |  | limit specifies the maximum number of solutions to be returned. This field is governed by max_result_count, which defines the upper limit of results that may be requested per query. If this field is not explicitly set, a default value of 1 is applied. |
 
 <a name="logic.v1beta2.QueryServiceAskResponse"></a>
 

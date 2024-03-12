@@ -1,3 +1,4 @@
+//nolint:gocognit
 package keeper_test
 
 import (
@@ -33,6 +34,7 @@ func TestGRPCAsk(t *testing.T) {
 			program            string
 			query              string
 			limit              int
+			maxResultCount     int
 			predicateBlacklist []string
 			maxGas             uint64
 			predicateCosts     map[string]uint64
@@ -83,15 +85,41 @@ func TestGRPCAsk(t *testing.T) {
 				},
 			},
 			{
-				program: "father(bob, alice). father(bob, john).",
-				query:   "father(bob, X).",
-				limit:   5,
+				program:        "father(bob, alice). father(bob, john).",
+				query:          "father(bob, X).",
+				maxResultCount: 5,
+				expectedAnswer: &types.Answer{
+					HasMore:   true,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X", Expression: "alice",
+					}}}},
+				},
+			},
+			{
+				program:        "father(bob, alice). father(bob, john).",
+				query:          "father(bob, X).",
+				limit:          2,
+				maxResultCount: 5,
 				expectedAnswer: &types.Answer{
 					Variables: []string{"X"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
 						Variable: "X", Expression: "alice",
 					}}}, {Substitutions: []types.Substitution{{
 						Variable: "X", Expression: "john",
+					}}}},
+				},
+			},
+			{
+				program:        "father(bob, alice). father(bob, john).",
+				query:          "father(bob, X).",
+				limit:          2,
+				maxResultCount: 1,
+				expectedAnswer: &types.Answer{
+					HasMore:   true,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X", Expression: "alice",
 					}}}},
 				},
 			},
@@ -204,8 +232,8 @@ foo(a2).
 foo(a3) :- throw(error(resource_error(foo))).
 foo(a4).
 `,
-				query: `foo(X).`,
-				limit: 1,
+				query:          `foo(X).`,
+				maxResultCount: 1,
 				expectedAnswer: &types.Answer{
 					HasMore:   true,
 					Variables: []string{"X"},
@@ -221,8 +249,9 @@ foo(a2).
 foo(a3) :- throw(error(resource_error(foo))).
 foo(a4).
 `,
-				query: `foo(X).`,
-				limit: 2,
+				query:          `foo(X).`,
+				limit:          2,
+				maxResultCount: 3,
 				expectedAnswer: &types.Answer{
 					HasMore:   true,
 					Variables: []string{"X"},
@@ -239,8 +268,9 @@ foo(a2).
 foo(a3) :- throw(error(resource_error(foo))).
 foo(a4).
 `,
-				query: `foo(X).`,
-				limit: 3,
+				query:          `foo(X).`,
+				limit:          5,
+				maxResultCount: 3,
 				expectedAnswer: &types.Answer{
 					Variables: []string{"X"},
 					Results: []types.Result{
@@ -257,8 +287,9 @@ foo(a2).
 foo(a3) :- throw(error(resource_error(foo))).
 foo(a4).
 `,
-				query: `foo(X).`,
-				limit: 5,
+				query:          `foo(X).`,
+				limit:          5,
+				maxResultCount: 5,
 				expectedAnswer: &types.Answer{
 					Variables: []string{"X"},
 					Results: []types.Result{
@@ -295,9 +326,9 @@ foo(a4).
 							return fsProvider
 						},
 					)
-					limit := sdkmath.NewUint(uint64(lo.If(tc.limit == 0, 1).Else(tc.limit)))
+					maxResultCount := sdkmath.NewUint(uint64(lo.If(tc.maxResultCount == 0, 1).Else(tc.maxResultCount)))
 					params := types.DefaultParams()
-					params.Limits.MaxResultCount = &limit
+					params.Limits.MaxResultCount = &maxResultCount
 					if tc.predicateBlacklist != nil {
 						params.Interpreter.PredicatesFilter.Blacklist = tc.predicateBlacklist
 					}
@@ -326,9 +357,15 @@ foo(a4).
 
 						queryClient := types.NewQueryServiceClient(queryHelper)
 
+						var limit *sdkmath.Uint
+						if tc.limit != 0 {
+							v := sdkmath.NewUint(uint64(tc.limit))
+							limit = &v
+						}
 						query := types.QueryServiceAskRequest{
 							Program: tc.program,
 							Query:   tc.query,
+							Limit:   limit,
 						}
 
 						Convey("when the grpc query ask is called", func() {

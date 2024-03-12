@@ -4,13 +4,17 @@ import (
 	goctx "context"
 
 	errorsmod "cosmossdk.io/errors"
+	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/okp4/okp4d/v7/x/logic/meter"
 	"github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/okp4/okp4d/v7/x/logic/util"
 )
+
+var defaultLimits = sdkmath.OneUint()
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
@@ -43,7 +47,8 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 	return k.execute(
 		sdkCtx,
 		req.Program,
-		req.Query)
+		req.Query,
+		util.DerefOrDefault(req.Limit, defaultLimits))
 }
 
 // withGasMeter returns a new context with a gas meter that has the given limit.
