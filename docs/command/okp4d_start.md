@@ -39,7 +39,7 @@ okp4d start [flags]
 
 ```
       --abci string                                     specify abci transport (socket | grpc) (default "socket")
-      --address string                                  Listen address (default "tcp://0.0.0.0:26658")
+      --address string                                  Listen address (default "tcp://127.0.0.1:26658")
       --api.address string                              the API server address to listen on (default "tcp://localhost:1317")
       --api.enable                                      Define if the API server should be enabled
       --api.enabled-unsafe-cors                         Define if CORS should be enabled (unsafe - use it at your own risk)
@@ -88,6 +88,7 @@ okp4d start [flags]
       --rpc.laddr string                                RPC listen address. Port required (default "tcp://127.0.0.1:26657")
       --rpc.pprof_laddr string                          pprof listen address (https://golang.org/pkg/net/http/pprof)
       --rpc.unsafe                                      enabled unsafe rpc methods
+      --shutdown-grace duration                         On Shutdown, duration to wait for resource clean up
       --state-sync.snapshot-interval uint               State sync snapshot interval
       --state-sync.snapshot-keep-recent uint32          State sync snapshot to keep (default 2)
       --trace                                           Provide full stack traces for errors in ABCI Log
