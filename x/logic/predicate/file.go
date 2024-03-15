@@ -129,6 +129,16 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 		return engine.Error(engine.TypeError(prolog.AtomTypeAtom, sourceSink, env))
 	}
 
+	if prolog.IsGround(options, env) {
+		_, err := prolog.AssertList(options, env)
+		switch {
+		case err != nil:
+			return engine.Error(err)
+		case !prolog.IsEmptyList(options, env):
+			return engine.Error(engine.DomainError(prolog.ValidEmptyList(), options, env))
+		}
+	}
+
 	var streamMode ioMode
 	switch m := env.Resolve(mode).(type) {
 	case engine.Variable:
@@ -161,16 +171,6 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 		return engine.Error(engine.ExistenceError(prolog.AtomObjectTypeSourceSink, sourceSink, env))
 	}
 	s := engine.NewInputTextStream(f)
-
-	if prolog.IsGround(options, env) {
-		_, err = prolog.AssertList(options, env)
-		switch {
-		case err != nil:
-			return engine.Error(err)
-		case !prolog.IsEmptyList(options, env):
-			return engine.Error(engine.DomainError(prolog.ValidEmptyList(), options, env))
-		}
-	}
 
 	return engine.Unify(vm, stream, s, k, env)
 }
