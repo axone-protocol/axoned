@@ -4,15 +4,14 @@ FROM golang:1.21-alpine3.17 AS go-builder
 WORKDIR /src
 
 # CosmWasm: see https://github.com/CosmWasm/wasmvm/releases
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.2/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v1.5.2/libwasmvm_muslc.x86_64.a /lib/libwasmvm_muslc.x86_64.a
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v2.0.0/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v2.0.0/libwasmvm_muslc.x86_64.a /lib/libwasmvm_muslc.x86_64.a
 
 # hadolint ignore=DL4006
 RUN set -eux \
     && apk add --no-cache ca-certificates=20230506-r0 build-base=0.5-r3 git=2.38.5-r0 linux-headers=5.19.5-r0 \
-    && sha256sum /lib/libwasmvm_muslc.aarch64.a | grep e78b224c15964817a3b75a40e59882b4d0e06fd055b39514d61646689cef8c6e \
-    && sha256sum /lib/libwasmvm_muslc.x86_64.a | grep e660a38efb2930b34ee6f6b0bb12730adccb040b6ab701b8f82f34453a426ae7 \
-    && cp "/lib/libwasmvm_muslc.$(uname -m).a" /lib/libwasmvm_muslc.a
+    && sha256sum /lib/libwasmvm_muslc.aarch64.a | grep 3b478b3e51d31e53ce9324a8895d2cd7278af5179b9a02ea55d8627958e42afa \
+    && sha256sum /lib/libwasmvm_muslc.x86_64.a | grep ca08bb7b73b49b483611d9755bb8455620bb8c0faf3014400908ed49bf3b19a5
 
 COPY . /src/
 
