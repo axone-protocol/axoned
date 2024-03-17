@@ -11,6 +11,21 @@ import (
 	"github.com/okp4/okp4d/v7/x/logic/prolog"
 )
 
+// Consult is a predicate which read files as Prolog source code.
+//
+// # Signature
+//
+//	consult(+Files) is det
+//
+// where:
+//   - Files represents the source files to be loaded. It can be an atom or a list of atoms representing the source files.
+//
+// The Files argument are typically URIs that point to the sources file to be loaded through the Virtual File System (VFS).
+// Please refer to the open/4 predicate for more information about the VFS.
+func Consult(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return engine.Consult(vm, file, cont, env)
+}
+
 // SourceFile is a predicate which unifies the given term with the source file that is currently loaded.
 //
 // # Signature
@@ -86,7 +101,7 @@ func (m ioMode) Term() engine.Term {
 //	open(+SourceSink, +Mode, -Stream, +Options)
 //
 // where:
-//   - SourceSink is an atom representing the source or sink of the stream.
+//   - SourceSink is an atom representing the source or sink of the stream, which is typically a URI.
 //   - Mode is an atom representing the mode of the stream to be opened. It can be one of "read", "write", or "append".
 //   - Stream is the stream to be opened.
 //   - Options is a list of options. No options are currently defined, so the list should be empty.

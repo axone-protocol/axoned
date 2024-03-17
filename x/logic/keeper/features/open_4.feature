@@ -20,17 +20,34 @@ Feature: open/4
       response: |
         Hello, World!
       """
+    Given the program:
+      """ prolog
+      atomic_list_concat([], '').
+      atomic_list_concat([H|T], Atom) :-
+        atomic_list_concat(T, TAtom),
+        atom_concat(H, TAtom, Atom).
+
+      resource_uri(Contract, Query, URI) :-
+        uri_encoded(query_value, Query, EncodedQuery),
+        atomic_list_concat(['cosmwasm:storage:', Contract, '?query=', EncodedQuery, '&base64Decode=false'], URI).
+      """
     Given the query:
       """ prolog
-      open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false', read, _, []).
+      resource_uri(
+        'okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht',
+        '{"object_data":{"id": "4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05"}}',
+        URI),
+      open(URI, read, _, []).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       has_more: false
-      variables:
+      variables: ["URI"]
       results:
       - substitutions:
+        - variable: URI
+          expression: "'cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
       """
 
   @great_for_documentation
@@ -54,22 +71,13 @@ Feature: open/4
     Given the program:
       """ prolog
       read_resource(Resource, Chars) :-
-        open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false', read, Stream, []),
-        get_char(Stream, Char),
-        read_resource(Stream, Char, Chars),
+        open(Resource, read, Stream, []),
+        read_string(Stream, _, Chars),
         close(Stream).
-
-      read_resource(Stream, Char, Chars) :-
-        (   Char == end_of_file ->
-            Chars = []
-        ;   Chars = [Char| Rest],
-            get_char(Stream, Next),
-            read_resource(Stream, Next, Rest)
-        ).
       """
     Given the query:
       """ prolog
-      read_resource('hello-world.txt', Chars).
+      read_resource('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false', Chars).
       """
     When the query is run
     Then the answer we get is:
@@ -79,7 +87,7 @@ Feature: open/4
       results:
       - substitutions:
         - variable: Chars
-          expression: "['H',e,l,l,o,',',' ','W',o,r,l,d,!]"
+          expression: "'Hello, World!'"
       """
 
   @great_for_documentation
@@ -101,22 +109,13 @@ Feature: open/4
     Given the program:
       """ prolog
       read_resource(Resource, Chars) :-
-        open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=true', read, Stream, []),
-        get_char(Stream, Char),
-        read_resource(Stream, Char, Chars),
+        open(Resource, read, Stream, []),
+        read_string(Stream, _, Chars),
         close(Stream).
-
-      read_resource(Stream, Char, Chars) :-
-        (   Char == end_of_file ->
-            Chars = []
-        ;   Chars = [Char| Rest],
-            get_char(Stream, Next),
-            read_resource(Stream, Next, Rest)
-        ).
       """
     Given the query:
       """ prolog
-      read_resource('hello-world.txt', Chars).
+      read_resource('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=true', Chars).
       """
     When the query is run
     Then the answer we get is:
@@ -126,7 +125,7 @@ Feature: open/4
       results:
       - substitutions:
         - variable: Chars
-          expression: "['H',e,l,l,o,',',' ','W',o,r,l,d,!]"
+          expression: "'Hello, World!'"
       """
 
   @great_for_documentation

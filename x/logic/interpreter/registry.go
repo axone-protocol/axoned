@@ -90,7 +90,7 @@ var registry = map[string]any{
 	"set_prolog_flag/2":         engine.SetPrologFlag,
 	"current_prolog_flag/2":     engine.CurrentPrologFlag,
 	"halt/1":                    engine.Halt,
-	"consult/1":                 engine.Consult,
+	"consult/1":                 predicate.Consult,
 	"phrase/3":                  engine.Phrase,
 	"expand_term/2":             engine.ExpandTerm,
 	"append/3":                  engine.Append,
