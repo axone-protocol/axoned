@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -23,11 +24,13 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdktestutil "github.com/cosmos/cosmos-sdk/testutil"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/okp4/okp4d/v7/x/logic"
+	logicfs "github.com/okp4/okp4d/v7/x/logic/fs"
 	"github.com/okp4/okp4d/v7/x/logic/keeper"
 	logictestutil "github.com/okp4/okp4d/v7/x/logic/testutil"
 	"github.com/okp4/okp4d/v7/x/logic/types"
@@ -51,10 +54,17 @@ func TestFeatures(t *testing.T) {
 }
 
 type testCase struct {
-	t       testing.TB
-	ctx     sdktestutil.TestContext
-	request types.QueryServiceAskRequest
-	got     *types.Answer
+	ctx           sdktestutil.TestContext
+	accountKeeper *logictestutil.MockAccountKeeper
+	bankKeeper    *logictestutil.MockBankKeeper
+	wasmKeeper    *logictestutil.MockWasmKeeper
+	request       types.QueryServiceAskRequest
+	got           *types.Answer
+}
+
+type SmartContractConfiguration struct {
+	Message  string `json:"message" yaml:"message"`
+	Response string `json:"response" yaml:"response"`
 }
 
 type testCaseCtxKey struct{}
@@ -102,6 +112,44 @@ func givenTheProgram(ctx context.Context, program *godog.DocString) error {
 	return nil
 }
 
+func givenASmartContractWithAddress(ctx context.Context, address string, configuration *godog.DocString) error {
+	smartContractConfiguration := &SmartContractConfiguration{}
+	if strings.TrimSpace(configuration.MediaType) != "yaml" {
+		return fmt.Errorf("unsupported media type: %s. Want %s", configuration.MediaType, "yaml")
+	}
+	if err := yaml.Unmarshal([]byte(configuration.Content), &smartContractConfiguration); err != nil {
+		return err
+	}
+
+	contractAddr, err := sdk.AccAddressFromBech32(address)
+	if err != nil {
+		return err
+	}
+	messageWant := map[string]interface{}{}
+	if err := json.Unmarshal([]byte(smartContractConfiguration.Message), &messageWant); err != nil {
+		return err
+	}
+
+	wasmKeeper := testCaseFromContext(ctx).wasmKeeper
+	wasmKeeper.EXPECT().
+		QuerySmart(gomock.Any(), contractAddr, gomock.Any()).
+		DoAndReturn(func(_ context.Context, _ []byte, messageBytes []byte) ([]byte, error) {
+			message := map[string]interface{}{}
+			if err := json.Unmarshal(messageBytes, &message); err != nil {
+				return nil, err
+			}
+
+			if reflect.DeepEqual(message, messageWant) {
+				return []byte(smartContractConfiguration.Response), nil
+			}
+
+			return nil, fmt.Errorf("unexpected message: %v", message)
+		}).
+		AnyTimes()
+
+	return nil
+}
+
 func givenTheQuery(ctx context.Context, query *godog.DocString) error {
 	testCaseFromContext(ctx).request.Query = query.Content
 
@@ -109,12 +157,20 @@ func givenTheQuery(ctx context.Context, query *godog.DocString) error {
 }
 
 func whenTheQueryIsRun(ctx context.Context) error {
+	tc := testCaseFromContext(ctx)
+
+	tc.wasmKeeper.EXPECT().
+		QuerySmart(gomock.Any(), gomock.Any(), gomock.Any()).
+		DoAndReturn(func(_ context.Context, contractAddr []byte, _ []byte) ([]byte, error) {
+			return nil, fmt.Errorf("not existing contract: %s", contractAddr)
+		}).
+		AnyTimes()
+
 	queryClient, err := newQueryClient(ctx)
 	if err != nil {
 		return err
 	}
 
-	tc := testCaseFromContext(ctx)
 	got, err := queryClient.Ask(context.Background(), &tc.request)
 	if err != nil {
 		return err
@@ -159,19 +215,28 @@ func assert(actual any, assertion Assertion, expected ...any) error {
 }
 
 func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
+	sdk.GetConfig().SetBech32PrefixForAccount("okp4", "okp4pub")
+
 	return func(ctx *godog.ScenarioContext) {
 		ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
 			testCtx := sdktestutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+			ctrl := gomock.NewController(t)
+			accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
+			bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
+			wasmKeeper := logictestutil.NewMockWasmKeeper(ctrl)
 
 			tc := testCase{
-				t:   t,
-				ctx: testCtx,
+				ctx:           testCtx,
+				accountKeeper: accountKeeper,
+				bankKeeper:    bankKeeper,
+				wasmKeeper:    wasmKeeper,
 			}
 
 			return testCaseToContext(ctx, tc), nil
 		})
 
 		ctx.Given(`a block with the following header:`, givenABlockWithTheFollowingHeader)
+		ctx.Given(`the CosmWasm smart contract "([^"]+)" and the behavior:`, givenASmartContractWithAddress)
 		ctx.Given(`the query:`, givenTheQuery)
 		ctx.Given(`the program:`, givenTheProgram)
 		ctx.When(`the query is run`, whenTheQueryIsRun)
@@ -182,23 +247,20 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 	tc := testCaseFromContext(ctx)
 
-	ctrl := gomock.NewController(tc.t)
-	accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
-	bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
-	fsProvider := logictestutil.NewMockFS(ctrl)
 	encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
-
 	logicKeeper := keeper.NewKeeper(
 		encCfg.Codec,
 		key,
 		key,
 		authtypes.NewModuleAddress(govtypes.ModuleName),
-		accountKeeper,
-		bankKeeper,
-		func(_ context.Context) fs.FS {
-			return fsProvider
+		tc.accountKeeper,
+		tc.bankKeeper,
+		func(ctx context.Context) fs.FS {
+			wasmHandler := logicfs.NewWasmHandler(tc.wasmKeeper)
+			return logicfs.NewVirtualFS(ctx, []logicfs.URIHandler{wasmHandler})
 		},
 	)
+
 	if err := logicKeeper.SetParams(tc.ctx.Ctx, types.DefaultParams()); err != nil {
 		return nil, err
 	}
