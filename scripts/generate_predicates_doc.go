@@ -143,9 +143,12 @@ func isFuncAPredicate(f *lang.Func) bool {
 }
 
 func functorName(f *lang.Func) string {
-	name := xstrings.ToSnakeCase(f.Name())
 	signature, _ := f.Signature()
 	arity := strings.Count(signature, ",") - 2
+
+	// TODO: This is a hack to get the name of the predicate. We remove the arity from the name if present  (e.g. `Open3` becomes `open`).
+	name := strings.TrimSuffix(xstrings.ToSnakeCase(f.Name()), fmt.Sprintf("%d", arity))
+
 	return fmt.Sprintf("%s/%d", name, arity)
 }
 
