@@ -11,22 +11,31 @@ import (
 	"github.com/okp4/okp4d/v7/x/logic/prolog"
 )
 
-// SourceFile is a predicate that unify the given term with the currently loaded source file.
+var atomOpen = engine.NewAtom("open")
+
+// Consult is a predicate which read files as Prolog source code.
 //
-// The signature is as follows:
+// # Signature
 //
-//	source_file(?File).
+//	consult(+Files) is det
 //
-// Where:
-//   - File represents a loaded source file.
+// where:
+//   - Files represents the source files to be loaded. It can be an atom or a list of atoms representing the source files.
 //
-// # Examples:
+// The Files argument are typically URIs that point to the sources file to be loaded through the Virtual File System (VFS).
+// Please refer to the open/4 predicate for more information about the VFS.
+func Consult(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return engine.Consult(vm, file, cont, env)
+}
+
+// SourceFile is a predicate which unifies the given term with the source file that is currently loaded.
 //
-//	# Query all the loaded source files, in alphanumeric order.
-//	- source_file(File).
+// # Signature
 //
-//	# Query the given source file is loaded.
-//	- source_file('foo.pl').
+//	source_file(?File) is det
+//
+// where:
+//   - File represents the loaded source file.
 func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	loaded := getLoadedSources(vm)
 
@@ -87,24 +96,45 @@ func (m ioMode) Term() engine.Term {
 	}[m]
 }
 
-// Open is a predicate that unify a stream with a source sink on a virtual file system.
+// Open is a predicate which opens a stream to a source or sink.
 //
-// The signature is as follows:
+// # Signature
 //
-//	open(+SourceSink, +Mode, ?Stream, +Options)
+//	open(+SourceSink, +Mode, -Stream, +Options)
 //
-// Where:
-//   - SourceSink is an atom representing the source or sink of the stream. The atom typically represents a resource
-//     that can be opened, such as a URI. The URI scheme determines the type of resource that is opened.
-//   - Mode is an atom representing the mode of the stream (read, write, append).
+// where:
+//   - SourceSink is an atom representing the source or sink of the stream, which is typically a URI.
+//   - Mode is an atom representing the mode of the stream to be opened. It can be one of "read", "write", or "append".
 //   - Stream is the stream to be opened.
 //   - Options is a list of options. No options are currently defined, so the list should be empty.
 //
-// # Examples:
+// open/4 gives True when SourceSink can be opened in Mode with the given Options.
 //
-//	# Open a stream from a cosmwasm query.
-//	# The Stream should be read as a string with a read_string/3 predicate, and then closed with the close/1 predicate.
-//	- open('cosmwasm:okp4-objectarium:okp412kgx?query=%7B%22object_data%22%3A%7B%...4dd539e3%22%7D%7D', 'read', Stream, [])
+// # Virtual File System (VFS)
+//
+// The logical module interprets on-chain Prolog programs, relying on a Virtual Machine that isolates execution from the
+// external environment. Consequently, the open/4 predicate doesn't access the physical file system as one might expect.
+// Instead, it operates with a Virtual File System (VFS), a conceptual layer that abstracts the file system. This abstraction
+// offers a unified view across various storage systems, adhering to the constraints imposed by blockchain technology.
+//
+// This VFS extends the file concept to resources, which are identified by a Uniform Resource Identifier (URI). A URI
+// specifies the access protocol for the resource, its path, and any necessary parameters.
+//
+// # CosmWasm URI
+//
+// The cosmwasm URI enables interaction with instantiated CosmWasm smart contract on the blockchain. The URI is used to
+// query the smart contract and retrieve the response. The query is executed on the smart contract, and the response is
+// returned as a stream. Query parameters are passed as part of the URI to customize the interaction with the smart contract.
+//
+// Its format is as follows:
+//
+//	cosmwasm:{contract_name}:{contract_address}?query={contract_query}[&base64Decode={true|false}]
+//
+// where:
+//   - {contract_name}: For informational purposes, indicates the name or type of the smart contract (e.g., "okp4-objectarium").
+//   - {contract_address}: Specifies the smart contract instance to query.
+//   - {contract_query}: The query to be executed on the smart contract. It is a JSON object that specifies the query payload.
+//   - base64Decode: (Optional) If true, the response is base64-decoded. Otherwise, the response is returned as is.
 func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
 	var name string
 	switch s := env.Resolve(sourceSink).(type) {
@@ -114,6 +144,16 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 		name = s.String()
 	default:
 		return engine.Error(engine.TypeError(prolog.AtomTypeAtom, sourceSink, env))
+	}
+
+	if prolog.IsGround(options, env) {
+		_, err := prolog.AssertList(options, env)
+		switch {
+		case err != nil:
+			return engine.Error(err)
+		case !prolog.IsEmptyList(options, env):
+			return engine.Error(engine.DomainError(prolog.ValidEmptyList(), options, env))
+		}
 	}
 
 	var streamMode ioMode
@@ -149,17 +189,27 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 	}
 	s := engine.NewInputTextStream(f)
 
-	if prolog.IsGround(options, env) {
-		_, err = prolog.AssertList(options, env)
-		switch {
-		case err != nil:
-			return engine.Error(err)
-		case !prolog.IsEmptyList(options, env):
-			return engine.Error(engine.DomainError(prolog.ValidEmptyList(), options, env))
-		}
-	}
-
 	return engine.Unify(vm, stream, s, k, env)
+}
+
+// Open3 is a predicate which opens a stream to a source or sink.
+// This predicate is a shorthand for open/4 with an empty list of options.
+//
+// # Signature
+//
+//	open(+SourceSink, +Mode, -Stream)
+//
+// where:
+//   - SourceSink is an atom representing the source or sink of the stream, which is typically a URI.
+//   - Mode is an atom representing the mode of the stream to be opened. It can be one of "read", "write", or "append".
+//   - Stream is the stream to be opened.
+//
+// open/3 gives True when SourceSink can be opened in Mode.
+func Open3(vm *engine.VM, sourceSink, mode, stream engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
+	return engine.Call(
+		vm,
+		atomOpen.Apply(sourceSink, mode, stream, prolog.AtomEmptyList),
+		k, env)
 }
 
 func getLoadedSources(vm *engine.VM) map[string]struct{} {

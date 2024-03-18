@@ -1,5 +1,5 @@
 ---
-sidebar_position: 15
+sidebar_position: 17
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -26,11 +26,10 @@ Where:
 ```text
 # Given a file `foo.txt` that contains `Hello World`:
 
-file_to_string(File, String, Length) :-
-
-open(File, read, In),
-read_string(In, Length, String),
-close(Stream).
+ file_to_string(File, String, Length) :-
+ open(File, read, In),
+ read_string(In, Length, String),
+ close(Stream).
 
 # It gives:
 ?- file_to_string('path/file/foo.txt', String, Length).

@@ -80,9 +80,6 @@ retractall(_).
 
 % Stream selection and control
 
-open(Filename, Mode, Stream) :-
-  open(Filename, Mode, Stream, []).
-
 close(Stream) :- close(Stream, []).
 
 flush_output :-

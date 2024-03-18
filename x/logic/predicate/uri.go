@@ -14,8 +14,8 @@ import (
 //	uri_encoded(+Component, -Value, +Encoded) is det
 //
 // Where:
-//   - Component represents the component of the URI to be escaped. It can be the atom query, fragment, path or
-//     segment.
+//   - Component represents the component of the URI to be escaped. It can be the atom 'query_path', 'fragment', 'path' or
+//     'segment'.
 //   - Decoded represents the decoded string to be escaped.
 //   - Encoded represents the encoded string.
 //
