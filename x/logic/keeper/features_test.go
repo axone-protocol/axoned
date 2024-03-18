@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	sdkmath "cosmossdk.io/math"
 	"github.com/cucumber/godog"
 	"github.com/golang/mock/gomock"
 	"github.com/sergi/go-diff/diffmatchpatch"
@@ -181,6 +182,15 @@ func whenTheQueryIsRun(ctx context.Context) error {
 	return nil
 }
 
+func whenTheQueryIsRunLimitedToNSolutions(ctx context.Context, n uint64) error {
+	tc := testCaseFromContext(ctx).request
+
+	limit := sdkmath.NewUint(n)
+	tc.Limit = &limit
+
+	return whenTheQueryIsRun(ctx)
+}
+
 func theAnswerWeGetIs(ctx context.Context, want *godog.DocString) error {
 	got := testCaseFromContext(ctx).got
 	wantAnswer := &types.Answer{}
@@ -239,7 +249,8 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 		ctx.Given(`the CosmWasm smart contract "([^"]+)" and the behavior:`, givenASmartContractWithAddress)
 		ctx.Given(`the query:`, givenTheQuery)
 		ctx.Given(`the program:`, givenTheProgram)
-		ctx.When(`the query is run`, whenTheQueryIsRun)
+		ctx.When(`$the query is run^`, whenTheQueryIsRun)
+		ctx.When(`the query is run (limited to (\d+) solutions)`, whenTheQueryIsRunLimitedToNSolutions)
 		ctx.Then(`the answer we get is:`, theAnswerWeGetIs)
 	}
 }
