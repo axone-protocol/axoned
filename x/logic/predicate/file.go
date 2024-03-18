@@ -11,6 +11,8 @@ import (
 	"github.com/okp4/okp4d/v7/x/logic/prolog"
 )
 
+var atomOpen = engine.NewAtom("open")
+
 // Consult is a predicate which read files as Prolog source code.
 //
 // # Signature
@@ -204,7 +206,10 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 //
 // open/3 gives True when SourceSink can be opened in Mode.
 func Open3(vm *engine.VM, sourceSink, mode, stream engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
-	return Open(vm, sourceSink, mode, stream, prolog.AtomEmptyList, k, env)
+	return engine.Call(
+		vm,
+		atomOpen.Apply(sourceSink, mode, stream, prolog.AtomEmptyList),
+		k, env)
 }
 
 func getLoadedSources(vm *engine.VM) map[string]struct{} {

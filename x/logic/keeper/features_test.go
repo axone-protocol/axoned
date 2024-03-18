@@ -12,7 +12,6 @@ import (
 	"testing"
 	"time"
 
-	sdkmath "cosmossdk.io/math"
 	"github.com/cucumber/godog"
 	"github.com/golang/mock/gomock"
 	"github.com/sergi/go-diff/diffmatchpatch"
@@ -21,6 +20,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
