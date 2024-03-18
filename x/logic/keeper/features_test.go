@@ -182,11 +182,13 @@ func whenTheQueryIsRun(ctx context.Context) error {
 	return nil
 }
 
-func whenTheQueryIsRunLimitedToNSolutions(ctx context.Context, n uint64) error {
-	tc := testCaseFromContext(ctx).request
+func whenTheQueryIsRunLimitedToNSolutions(ctx context.Context, n int) error {
+	request := testCaseFromContext(ctx).request
 
-	limit := sdkmath.NewUint(n)
-	tc.Limit = &limit
+	limit := sdkmath.NewUint(uint64(n))
+	request.Limit = &limit
+
+	testCaseFromContext(ctx).request = request
 
 	return whenTheQueryIsRun(ctx)
 }
@@ -249,8 +251,8 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 		ctx.Given(`the CosmWasm smart contract "([^"]+)" and the behavior:`, givenASmartContractWithAddress)
 		ctx.Given(`the query:`, givenTheQuery)
 		ctx.Given(`the program:`, givenTheProgram)
-		ctx.When(`$the query is run^`, whenTheQueryIsRun)
-		ctx.When(`the query is run (limited to (\d+) solutions)`, whenTheQueryIsRunLimitedToNSolutions)
+		ctx.When(`^the query is run$`, whenTheQueryIsRun)
+		ctx.When(`^the query is run \(limited to (\d+) solutions\)$`, whenTheQueryIsRunLimitedToNSolutions)
 		ctx.Then(`the answer we get is:`, theAnswerWeGetIs)
 	}
 }
@@ -272,7 +274,7 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		},
 	)
 
-	if err := logicKeeper.SetParams(tc.ctx.Ctx, types.DefaultParams()); err != nil {
+	if err := logicKeeper.SetParams(tc.ctx.Ctx, logicKeeperParams()); err != nil {
 		return nil, err
 	}
 
@@ -280,6 +282,15 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 	types.RegisterQueryServiceServer(queryHelper, logicKeeper)
 	queryClient := types.NewQueryServiceClient(queryHelper)
 	return queryClient, nil
+}
+
+func logicKeeperParams() types.Params {
+	params := types.DefaultParams()
+	limits := params.Limits
+	maxResultCount := sdkmath.NewUint(10)
+	limits.MaxResultCount = &maxResultCount
+	params.Limits = limits
+	return params
 }
 
 func atoi64(s string) (int64, error) {

@@ -106,7 +106,7 @@ func (m ioMode) Term() engine.Term {
 //   - Stream is the stream to be opened.
 //   - Options is a list of options. No options are currently defined, so the list should be empty.
 //
-// open/4 gives True when SourceSink can be opened in  Mode with the given Options.
+// open/4 gives True when SourceSink can be opened in Mode with the given Options.
 //
 // # Virtual File System (VFS)
 //
@@ -188,6 +188,23 @@ func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine
 	s := engine.NewInputTextStream(f)
 
 	return engine.Unify(vm, stream, s, k, env)
+}
+
+// Open3 is a predicate which opens a stream to a source or sink.
+// This predicate is a shorthand for open/4 with an empty list of options.
+//
+// # Signature
+//
+//	open(+SourceSink, +Mode, -Stream)
+//
+// where:
+//   - SourceSink is an atom representing the source or sink of the stream, which is typically a URI.
+//   - Mode is an atom representing the mode of the stream to be opened. It can be one of "read", "write", or "append".
+//   - Stream is the stream to be opened.
+//
+// open/3 gives True when SourceSink can be opened in Mode.
+func Open3(vm *engine.VM, sourceSink, mode, stream engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
+	return Open(vm, sourceSink, mode, stream, prolog.AtomEmptyList, k, env)
 }
 
 func getLoadedSources(vm *engine.VM) map[string]struct{} {
