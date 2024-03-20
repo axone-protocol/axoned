@@ -15,12 +15,15 @@ Feature: block_time/1
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Time"]
-      results:
-      - substitutions:
-        - variable: Time
-          expression: "1709550216"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Time"]
+        results:
+        - substitutions:
+          - variable: Time
+            expression: "1709550216"
       """
 
   @great_for_documentation
@@ -40,10 +43,13 @@ Feature: block_time/1
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Time"]
-      results:
-      - substitutions:
-        - variable: Time
-          expression: "1709550217"
+      height: 42
+      gas_used: 2223
+      answer:
+        has_more: false
+        variables: ["Time"]
+        results:
+        - substitutions:
+          - variable: Time
+            expression: "1709550217"
       """

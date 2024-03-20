@@ -15,12 +15,15 @@ Feature: block_height/1
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Height"]
-      results:
-      - substitutions:
-        - variable: Height
-          expression: "100"
+      height: 100
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Height"]
+        results:
+        - substitutions:
+          - variable: Height
+            expression: "100"
       """
 
   @great_for_documentation
@@ -39,10 +42,13 @@ Feature: block_height/1
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Height"]
-      results:
-      - substitutions:
-        - variable: Height
-          expression: "101"
+      height: 101
+      gas_used: 2223
+      answer:
+        has_more: false
+        variables: ["Height"]
+        results:
+        - substitutions:
+          - variable: Height
+            expression: "101"
       """

@@ -15,12 +15,15 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Address"]
-      results:
-      - substitutions:
-        - variable: Address
-          expression: "okp4-[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Address"]
+        results:
+        - substitutions:
+          - variable: Address
+            expression: "okp4-[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
       """
   @great_for_documentation
   Scenario: Decode Hrp and Address from a bech32 address
@@ -35,14 +38,17 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Hrp", "Address"]
-      results:
-      - substitutions:
-        - variable: Hrp
-          expression: "okp4"
-        - variable: Address
-          expression: "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Hrp", "Address"]
+        results:
+        - substitutions:
+          - variable: Hrp
+            expression: "okp4"
+          - variable: Address
+            expression: "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
       """
   @great_for_documentation
   Scenario: Extract Address only for OKP4 bech32 address
@@ -56,12 +62,15 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Address"]
-      results:
-      - substitutions:
-        - variable: Address
-          expression: "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Address"]
+        results:
+        - substitutions:
+          - variable: Address
+            expression: "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
       """
   @great_for_documentation
   Scenario: Encode Address Pair into Bech32 Address
@@ -74,12 +83,15 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Bech32"]
-      results:
-      - substitutions:
-        - variable: Bech32
-          expression: "okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Bech32"]
+        results:
+        - substitutions:
+          - variable: Bech32
+            expression: "okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn"
       """
   @great_for_documentation
   Scenario: Check if a bech32 address is part of the okp4 protocol
@@ -96,9 +108,12 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      results:
-      - substitutions:
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        results:
+        - substitutions:
       """
   Scenario: Check if a bech32 address is part of the okp4 protocol (not success)
     This scenario shows how to check if a bech32 address is part of the okp4 protocol.
@@ -114,8 +129,11 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      results:
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        results:
       """
   Scenario: Check address equality
     This scenario demonstrates how to check if two bech32 addresses representation are equal.
@@ -127,9 +145,12 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      results:
-      - substitutions:
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        results:
+        - substitutions:
       """
   Scenario: Decode HRP from a bech32 address
     This scenario demonstrates how to decode the human-readable part (Hrp) from a bech32 address string.
@@ -141,12 +162,15 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Hrp"]
-      results:
-      - substitutions:
-        - variable: Hrp
-          expression: "okp4"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Hrp"]
+        results:
+        - substitutions:
+          - variable: Hrp
+            expression: "okp4"
       """
   @great_for_documentation
   Scenario: Error on Incorrect Bech32 Address format
@@ -161,10 +185,13 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Address"]
-      results:
-      - error: "error(domain_error(encoding(bech32),okp4incorrect),[d,e,c,o,d,i,n,g, ,b,e,c,h,3,2, ,f,a,i,l,e,d,:, ,i,n,v,a,l,i,d, ,s,e,p,a,r,a,t,o,r, ,i,n,d,e,x, ,-,1],bech32_address/2)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Address"]
+        results:
+        - error: "error(domain_error(encoding(bech32),okp4incorrect),[d,e,c,o,d,i,n,g, ,b,e,c,h,3,2, ,f,a,i,l,e,d,:, ,i,n,v,a,l,i,d, ,s,e,p,a,r,a,t,o,r, ,i,n,d,e,x, ,-,1],bech32_address/2)"
       """
   @great_for_documentation
   Scenario: Error on Incorrect Bech32 Address type
@@ -179,10 +206,13 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["X"]
-      results:
-      - error: "error(type_error(atom,foo(bar)),bech32_address/2)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - error: "error(type_error(atom,foo(bar)),bech32_address/2)"
       """
   Scenario: Error on Incorrect Hrp type
     This scenario demonstrates the system's response to an incorrect Hrp type.
@@ -196,10 +226,13 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Bech32"]
-      results:
-      - error: "error(type_error(pair,foo(bar)),bech32_address/2)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Bech32"]
+        results:
+        - error: "error(type_error(pair,foo(bar)),bech32_address/2)"
       """
   Scenario: Error on Incorrect Hrp type (2)
     This scenario demonstrates the system's response to an incorrect Hrp type.
@@ -213,10 +246,13 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Bech32"]
-      results:
-      - error: "error(type_error(atom,1),bech32_address/2)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Bech32"]
+        results:
+        - error: "error(type_error(atom,1),bech32_address/2)"
       """
   Scenario: Error on Incorrect Address type
     This scenario demonstrates the system's response to an incorrect Address type.
@@ -230,10 +266,13 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Bech32"]
-      results:
-      - error: "error(type_error(byte,163),bech32_address/2)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Bech32"]
+        results:
+        - error: "error(type_error(byte,163),bech32_address/2)"
       """
   Scenario: Error on Incorrect Address type (2)
     This scenario demonstrates the system's response to an incorrect Address type.
@@ -247,10 +286,13 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Bech32"]
-      results:
-      - error: "error(type_error(byte,x),bech32_address/2)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Bech32"]
+        results:
+        - error: "error(type_error(byte,x),bech32_address/2)"
       """
   Scenario: Error on Incorrect Address type (3)
     This scenario demonstrates the system's response to an incorrect Address type.
@@ -264,10 +306,13 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Bech32"]
-      results:
-      - error: "error(type_error(list,hey(2)),bech32_address/2)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Bech32"]
+        results:
+        - error: "error(type_error(list,hey(2)),bech32_address/2)"
       """
   Scenario: Not sufficiently instantiated
     This scenario shows the system's response when the query is not sufficiently instantiated.
@@ -281,10 +326,13 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Address", "Bech32"]
-      results:
-      - error: "error(instantiation_error,bech32_address/2)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Address", "Bech32"]
+        results:
+        - error: "error(instantiation_error,bech32_address/2)"
       """
   Scenario: Not sufficiently instantiated (2)
     This scenario shows the system's response when the query is not sufficiently instantiated.
@@ -298,8 +346,11 @@ Feature: bech32_address/2
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Hrp", "Bech32"]
-      results:
-      - error: "error(instantiation_error,bech32_address/2)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Hrp", "Bech32"]
+        results:
+        - error: "error(instantiation_error,bech32_address/2)"
       """

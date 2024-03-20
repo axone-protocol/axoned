@@ -60,7 +60,7 @@ type testCase struct {
 	bankKeeper    *logictestutil.MockBankKeeper
 	wasmKeeper    *logictestutil.MockWasmKeeper
 	request       types.QueryServiceAskRequest
-	got           *types.Answer
+	got           *types.QueryServiceAskResponse
 }
 
 type SmartContractConfiguration struct {
@@ -177,7 +177,7 @@ func whenTheQueryIsRun(ctx context.Context) error {
 		return err
 	}
 
-	tc.got = got.Answer
+	tc.got = got
 
 	return nil
 }
@@ -195,7 +195,7 @@ func whenTheQueryIsRunLimitedToNSolutions(ctx context.Context, n int) error {
 
 func theAnswerWeGetIs(ctx context.Context, want *godog.DocString) error {
 	got := testCaseFromContext(ctx).got
-	wantAnswer := &types.Answer{}
+	wantAnswer := &types.QueryServiceAskResponse{}
 	if err := yaml.Unmarshal([]byte(want.Content), &wantAnswer); err != nil {
 		return err
 	}
@@ -236,6 +236,12 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 			accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
 			bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 			wasmKeeper := logictestutil.NewMockWasmKeeper(ctrl)
+
+			header := testCtx.Ctx.BlockHeader()
+			header.ChainID = "okp4-testchain-1"
+			header.Height = 42
+			header.Time = time.Date(2024, 4, 10, 10, 44, 27, 0, time.UTC)
+			testCtx.Ctx = testCtx.Ctx.WithBlockHeader(header)
 
 			tc := testCase{
 				ctx:           testCtx,
