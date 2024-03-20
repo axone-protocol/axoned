@@ -73,18 +73,39 @@ func envsToResults(envs []*engine.Env, vars []engine.ParsedVariable, i *prolog.I
 	for _, rEnv := range envs {
 		substitutions := make([]types.Substitution, 0, len(vars))
 		for _, v := range vars {
-			var expression prolog.TermString
-			err := expression.Scan(&i.VM, v.Variable, rEnv)
-			if err != nil {
-				return nil, err
+			if !isBound(v, rEnv) {
+				// skip parsed variables that are not bound (singletons variables or other)
+				continue
 			}
-			substitution := types.Substitution{
-				Variable:   v.Name.String(),
-				Expression: string(expression),
+
+			substitution, err := scanExpression(i, v, rEnv)
+			if err != nil {
+				return results, err
 			}
 			substitutions = append(substitutions, substitution)
 		}
 		results = append(results, types.Result{Substitutions: substitutions})
 	}
 	return results, nil
+}
+
+func scanExpression(i *prolog.Interpreter, v engine.ParsedVariable, rEnv *engine.Env) (types.Substitution, error) {
+	var expression prolog.TermString
+	err := expression.Scan(&i.VM, v.Variable, rEnv)
+	if err != nil {
+		return types.Substitution{}, err
+	}
+	substitution := types.Substitution{
+		Variable:   v.Name.String(),
+		Expression: string(expression),
+	}
+
+	return substitution, nil
+}
+
+// isBound returns true if the given parsed variable is bound in the given environment.
+func isBound(v engine.ParsedVariable, env *engine.Env) bool {
+	_, ok := env.Resolve(v.Variable).(engine.Variable)
+
+	return !ok
 }
