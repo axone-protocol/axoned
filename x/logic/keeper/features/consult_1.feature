@@ -96,11 +96,11 @@ Feature: consult/1
         variables: ["X"]
         results:
         - substitutions:
-        - variable: X
-          expression: "b"
-      - substitutions:
-        - variable: X
-          expression: "a"
+          - variable: X
+            expression: "b"
+        - substitutions:
+          - variable: X
+            expression: "a"
       """
 
   @great_for_documentation

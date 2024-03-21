@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"dario.cat/mergo"
 	"github.com/cucumber/godog"
 	"github.com/golang/mock/gomock"
 	"github.com/sergi/go-diff/diffmatchpatch"
@@ -59,6 +60,7 @@ type testCase struct {
 	accountKeeper *logictestutil.MockAccountKeeper
 	bankKeeper    *logictestutil.MockBankKeeper
 	wasmKeeper    *logictestutil.MockWasmKeeper
+	params        types.Params
 	request       types.QueryServiceAskRequest
 	got           *types.QueryServiceAskResponse
 }
@@ -103,6 +105,23 @@ func givenABlockWithTheFollowingHeader(ctx context.Context, table *godog.Table) 
 		}
 	}
 	tc.ctx.Ctx = tc.ctx.Ctx.WithBlockHeader(header)
+
+	return nil
+}
+
+func givenTheModuleConfiguration(ctx context.Context, configuration *godog.DocString) error {
+	params := types.Params{}
+	if err := json.Unmarshal([]byte(configuration.Content), &params); err != nil {
+		return err
+	}
+
+	x := testCaseFromContext(ctx).params
+	mergedParams := x
+	if err := mergo.Merge(&mergedParams, params); err != nil {
+		return err
+	}
+
+	testCaseFromContext(ctx).params = mergedParams
 
 	return nil
 }
@@ -248,11 +267,13 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 				accountKeeper: accountKeeper,
 				bankKeeper:    bankKeeper,
 				wasmKeeper:    wasmKeeper,
+				params:        logicKeeperParams(),
 			}
 
 			return testCaseToContext(ctx, tc), nil
 		})
 
+		ctx.Given(`the module configuration:`, givenTheModuleConfiguration)
 		ctx.Given(`a block with the following header:`, givenABlockWithTheFollowingHeader)
 		ctx.Given(`the CosmWasm smart contract "([^"]+)" and the behavior:`, givenASmartContractWithAddress)
 		ctx.Given(`the query:`, givenTheQuery)
@@ -280,7 +301,7 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		},
 	)
 
-	if err := logicKeeper.SetParams(tc.ctx.Ctx, logicKeeperParams()); err != nil {
+	if err := logicKeeper.SetParams(tc.ctx.Ctx, tc.params); err != nil {
 		return nil, err
 	}
 
