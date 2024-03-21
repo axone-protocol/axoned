@@ -42,12 +42,15 @@ bech32_address(Address, 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Address"]
-results:
-- substitutions:
-  - variable: Address
-    expression: "okp4-[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Address"]
+  results:
+  - substitutions:
+    - variable: Address
+      expression: "okp4-[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
 ```
 
 ### Decode Hrp and Address from a bech32 address
@@ -68,14 +71,17 @@ bech32_address(-(Hrp, Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Hrp", "Address"]
-results:
-- substitutions:
-  - variable: Hrp
-    expression: "okp4"
-  - variable: Address
-    expression: "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Hrp", "Address"]
+  results:
+  - substitutions:
+    - variable: Hrp
+      expression: "okp4"
+    - variable: Address
+      expression: "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
 ```
 
 ### Extract Address only for OKP4 bech32 address
@@ -95,12 +101,15 @@ bech32_address(-(okp4, Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Address"]
-results:
-- substitutions:
-  - variable: Address
-    expression: "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Address"]
+  results:
+  - substitutions:
+    - variable: Address
+      expression: "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
 ```
 
 ### Encode Address Pair into Bech32 Address
@@ -119,12 +128,15 @@ bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,14
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Bech32"]
-results:
-- substitutions:
-  - variable: Bech32
-    expression: "okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Bech32"]
+  results:
+  - substitutions:
+    - variable: Bech32
+      expression: "okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn"
 ```
 
 ### Check if a bech32 address is part of the okp4 protocol
@@ -149,9 +161,12 @@ okp4_addr('okp41p8u47en82gmzfm259y6z93r9qe63l25dfwwng6').
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-results:
-- substitutions:
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  results:
+  - substitutions:
 ```
 
 ### Error on Incorrect Bech32 Address format
@@ -172,10 +187,13 @@ bech32_address(Address, okp4incorrect).
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Address"]
-results:
-- error: "error(domain_error(encoding(bech32),okp4incorrect),[d,e,c,o,d,i,n,g, ,b,e,c,h,3,2, ,f,a,i,l,e,d,:, ,i,n,v,a,l,i,d, ,s,e,p,a,r,a,t,o,r, ,i,n,d,e,x, ,-,1],bech32_address/2)"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Address"]
+  results:
+  - error: "error(domain_error(encoding(bech32),okp4incorrect),[d,e,c,o,d,i,n,g, ,b,e,c,h,3,2, ,f,a,i,l,e,d,:, ,i,n,v,a,l,i,d, ,s,e,p,a,r,a,t,o,r, ,i,n,d,e,x, ,-,1],bech32_address/2)"
 ```
 
 ### Error on Incorrect Bech32 Address type
@@ -196,8 +214,11 @@ bech32_address(-('okp4', X), foo(bar)).
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["X"]
-results:
-- error: "error(type_error(atom,foo(bar)),bech32_address/2)"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["X"]
+  results:
+  - error: "error(type_error(atom,foo(bar)),bech32_address/2)"
 ```

@@ -43,12 +43,15 @@ block_height(Height).
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Height"]
-results:
-- substitutions:
-  - variable: Height
-    expression: "100"
+height: 100
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Height"]
+  results:
+  - substitutions:
+    - variable: Height
+      expression: "100"
 ```
 
 ### Check that the block height is greater than a certain value
@@ -75,10 +78,13 @@ Height > 100.
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Height"]
-results:
-- substitutions:
-  - variable: Height
-    expression: "101"
+height: 101
+gas_used: 2223
+answer:
+  has_more: false
+  variables: ["Height"]
+  results:
+  - substitutions:
+    - variable: Height
+      expression: "101"
 ```

@@ -1,5 +1,5 @@
 ---
-sidebar_position: 15
+sidebar_position: 16
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -99,12 +99,15 @@ open(URI, read, _, []).
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["URI"]
-results:
-- substitutions:
-  - variable: URI
-    expression: "'cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
+height: 42
+gas_used: 2228
+answer:
+  has_more: false
+  variables: ["URI"]
+  results:
+  - substitutions:
+    - variable: URI
+      expression: "'cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
 ```
 
 ### Open an existing resource and read its content
@@ -148,12 +151,15 @@ read_resource('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Chars"]
-results:
-- substitutions:
-  - variable: Chars
-    expression: "'Hello, World!'"
+height: 42
+gas_used: 2224
+answer:
+  has_more: false
+  variables: ["Chars"]
+  results:
+  - substitutions:
+    - variable: Chars
+      expression: "'Hello, World!'"
 ```
 
 ### Open an existing resource and read its content (base64-encoded)
@@ -195,12 +201,15 @@ read_resource('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Chars"]
-results:
-- substitutions:
-  - variable: Chars
-    expression: "'Hello, World!'"
+height: 42
+gas_used: 2224
+answer:
+  has_more: false
+  variables: ["Chars"]
+  results:
+  - substitutions:
+    - variable: Chars
+      expression: "'Hello, World!'"
 ```
 
 ### Try to open a non-existing resource
@@ -219,10 +228,13 @@ open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Stream"]
-results:
-- error: "error(existence_error(source_sink,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Stream"]
+  results:
+  - error: "error(existence_error(source_sink,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
 ```
 
 ### Try to open a resource for writing
@@ -242,10 +254,13 @@ open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Stream"]
-results:
-- error: "error(permission_error(input,stream,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Stream"]
+  results:
+  - error: "error(permission_error(input,stream,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
 ```
 
 ### Try to open a resource for appending
@@ -265,10 +280,13 @@ open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Stream"]
-results:
-- error: "error(permission_error(input,stream,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Stream"]
+  results:
+  - error: "error(permission_error(input,stream,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
 ```
 
 ### Pass incorrect options to open/4
@@ -287,8 +305,11 @@ open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Stream"]
-results:
-- error: "error(domain_error(empty_list,[non_existing_option]),open/4)"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Stream"]
+  results:
+  - error: "error(domain_error(empty_list,[non_existing_option]),open/4)"
 ```

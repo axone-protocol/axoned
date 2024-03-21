@@ -30,8 +30,11 @@ Feature: open/3
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables:
-      results:
-      - substitutions:
+      height: 42
+      gas_used: 2223
+      answer:
+        has_more: false
+        variables:
+        results:
+        - substitutions:
       """

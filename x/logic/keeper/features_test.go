@@ -12,6 +12,7 @@ import (
 	"testing"
 	"time"
 
+	"dario.cat/mergo"
 	"github.com/cucumber/godog"
 	"github.com/golang/mock/gomock"
 	"github.com/sergi/go-diff/diffmatchpatch"
@@ -59,8 +60,9 @@ type testCase struct {
 	accountKeeper *logictestutil.MockAccountKeeper
 	bankKeeper    *logictestutil.MockBankKeeper
 	wasmKeeper    *logictestutil.MockWasmKeeper
+	params        types.Params
 	request       types.QueryServiceAskRequest
-	got           *types.Answer
+	got           *types.QueryServiceAskResponse
 }
 
 type SmartContractConfiguration struct {
@@ -103,6 +105,23 @@ func givenABlockWithTheFollowingHeader(ctx context.Context, table *godog.Table) 
 		}
 	}
 	tc.ctx.Ctx = tc.ctx.Ctx.WithBlockHeader(header)
+
+	return nil
+}
+
+func givenTheModuleConfiguration(ctx context.Context, configuration *godog.DocString) error {
+	params := types.Params{}
+	if err := json.Unmarshal([]byte(configuration.Content), &params); err != nil {
+		return err
+	}
+
+	x := testCaseFromContext(ctx).params
+	mergedParams := x
+	if err := mergo.Merge(&mergedParams, params); err != nil {
+		return err
+	}
+
+	testCaseFromContext(ctx).params = mergedParams
 
 	return nil
 }
@@ -177,7 +196,7 @@ func whenTheQueryIsRun(ctx context.Context) error {
 		return err
 	}
 
-	tc.got = got.Answer
+	tc.got = got
 
 	return nil
 }
@@ -195,7 +214,7 @@ func whenTheQueryIsRunLimitedToNSolutions(ctx context.Context, n int) error {
 
 func theAnswerWeGetIs(ctx context.Context, want *godog.DocString) error {
 	got := testCaseFromContext(ctx).got
-	wantAnswer := &types.Answer{}
+	wantAnswer := &types.QueryServiceAskResponse{}
 	if err := yaml.Unmarshal([]byte(want.Content), &wantAnswer); err != nil {
 		return err
 	}
@@ -237,16 +256,24 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 			bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 			wasmKeeper := logictestutil.NewMockWasmKeeper(ctrl)
 
+			header := testCtx.Ctx.BlockHeader()
+			header.ChainID = "okp4-testchain-1"
+			header.Height = 42
+			header.Time = time.Date(2024, 4, 10, 10, 44, 27, 0, time.UTC)
+			testCtx.Ctx = testCtx.Ctx.WithBlockHeader(header)
+
 			tc := testCase{
 				ctx:           testCtx,
 				accountKeeper: accountKeeper,
 				bankKeeper:    bankKeeper,
 				wasmKeeper:    wasmKeeper,
+				params:        logicKeeperParams(),
 			}
 
 			return testCaseToContext(ctx, tc), nil
 		})
 
+		ctx.Given(`the module configuration:`, givenTheModuleConfiguration)
 		ctx.Given(`a block with the following header:`, givenABlockWithTheFollowingHeader)
 		ctx.Given(`the CosmWasm smart contract "([^"]+)" and the behavior:`, givenASmartContractWithAddress)
 		ctx.Given(`the query:`, givenTheQuery)
@@ -274,7 +301,7 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		},
 	)
 
-	if err := logicKeeper.SetParams(tc.ctx.Ctx, logicKeeperParams()); err != nil {
+	if err := logicKeeper.SetParams(tc.ctx.Ctx, tc.params); err != nil {
 		return nil, err
 	}
 

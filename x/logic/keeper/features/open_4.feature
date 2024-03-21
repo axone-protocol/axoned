@@ -42,12 +42,15 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["URI"]
-      results:
-      - substitutions:
-        - variable: URI
-          expression: "'cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
+      height: 42
+      gas_used: 2228
+      answer:
+        has_more: false
+        variables: ["URI"]
+        results:
+        - substitutions:
+          - variable: URI
+            expression: "'cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
       """
 
   @great_for_documentation
@@ -82,12 +85,15 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Chars"]
-      results:
-      - substitutions:
-        - variable: Chars
-          expression: "'Hello, World!'"
+     height: 42
+      gas_used: 2224
+      answer:
+        has_more: false
+        variables: ["Chars"]
+        results:
+        - substitutions:
+          - variable: Chars
+            expression: "'Hello, World!'"
       """
 
   @great_for_documentation
@@ -120,12 +126,15 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Chars"]
-      results:
-      - substitutions:
-        - variable: Chars
-          expression: "'Hello, World!'"
+      height: 42
+      gas_used: 2224
+      answer:
+        has_more: false
+        variables: ["Chars"]
+        results:
+        - substitutions:
+          - variable: Chars
+            expression: "'Hello, World!'"
       """
 
   @great_for_documentation
@@ -139,10 +148,13 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Stream"]
-      results:
-      - error: "error(existence_error(source_sink,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Stream"]
+        results:
+        - error: "error(existence_error(source_sink,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
       """
 
   @great_for_documentation
@@ -157,10 +169,13 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Stream"]
-      results:
-      - error: "error(permission_error(input,stream,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Stream"]
+        results:
+        - error: "error(permission_error(input,stream,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
       """
 
   @great_for_documentation
@@ -175,10 +190,13 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Stream"]
-      results:
-      - error: "error(permission_error(input,stream,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Stream"]
+        results:
+        - error: "error(permission_error(input,stream,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
       """
 
 
@@ -193,10 +211,13 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Stream"]
-      results:
-      - error: "error(domain_error(empty_list,[non_existing_option]),open/4)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Stream"]
+        results:
+        - error: "error(domain_error(empty_list,[non_existing_option]),open/4)"
       """
 
 
@@ -210,10 +231,13 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Stream"]
-      results:
-      - error: "error(type_error(io_mode,incorrect_mode),open/4)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Stream"]
+        results:
+        - error: "error(type_error(io_mode,incorrect_mode),open/4)"
       """
 
   Scenario: Open a resource with incorrect mode (2)
@@ -226,10 +250,13 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Stream"]
-      results:
-      - error: "error(type_error(io_mode,666),open/4)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Stream"]
+        results:
+        - error: "error(type_error(io_mode,666),open/4)"
       """
 
   Scenario: Insufficient instantiation error (1)
@@ -242,10 +269,13 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Resource", "Stream"]
-      results:
-      - error: "error(instantiation_error,open/4)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Resource", "Stream"]
+        results:
+        - error: "error(instantiation_error,open/4)"
       """
 
   Scenario: Insufficient instantiation error (2)
@@ -258,8 +288,11 @@ Feature: open/4
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Mode", "Stream"]
-      results:
-      - error: "error(instantiation_error,open/4)"
+      height: 42
+      gas_used: 2222
+      answer:
+        has_more: false
+        variables: ["Mode", "Stream"]
+        results:
+        - error: "error(instantiation_error,open/4)"
       """

@@ -33,12 +33,15 @@ Feature: consult/1
     When the query is run
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["Who"]
-      results:
-      - substitutions:
-        - variable: Who
-          expression: "['W',o,r,l,d,!]"
+      height: 42
+      gas_used: 2224
+      answer:
+        has_more: false
+        variables: ["Who"]
+        results:
+        - substitutions:
+          - variable: Who
+            expression: "['W',o,r,l,d,!]"
       """
 
 
@@ -80,21 +83,24 @@ Feature: consult/1
       """
     Given the query:
       """ prolog
-      consult('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'),
-      program(X).
+        consult('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'),
+        program(X).
       """
     When the query is run (limited to 2 solutions)
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["X"]
-      results:
-      - substitutions:
-        - variable: X
-          expression: "b"
-      - substitutions:
-        - variable: X
-          expression: "a"
+      height: 42
+      gas_used: 2223
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - substitutions:
+          - variable: X
+            expression: "b"
+        - substitutions:
+          - variable: X
+            expression: "a"
       """
 
   @great_for_documentation
@@ -137,13 +143,16 @@ Feature: consult/1
     When the query is run (limited to 2 solutions)
     Then the answer we get is:
       """ yaml
-      has_more: false
-      variables: ["File"]
-      results:
-      - substitutions:
-        - variable: File
-          expression: "'cosmwasm:storage:okp412ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqgmqnmk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%225d3933430d0a12794fae719e0db87b6ec5f549b2%22%7D%7D&base64Decode=false'"
-      - substitutions:
-        - variable: File
-          expression: "'cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
+      height: 42
+      gas_used: 2223
+      answer:
+        has_more: false
+        variables: ["File"]
+        results:
+        - substitutions:
+          - variable: File
+            expression: "'cosmwasm:storage:okp412ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqgmqnmk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%225d3933430d0a12794fae719e0db87b6ec5f549b2%22%7D%7D&base64Decode=false'"
+        - substitutions:
+          - variable: File
+            expression: "'cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
       """

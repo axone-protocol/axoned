@@ -1,5 +1,5 @@
 ---
-sidebar_position: 16
+sidebar_position: 17
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -61,8 +61,11 @@ open(
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables:
-results:
-- substitutions:
+height: 42
+gas_used: 2223
+answer:
+  has_more: false
+  variables:
+  results:
+  - substitutions:
 ```
