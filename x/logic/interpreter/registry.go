@@ -50,7 +50,7 @@ var registry = map[string]any{
 	"bagof/3":                   engine.BagOf,
 	"setof/3":                   engine.SetOf,
 	"current_input/1":           engine.CurrentInput,
-	"current_output/1":          engine.CurrentOutput,
+	"current_output/1":          predicate.CurrentOutput,
 	"set_input/1":               engine.SetInput,
 	"set_output/1":              engine.SetOutput,
 	"open/4":                    predicate.Open,
