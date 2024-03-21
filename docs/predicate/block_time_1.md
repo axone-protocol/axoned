@@ -43,12 +43,15 @@ block_time(Time).
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Time"]
-results:
-- substitutions:
-  - variable: Time
-    expression: "1709550216"
+height: 42
+gas_used: 2222
+answer:
+  has_more: false
+  variables: ["Time"]
+  results:
+  - substitutions:
+    - variable: Time
+      expression: "1709550216"
 ```
 
 ### Check that the block time is greater than a certain time
@@ -76,10 +79,13 @@ Time > 1709550216.
 - **Then** the answer we get is:
 
 ```  yaml
-has_more: false
-variables: ["Time"]
-results:
-- substitutions:
-  - variable: Time
-    expression: "1709550217"
+height: 42
+gas_used: 2223
+answer:
+  has_more: false
+  variables: ["Time"]
+  results:
+  - substitutions:
+    - variable: Time
+      expression: "1709550217"
 ```
