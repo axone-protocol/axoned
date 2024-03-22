@@ -2,7 +2,10 @@ package keeper
 
 import (
 	"context"
+	"fmt"
+	"io"
 	"math"
+	"strings"
 
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
@@ -28,6 +31,12 @@ const (
 	defaultWeightFactor  = uint64(1)
 )
 
+// writerStringer is an interface that combines io.Writer with capabilities of fmt.Stringer.
+type writerStringer interface {
+	io.Writer
+	fmt.Stringer
+}
+
 func (k Keeper) limits(ctx context.Context) types.Limits {
 	params := k.GetParams(sdk.UnwrapSDKContext(ctx))
 	return params.GetLimits()
@@ -45,7 +54,7 @@ func (k Keeper) execute(ctx context.Context, program, query string, limit sdkmat
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	limits := k.limits(sdkCtx)
 
-	i, userOutputBuffer, err := k.newInterpreter(ctx)
+	i, userOutput, err := k.newInterpreter(ctx)
 	if err != nil {
 		return nil, errorsmod.Wrapf(types.Internal, "error creating interpreter: %v", err.Error())
 	}
@@ -58,16 +67,11 @@ func (k Keeper) execute(ctx context.Context, program, query string, limit sdkmat
 		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
 	}
 
-	var userOutput string
-	if userOutputBuffer != nil {
-		userOutput = userOutputBuffer.String()
-	}
-
 	return &types.QueryServiceAskResponse{
 		Height:     uint64(sdkCtx.BlockHeight()),
 		GasUsed:    sdkCtx.GasMeter().GasConsumed(),
 		Answer:     answer,
-		UserOutput: userOutput,
+		UserOutput: userOutput.String(),
 	}, nil
 }
 
@@ -77,7 +81,7 @@ func (k Keeper) queryInterpreter(ctx context.Context, i *prolog.Interpreter, que
 }
 
 // newInterpreter creates a new interpreter properly configured.
-func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, *util.BoundedBuffer, error) {
+func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, fmt.Stringer, error) {
 	sdkctx := sdk.UnwrapSDKContext(ctx)
 	params := k.GetParams(sdkctx)
 
@@ -121,16 +125,18 @@ func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, *util.
 		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
 		util.Indexed(util.ParseURLMust))
 
+	var userOutputBuffer writerStringer
+	if limits.MaxUserOutputSize != nil && limits.MaxUserOutputSize.GT(sdkmath.ZeroUint()) {
+		userOutputBuffer = util.NewBoundedBufferMust(int(limits.MaxUserOutputSize.Uint64()))
+	} else {
+		userOutputBuffer = new(strings.Builder)
+	}
+
 	options := []interpreter.Option{
 		interpreter.WithPredicates(ctx, interpreter.RegistryNames, hook),
 		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
 		interpreter.WithFS(fs.NewFilteredFS(whitelistUrls, blacklistUrls, k.fsProvider(ctx))),
-	}
-
-	var userOutputBuffer *util.BoundedBuffer
-	if limits.MaxUserOutputSize != nil && limits.MaxUserOutputSize.GT(sdkmath.ZeroUint()) {
-		userOutputBuffer = util.NewBoundedBufferMust(int(limits.MaxUserOutputSize.Uint64()))
-		options = append(options, interpreter.WithUserOutputWriter(userOutputBuffer))
+		interpreter.WithUserOutputWriter(userOutputBuffer),
 	}
 
 	i, err := interpreter.New(options...)

@@ -153,3 +153,38 @@ Feature: current_output/1
         - substitutions:
       user_output: "🧙!"
       """
+
+  Scenario: Write strings to the current output (no limit configured)
+  This scenario demonstrates that if no limit is configured in the logic module, the user can write as much as they want.
+  This case should not be used in production, as it can lead to performance issues.
+
+    Given the program:
+      """ prolog
+      log_message([]).
+      log_message([H|T]) :-
+          current_output(UserStream),
+          put_char(UserStream, H),
+          log_message(T).
+      """
+    Given the query:
+      """ prolog
+      log_message("Prolog's logic weaves through the fabric of the chain,\nGovernance and rules, in its domain reign."),
+      log_message("\n"),
+      log_message("Knowledge blooms in the heart of the OKP4 lore,\nUnlocking a world of possibilities to explore.").
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 2605
+      answer:
+        has_more: false
+        variables:
+        results:
+        - substitutions:
+      user_output: |
+        Prolog's logic weaves through the fabric of the chain,
+        Governance and rules, in its domain reign.
+        Knowledge blooms in the heart of the OKP4 lore,
+        Unlocking a world of possibilities to explore.
+      """
