@@ -18,7 +18,7 @@ require (
 	cosmossdk.io/x/feegrant v0.1.0
 	cosmossdk.io/x/tx v0.13.0
 	cosmossdk.io/x/upgrade v0.1.1
-	github.com/CosmWasm/wasmd v0.51.0-rc.1
+	github.com/CosmWasm/wasmd v0.51.0-rc.2
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/cometbft/cometbft v0.38.5
 	github.com/cosmos/cosmos-db v1.0.2
@@ -32,7 +32,7 @@ require (
 	github.com/cucumber/messages/go/v21 v21.0.1
 	github.com/dustinxie/ecc v0.0.0-20210511000915-959544187564
 	github.com/golang/mock v1.6.0
-	github.com/golang/protobuf v1.5.3
+	github.com/golang/protobuf v1.5.4
 	github.com/grpc-ecosystem/grpc-gateway v1.16.0
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/huandu/xstrings v1.4.0
@@ -55,7 +55,7 @@ require (
 	golang.org/x/net v0.21.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20231120223509-83a465c0220f
 	google.golang.org/grpc v1.60.1
-	google.golang.org/protobuf v1.32.0
+	google.golang.org/protobuf v1.33.0
 	gopkg.in/yaml.v3 v3.0.1
 	gotest.tools/v3 v3.5.1
 	sigs.k8s.io/yaml v1.4.0
@@ -84,7 +84,7 @@ require (
 	filippo.io/edwards25519 v1.0.0 // indirect
 	github.com/99designs/go-keychain v0.0.0-20191008050251-8e49817e8af4 // indirect
 	github.com/99designs/keyring v1.2.1 // indirect
-	github.com/CosmWasm/wasmvm/v2 v2.0.0-rc.2 // indirect
+	github.com/CosmWasm/wasmvm/v2 v2.0.0 // indirect
 	github.com/DataDog/datadog-go v3.2.0+incompatible // indirect
 	github.com/DataDog/zstd v1.5.5 // indirect
 	github.com/Masterminds/goutils v1.1.1 // indirect
