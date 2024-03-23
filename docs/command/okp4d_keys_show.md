@@ -15,13 +15,13 @@ okp4d keys show [name_or_address [name_or_address...]] [flags]
 ### Options
 
 ```
-  -a, --address                  Output the address only (overrides --output)
+  -a, --address                  Output the address only (cannot be used with --output)
       --bech string              The Bech32 prefix encoding for a key (acc|val|cons) (default "acc")
-  -d, --device                   Output the address in a ledger device
+  -d, --device                   Output the address in a ledger device (cannot be used with --pubkey)
   -k, --did                      Output the did:key only (overrides --output)
   -h, --help                     help for show
       --multisig-threshold int   K out of N required signatures (default 1)
-  -p, --pubkey                   Output the public key only (overrides --output)
+  -p, --pubkey                   Output the public key only (cannot be used with --output)
 ```
 
 ### Options inherited from parent commands

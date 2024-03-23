@@ -6,14 +6,14 @@ Grant authorization to interact with a contract on behalf of you
 
 Grant authorization to an address.
 Examples:
-$ okp4d tx grant contract execution &lt;grantee_addr&gt; &lt;contract_addr&gt; --allow-all-messages --max-calls 1 --no-token-transfer --expiration 1667979596
+$ okp4d tx grant contract &lt;grantee_addr&gt; execution &lt;contract_addr&gt; --allow-all-messages --max-calls 1 --no-token-transfer --expiration 1667979596
 
-$ okp4d tx grant contract execution &lt;grantee_addr&gt; &lt;contract_addr&gt; --allow-all-messages --max-funds 100000uwasm --expiration 1667979596
+$ okp4d tx grant contract &lt;grantee_addr&gt; execution &lt;contract_addr&gt; --allow-all-messages --max-funds 100000uwasm --expiration 1667979596
 
-$ okp4d tx grant contract execution &lt;grantee_addr&gt; &lt;contract_addr&gt; --allow-all-messages --max-calls 5 --max-funds 100000uwasm --expiration 1667979596
+$ okp4d tx grant contract &lt;grantee_addr&gt; execution &lt;contract_addr&gt; --allow-all-messages --max-calls 5 --max-funds 100000uwasm --expiration 1667979596
 
 ```
-okp4d tx wasm grant contract [message_type="execution"|"migration"] [grantee] [contract_addr_bech32] --allow-raw-msgs [msg1,msg2,...] --allow-msg-keys [key1,key2,...] --allow-all-messages [flags]
+okp4d tx wasm grant contract [grantee] [message_type="execution"|"migration"] [contract_addr_bech32] --allow-raw-msgs [msg1,msg2,...] --allow-msg-keys [key1,key2,...] --allow-all-messages [flags]
 ```
 
 ### Options

@@ -44,6 +44,7 @@ okp4d keys add <name> [flags]
       --no-backup                Don't print out seed phrase (if others are watching the terminal)
       --nosort                   Keys passed to --multisig are taken in the order they're supplied
       --pubkey string            Parse a public key in JSON format and saves key info to <name> file.
+      --pubkey-base64 string     Parse a public key in base64 format and saves key info.
       --recover                  Provide seed phrase to recover existing key instead of creating
 ```
 
