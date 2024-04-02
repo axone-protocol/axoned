@@ -1,5 +1,23 @@
 # ØKP4 protocol changelog
 
+## [7.1.0](https://github.com/okp4/okp4d/compare/v7.0.1...v7.1.0) (2024-04-02)
+
+
+### Features
+
+* **logic:** expose open/3 predicate ([b71bf4f](https://github.com/okp4/okp4d/commit/b71bf4f3089239da24df5d52f055f354e58e0159))
+* **logic:** introduce parameter "limit" for queries ([cc86031](https://github.com/okp4/okp4d/commit/cc860317cd40cc8462e462267e31c527b0e09d25))
+* update generated proto & docs ([2d833c8](https://github.com/okp4/okp4d/commit/2d833c8164efb627e347d8d7d497d4c4ea42995a))
+* **wasm:** update cosmwasm to v2 ([5640041](https://github.com/okp4/okp4d/commit/564004197d555855935d2aebcb61851b083bf7c2))
+
+
+### Bug Fixes
+
+* **logic:** make the user output stream always initialized ([2345934](https://github.com/okp4/okp4d/commit/2345934f62c6519a951031a71768390f681f7cc6))
+* **logic:** prevent non-bound substitution variables to be returned ([9250bda](https://github.com/okp4/okp4d/commit/9250bda2ddca9119c9cb18014f3e2008f30c4e0c))
+* **sign:** properly expand input path ([a783c02](https://github.com/okp4/okp4d/commit/a783c0228d34f0e4d2b21c2b457ab478b38fd667))
+* **sign:** use right signature algorithm ([5bb6d2d](https://github.com/okp4/okp4d/commit/5bb6d2dced285b3519f012b840fef8192993193d))
+
 ## [7.0.1](https://github.com/okp4/okp4d/compare/v7.0.0...v7.0.1) (2024-03-05)
 
 ## [7.0.0](https://github.com/okp4/okp4d/compare/v6.0.0...v7.0.0) (2024-02-29)
