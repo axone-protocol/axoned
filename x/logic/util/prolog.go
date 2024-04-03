@@ -19,7 +19,7 @@ const (
 
 // QueryInterpreter interprets a query and returns the solutions up to the given limit.
 func QueryInterpreter(
-	ctx context.Context, i *prolog.Interpreter, query string, limit sdkmath.Uint,
+	ctx context.Context, i *prolog.Interpreter, query string, solutionsLimit sdkmath.Uint,
 ) (*types.Answer, error) {
 	p := engine.NewParser(&i.VM, strings.NewReader(query))
 	t, err := p.Term()
@@ -29,13 +29,13 @@ func QueryInterpreter(
 
 	var env *engine.Env
 	count := sdkmath.ZeroUint()
-	envs := make([]*engine.Env, 0, sdkmath.MinUint(limit, sdkmath.NewUint(defaultEnvCap)).Uint64())
+	envs := make([]*engine.Env, 0, sdkmath.MinUint(solutionsLimit, sdkmath.NewUint(defaultEnvCap)).Uint64())
 	_, callErr := engine.Call(&i.VM, t, func(env *engine.Env) *engine.Promise {
-		if count.LT(limit) {
+		if count.LT(solutionsLimit) {
 			envs = append(envs, env)
 		}
 		count = count.Incr()
-		return engine.Bool(count.GT(limit))
+		return engine.Bool(count.GT(solutionsLimit))
 	}, env).Force(ctx)
 
 	vars := parsedVarsToVars(p.Vars)
@@ -46,7 +46,7 @@ func QueryInterpreter(
 	}
 
 	if callErr != nil {
-		if sdkmath.NewUint(uint64(len(results))).LT(limit) {
+		if sdkmath.NewUint(uint64(len(results))).LT(solutionsLimit) {
 			// error is not part of the look-ahead and should be included in the solutions
 			results = append(results, types.Result{Error: callErr.Error()})
 		} else {
@@ -56,7 +56,7 @@ func QueryInterpreter(
 	}
 
 	return &types.Answer{
-		HasMore:   count.GT(limit),
+		HasMore:   count.GT(solutionsLimit),
 		Variables: vars,
 		Results:   results,
 	}, nil

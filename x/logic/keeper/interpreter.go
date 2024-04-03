@@ -49,7 +49,9 @@ func (k Keeper) enhanceContext(ctx context.Context) context.Context {
 	return sdkCtx
 }
 
-func (k Keeper) execute(ctx context.Context, program, query string, limit sdkmath.Uint) (*types.QueryServiceAskResponse, error) {
+func (k Keeper) execute(
+	ctx context.Context, program, query string, solutionsLimit sdkmath.Uint,
+) (*types.QueryServiceAskResponse, error) {
 	ctx = k.enhanceContext(ctx)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	limits := k.limits(sdkCtx)
@@ -62,7 +64,7 @@ func (k Keeper) execute(ctx context.Context, program, query string, limit sdkmat
 		return nil, errorsmod.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
 	}
 
-	answer, err := k.queryInterpreter(ctx, i, query, sdkmath.MinUint(limit, *limits.MaxResultCount))
+	answer, err := k.queryInterpreter(ctx, i, query, sdkmath.MinUint(solutionsLimit, *limits.MaxResultCount))
 	if err != nil {
 		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
 	}
@@ -76,8 +78,10 @@ func (k Keeper) execute(ctx context.Context, program, query string, limit sdkmat
 }
 
 // queryInterpreter executes the given query on the given interpreter and returns the answer.
-func (k Keeper) queryInterpreter(ctx context.Context, i *prolog.Interpreter, query string, limit sdkmath.Uint) (*types.Answer, error) {
-	return util.QueryInterpreter(ctx, i, query, limit)
+func (k Keeper) queryInterpreter(
+	ctx context.Context, i *prolog.Interpreter, query string, solutionsLimit sdkmath.Uint,
+) (*types.Answer, error) {
+	return util.QueryInterpreter(ctx, i, query, solutionsLimit)
 }
 
 // newInterpreter creates a new interpreter properly configured.
@@ -146,9 +150,9 @@ func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, fmt.St
 
 func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) error {
 	size := sdkmath.NewUint(uint64(len(request.GetQuery())))
-	limit := util.DerefOrDefault(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
-	if size.GT(limit) {
-		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size, limit)
+	maxSize := util.DerefOrDefault(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
+	if size.GT(maxSize) {
+		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size, maxSize)
 	}
 
 	return nil
