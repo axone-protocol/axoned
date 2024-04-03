@@ -27,6 +27,8 @@ $ okp4d query logic ask "chain_id(X)." # returns the chain-id
       --grpc-insecure      allow gRPC over insecure channels, if not the server must use TLS
       --height int         Use a specific height to query state at (this can error if the node is pruning state)
   -h, --help               help for ask
+      --limit uint         limit the maximum number of solutions to return.
+                           This parameter is constrained by the 'max_result_count' setting in the module configuration, which specifies the maximum number of results that can be requested per query. (default 1)
       --node string        <host>:<port> to CometBFT RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string      Output format (text|json) (default "text")
       --program string     reads the program from the given string.
