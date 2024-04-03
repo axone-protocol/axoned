@@ -6,6 +6,8 @@ import (
 
 	"github.com/spf13/cobra"
 
+	sdkmath "cosmossdk.io/math"
+
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -13,7 +15,10 @@ import (
 	"github.com/okp4/okp4d/v7/x/logic/types"
 )
 
-var program string
+var (
+	program string
+	limit   uint64
+)
 
 func CmdQueryAsk() *cobra.Command {
 	cmd := &cobra.Command{
@@ -33,9 +38,11 @@ func CmdQueryAsk() *cobra.Command {
 			query := args[0]
 			queryClient := types.NewQueryServiceClient(clientCtx)
 
+			limit := sdkmath.NewUint(limit)
 			res, err := queryClient.Ask(context.Background(), &types.QueryServiceAskRequest{
 				Program: program,
 				Query:   query,
+				Limit:   &limit,
 			})
 			if err != nil {
 				return
@@ -50,6 +57,13 @@ func CmdQueryAsk() *cobra.Command {
 		"program",
 		"",
 		`reads the program from the given string.`)
+	//nolint:lll
+	cmd.Flags().Uint64Var(
+		&limit,
+		"limit",
+		1,
+		`limit the maximum number of solutions to return.
+This parameter is constrained by the 'max_result_count' setting in the module configuration, which specifies the maximum number of results that can be requested per query.`)
 
 	flags.AddQueryFlagsToCmd(cmd)
 

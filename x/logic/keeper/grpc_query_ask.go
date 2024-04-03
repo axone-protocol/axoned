@@ -14,7 +14,7 @@ import (
 	"github.com/okp4/okp4d/v7/x/logic/util"
 )
 
-var defaultLimits = sdkmath.OneUint()
+var defaultSolutionsLimit = sdkmath.OneUint()
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
@@ -48,7 +48,7 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 		sdkCtx,
 		req.Program,
 		req.Query,
-		util.DerefOrDefault(req.Limit, defaultLimits))
+		util.DerefOrDefault(req.Limit, defaultSolutionsLimit))
 }
 
 // withGasMeter returns a new context with a gas meter that has the given limit.
