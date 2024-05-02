@@ -5,7 +5,7 @@ package logic.v1beta2;
 import "gogoproto/gogo.proto";
 import "logic/v1beta2/params.proto";
 
-option go_package = "github.com/okp4/okp4d/x/logic/types";
+option go_package = "github.com/axone/axoned/x/logic/types";
 
 // GenesisState defines the logic module's genesis state.
 message GenesisState {

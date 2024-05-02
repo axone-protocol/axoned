@@ -4,7 +4,7 @@ package logic.v1beta2;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/okp4/okp4d/x/logic/types";
+option go_package = "github.com/axone/axoned/x/logic/types";
 
 // Params defines all the configuration parameters of the "logic" module.
 message Params {
@@ -114,10 +114,10 @@ message Interpreter {
 
   // virtual_files_filter specifies the filter for the virtual files that are allowed to be used by the interpreter.
   // The filter is used to whitelist or blacklist virtual files represented as URI, for example:
-  // `file:///path/to/file`, `cosmwasm:cw-storage:okp4...?query=foo`
+  // `file:///path/to/file`, `cosmwasm:cw-storage:axone...?query=foo`
   // The filter is applied to the components of the URI, for example:
   // `file:///path/to/file` -> `file`, `/path/to/file`
-  // `cosmwasm:cw-storage:okp4...?query=foo` -> `cosmwasm`, `cw-storage`, `okp4...`, `query=foo`
+  // `cosmwasm:cw-storage:axone...?query=foo` -> `cosmwasm`, `cw-storage`, `axone...`, `query=foo`
   // If a component is included in the filter, then all components with that name will be considered, starting from the
   // beginning of the URI. For example, if `file` is included in the filter, then all URIs that start with `file` will be
   // allowed, regardless of the rest of the components. But `file2` will not be allowed.

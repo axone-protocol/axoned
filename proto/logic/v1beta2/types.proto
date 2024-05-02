@@ -4,7 +4,7 @@ package logic.v1beta2;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/okp4/okp4d/x/logic/types";
+option go_package = "github.com/axone/axoned/x/logic/types";
 
 // Substitution represents a substitution made to the variables in the query to obtain the answer.
 message Substitution {
@@ -40,9 +40,7 @@ message Answer {
   // has_more specifies if there are more solutions than the ones returned.
   bool has_more = 2 [(gogoproto.moretags) = "yaml:\"has_more\",omitempty"];
   // variables represent all the variables in the query.
-  repeated string variables = 3 [
-    (gogoproto.moretags) = "yaml:\"variables\",omitempty"
-  ];
+  repeated string variables = 3 [(gogoproto.moretags) = "yaml:\"variables\",omitempty"];
   // results represent all the results of the query.
   repeated Result results = 4 [
     (gogoproto.nullable) = false,

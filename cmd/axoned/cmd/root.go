@@ -79,7 +79,7 @@ func NewRootCmd() *cobra.Command {
 AXONE Daemon 👹 - a revolutionary public PoS layer 1 specifically designed to enable communities to trustlessly share data,
 algorithms and resources to build the Dataverse!
 
-Want to lean more about AXONE network? Complete documentation is available at https://docs.okp4.network 👀
+Want to lean more about AXONE network? Complete documentation is available at https://docs.axone.xyz 👀
 `,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs

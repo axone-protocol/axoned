@@ -7,7 +7,7 @@ import "cosmos/auth/v1beta1/auth.proto";
 import "cosmos/base/v1beta1/coin.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/okp4/okp4d/x/vesting/types";
+option go_package = "github.com/axone/axoned/x/vesting/types";
 
 // BaseVestingAccount implements the VestingAccount interface. It contains all
 // the necessary fields needed for any vesting account implementation.
