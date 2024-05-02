@@ -136,7 +136,7 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 
-	okp4wasm "github.com/axone/axoned/v7/app/wasm"
+	axonewasm "github.com/axone/axoned/v7/app/wasm"
 	"github.com/axone/axoned/v7/docs"
 	logicmodule "github.com/axone/axoned/v7/x/logic"
 	logicfs "github.com/axone/axoned/v7/x/logic/fs"
@@ -150,8 +150,8 @@ import (
 )
 
 const (
-	AccountAddressPrefix = "okp4"
-	Name                 = "okp4d"
+	AccountAddressPrefix = "axone"
+	Name                 = "axoned"
 )
 
 var (
@@ -585,7 +585,7 @@ func New(
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
 
-	wasmOpts = append(wasmOpts, wasmkeeper.WithQueryPlugins(okp4wasm.CustomQueryPlugins(&app.LogicKeeper)))
+	wasmOpts = append(wasmOpts, wasmkeeper.WithQueryPlugins(axonewasm.CustomQueryPlugins(&app.LogicKeeper)))
 
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
@@ -605,7 +605,7 @@ func New(
 		app.GRPCQueryRouter(),
 		wasmDir,
 		wasmConfig,
-		okp4wasm.AllCapabilities(),
+		axonewasm.AllCapabilities(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		wasmOpts...,
 	)

@@ -43,7 +43,7 @@ import (
 	"github.com/axone/axoned/v7/app"
 	appparams "github.com/axone/axoned/v7/app/params"
 	"github.com/axone/axoned/v7/client/credential"
-	okp4keys "github.com/axone/axoned/v7/client/keys"
+	axonekeys "github.com/axone/axoned/v7/client/keys"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application.
@@ -74,12 +74,12 @@ func NewRootCmd() *cobra.Command {
 
 	rootCmd := &cobra.Command{
 		Use:   app.Name,
-		Short: "OKP4 Daemon 👹",
+		Short: "AXONE Daemon 👹",
 		Long: `
-OKP4 Daemon 👹 - a revolutionary public PoS layer 1 specifically designed to enable communities to trustlessly share data,
+AXONE Daemon 👹 - a revolutionary public PoS layer 1 specifically designed to enable communities to trustlessly share data,
 algorithms and resources to build the Dataverse!
 
-Want to lean more about OKP4 network? Complete documentation is available at https://docs.okp4.network 👀
+Want to lean more about AXONE network? Complete documentation is available at https://docs.okp4.network 👀
 `,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs
@@ -186,7 +186,7 @@ func initRootCmd(
 		genesisCommand(encodingConfig.TxConfig, basicManager),
 		queryCommand(),
 		txCommand(),
-		okp4keys.Enhance(keys.Commands()),
+		axonekeys.Enhance(keys.Commands()),
 		credential.Commands(),
 	)
 }
@@ -300,7 +300,7 @@ func appExport(
 	appOpts servertypes.AppOptions,
 	modulesToExport []string,
 ) (servertypes.ExportedApp, error) {
-	var okp4App *app.App
+	var axoneApp *app.App
 
 	homePath, ok := appOpts.Get(flags.FlagHome).(string)
 	if !ok || homePath == "" {
@@ -316,7 +316,7 @@ func appExport(
 	viperAppOpts.Set(server.FlagInvCheckPeriod, 1)
 	appOpts = viperAppOpts
 
-	okp4App = app.New(
+	axoneApp = app.New(
 		logger,
 		db,
 		traceStore,
@@ -325,12 +325,12 @@ func appExport(
 	)
 
 	if height != -1 {
-		if err := okp4App.LoadHeight(height); err != nil {
+		if err := axoneApp.LoadHeight(height); err != nil {
 			return servertypes.ExportedApp{}, err
 		}
 	}
 
-	return okp4App.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
+	return axoneApp.ExportAppStateAndValidators(forZeroHeight, jailAllowedAddrs, modulesToExport)
 }
 
 // initAppConfig helps to override default appConfig template and configs.
