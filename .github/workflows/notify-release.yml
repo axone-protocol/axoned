@@ -88,6 +88,6 @@ jobs:
             {
               "ref": "main",
               "inputs": {
-                "okp4dVersion": "${{ github.event.release.tag_name }}"
+                "axonedVersion": "${{ github.event.release.tag_name }}"
               }
             }
