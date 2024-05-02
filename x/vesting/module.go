@@ -18,8 +18,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
-	"github.com/okp4/okp4d/v7/x/vesting/client/cli"
-	"github.com/okp4/okp4d/v7/x/vesting/types"
+	"github.com/axone/axoned/v7/x/vesting/client/cli"
+	"github.com/axone/axoned/v7/x/vesting/types"
 )
 
 var (

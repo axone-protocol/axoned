@@ -19,7 +19,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/v7/x/logic/testutil"
+	"github.com/axone/axoned/v7/x/logic/testutil"
 )
 
 func TestJsonProlog(t *testing.T) {

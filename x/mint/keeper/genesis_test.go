@@ -17,10 +17,10 @@ import (
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/okp4/okp4d/v7/x/mint"
-	"github.com/okp4/okp4d/v7/x/mint/keeper"
-	minttestutil "github.com/okp4/okp4d/v7/x/mint/testutil"
-	"github.com/okp4/okp4d/v7/x/mint/types"
+	"github.com/axone/axoned/v7/x/mint"
+	"github.com/axone/axoned/v7/x/mint/keeper"
+	minttestutil "github.com/axone/axoned/v7/x/mint/testutil"
+	"github.com/axone/axoned/v7/x/mint/types"
 )
 
 var minterAcc = authtypes.NewEmptyModuleAccount(types.ModuleName, authtypes.Minter)

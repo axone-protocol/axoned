@@ -3,7 +3,7 @@ package wasm
 import (
 	sdkmath "cosmossdk.io/math"
 
-	"github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/axone/axoned/v7/x/logic/types"
 )
 
 // AskQuery implements the wasm custom Ask query JSON schema, it basically redefined the Ask gRPC request parameters

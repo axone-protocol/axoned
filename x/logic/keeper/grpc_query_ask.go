@@ -9,9 +9,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/v7/x/logic/meter"
-	"github.com/okp4/okp4d/v7/x/logic/types"
-	"github.com/okp4/okp4d/v7/x/logic/util"
+	"github.com/axone/axoned/v7/x/logic/meter"
+	"github.com/axone/axoned/v7/x/logic/types"
+	"github.com/axone/axoned/v7/x/logic/util"
 )
 
 var defaultSolutionsLimit = sdkmath.OneUint()

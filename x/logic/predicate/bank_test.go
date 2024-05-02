@@ -22,8 +22,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/okp4/okp4d/v7/x/logic/testutil"
-	"github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/axone/axoned/v7/x/logic/testutil"
+	"github.com/axone/axoned/v7/x/logic/types"
 )
 
 func TestBank(t *testing.T) {

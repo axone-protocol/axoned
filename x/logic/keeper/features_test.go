@@ -31,11 +31,11 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/okp4/okp4d/v7/x/logic"
-	logicfs "github.com/okp4/okp4d/v7/x/logic/fs"
-	"github.com/okp4/okp4d/v7/x/logic/keeper"
-	logictestutil "github.com/okp4/okp4d/v7/x/logic/testutil"
-	"github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/axone/axoned/v7/x/logic"
+	logicfs "github.com/axone/axoned/v7/x/logic/fs"
+	"github.com/axone/axoned/v7/x/logic/keeper"
+	logictestutil "github.com/axone/axoned/v7/x/logic/testutil"
+	"github.com/axone/axoned/v7/x/logic/types"
 )
 
 var key = storetypes.NewKVStoreKey(types.StoreKey)

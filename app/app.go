@@ -136,17 +136,17 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 
-	okp4wasm "github.com/okp4/okp4d/v7/app/wasm"
-	"github.com/okp4/okp4d/v7/docs"
-	logicmodule "github.com/okp4/okp4d/v7/x/logic"
-	logicfs "github.com/okp4/okp4d/v7/x/logic/fs"
-	logicmodulekeeper "github.com/okp4/okp4d/v7/x/logic/keeper"
-	logicmoduletypes "github.com/okp4/okp4d/v7/x/logic/types"
-	"github.com/okp4/okp4d/v7/x/mint"
-	mintkeeper "github.com/okp4/okp4d/v7/x/mint/keeper"
-	minttypes "github.com/okp4/okp4d/v7/x/mint/types"
-	"github.com/okp4/okp4d/v7/x/vesting"
-	vestingtypes "github.com/okp4/okp4d/v7/x/vesting/types"
+	okp4wasm "github.com/axone/axoned/v7/app/wasm"
+	"github.com/axone/axoned/v7/docs"
+	logicmodule "github.com/axone/axoned/v7/x/logic"
+	logicfs "github.com/axone/axoned/v7/x/logic/fs"
+	logicmodulekeeper "github.com/axone/axoned/v7/x/logic/keeper"
+	logicmoduletypes "github.com/axone/axoned/v7/x/logic/types"
+	"github.com/axone/axoned/v7/x/mint"
+	mintkeeper "github.com/axone/axoned/v7/x/mint/keeper"
+	minttypes "github.com/axone/axoned/v7/x/mint/types"
+	"github.com/axone/axoned/v7/x/vesting"
+	vestingtypes "github.com/axone/axoned/v7/x/vesting/types"
 )
 
 const (

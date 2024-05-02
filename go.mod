@@ -1,4 +1,4 @@
-module github.com/okp4/okp4d/v7
+module github.com/axone/axoned/v7
 
 go 1.21
 

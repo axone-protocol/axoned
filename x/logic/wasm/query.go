@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/v7/x/logic/keeper"
-	"github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/axone/axoned/v7/x/logic/keeper"
+	"github.com/axone/axoned/v7/x/logic/types"
 )
 
 // LogicQuerier ease the bridge between the logic module with the wasm CustomQuerier to allow wasm contracts to query

@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/v7/x/vesting/types"
+	"github.com/axone/axoned/v7/x/vesting/types"
 )
 
 // FlagDelayed Transaction command flags.

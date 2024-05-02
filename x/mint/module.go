@@ -17,10 +17,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/okp4/okp4d/v7/x/mint/client/cli"
-	"github.com/okp4/okp4d/v7/x/mint/keeper"
-	"github.com/okp4/okp4d/v7/x/mint/simulation"
-	"github.com/okp4/okp4d/v7/x/mint/types"
+	"github.com/axone/axoned/v7/x/mint/client/cli"
+	"github.com/axone/axoned/v7/x/mint/keeper"
+	"github.com/axone/axoned/v7/x/mint/simulation"
+	"github.com/axone/axoned/v7/x/mint/types"
 )
 
 var (

@@ -17,10 +17,10 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/okp4/okp4d/v7/x/logic"
-	"github.com/okp4/okp4d/v7/x/logic/keeper"
-	logictestutil "github.com/okp4/okp4d/v7/x/logic/testutil"
-	"github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/axone/axoned/v7/x/logic"
+	"github.com/axone/axoned/v7/x/logic/keeper"
+	logictestutil "github.com/axone/axoned/v7/x/logic/testutil"
+	"github.com/axone/axoned/v7/x/logic/types"
 )
 
 func TestUpdateParams(t *testing.T) {

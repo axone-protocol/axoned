@@ -11,9 +11,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/kv"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 
-	"github.com/okp4/okp4d/v7/x/mint"
-	"github.com/okp4/okp4d/v7/x/mint/simulation"
-	"github.com/okp4/okp4d/v7/x/mint/types"
+	"github.com/axone/axoned/v7/x/mint"
+	"github.com/axone/axoned/v7/x/mint/simulation"
+	"github.com/axone/axoned/v7/x/mint/types"
 )
 
 func TestDecodeStore(t *testing.T) {

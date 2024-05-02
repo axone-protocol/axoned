@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/v7/x/logic/prolog"
-	"github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/axone/axoned/v7/x/logic/prolog"
+	"github.com/axone/axoned/v7/x/logic/types"
 )
 
 // BankBalances is a predicate which unifies the given terms with the list of balances (coins) of the given account.

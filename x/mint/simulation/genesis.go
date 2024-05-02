@@ -12,7 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/okp4/okp4d/v7/x/mint/types"
+	"github.com/axone/axoned/v7/x/mint/types"
 )
 
 // Simulation parameter constants.
