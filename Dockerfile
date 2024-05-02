@@ -20,8 +20,8 @@ RUN BUILD_TAGS=muslc LINK_STATICALLY=true make build
 #--- Image stage
 FROM alpine:3.18.6
 
-COPY --from=go-builder /src/target/dist/okp4d /usr/bin/okp4d
+COPY --from=go-builder /src/target/dist/axoned /usr/bin/axoned
 
 WORKDIR /opt
 
-ENTRYPOINT ["okp4d"]
+ENTRYPOINT ["axoned"]
