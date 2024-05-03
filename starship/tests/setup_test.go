@@ -28,7 +28,7 @@ func (s *TestSuite) TestChainsStatus() {
 }
 
 func (s *TestSuite) TestChainTokenTransfer() {
-	chain1, err := s.chainClients.GetChainClient("okp4-1")
+	chain1, err := s.chainClients.GetChainClient("axone-1")
 	s.Require().NoError(err)
 
 	keyName := "test-transfer"
@@ -53,14 +53,14 @@ func (s *TestSuite) TestChainTokenTransfer() {
 func (s *TestSuite) TestChainIBCTransfer() {
 	chain2, err := s.chainClients.GetChainClient("gaia-1")
 	s.Require().NoError(err)
-	chain1, err := s.chainClients.GetChainClient("okp4-1")
+	chain1, err := s.chainClients.GetChainClient("axone-1")
 	s.Require().NoError(err)
 
 	keyName := "test-ibc-transfer"
 	address, err := chain1.CreateRandWallet(keyName)
 	s.Require().NoError(err)
 
-	// Tranfer atom to okp4 chain
+	// Tranfer atom to axone chain
 	s.IBCTransferTokens(chain2, chain1, address, 12345000)
 
 	// Verify the address recived the token

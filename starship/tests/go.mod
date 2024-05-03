@@ -1,4 +1,4 @@
-module github.com/okp4/okp4d/starship/tests
+module github.com/axone/axoned/starship/tests
 
 go 1.21
 

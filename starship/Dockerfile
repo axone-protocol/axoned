@@ -21,7 +21,7 @@ RUN BUILD_TAGS=muslc LINK_STATICALLY=true make build
 #--- Image stage
 FROM alpine:3.17.3
 
-COPY --from=go-builder /src/target/dist/okp4d /usr/bin/okp4d
+COPY --from=go-builder /src/target/dist/axoned /usr/bin/axoned
 
 # Set up dependencies
 ENV PACKAGES curl make bash jq sed
@@ -31,4 +31,4 @@ RUN apk add --no-cache $PACKAGES
 
 WORKDIR /opt
 
-ENTRYPOINT ["okp4d"]
+ENTRYPOINT ["axoned"]
