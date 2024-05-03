@@ -20,7 +20,7 @@ axoned tx upgrade software-upgrade [name] (--upgrade-height [height]) (--upgrade
       --aux                      Generate aux signer data instead of sending a tx
   -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
       --chain-id string          The network chain ID
-      --daemon-name string       The name of the executable being upgraded (for upgrade-info validation). Default is the DAEMON_NAME env var if set, or else this executable (default "okp4d")
+      --daemon-name string       The name of the executable being upgraded (for upgrade-info validation). Default is the DAEMON_NAME env var if set, or else this executable (default "axoned")
       --deposit string           The deposit to include with the governance proposal
       --dry-run                  ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
       --fee-granter string       Fee granter grants fees for the transaction

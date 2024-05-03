@@ -42,7 +42,7 @@ import (
 // # Examples:
 //
 //	# Compute the SHA-256 hash of the given data and unify it with the given Hash.
-//	- crypto_data_hash('Hello OKP4', Hash).
+//	- crypto_data_hash('Hello AXONE', Hash).
 //
 //	# Compute the SHA-256 hash of the given hexadecimal data and unify it with the given Hash.
 //	- crypto_data_hash('9b038f8ef6918cbb56040dfda401b56b...', Hash, encoding(hex)).

@@ -45,10 +45,10 @@ plugins:
         make release-assets
   - - "@semantic-release/github"
     - assets:
-        - path: "./target/release/okp4d-*-linux-amd64"
-        - path: "./target/release/okp4d-*-linux-amd64.tar.gz"
-        - path: "./target/release/okp4d-*-linux-arm64"
-        - path: "./target/release/okp4d-*-linux-arm64.tar.gz"
+        - path: "./target/release/axoned-*-linux-amd64"
+        - path: "./target/release/axoned-*-linux-amd64.tar.gz"
+        - path: "./target/release/axoned-*-linux-arm64"
+        - path: "./target/release/axoned-*-linux-arm64.tar.gz"
         - path: "./target/release/sha256sum.txt"
   - - "@semantic-release/git"
     - assets:

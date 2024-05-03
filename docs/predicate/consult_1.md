@@ -32,7 +32,7 @@ identify this smart contract and pinpoint the Prolog program we want to consult 
 
 Here's the steps of the scenario:
 
-- **Given** the CosmWasm smart contract "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht" and the behavior:
+- **Given** the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
 
 ```  yaml
 message: |
@@ -50,7 +50,7 @@ response: |
 ```  prolog
 :-
   uri_encoded(query_value, '{"object_data":{"id": "4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05"}}', Query),
-  atom_concat('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?base64Decode=false&query=', Query, URI),
+  atom_concat('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?base64Decode=false&query=', Query, URI),
   consult(URI).
 ```
 
@@ -86,7 +86,7 @@ predicate definition.
 
 Here's the steps of the scenario:
 
-- **Given** the CosmWasm smart contract "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht" and the behavior:
+- **Given** the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
 
 ```  yaml
 message: |
@@ -97,12 +97,12 @@ message: |
   }
 response: |
   :- multifile(program/1).
-  :- consult('cosmwasm:storage:okp412ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqgmqnmk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%225d3933430d0a12794fae719e0db87b6ec5f549b2%22%7D%7D&base64Decode=false').
+  :- consult('cosmwasm:storage:axone12ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqvyan0t?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%225d3933430d0a12794fae719e0db87b6ec5f549b2%22%7D%7D&base64Decode=false').
 
   program(a).
 ```
 
-- **Given** the CosmWasm smart contract "okp412ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqgmqnmk" and the behavior:
+- **Given** the CosmWasm smart contract "axone12ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqvyan0t" and the behavior:
 
 ```  yaml
 message: |
@@ -120,7 +120,7 @@ response: |
 - **Given** the query:
 
 ```  prolog
-  consult('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'),
+  consult('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'),
   program(X).
 ```
 
@@ -148,7 +148,7 @@ This scenario demonstrates the consultation of several Prolog programs from diff
 
 Here's the steps of the scenario:
 
-- **Given** the CosmWasm smart contract "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht" and the behavior:
+- **Given** the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
 
 ```  yaml
 message: |
@@ -161,7 +161,7 @@ response: |
   program(a).
 ```
 
-- **Given** the CosmWasm smart contract "okp412ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqgmqnmk" and the behavior:
+- **Given** the CosmWasm smart contract "axone12ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqvyan0t" and the behavior:
 
 ```  yaml
 message: |
@@ -178,8 +178,8 @@ response: |
 
 ```  prolog
   :- consult([
-    'cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false',
-    'cosmwasm:storage:okp412ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqgmqnmk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%225d3933430d0a12794fae719e0db87b6ec5f549b2%22%7D%7D&base64Decode=false'
+    'cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false',
+    'cosmwasm:storage:axone12ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqvyan0t?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%225d3933430d0a12794fae719e0db87b6ec5f549b2%22%7D%7D&base64Decode=false'
    ]).
 ```
 
@@ -201,8 +201,8 @@ answer:
   results:
   - substitutions:
     - variable: File
-      expression: "'cosmwasm:storage:okp412ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqgmqnmk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%225d3933430d0a12794fae719e0db87b6ec5f549b2%22%7D%7D&base64Decode=false'"
+      expression: "'cosmwasm:storage:axone12ssv28mzr02jffvy4x39akrpky9ykfafzyjzmvgsqqdw78yjevpqvyan0t?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%225d3933430d0a12794fae719e0db87b6ec5f549b2%22%7D%7D&base64Decode=false'"
   - substitutions:
     - variable: File
-      expression: "'cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
+      expression: "'cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
 ```

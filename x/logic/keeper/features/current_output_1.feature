@@ -170,7 +170,7 @@ Feature: current_output/1
       """ prolog
       log_message("Prolog's logic weaves through the fabric of the chain,\nGovernance and rules, in its domain reign."),
       log_message("\n"),
-      log_message("Knowledge blooms in the heart of the OKP4 lore,\nUnlocking a world of possibilities to explore.").
+      log_message("Knowledge blooms in the heart of the AXONE lore,\nUnlocking a world of possibilities to explore.").
       """
     When the query is run
     Then the answer we get is:
@@ -185,6 +185,6 @@ Feature: current_output/1
       user_output: |
         Prolog's logic weaves through the fabric of the chain,
         Governance and rules, in its domain reign.
-        Knowledge blooms in the heart of the OKP4 lore,
+        Knowledge blooms in the heart of the AXONE lore,
         Unlocking a world of possibilities to explore.
       """

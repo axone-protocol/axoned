@@ -449,8 +449,8 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
-				json:        "'{\"cosmos\":[\"okp4\",{\"name\":\"localnet\"}]}'",
-				term:        "json([cosmos-[okp4,json([name-localnet])]])",
+				json:        "'{\"cosmos\":[\"axone\",{\"name\":\"localnet\"}]}'",
+				term:        "json([cosmos-[axone,json([name-localnet])]])",
 				wantSuccess: true,
 			},
 			{

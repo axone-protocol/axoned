@@ -131,7 +131,7 @@ func (m ioMode) Term() engine.Term {
 //	cosmwasm:{contract_name}:{contract_address}?query={contract_query}[&base64Decode={true|false}]
 //
 // where:
-//   - {contract_name}: For informational purposes, indicates the name or type of the smart contract (e.g., "okp4-objectarium").
+//   - {contract_name}: For informational purposes, indicates the name or type of the smart contract (e.g., "axone-objectarium").
 //   - {contract_address}: Specifies the smart contract instance to query.
 //   - {contract_query}: The query to be executed on the smart contract. It is a JSON object that specifies the query payload.
 //   - base64Decode: (Optional) If true, the response is base64-decoded. Otherwise, the response is returned as is.

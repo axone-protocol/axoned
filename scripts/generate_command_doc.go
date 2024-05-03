@@ -9,7 +9,7 @@ import (
 )
 
 func generateCommandDocumentation() error {
-	if err := os.Setenv("DAEMON_NAME", "okp4d"); err != nil {
+	if err := os.Setenv("DAEMON_NAME", "axoned"); err != nil {
 		return err
 	}
 

@@ -43,76 +43,76 @@ func TestBank(t *testing.T) {
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(100))),
 					},
 				},
-				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
+				query:      `bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).`,
 				wantResult: []testutil.TermResults{{"X": "[uknow-100]"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(100))),
 					},
 				},
-				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
+				query:      `bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [X]).`,
 				wantResult: []testutil.TermResults{{"X": "uatom-100"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
-				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
+				query:      `bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [X, Y]).`,
 				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
-				query:      `bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
+				query:      `bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A) | _]).`,
 				wantResult: []testutil.TermResults{{"D": "uatom", "A": "589"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
-				query:      `bank_balances('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
+				query:      `bank_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', [_, X]).`,
 				wantResult: []testutil.TermResults{{"X": "uknow-589"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				program:    `bank_balances_has_coin(A, D, V) :- bank_balances(A, R), member(D-V, R).`,
-				query:      `bank_balances_has_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', 'uknow', V).`,
+				query:      `bank_balances_has_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', 'uknow', V).`,
 				wantResult: []testutil.TermResults{{"V": "589"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins: sdk.NewCoins(
 							sdk.NewCoin("uknow", math.NewInt(589)),
 							sdk.NewCoin("uatom", math.NewInt(693)),
@@ -124,24 +124,24 @@ func TestBank(t *testing.T) {
 					},
 				},
 				program:    `bank_balances_has_sufficient_coin(A, C, S) :- bank_balances(A, R), member(C, R), -(_, V) = C, compare(>, V, S).`,
-				query:      `bank_balances_has_sufficient_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', C, 600).`,
+				query:      `bank_balances_has_sufficient_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', C, 600).`,
 				wantResult: []testutil.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query: `bank_balances(Accounts, Balances).`,
 				wantResult: []testutil.TermResults{
-					{"Accounts": "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm", "Balances": "[uknow-420]"},
-					{"Accounts": "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38", "Balances": "[uatom-589]"},
+					{"Accounts": "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa", "Balances": "[uknow-420]"},
+					{"Accounts": "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep", "Balances": "[uatom-589]"},
 				},
 			},
 			{
@@ -154,82 +154,82 @@ func TestBank(t *testing.T) {
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1000))),
 					},
 				},
 				spendableCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(100))),
 					},
 				},
-				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
+				query:      `bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).`,
 				wantResult: []testutil.TermResults{{"X": "[uknow-100]"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(100))),
 					},
 				},
-				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
+				query:      `bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [X]).`,
 				wantResult: []testutil.TermResults{{"X": "uatom-100"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
-				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
+				query:      `bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [X, Y]).`,
 				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
-				query:      `bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
+				query:      `bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A) | _]).`,
 				wantResult: []testutil.TermResults{{"D": "uatom", "A": "589"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
-				query:      `bank_spendable_balances('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
+				query:      `bank_spendable_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', [_, X]).`,
 				wantResult: []testutil.TermResults{{"X": "uknow-589"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				program:    `bank_spendable_has_coin(A, D, V) :- bank_spendable_balances(A, R), member(D-V, R).`,
-				query:      `bank_spendable_has_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', 'uknow', V).`,
+				query:      `bank_spendable_has_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', 'uknow', V).`,
 				wantResult: []testutil.TermResults{{"V": "589"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins: sdk.NewCoins(
 							sdk.NewCoin("uknow", math.NewInt(589)),
 							sdk.NewCoin("uatom", math.NewInt(693)),
@@ -242,34 +242,34 @@ func TestBank(t *testing.T) {
 				},
 				program: `bank_spendable_has_sufficient_coin(A, C, S) :- bank_spendable_balances(A, R), member(C, R),
 -(_, V) = C, compare(>, V, S).`,
-				query:      `bank_spendable_has_sufficient_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', C, 600).`,
+				query:      `bank_spendable_has_sufficient_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', C, 600).`,
 				wantResult: []testutil.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1220))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(8000))),
 					},
 				},
 				spendableCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query: `bank_spendable_balances(Accounts, SpendableCoins).`,
 				wantResult: []testutil.TermResults{
-					{"Accounts": "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm", "SpendableCoins": "[uknow-420]"},
-					{"Accounts": "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38", "SpendableCoins": "[uatom-589]"},
+					{"Accounts": "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa", "SpendableCoins": "[uknow-420]"},
+					{"Accounts": "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep", "SpendableCoins": "[uatom-589]"},
 				},
 			},
 			{
@@ -283,88 +283,88 @@ func TestBank(t *testing.T) {
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1000))),
 					},
 				},
 				spendableCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(100))),
 					},
 				},
 				lockedCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(900))),
 					},
 				},
-				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).`,
+				query:      `bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).`,
 				wantResult: []testutil.TermResults{{"X": "[uknow-900]"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(100))),
 					},
 				},
-				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X]).`,
+				query:      `bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [X]).`,
 				wantResult: []testutil.TermResults{{"X": "uatom-100"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
-				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [X, Y]).`,
+				query:      `bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [X, Y]).`,
 				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
-				query:      `bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A) | _]).`,
+				query:      `bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A) | _]).`,
 				wantResult: []testutil.TermResults{{"D": "uatom", "A": "589"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
-				query:      `bank_locked_balances('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', [_, X]).`,
+				query:      `bank_locked_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', [_, X]).`,
 				wantResult: []testutil.TermResults{{"X": "uknow-589"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				program:    `bank_locked_has_coin(A, D, V) :- bank_locked_balances(A, R), member(D-V, R).`,
-				query:      `bank_locked_has_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', 'uknow', V).`,
+				query:      `bank_locked_has_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', 'uknow', V).`,
 				wantResult: []testutil.TermResults{{"V": "589"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins: sdk.NewCoins(
 							sdk.NewCoin("uknow", math.NewInt(589)),
 							sdk.NewCoin("uatom", math.NewInt(693)),
@@ -377,44 +377,44 @@ func TestBank(t *testing.T) {
 				},
 				program: `bank_locked_has_sufficient_coin(A, C, S) :- bank_locked_balances(A, R), member(C, R),
 -(_, V) = C, compare(>, V, S).`,
-				query:      `bank_locked_has_sufficient_coin('okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38', C, 600).`,
+				query:      `bank_locked_has_sufficient_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', C, 600).`,
 				wantResult: []testutil.TermResults{{"C": "uakt-4099"}, {"C": "uatom-693"}, {"C": "uband-4282"}, {"C": "ukava-836"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1220))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(8000))),
 					},
 				},
 				spendableCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				lockedCoins: []bank.Balance{
 					{
-						Address: "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm",
+						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(800))),
 					},
 					{
-						Address: "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38",
+						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uatom", math.NewInt(7411))),
 					},
 				},
 				query: `bank_locked_balances(Accounts, LockedCoins).`,
 				wantResult: []testutil.TermResults{
-					{"Accounts": "okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm", "LockedCoins": "[uknow-800]"},
-					{"Accounts": "okp41wze8mn5nsgl9qrgazq6a92fvh7m5e6pslyrz38", "LockedCoins": "[uatom-7411]"},
+					{"Accounts": "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa", "LockedCoins": "[uknow-800]"},
+					{"Accounts": "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep", "LockedCoins": "[uatom-7411]"},
 				},
 			},
 			{
@@ -434,7 +434,7 @@ func TestBank(t *testing.T) {
 					ctx := sdk.
 						NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger()).
 						WithValue(types.BankKeeperContextKey, bankKeeper)
-					sdk.GetConfig().SetBech32PrefixForAccount("okp4", "okp4pub")
+					sdk.GetConfig().SetBech32PrefixForAccount("axone", "axonepub")
 
 					Convey("and a bank keeper initialized with the preconfigured balances", func() {
 						for _, balance := range tc.balances {

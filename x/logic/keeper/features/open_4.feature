@@ -9,7 +9,7 @@ Feature: open/4
   Assuming the existence of a CosmWasm smart contract configured to store resources, we construct a URI to specifically
   identify the smart contract and pinpoint the resource we aim to retrieve via a query message.
 
-    Given the CosmWasm smart contract "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht" and the behavior:
+    Given the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
       """ yaml
       message: |
         {
@@ -34,7 +34,7 @@ Feature: open/4
     Given the query:
       """ prolog
       resource_uri(
-        'okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht',
+        'axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk',
         '{"object_data":{"id": "4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05"}}',
         URI),
       open(URI, read, _, []).
@@ -50,7 +50,7 @@ Feature: open/4
         results:
         - substitutions:
           - variable: URI
-            expression: "'cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
+            expression: "'cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false'"
       """
 
   @great_for_documentation
@@ -60,7 +60,7 @@ Feature: open/4
 
   The resource is opened for reading, and the content is read into a list of characters. Finally, the stream is closed.
 
-    Given the CosmWasm smart contract "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht" and the behavior:
+    Given the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
       """ yaml
       message: |
         {
@@ -80,7 +80,7 @@ Feature: open/4
       """
     Given the query:
       """ prolog
-      read_resource('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false', Chars).
+      read_resource('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false', Chars).
       """
     When the query is run
     Then the answer we get is:
@@ -101,7 +101,7 @@ Feature: open/4
   This scenario is a variation of the previous one. The difference is that the smart contract returns a base64-encoded
   response. For this reason, we set the `base64Decode` parameter to `true` in the query (the default value is `false`).
 
-    Given the CosmWasm smart contract "okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht" and the behavior:
+    Given the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
       """ yaml
       message: |
         {
@@ -121,7 +121,7 @@ Feature: open/4
       """
     Given the query:
       """ prolog
-      read_resource('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=true', Chars).
+      read_resource('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=true', Chars).
       """
     When the query is run
     Then the answer we get is:
@@ -143,7 +143,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo', read, Stream, []).
+      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', read, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -154,7 +154,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(existence_error(source_sink,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
+        - error: "error(existence_error(source_sink,cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo),open/4)"
       """
 
   @great_for_documentation
@@ -164,7 +164,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo', write, Stream, []).
+      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', write, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -175,7 +175,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(permission_error(input,stream,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
+        - error: "error(permission_error(input,stream,cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo),open/4)"
       """
 
   @great_for_documentation
@@ -185,7 +185,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo', write, Stream, []).
+      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', write, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -196,7 +196,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(permission_error(input,stream,cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo),open/4)"
+        - error: "error(permission_error(input,stream,cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo),open/4)"
       """
 
 
@@ -206,7 +206,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo', read, Stream, [non_existing_option]).
+      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', read, Stream, [non_existing_option]).
       """
     When the query is run
     Then the answer we get is:
@@ -226,7 +226,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo', incorrect_mode, Stream, []).
+      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', incorrect_mode, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -245,7 +245,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo', 666, Stream, []).
+      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', 666, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -283,7 +283,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('cosmwasm:storage:okp415ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3ts8gddht?query=foo', Mode, Stream, []).
+      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', Mode, Stream, []).
       """
     When the query is run
     Then the answer we get is:

@@ -24,11 +24,11 @@ where:
 
 ```text
 # Query the balances of the account.
-- bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
+- bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).
 
 # Query the balances of all accounts. The result is a list of pairs of account address and balances.
 - bank_balances(X, Y).
 
 # Query the first balance of the given account by unifying the denomination and amount with the given terms.
-- bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
+- bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A), _]).
 ```
