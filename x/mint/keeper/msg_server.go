@@ -7,7 +7,7 @@ import (
 
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/axone/axoned/v7/x/mint/types"
+	"github.com/axone-protocol/axoned/v7/x/mint/types"
 )
 
 var _ types.MsgServer = msgServer{}

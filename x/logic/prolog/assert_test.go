@@ -9,8 +9,8 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/axone/axoned/v7/x/logic/testutil"
-	"github.com/axone/axoned/v7/x/logic/util"
+	"github.com/axone-protocol/axoned/v7/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v7/x/logic/util"
 )
 
 var (

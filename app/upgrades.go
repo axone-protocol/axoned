@@ -3,7 +3,7 @@ package app
 import (
 	"fmt"
 
-	v7 "github.com/axone/axoned/v7/app/upgrades/v7"
+	v7 "github.com/axone-protocol/axoned/v7/app/upgrades/v7"
 )
 
 // RegisterUpgradeHandlers registers the chain upgrade handlers.

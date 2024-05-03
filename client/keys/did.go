@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/axone/axoned/v7/x/logic/util"
+	"github.com/axone-protocol/axoned/v7/x/logic/util"
 )
 
 var flagPubKeyType = "type"

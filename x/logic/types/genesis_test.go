@@ -5,7 +5,7 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/axone/axoned/v7/x/logic/types"
+	"github.com/axone-protocol/axoned/v7/x/logic/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {

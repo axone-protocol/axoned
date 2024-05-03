@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/msgservice"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/axone/axoned/v7/x/vesting/exported"
+	"github.com/axone-protocol/axoned/v7/x/vesting/exported"
 )
 
 // RegisterLegacyAminoCodec registers the vesting interfaces and concrete types on the

@@ -5,7 +5,7 @@ package mint.v1beta1;
 import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/axone/axoned/x/mint/types";
+option go_package = "github.com/axone-protocol/axoned/x/mint/types";
 
 // Minter holds the state of minting within the blockchain.
 message Minter {

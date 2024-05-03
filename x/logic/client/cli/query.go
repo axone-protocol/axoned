@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client"
 
-	"github.com/axone/axoned/v7/x/logic/types"
+	"github.com/axone-protocol/axoned/v7/x/logic/types"
 )
 
 // GetQueryCmd returns the cli query commands for this module.

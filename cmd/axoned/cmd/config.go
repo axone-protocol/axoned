@@ -3,7 +3,7 @@ package cmd
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone/axoned/v7/app"
+	"github.com/axone-protocol/axoned/v7/app"
 )
 
 func initSDKConfig() {

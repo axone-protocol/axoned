@@ -12,7 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	vestexported "github.com/axone/axoned/v7/x/vesting/exported"
+	vestexported "github.com/axone-protocol/axoned/v7/x/vesting/exported"
 )
 
 // Compile-time type assertions.

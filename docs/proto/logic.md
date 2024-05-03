@@ -440,8 +440,8 @@ QueryService defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `Params` | [QueryServiceParamsRequest](#logic.v1beta2.QueryServiceParamsRequest) | [QueryServiceParamsResponse](#logic.v1beta2.QueryServiceParamsResponse) | Params queries all parameters for the logic module. | GET|/axone/axoned/logic/params|
-| `Ask` | [QueryServiceAskRequest](#logic.v1beta2.QueryServiceAskRequest) | [QueryServiceAskResponse](#logic.v1beta2.QueryServiceAskResponse) | Ask executes a logic query and returns the solutions found. Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee is charged for this, but the execution is constrained by the current limits configured in the module. | GET|/axone/axoned/logic/ask|
+| `Params` | [QueryServiceParamsRequest](#logic.v1beta2.QueryServiceParamsRequest) | [QueryServiceParamsResponse](#logic.v1beta2.QueryServiceParamsResponse) | Params queries all parameters for the logic module. | GET|/axone-protocol/axoned/logic/params|
+| `Ask` | [QueryServiceAskRequest](#logic.v1beta2.QueryServiceAskRequest) | [QueryServiceAskResponse](#logic.v1beta2.QueryServiceAskResponse) | Ask executes a logic query and returns the solutions found. Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee is charged for this, but the execution is constrained by the current limits configured in the module. | GET|/axone-protocol/axoned/logic/ask|
 
  [//]: # (end services)
 

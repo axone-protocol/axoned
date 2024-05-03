@@ -10,7 +10,7 @@ import (
 
 	sdkmath "cosmossdk.io/math"
 
-	"github.com/axone/axoned/v7/x/logic/types"
+	"github.com/axone-protocol/axoned/v7/x/logic/types"
 )
 
 const (

@@ -10,7 +10,7 @@ chains:
     coins: 100000000000000uknow
     hdPath: m/44'/118'/0'/0/0
     coinType: 118
-    repo: https://github.com/axone/axoned
+    repo: https://github.com/axone-protocol/axoned
     ports:
       rest: 1317
       rpc: 26657

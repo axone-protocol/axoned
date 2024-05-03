@@ -17,5 +17,5 @@ echo "Generating gogo proto code"
   done
 )
 
-cp -r github.com/axone/axoned/* ./
+cp -r github.com/axone-protocol/axoned/* ./
 rm -rf github.com

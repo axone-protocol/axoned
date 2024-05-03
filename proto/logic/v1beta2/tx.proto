@@ -7,7 +7,7 @@ import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "logic/v1beta2/params.proto";
 
-option go_package = "github.com/axone/axoned/x/logic/types";
+option go_package = "github.com/axone-protocol/axoned/x/logic/types";
 
 // MsgService defines the service for the logic module.
 // Do nothing for now as the service is without any side effects.

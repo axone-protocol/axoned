@@ -240,7 +240,7 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
 	@echo "${COLOR_CYAN} ⬆️ Upgrade the chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} from ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} to ${COLOR_YELLOW}${TO_VERSION}${COLOR_RESET}"
 	@killall cosmovisor || \
 	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
-	git clone -b ${FROM_VERSION} https://github.com/axone/axoned.git ${TARGET_FOLDER}/${FROM_VERSION}; \
+	git clone -b ${FROM_VERSION} https://github.com/axone-protocol/axoned.git ${TARGET_FOLDER}/${FROM_VERSION}; \
 	echo "${COLOR_CYAN} 🏗 Build the ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} binary...${COLOR_RESET}"; \
 	cd ${TARGET_FOLDER}/${FROM_VERSION}; \
 	make build; \

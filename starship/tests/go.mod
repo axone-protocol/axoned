@@ -1,4 +1,4 @@
-module github.com/axone/axoned/starship/tests
+module github.com/axone-protocol/axoned/starship/tests
 
 go 1.21
 

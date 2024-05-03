@@ -44121,7 +44121,7 @@ paths:
           format: uint64
       tags:
         - Query
-  /axone/axoned/logic/params:
+  /axone-protocol/axoned/logic/params:
     get:
       summary: Parameters queries the parameters of the module.
       operationId: LogicV1BetaParams

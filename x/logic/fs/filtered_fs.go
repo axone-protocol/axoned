@@ -4,7 +4,7 @@ import (
 	"io/fs"
 	"net/url"
 
-	"github.com/axone/axoned/v7/x/logic/util"
+	"github.com/axone-protocol/axoned/v7/x/logic/util"
 )
 
 // FilteredFS is a wrapper around a fs.FS that filters out files that are not allowed to be read.

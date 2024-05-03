@@ -176,7 +176,7 @@ Feature: current_output/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 2605
+      gas_used: 2607
       answer:
         has_more: false
         variables:

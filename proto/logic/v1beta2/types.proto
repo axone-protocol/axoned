@@ -4,7 +4,7 @@ package logic.v1beta2;
 
 import "gogoproto/gogo.proto";
 
-option go_package = "github.com/axone/axoned/x/logic/types";
+option go_package = "github.com/axone-protocol/axoned/x/logic/types";
 
 // Substitution represents a substitution made to the variables in the query to obtain the answer.
 message Substitution {
