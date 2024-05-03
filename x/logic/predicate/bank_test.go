@@ -44,11 +44,11 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(100))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(100))),
 					},
 				},
 				query:      `bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).`,
-				wantResult: []testutil.TermResults{{"X": "[uknow-100]"}},
+				wantResult: []testutil.TermResults{{"X": "[uaxone-100]"}},
 			},
 			{
 				balances: []bank.Balance{
@@ -64,17 +64,17 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [X, Y]).`,
-				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
+				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uaxone-420"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A) | _]).`,
@@ -84,29 +84,29 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				query:      `bank_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', [_, X]).`,
-				wantResult: []testutil.TermResults{{"X": "uknow-589"}},
+				wantResult: []testutil.TermResults{{"X": "uaxone-589"}},
 			},
 			{
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				program:    `bank_balances_has_coin(A, D, V) :- bank_balances(A, R), member(D-V, R).`,
-				query:      `bank_balances_has_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', 'uknow', V).`,
+				query:      `bank_balances_has_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', 'uaxone', V).`,
 				wantResult: []testutil.TermResults{{"V": "589"}},
 			},
 			{
@@ -114,7 +114,7 @@ func TestBank(t *testing.T) {
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins: sdk.NewCoins(
-							sdk.NewCoin("uknow", math.NewInt(589)),
+							sdk.NewCoin("uaxone", math.NewInt(589)),
 							sdk.NewCoin("uatom", math.NewInt(693)),
 							sdk.NewCoin("uband", math.NewInt(4282)),
 							sdk.NewCoin("uakt", math.NewInt(4099)),
@@ -131,7 +131,7 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
@@ -140,14 +140,14 @@ func TestBank(t *testing.T) {
 				},
 				query: `bank_balances(Accounts, Balances).`,
 				wantResult: []testutil.TermResults{
-					{"Accounts": "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa", "Balances": "[uknow-420]"},
+					{"Accounts": "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa", "Balances": "[uaxone-420]"},
 					{"Accounts": "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep", "Balances": "[uatom-589]"},
 				},
 			},
 			{
 				balances:   []bank.Balance{},
 				query:      `bank_balances('foo', X).`,
-				wantResult: []testutil.TermResults{{"X": "[uknow-100]"}},
+				wantResult: []testutil.TermResults{{"X": "[uaxone-100]"}},
 				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],bank_balances/2)",
 					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
@@ -155,17 +155,17 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1000))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(1000))),
 					},
 				},
 				spendableCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(100))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(100))),
 					},
 				},
 				query:      `bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).`,
-				wantResult: []testutil.TermResults{{"X": "[uknow-100]"}},
+				wantResult: []testutil.TermResults{{"X": "[uaxone-100]"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
@@ -181,17 +181,17 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [X, Y]).`,
-				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
+				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uaxone-420"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A) | _]).`,
@@ -201,29 +201,29 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				query:      `bank_spendable_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', [_, X]).`,
-				wantResult: []testutil.TermResults{{"X": "uknow-589"}},
+				wantResult: []testutil.TermResults{{"X": "uaxone-589"}},
 			},
 			{
 				spendableCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				program:    `bank_spendable_has_coin(A, D, V) :- bank_spendable_balances(A, R), member(D-V, R).`,
-				query:      `bank_spendable_has_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', 'uknow', V).`,
+				query:      `bank_spendable_has_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', 'uaxone', V).`,
 				wantResult: []testutil.TermResults{{"V": "589"}},
 			},
 			{
@@ -231,7 +231,7 @@ func TestBank(t *testing.T) {
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins: sdk.NewCoins(
-							sdk.NewCoin("uknow", math.NewInt(589)),
+							sdk.NewCoin("uaxone", math.NewInt(589)),
 							sdk.NewCoin("uatom", math.NewInt(693)),
 							sdk.NewCoin("uband", math.NewInt(4282)),
 							sdk.NewCoin("uakt", math.NewInt(4099)),
@@ -249,7 +249,7 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1220))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(1220))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
@@ -259,7 +259,7 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
@@ -268,14 +268,14 @@ func TestBank(t *testing.T) {
 				},
 				query: `bank_spendable_balances(Accounts, SpendableCoins).`,
 				wantResult: []testutil.TermResults{
-					{"Accounts": "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa", "SpendableCoins": "[uknow-420]"},
+					{"Accounts": "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa", "SpendableCoins": "[uaxone-420]"},
 					{"Accounts": "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep", "SpendableCoins": "[uatom-589]"},
 				},
 			},
 			{
 				spendableCoins: []bank.Balance{},
 				query:          `bank_spendable_balances('foo', X).`,
-				wantResult:     []testutil.TermResults{{"X": "[uknow-100]"}},
+				wantResult:     []testutil.TermResults{{"X": "[uaxone-100]"}},
 				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],bank_spendable_balances/2)",
 					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},
@@ -284,23 +284,23 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1000))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(1000))),
 					},
 				},
 				spendableCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(100))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(100))),
 					},
 				},
 				lockedCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(900))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(900))),
 					},
 				},
 				query:      `bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).`,
-				wantResult: []testutil.TermResults{{"X": "[uknow-900]"}},
+				wantResult: []testutil.TermResults{{"X": "[uaxone-900]"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
@@ -316,17 +316,17 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [X, Y]).`,
-				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uknow-420"}},
+				wantResult: []testutil.TermResults{{"X": "uatom-589", "Y": "uaxone-420"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(589))),
 					},
 				},
 				query:      `bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A) | _]).`,
@@ -336,29 +336,29 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				query:      `bank_locked_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', [_, X]).`,
-				wantResult: []testutil.TermResults{{"X": "uknow-589"}},
+				wantResult: []testutil.TermResults{{"X": "uaxone-589"}},
 			},
 			{
 				lockedCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420)), sdk.NewCoin("uatom", math.NewInt(493))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(589)), sdk.NewCoin("uatom", math.NewInt(693))),
 					},
 				},
 				program:    `bank_locked_has_coin(A, D, V) :- bank_locked_balances(A, R), member(D-V, R).`,
-				query:      `bank_locked_has_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', 'uknow', V).`,
+				query:      `bank_locked_has_coin('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', 'uaxone', V).`,
 				wantResult: []testutil.TermResults{{"V": "589"}},
 			},
 			{
@@ -366,7 +366,7 @@ func TestBank(t *testing.T) {
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
 						Coins: sdk.NewCoins(
-							sdk.NewCoin("uknow", math.NewInt(589)),
+							sdk.NewCoin("uaxone", math.NewInt(589)),
 							sdk.NewCoin("uatom", math.NewInt(693)),
 							sdk.NewCoin("uband", math.NewInt(4282)),
 							sdk.NewCoin("uakt", math.NewInt(4099)),
@@ -384,7 +384,7 @@ func TestBank(t *testing.T) {
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(1220))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(1220))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
@@ -394,7 +394,7 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(420))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(420))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
@@ -404,7 +404,7 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
-						Coins:   sdk.NewCoins(sdk.NewCoin("uknow", math.NewInt(800))),
+						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(800))),
 					},
 					{
 						Address: "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep",
@@ -413,14 +413,14 @@ func TestBank(t *testing.T) {
 				},
 				query: `bank_locked_balances(Accounts, LockedCoins).`,
 				wantResult: []testutil.TermResults{
-					{"Accounts": "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa", "LockedCoins": "[uknow-800]"},
+					{"Accounts": "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa", "LockedCoins": "[uaxone-800]"},
 					{"Accounts": "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep", "LockedCoins": "[uatom-7411]"},
 				},
 			},
 			{
 				lockedCoins: []bank.Balance{},
 				query:       `bank_locked_balances('foo', X).`,
-				wantResult:  []testutil.TermResults{{"X": "[uknow-100]"}},
+				wantResult:  []testutil.TermResults{{"X": "[uaxone-100]"}},
 				wantError: fmt.Errorf("error(resource_error(resource_module(bank)),[%s],bank_locked_balances/2)",
 					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
 			},

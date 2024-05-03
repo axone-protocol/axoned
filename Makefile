@@ -203,7 +203,7 @@ chain-init: build ## Initialize the blockchain with default settings.
 	  --chain-id=axone-${CHAIN} \
 	  --home "${CHAIN_HOME}"; \
 	\
-	sed -i $(SED_FLAG) "s/\"stake\"/\"uknow\"/g" "${CHAIN_HOME}/config/genesis.json"; \
+	sed -i $(SED_FLAG) "s/\"stake\"/\"uaxone\"/g" "${CHAIN_HOME}/config/genesis.json"; \
 	\
 	MNEMONIC_VALIDATOR="island position immense mom cross enemy grab little deputy tray hungry detect state helmet \
 	  tomorrow trap expect admit inhale present vault reveal scene atom"; \
@@ -213,12 +213,12 @@ chain-init: build ## Initialize the blockchain with default settings.
 	      --keyring-backend test \
 	      --home "${CHAIN_HOME}"; \
 	\
-	${CHAIN_BINARY} genesis add-genesis-account validator 1000000000uknow \
+	${CHAIN_BINARY} genesis add-genesis-account validator 1000000000uaxone \
 	  --keyring-backend test \
 	  --home "${CHAIN_HOME}"; \
 	\
 	NODE_ID=`${CHAIN_BINARY} tendermint show-node-id --home ${CHAIN_HOME}`; \
-	${CHAIN_BINARY} genesis gentx validator 1000000uknow \
+	${CHAIN_BINARY} genesis gentx validator 1000000uaxone \
 	  --node-id $$NODE_ID \
 	  --chain-id=axone-${CHAIN} \
 	  --keyring-backend test \
@@ -256,7 +256,7 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
 	PROPOSAL=${PROPOSAL}; \
 	if [[ ! -f "$$PROPOSAL" ]]; then \
         echo "${COLOR_CYAN} 👩‍🚀 No proposal given  ${COLOR_RESET}"; \
-        echo '{"messages": [{"@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade","authority": "axone10d07y265gmmuvt4z0w9aw880jnsr700jh7kd2g","plan": {"name": "","time": "0001-01-01T00:00:00Z","height": "10","info": "","upgraded_client_state": null}}],"title": "Software update", "summary": "Update the binary", "metadata": "ipfs://CID","deposit": "1uknow"}' | \
+        echo '{"messages": [{"@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade","authority": "axone10d07y265gmmuvt4z0w9aw880jnsr700jh7kd2g","plan": {"name": "","time": "0001-01-01T00:00:00Z","height": "10","info": "","upgraded_client_state": null}}],"title": "Software update", "summary": "Update the binary", "metadata": "ipfs://CID","deposit": "1uaxone"}' | \
         jq --arg name "${TO_VERSION}" '.messages[].plan.name = $$name' > ${TARGET_FOLDER}/proposal.json; \
       	PROPOSAL=${TARGET_FOLDER}/proposal.json; \
     fi; \
@@ -276,7 +276,7 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
  		-b sync; \
  	\
  	sleep 5;\
- 	$$BINARY_OLD tx gov deposit 1 10000000uknow \
+ 	$$BINARY_OLD tx gov deposit 1 10000000uaxone \
      		--from validator \
      		--yes \
      		--home ${CHAIN_HOME} \

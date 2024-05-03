@@ -31,7 +31,7 @@ Read more in the [introduction blog post](https://blog.axone.xyz/). For a high-l
 
 ## Want to become a validator?
 
-Validators are responsible for securing the axone network. Validator responsibilities include maintaining a functional [node](https://docs.axone.xyz/docs/nodes/run-node) with constant uptime and providing a sufficient amount of $KNOW as stake. In exchange for this service, validators receive block rewards and transaction fees.
+Validators are responsible for securing the axone network. Validator responsibilities include maintaining a functional [node](https://docs.axone.xyz/docs/nodes/run-node) with constant uptime and providing a sufficient amount of $AXONE as stake. In exchange for this service, validators receive block rewards and transaction fees.
 
 Want to become a validator? 👉 [Checkout the documentation!](https://docs.axone.xyz/docs/nodes/introduction)
 

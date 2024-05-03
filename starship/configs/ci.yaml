@@ -6,8 +6,8 @@ chains:
     home: /root/.axoned
     binary: axoned
     prefix: axone
-    denom: uknow
-    coins: 100000000000000uknow
+    denom: uaxone
+    coins: 100000000000000uaxone
     hdPath: m/44'/118'/0'/0/0
     coinType: 118
     repo: https://github.com/axone-protocol/axoned
