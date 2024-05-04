@@ -74,12 +74,13 @@ func NewRootCmd() *cobra.Command {
 
 	rootCmd := &cobra.Command{
 		Use:   app.Name,
-		Short: "AXONE Daemon 👹",
+		Short: "Axone - Orchestration Layer for AI",
 		Long: `
-AXONE Daemon 👹 - a revolutionary public PoS layer 1 specifically designed to enable communities to trustlessly share data,
-algorithms and resources to build the Dataverse!
+Axone is a public dPoS layer 1 specifically designed for connecting, sharing, and monetizing any resources in the AI stack.
+It is an open network dedicated to collaborative AI workflow management that is universally compatible with any data, model,
+or infrastructure. Data, algorithms, storage, compute, APIs... Anything on-chain and off-chain can be shared.
 
-Want to lean more about AXONE network? Complete documentation is available at https://docs.axone.xyz 👀
+Want to lean more about AXONE network? Complete documentation is available at: https://docs.axone.xyz 👀
 `,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs
