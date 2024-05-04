@@ -38,4 +38,4 @@ prune custom --pruning-keep-recent 100 --app-db-backend 'goleveldb'
 
 ### SEE ALSO
 
-- [axoned](axoned.md)	 - AXONE Daemon 👹
+- [axoned](axoned.md)	 - Axone - Orchestration Layer for AI

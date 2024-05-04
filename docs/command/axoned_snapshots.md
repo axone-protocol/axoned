@@ -10,7 +10,7 @@ Manage local snapshots
 
 ### SEE ALSO
 
-* [axoned](axoned.md)	 - AXONE Daemon 👹
+* [axoned](axoned.md)	 - Axone - Orchestration Layer for AI
 * [axoned snapshots delete](axoned_snapshots_delete.md)	 - Delete a local snapshot
 * [axoned snapshots dump](axoned_snapshots_dump.md)	 - Dump the snapshot as portable archive format
 * [axoned snapshots export](axoned_snapshots_export.md)	 - Export app state to snapshot store

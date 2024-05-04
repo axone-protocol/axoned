@@ -16,5 +16,5 @@ This command provides a set of sub-commands to manage W3C Verifiable Credentials
 
 ### SEE ALSO
 
-* [axoned](axoned.md)	 - AXONE Daemon 👹
+* [axoned](axoned.md)	 - Axone - Orchestration Layer for AI
 * [axoned credential sign](axoned_credential_sign.md)	 - Sign a W3C Verifiable Credential provided as a file or stdin

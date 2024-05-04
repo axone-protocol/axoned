@@ -25,4 +25,4 @@ axoned rollback [flags]
 
 ### SEE ALSO
 
-* [axoned](axoned.md)	 - AXONE Daemon 👹
+* [axoned](axoned.md)	 - Axone - Orchestration Layer for AI

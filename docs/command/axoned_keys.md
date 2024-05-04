@@ -37,7 +37,7 @@ The pass backend requires GnuPG: [https://gnupg.org/](https://gnupg.org/)
 
 ### SEE ALSO
 
-* [axoned](axoned.md)	 - AXONE Daemon 👹
+* [axoned](axoned.md)	 - Axone - Orchestration Layer for AI
 * [axoned keys add](axoned_keys_add.md)	 - Add an encrypted private key (either newly generated or recovered), encrypt it, and save to &lt;name&gt; file
 * [axoned keys delete](axoned_keys_delete.md)	 - Delete the given keys
 * [axoned keys did](axoned_keys_did.md)	 - Give the did:key from a ed25519 or secp256k1 pubkey (hex, base64)

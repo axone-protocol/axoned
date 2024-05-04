@@ -14,7 +14,7 @@ axoned tx [flags]
 
 ### SEE ALSO
 
-* [axoned](axoned.md)	 - AXONE Daemon 👹
+* [axoned](axoned.md)	 - Axone - Orchestration Layer for AI
 * [axoned tx auth](axoned_tx_auth.md)	 - Transactions commands for the auth module
 * [axoned tx authz](axoned_tx_authz.md)	 - Authorization transactions subcommands
 * [axoned tx bank](axoned_tx_bank.md)	 - Bank transaction subcommands

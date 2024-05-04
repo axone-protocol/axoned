@@ -14,7 +14,7 @@ axoned debug [flags]
 
 ### SEE ALSO
 
-* [axoned](axoned.md)	 - AXONE Daemon 👹
+* [axoned](axoned.md)	 - Axone - Orchestration Layer for AI
 * [axoned debug addr](axoned_debug_addr.md)	 - Convert an address between hex and bech32
 * [axoned debug codec](axoned_debug_codec.md)	 - Tool for helping with debugging your application codec
 * [axoned debug prefixes](axoned_debug_prefixes.md)	 - List prefixes used for Human-Readable Part (HRP) in Bech32

@@ -10,7 +10,7 @@ CometBFT subcommands
 
 ### SEE ALSO
 
-* [axoned](axoned.md)	 - AXONE Daemon 👹
+* [axoned](axoned.md)	 - Axone - Orchestration Layer for AI
 * [axoned comet bootstrap-state](axoned_comet_bootstrap-state.md)	 - Bootstrap CometBFT state at an arbitrary block height using a light client
 * [axoned comet reset-state](axoned_comet_reset-state.md)	 - Remove all the data and WAL
 * [axoned comet show-address](axoned_comet_show-address.md)	 - Shows this node's CometBFT validator consensus address

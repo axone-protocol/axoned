@@ -10,7 +10,7 @@ Utilities for managing application configuration
 
 ### SEE ALSO
 
-* [axoned](axoned.md)	 - AXONE Daemon 👹
+* [axoned](axoned.md)	 - Axone - Orchestration Layer for AI
 * [axoned config diff](axoned_config_diff.md)	 - Outputs all config values that are different from the app.toml defaults.
 * [axoned config get](axoned_config_get.md)	 - Get an application config value
 * [axoned config home](axoned_config_home.md)	 - Outputs the folder used as the binary home. No home directory is set when using the tool standalone.

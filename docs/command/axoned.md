@@ -1,13 +1,14 @@
 ## axoned
 
-AXONE Daemon 👹
+Axone - Orchestration Layer for AI
 
 ### Synopsis
 
-AXONE Daemon 👹 - a revolutionary public PoS layer 1 specifically designed to enable communities to trustlessly share data,
-algorithms and resources to build the Dataverse!
+Axone is a public dPoS layer 1 specifically designed for connecting, sharing, and monetizing any resources in the AI stack.
+It is an open network dedicated to collaborative AI workflow management that is universally compatible with any data, model,
+or infrastructure. Data, algorithms, storage, compute, APIs... Anything on-chain and off-chain can be shared.
 
-Want to lean more about AXONE network? Complete documentation is available at [https://docs.axone.xyz](https://docs.axone.xyz)  👀
+Want to lean more about AXONE network? Complete documentation is available at: [https://docs.axone.xyz](https://docs.axone.xyz)  👀
 
 ### Options
 

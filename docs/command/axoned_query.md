@@ -14,7 +14,7 @@ axoned query [flags]
 
 ### SEE ALSO
 
-* [axoned](axoned.md)	 - AXONE Daemon 👹
+* [axoned](axoned.md)	 - Axone - Orchestration Layer for AI
 * [axoned query auth](axoned_query_auth.md)	 - Querying commands for the auth module
 * [axoned query authz](axoned_query_authz.md)	 - Querying commands for the authz module
 * [axoned query bank](axoned_query_bank.md)	 - Querying commands for the bank module
