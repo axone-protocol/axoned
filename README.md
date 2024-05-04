@@ -8,7 +8,7 @@
   <a href="https://www.youtube.com/channel/UCiOfcTaUyv2Szv4OQIepIvg"><img src="https://img.shields.io/badge/YouTube-FF0000?style=for-the-badge&logo=youtube&logoColor=white" /></a>
 </p>
 
-# 𝒐𝒌𝒑4𝒅
+# Axone - Orchestration Layer for AI
 
 [![lint](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/lint.yml?label=lint&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/lint.yml)
 [![build](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/build.yml?label=build&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/build.yml)
@@ -21,11 +21,11 @@
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg?style=for-the-badge)](https://github.com/axone-protocol/.github/blob/main/CODE_OF_CONDUCT.md)
 [![license](https://img.shields.io/github/license/axone-protocol/axoned.svg?label=License&style=for-the-badge)](https://opensource.org/licenses/Apache-2.0)
 
-> `AXONE` is a public [dPoS](https://en.bitcoinwiki.org/wiki/DPoS) layer 1 specifically designed to enable communities to trustlessly share data, algorithms and resources to build the Dataverse - An open world where everybody can create or participate in custom ecosystems (with common governance mechanisms, sharing rules, business models...) to build a new generation of dApps way beyond Decentralized Finance.
+> `Axone` is a public [dPoS](https://en.bitcoinwiki.org/wiki/DPoS) layer 1 specifically designed for connecting, sharing, and monetizing any resources in the AI stack. It is an open network dedicated to collaborative AI workflow management that is universally compatible with any data, model, or infrastructure. Data, algorithms, storage, compute, APIs... Anything on-chain and off-chain can be shared.
 
 ## The protocol
 
-`axoned` is the node of the [AXONE](https://axone.xyz) network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, and designed to become a hub of incentivized data providers, developers, data scientists & users collaborating to generate value from data and algorithms.
+`axoned` is the node of the [AXONE](https://axone.xyz) network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, which allows companies & individuals to define on-chain rules, share any off-chain resources & create a new generation of applications on top of them.
 
 Read more in the [introduction blog post](https://blog.axone.xyz/). For a high-level overview of the AXONE protocol and network economics, check out the [white paper](https://docs.axone.xyz/docs/whitepaper/abstract).
 
