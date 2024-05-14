@@ -11,7 +11,7 @@ jobs:
       - name: Notify Discord
         uses: fjogeleit/http-request-action@v1
         with:
-          url: ${{ secrets.OKP4_DISCORD_WEBHOOK }}
+          url: ${{ secrets.DISCORD_WEBHOOK }}
           method: 'POST'
           customHeaders: '{"Content-Type": "application/json"}'
           data: |-
