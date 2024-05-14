@@ -27,7 +27,7 @@ jobs:
       - name: Check out repository
         uses: actions/checkout@v4
         with:
-          token: ${{ secrets.OKP4_TOKEN }}
+          token: ${{ secrets.OPS_TOKEN }}
 
       - name: Import GPG key
         uses: crazy-max/ghaction-import-gpg@v6
@@ -59,7 +59,7 @@ jobs:
           extends: |
             conventional-changelog-conventionalcommits@7.0.1
         env:
-          GITHUB_TOKEN: ${{ secrets.OKP4_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.OPS_TOKEN }}
           GIT_AUTHOR_NAME: ${{ secrets.OKP4_BOT_GIT_AUTHOR_NAME }}
           GIT_AUTHOR_EMAIL: ${{ secrets.OKP4_BOT_GIT_AUTHOR_EMAIL }}
           GIT_COMMITTER_NAME: ${{ secrets.OKP4_BOT_GIT_COMMITTER_NAME }}

@@ -12,4 +12,4 @@ jobs:
         uses: okp4/follow-contributor-action@v1.1.0
         with:
           username: ${{ github.event.pull_request.user.login }}
-          token: ${{ secrets.OKP4_TOKEN }}
+          token: ${{ secrets.OPS_TOKEN }}
