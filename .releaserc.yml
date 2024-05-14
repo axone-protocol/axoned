@@ -44,7 +44,8 @@ plugins:
     - prepareCmd: |
         make release-assets
   - - "@semantic-release/github"
-    - assets:
+    - successComment: false
+      assets:
         - path: "./target/release/axoned-*-linux-amd64"
         - path: "./target/release/axoned-*-linux-amd64.tar.gz"
         - path: "./target/release/axoned-*-linux-arm64"
