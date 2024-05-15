@@ -1,16 +1,16 @@
 chains:
-  - name: okp4-1
+  - name: axone-1
     type: custom
     numValidators: 4
-    image: anmol1696/okp4d:latest
-    home: /root/.okp4d
-    binary: okp4d
-    prefix: okp4
-    denom: uknow
-    coins: 100000000000000uknow
+    image: anmol1696/axoned:latest
+    home: /root/.axoned
+    binary: axoned
+    prefix: axone
+    denom: uaxone
+    coins: 100000000000000uaxone
     hdPath: m/44'/118'/0'/0/0
     coinType: 118
-    repo: https://github.com/okp4/okp4d
+    repo: https://github.com/axone-protocol/axoned
     ports:
       rest: 1317
       rpc: 26657
@@ -30,11 +30,11 @@ chains:
       memory: 2Gi
 
 relayers:
-  - name: okp4-gaia
+  - name: axone-gaia
     type: hermes
     replicas: 1
     chains:
-      - okp4-1
+      - axone-1
       - gaia-1
     resources:
       cpu: 1

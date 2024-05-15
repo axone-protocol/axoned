@@ -1,5 +1,5 @@
 version: v1
-name: buf.build/okp4/okp4d
+name: buf.build/axone-protocol/axoned
 deps:
   - buf.build/cosmos/cosmos-sdk:v0.50.1
   - buf.build/cosmos/cosmos-proto

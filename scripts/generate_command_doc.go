@@ -5,11 +5,11 @@ import (
 
 	"github.com/spf13/cobra/doc"
 
-	"github.com/okp4/okp4d/v7/cmd/okp4d/cmd"
+	"github.com/axone-protocol/axoned/v7/cmd/axoned/cmd"
 )
 
 func generateCommandDocumentation() error {
-	if err := os.Setenv("DAEMON_NAME", "okp4d"); err != nil {
+	if err := os.Setenv("DAEMON_NAME", "axoned"); err != nil {
 		return err
 	}
 

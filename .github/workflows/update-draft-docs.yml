@@ -13,7 +13,7 @@ jobs:
         with:
           url: 'https://api.github.com/repos/okp4/docs/actions/workflows/39152549/dispatches'
           method: 'POST'
-          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
               "ref": "main",
@@ -31,7 +31,7 @@ jobs:
         with:
           url: 'https://api.github.com/repos/okp4/docs/actions/workflows/39152549/dispatches'
           method: 'POST'
-          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
               "ref": "main",
@@ -49,7 +49,7 @@ jobs:
         with:
           url: 'https://api.github.com/repos/okp4/docs/actions/workflows/39152549/dispatches'
           method: 'POST'
-          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
               "ref": "main",

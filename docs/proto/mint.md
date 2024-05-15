@@ -13,7 +13,7 @@ key parameters with each block to maintain a balanced token supply.
 ## Calculation of Inflation
 
 The method for determining the inflation rate is outlined in the
-[OKP4 Whitepaper - Token Model](https://docs.okp4.network/whitepaper/token-model).
+[AXONE Whitepaper - Token Model](https://docs.axone.xyz/whitepaper/token-model).
 
 ## Per-Block Token Generation
 

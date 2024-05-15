@@ -9,7 +9,7 @@ import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "vesting/v1beta1/vesting.proto";
 
-option go_package = "github.com/okp4/okp4d/x/vesting/types";
+option go_package = "github.com/axone-protocol/axoned/x/vesting/types";
 
 // Msg defines the bank Msg service.
 service Msg {

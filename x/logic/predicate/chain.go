@@ -5,7 +5,7 @@ import (
 
 	"github.com/ichiban/prolog/engine"
 
-	"github.com/okp4/okp4d/v7/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v7/x/logic/prolog"
 )
 
 // ChainID is a predicate which unifies the given term with the current chain ID. The signature is:

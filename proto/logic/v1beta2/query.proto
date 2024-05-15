@@ -7,20 +7,20 @@ import "google/api/annotations.proto";
 import "logic/v1beta2/params.proto";
 import "logic/v1beta2/types.proto";
 
-option go_package = "github.com/okp4/okp4d/x/logic/types";
+option go_package = "github.com/axone-protocol/axoned/x/logic/types";
 
 // QueryService defines the gRPC querier service.
 service QueryService {
   // Params queries all parameters for the logic module.
   rpc Params(QueryServiceParamsRequest) returns (QueryServiceParamsResponse) {
-    option (google.api.http).get = "/okp4/okp4d/logic/params";
+    option (google.api.http).get = "/axone-protocol/axoned/logic/params";
   }
 
   // Ask executes a logic query and returns the solutions found.
   // Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee
   // is charged for this, but the execution is constrained by the current limits configured in the module.
   rpc Ask(QueryServiceAskRequest) returns (QueryServiceAskResponse) {
-    option (google.api.http).get = "/okp4/okp4d/logic/ask";
+    option (google.api.http).get = "/axone-protocol/axoned/logic/ask";
   }
 }
 

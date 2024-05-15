@@ -18,8 +18,8 @@ import (
 	clitestutil "github.com/cosmos/cosmos-sdk/testutil/cli"
 	testutilmod "github.com/cosmos/cosmos-sdk/types/module/testutil"
 
-	"github.com/okp4/okp4d/v7/x/mint"
-	mintcli "github.com/okp4/okp4d/v7/x/mint/client/cli"
+	"github.com/axone-protocol/axoned/v7/x/mint"
+	mintcli "github.com/axone-protocol/axoned/v7/x/mint/client/cli"
 )
 
 func TestGetCmdQueryParams(t *testing.T) {

@@ -136,22 +136,22 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v8/modules/core/keeper"
 	ibctm "github.com/cosmos/ibc-go/v8/modules/light-clients/07-tendermint"
 
-	okp4wasm "github.com/okp4/okp4d/v7/app/wasm"
-	"github.com/okp4/okp4d/v7/docs"
-	logicmodule "github.com/okp4/okp4d/v7/x/logic"
-	logicfs "github.com/okp4/okp4d/v7/x/logic/fs"
-	logicmodulekeeper "github.com/okp4/okp4d/v7/x/logic/keeper"
-	logicmoduletypes "github.com/okp4/okp4d/v7/x/logic/types"
-	"github.com/okp4/okp4d/v7/x/mint"
-	mintkeeper "github.com/okp4/okp4d/v7/x/mint/keeper"
-	minttypes "github.com/okp4/okp4d/v7/x/mint/types"
-	"github.com/okp4/okp4d/v7/x/vesting"
-	vestingtypes "github.com/okp4/okp4d/v7/x/vesting/types"
+	axonewasm "github.com/axone-protocol/axoned/v7/app/wasm"
+	"github.com/axone-protocol/axoned/v7/docs"
+	logicmodule "github.com/axone-protocol/axoned/v7/x/logic"
+	logicfs "github.com/axone-protocol/axoned/v7/x/logic/fs"
+	logicmodulekeeper "github.com/axone-protocol/axoned/v7/x/logic/keeper"
+	logicmoduletypes "github.com/axone-protocol/axoned/v7/x/logic/types"
+	"github.com/axone-protocol/axoned/v7/x/mint"
+	mintkeeper "github.com/axone-protocol/axoned/v7/x/mint/keeper"
+	minttypes "github.com/axone-protocol/axoned/v7/x/mint/types"
+	"github.com/axone-protocol/axoned/v7/x/vesting"
+	vestingtypes "github.com/axone-protocol/axoned/v7/x/vesting/types"
 )
 
 const (
-	AccountAddressPrefix = "okp4"
-	Name                 = "okp4d"
+	AccountAddressPrefix = "axone"
+	Name                 = "axoned"
 )
 
 var (
@@ -585,7 +585,7 @@ func New(
 		wasmOpts = append(wasmOpts, wasmkeeper.WithVMCacheMetrics(prometheus.DefaultRegisterer))
 	}
 
-	wasmOpts = append(wasmOpts, wasmkeeper.WithQueryPlugins(okp4wasm.CustomQueryPlugins(&app.LogicKeeper)))
+	wasmOpts = append(wasmOpts, wasmkeeper.WithQueryPlugins(axonewasm.CustomQueryPlugins(&app.LogicKeeper)))
 
 	// The last arguments can contain custom message handlers, and custom query handlers,
 	// if we want to allow any custom callbacks
@@ -605,7 +605,7 @@ func New(
 		app.GRPCQueryRouter(),
 		wasmDir,
 		wasmConfig,
-		okp4wasm.AllCapabilities(),
+		axonewasm.AllCapabilities(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		wasmOpts...,
 	)

@@ -1,7 +1,7 @@
 # ℹ Freely based on: https://gist.github.com/thomaspoignant/5b72d579bd5f311904d973652180c705
 
 # Constants
-BINARY_NAME             = okp4d
+BINARY_NAME             = axoned
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 RELEASE_FOLDER          = $(TARGET_FOLDER)/release
@@ -15,7 +15,7 @@ DOCKER_IMAGE_PROTO        = ghcr.io/cosmos/proto-builder:0.14.0
 DOCKER_IMAGE_BUF          = bufbuild/buf:1.4.0
 DOCKER_PROTO_RUN          := docker run --rm --user $(id -u):$(id -g) -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_PROTO)
 DOCKER_BUF_RUN            := docker run --rm -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_BUF)
-DOCKER_BUILDX_BUILDER     = okp4-builder
+DOCKER_BUILDX_BUILDER     = axone-builder
 DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
 DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
 
@@ -33,7 +33,7 @@ CHAIN_HOME    	:= ./target/deployment/${CHAIN}
 CHAIN_MONIKER 	:= local-node
 CHAIN_BINARY 	:= ./${DIST_FOLDER}/${BINARY_NAME}
 
-DAEMON_NAME 	:= okp4d
+DAEMON_NAME 	:= axoned
 DAEMON_HOME 	:= `pwd`/${CHAIN_HOME}
 
 BUILD_TAGS += netgo
@@ -68,10 +68,10 @@ BUILD_TAGS_COMMA_SEP := $(subst $(WHITESPACE),$(COMMA),$(BUILD_TAGS))
 VERSION  := $(shell cat version)
 COMMIT   := $(shell git log -1 --format='%H')
 LD_FLAGS  = \
-    -X github.com/cosmos/cosmos-sdk/version.AppName=okp4d      \
-	-X github.com/cosmos/cosmos-sdk/version.Name=okp4d         \
-	-X github.com/cosmos/cosmos-sdk/version.ServerName=okp4d   \
-	-X github.com/cosmos/cosmos-sdk/version.ClientName=okp4d   \
+    -X github.com/cosmos/cosmos-sdk/version.AppName=axoned      \
+	-X github.com/cosmos/cosmos-sdk/version.Name=axoned         \
+	-X github.com/cosmos/cosmos-sdk/version.ServerName=axoned   \
+	-X github.com/cosmos/cosmos-sdk/version.ClientName=axoned   \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)   \
     -X github.com/cosmos/cosmos-sdk/version.BuildTags=$(BUILD_TAGS_COMMA_SEP)
@@ -199,11 +199,11 @@ chain-init: build ## Initialize the blockchain with default settings.
 	@echo "${COLOR_CYAN} 🛠️ Initializing chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} under ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
 
 	@rm -rf "${CHAIN_HOME}"; \
-	${CHAIN_BINARY} init okp4-node \
-	  --chain-id=okp4-${CHAIN} \
+	${CHAIN_BINARY} init axone-node \
+	  --chain-id=axone-${CHAIN} \
 	  --home "${CHAIN_HOME}"; \
 	\
-	sed -i $(SED_FLAG) "s/\"stake\"/\"uknow\"/g" "${CHAIN_HOME}/config/genesis.json"; \
+	sed -i $(SED_FLAG) "s/\"stake\"/\"uaxone\"/g" "${CHAIN_HOME}/config/genesis.json"; \
 	\
 	MNEMONIC_VALIDATOR="island position immense mom cross enemy grab little deputy tray hungry detect state helmet \
 	  tomorrow trap expect admit inhale present vault reveal scene atom"; \
@@ -213,14 +213,14 @@ chain-init: build ## Initialize the blockchain with default settings.
 	      --keyring-backend test \
 	      --home "${CHAIN_HOME}"; \
 	\
-	${CHAIN_BINARY} genesis add-genesis-account validator 1000000000uknow \
+	${CHAIN_BINARY} genesis add-genesis-account validator 1000000000uaxone \
 	  --keyring-backend test \
 	  --home "${CHAIN_HOME}"; \
 	\
 	NODE_ID=`${CHAIN_BINARY} tendermint show-node-id --home ${CHAIN_HOME}`; \
-	${CHAIN_BINARY} genesis gentx validator 1000000uknow \
+	${CHAIN_BINARY} genesis gentx validator 1000000uaxone \
 	  --node-id $$NODE_ID \
-	  --chain-id=okp4-${CHAIN} \
+	  --chain-id=axone-${CHAIN} \
 	  --keyring-backend test \
       --home "${CHAIN_HOME}"; \
 	\
@@ -234,13 +234,13 @@ chain-start: build ## Start the blockchain with existing configuration (see chai
 
 chain-stop: ## Stop the blockchain
 	@echo "${COLOR_CYAN} ✋️ Stopping chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
-	@killall okp4d
+	@killall axoned
 
 chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION. You can pass also the proposal json file on PROPOSAL var
 	@echo "${COLOR_CYAN} ⬆️ Upgrade the chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} from ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} to ${COLOR_YELLOW}${TO_VERSION}${COLOR_RESET}"
 	@killall cosmovisor || \
 	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
-	git clone -b ${FROM_VERSION} https://github.com/okp4/okp4d.git ${TARGET_FOLDER}/${FROM_VERSION}; \
+	git clone -b ${FROM_VERSION} https://github.com/axone-protocol/axoned.git ${TARGET_FOLDER}/${FROM_VERSION}; \
 	echo "${COLOR_CYAN} 🏗 Build the ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} binary...${COLOR_RESET}"; \
 	cd ${TARGET_FOLDER}/${FROM_VERSION}; \
 	make build; \
@@ -256,7 +256,7 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
 	PROPOSAL=${PROPOSAL}; \
 	if [[ ! -f "$$PROPOSAL" ]]; then \
         echo "${COLOR_CYAN} 👩‍🚀 No proposal given  ${COLOR_RESET}"; \
-        echo '{"messages": [{"@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade","authority": "okp410d07y265gmmuvt4z0w9aw880jnsr700jh7kd2g","plan": {"name": "","time": "0001-01-01T00:00:00Z","height": "10","info": "","upgraded_client_state": null}}],"title": "Software update", "summary": "Update the binary", "metadata": "ipfs://CID","deposit": "1uknow"}' | \
+        echo '{"messages": [{"@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade","authority": "axone10d07y265gmmuvt4z0w9aw880jnsr700jh7kd2g","plan": {"name": "","time": "0001-01-01T00:00:00Z","height": "10","info": "","upgraded_client_state": null}}],"title": "Software update", "summary": "Update the binary", "metadata": "ipfs://CID","deposit": "1uaxone"}' | \
         jq --arg name "${TO_VERSION}" '.messages[].plan.name = $$name' > ${TARGET_FOLDER}/proposal.json; \
       	PROPOSAL=${TARGET_FOLDER}/proposal.json; \
     fi; \
@@ -271,16 +271,16 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
  		--from validator \
  		--yes \
  		--home ${CHAIN_HOME} \
- 		--chain-id okp4-${CHAIN} \
+ 		--chain-id axone-${CHAIN} \
  		--keyring-backend test \
  		-b sync; \
  	\
  	sleep 5;\
- 	$$BINARY_OLD tx gov deposit 1 10000000uknow \
+ 	$$BINARY_OLD tx gov deposit 1 10000000uaxone \
      		--from validator \
      		--yes \
      		--home ${CHAIN_HOME} \
-     		--chain-id okp4-${CHAIN} \
+     		--chain-id axone-${CHAIN} \
      		--keyring-backend test \
      		-b sync; \
 	\
@@ -289,7 +289,7 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
      		--from validator \
      		--yes \
      		--home ${CHAIN_HOME} \
-     		--chain-id okp4-${CHAIN} \
+     		--chain-id axone-${CHAIN} \
      		--keyring-backend test \
      		-b sync; \
 	mkdir -p ${DAEMON_HOME}/cosmovisor/upgrades/${TO_VERSION}/bin && cp ${CHAIN_BINARY} ${DAEMON_HOME}/cosmovisor/upgrades/${TO_VERSION}/bin; \
@@ -326,14 +326,14 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
         DATASOURCE="docs=`[ -f $${MODULE}/docs.yaml ] && echo $$MODULE_DATASOURCE || echo $${DEFAULT_DATASOURCE}`" ; \
 		docker run --rm \
 				-v ${HOME}/.cache:/root/.cache \
-				-v `pwd`:/usr/src/okp4d \
-				-w /usr/src/okp4d \
+				-v `pwd`:/usr/src/axoned \
+				-w /usr/src/axoned \
 				${DOCKER_IMAGE_GOTEMPLATE} \
 				-d $$DATASOURCE -f docs/$${MODULE}.md -o docs/$${MODULE}.md ; \
 	done
 	@docker run --rm \
-	  -v `pwd`:/usr/src/okp4d \
-	  -w /usr/src/okp4d/docs \
+	  -v `pwd`:/usr/src/axoned \
+	  -w /usr/src/axoned/docs \
 	  ${DOCKER_IMAGE_MARKDOWNLINT} -f proto
 
 .PHONY: doc-command
@@ -343,11 +343,11 @@ doc-command: ## Generate markdown documentation for the command
 	rm -rf $$OUT_FOLDER; \
 	go get ./scripts; \
 	go run ./scripts/. command; \
-	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.okp4d\")/(default \"\/home\/john\/\.okp4d\")/g' $$OUT_FOLDER/*.md; \
+	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.axoned\")/(default \"\/home\/john\/\.axoned\")/g' $$OUT_FOLDER/*.md; \
 	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' $$OUT_FOLDER/*.md; \
 	sed -i $(SED_FLAG) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' $$OUT_FOLDER/*.md; \
-	sed -i $(SED_FLAG) 's/&lt;appd&gt;/okp4d/g' $$OUT_FOLDER/*.md; \
-	sed -i $(SED_FLAG) 's/<appd>/okp4d/g' $$OUT_FOLDER/*.md; \
+	sed -i $(SED_FLAG) 's/&lt;appd&gt;/axoned/g' $$OUT_FOLDER/*.md; \
+	sed -i $(SED_FLAG) 's/<appd>/axoned/g' $$OUT_FOLDER/*.md; \
 	sed -i $(SED_FLAG) -E 's| (https?://[a-zA-Z0-9\.\/_=%-]+)| [\1](\1) |g' $$OUT_FOLDER/*.md; \
 	docker run --rm \
 	  -v `pwd`:/usr/src/docs \
@@ -387,7 +387,7 @@ release-binary-all: $(RELEASE_TARGETS)
 $(RELEASE_TARGETS): ensure-buildx-builder
 	@GOOS=$(word 3, $(subst -, ,$@)); \
     GOARCH=$(word 4, $(subst -, ,$@)); \
-    BINARY_NAME="okp4d-${VERSION}-$$GOOS-$$GOARCH"; \
+    BINARY_NAME="axoned-${VERSION}-$$GOOS-$$GOARCH"; \
 	echo "${COLOR_CYAN} 🎁 Building ${COLOR_GREEN}$$GOOS $$GOARCH ${COLOR_CYAN}release binary${COLOR_RESET} into ${COLOR_YELLOW}${RELEASE_FOLDER}${COLOR_RESET}"; \
 	docker buildx use ${DOCKER_BUILDX_BUILDER}; \
 	docker buildx build \
@@ -396,10 +396,10 @@ $(RELEASE_TARGETS): ensure-buildx-builder
 		--load \
 		.; \
 	mkdir -p ${RELEASE_FOLDER}; \
-	docker rm -f tmp-okp4d || true; \
-	docker create -ti --name tmp-okp4d $$BINARY_NAME; \
-	docker cp tmp-okp4d:/usr/bin/okp4d ${RELEASE_FOLDER}/$$BINARY_NAME; \
-	docker rm -f tmp-okp4d; \
+	docker rm -f tmp-axoned || true; \
+	docker create -ti --name tmp-axoned $$BINARY_NAME; \
+	docker cp tmp-axoned:/usr/bin/axoned ${RELEASE_FOLDER}/$$BINARY_NAME; \
+	docker rm -f tmp-axoned; \
 	tar -zcvf ${RELEASE_FOLDER}/$$BINARY_NAME.tar.gz ${RELEASE_FOLDER}/$$BINARY_NAME;
 
 release-checksums:

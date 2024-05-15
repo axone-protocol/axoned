@@ -19,7 +19,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/v7/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v7/x/logic/testutil"
 )
 
 func TestJsonProlog(t *testing.T) {
@@ -449,8 +449,8 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
-				json:        "'{\"cosmos\":[\"okp4\",{\"name\":\"localnet\"}]}'",
-				term:        "json([cosmos-[okp4,json([name-localnet])]])",
+				json:        "'{\"cosmos\":[\"axone\",{\"name\":\"localnet\"}]}'",
+				term:        "json([cosmos-[axone,json([name-localnet])]])",
 				wantSuccess: true,
 			},
 			{

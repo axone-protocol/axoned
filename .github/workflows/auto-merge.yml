@@ -12,4 +12,4 @@ jobs:
         uses: ahmadnassri/action-dependabot-auto-merge@v2
         with:
           target: patch
-          github-token: ${{ secrets.OKP4_TOKEN }}
+          github-token: ${{ secrets.OPS_TOKEN }}

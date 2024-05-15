@@ -29,4 +29,4 @@ jobs:
             -v $(pwd):/home \
             psampaz/gothanks:v0.4.0 \
             -y \
-            -github-token=${{ secrets.OKP4_TOKEN }}
+            -github-token=${{ secrets.OPS_TOKEN }}

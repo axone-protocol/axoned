@@ -10,8 +10,8 @@ import (
 
 // RegisterLegacyAminoCodec registers concrete types on the LegacyAmino codec.
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
-	cdc.RegisterConcrete(Params{}, "okp4/mint/Params", nil)
-	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "okp4/mint/MsgUpdateParams")
+	cdc.RegisterConcrete(Params{}, "axone/mint/Params", nil)
+	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "axone/mint/MsgUpdateParams")
 }
 
 // RegisterInterfaces registers the interfaces types with the interface registry.

@@ -11,7 +11,7 @@ jobs:
       - name: Notify Discord
         uses: fjogeleit/http-request-action@v1
         with:
-          url: ${{ secrets.OKP4_DISCORD_WEBHOOK }}
+          url: ${{ secrets.DISCORD_WEBHOOK }}
           method: 'POST'
           customHeaders: '{"Content-Type": "application/json"}'
           data: |-
@@ -27,9 +27,9 @@ jobs:
       - name: Update modules docs repository
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/okp4/docs/actions/workflows/39152549/dispatches'
+          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches'
           method: 'POST'
-          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
               "ref": "main",
@@ -44,9 +44,9 @@ jobs:
       - name: Update commands docs repository
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/okp4/docs/actions/workflows/39152549/dispatches'
+          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches'
           method: 'POST'
-          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
               "ref": "main",
@@ -61,9 +61,9 @@ jobs:
       - name: Update predicates docs repository
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/okp4/docs/actions/workflows/39152549/dispatches'
+          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches'
           method: 'POST'
-          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
               "ref": "main",
@@ -81,13 +81,13 @@ jobs:
       - name: Update docs version
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/okp4/docs/actions/workflows/37674835/dispatches'
+          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/37674835/dispatches'
           method: 'POST'
-          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OKP4_TOKEN }}"}'
+          customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
               "ref": "main",
               "inputs": {
-                "okp4dVersion": "${{ github.event.release.tag_name }}"
+                "axonedVersion": "${{ github.event.release.tag_name }}"
               }
             }

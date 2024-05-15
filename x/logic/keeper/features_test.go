@@ -31,11 +31,11 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/okp4/okp4d/v7/x/logic"
-	logicfs "github.com/okp4/okp4d/v7/x/logic/fs"
-	"github.com/okp4/okp4d/v7/x/logic/keeper"
-	logictestutil "github.com/okp4/okp4d/v7/x/logic/testutil"
-	"github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/axone-protocol/axoned/v7/x/logic"
+	logicfs "github.com/axone-protocol/axoned/v7/x/logic/fs"
+	"github.com/axone-protocol/axoned/v7/x/logic/keeper"
+	logictestutil "github.com/axone-protocol/axoned/v7/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v7/x/logic/types"
 )
 
 var key = storetypes.NewKVStoreKey(types.StoreKey)
@@ -246,7 +246,7 @@ func assert(actual any, assertion Assertion, expected ...any) error {
 }
 
 func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
-	sdk.GetConfig().SetBech32PrefixForAccount("okp4", "okp4pub")
+	sdk.GetConfig().SetBech32PrefixForAccount("axone", "axonepub")
 
 	return func(ctx *godog.ScenarioContext) {
 		ctx.Before(func(ctx context.Context, _ *godog.Scenario) (context.Context, error) {
@@ -257,7 +257,7 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 			wasmKeeper := logictestutil.NewMockWasmKeeper(ctrl)
 
 			header := testCtx.Ctx.BlockHeader()
-			header.ChainID = "okp4-testchain-1"
+			header.ChainID = "axone-testchain-1"
 			header.Height = 42
 			header.Time = time.Date(2024, 4, 10, 10, 44, 27, 0, time.UTC)
 			testCtx.Ctx = testCtx.Ctx.WithBlockHeader(header)

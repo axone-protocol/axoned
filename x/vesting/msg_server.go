@@ -13,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/okp4/okp4d/v7/x/vesting/types"
+	"github.com/axone-protocol/axoned/v7/x/vesting/types"
 )
 
 type msgServer struct {

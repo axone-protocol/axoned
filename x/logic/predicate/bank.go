@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/v7/x/logic/prolog"
-	"github.com/okp4/okp4d/v7/x/logic/types"
+	"github.com/axone-protocol/axoned/v7/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v7/x/logic/types"
 )
 
 // BankBalances is a predicate which unifies the given terms with the list of balances (coins) of the given account.
@@ -24,13 +24,13 @@ import (
 // # Examples:
 //
 //	# Query the balances of the account.
-//	- bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
+//	- bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).
 //
 //	# Query the balances of all accounts. The result is a list of pairs of account address and balances.
 //	- bank_balances(X, Y).
 //
 //	# Query the first balance of the given account by unifying the denomination and amount with the given terms.
-//	- bank_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
+//	- bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A), _]).
 func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return fetchBalances(
 		account,
@@ -59,13 +59,13 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 // # Examples:
 //
 //	# Query the spendable balances of the account.
-//	- bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
+//	- bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).
 //
 //	# Query the spendable balances of all accounts. The result is a list of pairs of account address and balances.
 //	- bank_spendable_balances(X, Y).
 //
 //	# Query the first spendable balances of the given account by unifying the denomination and amount with the given terms.
-//	- bank_spendable_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
+//	- bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A), _]).
 func BankSpendableBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return fetchBalances(
 		account,
@@ -91,13 +91,13 @@ func BankSpendableBalances(vm *engine.VM, account, balances engine.Term, cont en
 // # Examples:
 //
 //	# Query the locked coins of the account.
-//	- bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', X).
+//	- bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).
 //
 //	# Query the locked balances of all accounts. The result is a list of pairs of account address and balances.
 //	- bank_locked_balances(X, Y).
 //
 //	# Query the first locked balances of the given account by unifying the denomination and amount with the given terms.
-//	- bank_locked_balances('okp41ffd5wx65l407yvm478cxzlgygw07h79sq0m3fm', [-(D, A), _]).
+//	- bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A), _]).
 func BankLockedBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return fetchBalances(
 		account,

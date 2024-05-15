@@ -17,7 +17,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/okp4/okp4d/v7/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v7/x/logic/testutil"
 )
 
 func TestChainID(t *testing.T) {
@@ -26,11 +26,11 @@ func TestChainID(t *testing.T) {
 		implication string
 		wantOk      bool
 	}{
-		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id('okp4-nemeton-1')`, wantOk: true},
-		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id('akashnet-2')`, wantOk: false},
-		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id(X), X == 'okp4-nemeton-1'`, wantOk: true},
-		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id(X), X == "okp4-nemeton-1"`, wantOk: false},
-		{header: tmproto.Header{ChainID: "okp4-nemeton-1"}, implication: `chain_id(X), X == 'akashnet-2'`, wantOk: false},
+		{header: tmproto.Header{ChainID: "axone-nemeton-1"}, implication: `chain_id('axone-nemeton-1')`, wantOk: true},
+		{header: tmproto.Header{ChainID: "axone-nemeton-1"}, implication: `chain_id('akashnet-2')`, wantOk: false},
+		{header: tmproto.Header{ChainID: "axone-nemeton-1"}, implication: `chain_id(X), X == 'axone-nemeton-1'`, wantOk: true},
+		{header: tmproto.Header{ChainID: "axone-nemeton-1"}, implication: `chain_id(X), X == "axone-nemeton-1"`, wantOk: false},
+		{header: tmproto.Header{ChainID: "axone-nemeton-1"}, implication: `chain_id(X), X == 'akashnet-2'`, wantOk: false},
 	}
 	for _, tc := range cases {
 		Convey(fmt.Sprintf("Given the clause body: %s", tc.implication), t, func() {

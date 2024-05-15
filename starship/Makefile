@@ -1,4 +1,4 @@
-NAME = okp4-starship
+NAME = axone-starship
 FILE = configs/local.yaml
 
 HELM_REPO = starship
@@ -39,7 +39,7 @@ setup-deps:
 ###                          Docker build cmds                              ###
 ###############################################################################
 
-DOCKER_BUILDX_NAME := okp4
+DOCKER_BUILDX_NAME := axone
 
 .PHONY: docker-setup
 docker-setup:
@@ -47,7 +47,7 @@ docker-setup:
 
 .PHONY: docker-build
 docker-build: docker-setup
-	cd $(CURDIR)/.. && docker buildx build --platform linux/arm64,linux/amd64 -t anmol1696/okp4d:latest . --push -f starship/Dockerfile
+	cd $(CURDIR)/.. && docker buildx build --platform linux/arm64,linux/amd64 -t anmol1696/axoned:latest . --push -f starship/Dockerfile
 
 ###############################################################################
 ###                              Helm Charts                                ###

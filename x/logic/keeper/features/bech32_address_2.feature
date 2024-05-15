@@ -10,7 +10,7 @@ Feature: bech32_address/2
 
     Given the query:
       """ prolog
-      bech32_address(Address, 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').
+      bech32_address(Address, 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
       """
     When the query is run
     Then the answer we get is:
@@ -23,7 +23,7 @@ Feature: bech32_address/2
         results:
         - substitutions:
           - variable: Address
-            expression: "okp4-[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
+            expression: "axone-[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
       """
   @great_for_documentation
   Scenario: Decode Hrp and Address from a bech32 address
@@ -33,7 +33,7 @@ Feature: bech32_address/2
 
     Given the query:
       """ prolog
-      bech32_address(-(Hrp, Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').
+      bech32_address(-(Hrp, Address), 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
       """
     When the query is run
     Then the answer we get is:
@@ -46,18 +46,18 @@ Feature: bech32_address/2
         results:
         - substitutions:
           - variable: Hrp
-            expression: "okp4"
+            expression: "axone"
           - variable: Address
             expression: "[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]"
       """
   @great_for_documentation
-  Scenario: Extract Address only for OKP4 bech32 address
+  Scenario: Extract Address only for AXONE bech32 address
     This scenario demonstrates how to extract the address from a bech32 address string, specifically for a known
-    protocol, in this case, the okp4 protocol.
+    protocol, in this case, the axone protocol.
 
     Given the query:
       """ prolog
-      bech32_address(-(okp4, Address), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').
+      bech32_address(-(axone, Address), 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
       """
     When the query is run
     Then the answer we get is:
@@ -78,7 +78,7 @@ Feature: bech32_address/2
 
     Given the query:
       """ prolog
-      bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).
+      bech32_address(-('axone', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).
       """
     When the query is run
     Then the answer we get is:
@@ -91,19 +91,19 @@ Feature: bech32_address/2
         results:
         - substitutions:
           - variable: Bech32
-            expression: "okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn"
+            expression: "axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4"
       """
   @great_for_documentation
-  Scenario: Check if a bech32 address is part of the okp4 protocol
-    This scenario shows how to check if a bech32 address is part of the okp4 protocol.
+  Scenario: Check if a bech32 address is part of the axone protocol
+    This scenario shows how to check if a bech32 address is part of the axone protocol.
 
     Given the program:
       """ prolog
-      okp4_addr(Addr) :- bech32_address(-('okp4', _), Addr).
+      axone_addr(Addr) :- bech32_address(-('axone', _), Addr).
       """
     Given the query:
       """ prolog
-      okp4_addr('okp41p8u47en82gmzfm259y6z93r9qe63l25dfwwng6').
+      axone_addr('axone1p8u47en82gmzfm259y6z93r9qe63l25d858vqu').
       """
     When the query is run
     Then the answer we get is:
@@ -115,16 +115,16 @@ Feature: bech32_address/2
         results:
         - substitutions:
       """
-  Scenario: Check if a bech32 address is part of the okp4 protocol (not success)
-    This scenario shows how to check if a bech32 address is part of the okp4 protocol.
+  Scenario: Check if a bech32 address is part of the axone protocol (not success)
+    This scenario shows how to check if a bech32 address is part of the axone protocol.
 
     Given the program:
       """ prolog
-      okp4_addr(Addr) :- bech32_address(-('okp4', _), Addr).
+      axone_addr(Addr) :- bech32_address(-('axone', _), Addr).
       """
     Given the query:
       """ prolog
-      okp4_addr('cosmos15z956su069rt896dk5zrl7jmvzt9uu2gxe0l28').
+      axone_addr('cosmos15z956su069rt896dk5zrl7jmvzt9uu2gxe0l28').
       """
     When the query is run
     Then the answer we get is:
@@ -140,7 +140,7 @@ Feature: bech32_address/2
 
     Given the query:
       """ prolog
-      bech32_address(-('okp4', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').
+      bech32_address(-('axone', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
       """
     When the query is run
     Then the answer we get is:
@@ -157,7 +157,7 @@ Feature: bech32_address/2
 
     Given the query:
       """ prolog
-      bech32_address(-(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), 'okp415wn30a9z4uc692s0kkx5fp5d4qfr3ac7sj9dqn').
+      bech32_address(-(Hrp, [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
       """
     When the query is run
     Then the answer we get is:
@@ -170,7 +170,7 @@ Feature: bech32_address/2
         results:
         - substitutions:
           - variable: Hrp
-            expression: "okp4"
+            expression: "axone"
       """
   @great_for_documentation
   Scenario: Error on Incorrect Bech32 Address format
@@ -180,7 +180,7 @@ Feature: bech32_address/2
 
     Given the query:
       """ prolog
-      bech32_address(Address, okp4incorrect).
+      bech32_address(Address, axoneincorrect).
       """
     When the query is run
     Then the answer we get is:
@@ -191,7 +191,7 @@ Feature: bech32_address/2
         has_more: false
         variables: ["Address"]
         results:
-        - error: "error(domain_error(encoding(bech32),okp4incorrect),[d,e,c,o,d,i,n,g, ,b,e,c,h,3,2, ,f,a,i,l,e,d,:, ,i,n,v,a,l,i,d, ,s,e,p,a,r,a,t,o,r, ,i,n,d,e,x, ,-,1],bech32_address/2)"
+        - error: "error(domain_error(encoding(bech32),axoneincorrect),[d,e,c,o,d,i,n,g, ,b,e,c,h,3,2, ,f,a,i,l,e,d,:, ,i,n,v,a,l,i,d, ,s,e,p,a,r,a,t,o,r, ,i,n,d,e,x, ,-,1],bech32_address/2)"
       """
   @great_for_documentation
   Scenario: Error on Incorrect Bech32 Address type
@@ -201,7 +201,7 @@ Feature: bech32_address/2
 
     Given the query:
       """ prolog
-      bech32_address(-('okp4', X), foo(bar)).
+      bech32_address(-('axone', X), foo(bar)).
       """
     When the query is run
     Then the answer we get is:
@@ -261,7 +261,7 @@ Feature: bech32_address/2
 
     Given the query:
       """ prolog
-      bech32_address(-('okp4', ['163',167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).
+      bech32_address(-('axone', ['163',167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).
       """
     When the query is run
     Then the answer we get is:
@@ -281,7 +281,7 @@ Feature: bech32_address/2
 
     Given the query:
       """ prolog
-      bech32_address(-('okp4', [163,'x',23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).
+      bech32_address(-('axone', [163,'x',23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).
       """
     When the query is run
     Then the answer we get is:
@@ -301,7 +301,7 @@ Feature: bech32_address/2
 
     Given the query:
       """ prolog
-      bech32_address(-('okp4', hey(2)), Bech32).
+      bech32_address(-('axone', hey(2)), Bech32).
       """
     When the query is run
     Then the answer we get is:
