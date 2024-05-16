@@ -4,17 +4,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
-var _ sdk.Msg = &MsgCreateVestingAccount{}
-
-var _ sdk.Msg = &MsgCreatePermanentLockedAccount{}
-
-var _ sdk.Msg = &MsgCreatePeriodicVestingAccount{}
-
-var _ sdk.Msg = &MsgCreateCliffVestingAccount{}
+var (
+	_ sdk.Msg = &MsgCreateVestingAccount{}
+	_ sdk.Msg = &MsgCreatePermanentLockedAccount{}
+	_ sdk.Msg = &MsgCreatePeriodicVestingAccount{}
+	_ sdk.Msg = &MsgCreateCliffVestingAccount{}
+)
 
 // NewMsgCreateVestingAccount returns a reference to a new MsgCreateVestingAccount.
-//
-//nolint:interfacer
 func NewMsgCreateVestingAccount(fromAddr,
 	toAddr sdk.AccAddress,
 	amount sdk.Coins,
@@ -31,8 +28,6 @@ func NewMsgCreateVestingAccount(fromAddr,
 }
 
 // NewMsgCreatePermanentLockedAccount returns a reference to a new MsgCreatePermanentLockedAccount.
-//
-//nolint:interfacer
 func NewMsgCreatePermanentLockedAccount(fromAddr, toAddr sdk.AccAddress, amount sdk.Coins) *MsgCreatePermanentLockedAccount {
 	return &MsgCreatePermanentLockedAccount{
 		FromAddress: fromAddr.String(),
@@ -42,10 +37,7 @@ func NewMsgCreatePermanentLockedAccount(fromAddr, toAddr sdk.AccAddress, amount 
 }
 
 // NewMsgCreatePeriodicVestingAccount returns a reference to a new MsgCreatePeriodicVestingAccount.
-//
-//nolint:interfacer
-func NewMsgCreatePeriodicVestingAccount(fromAddr,
-	toAddr sdk.AccAddress,
+func NewMsgCreatePeriodicVestingAccount(fromAddr, toAddr sdk.AccAddress,
 	startTime int64,
 	periods []Period,
 ) *MsgCreatePeriodicVestingAccount {
@@ -58,8 +50,6 @@ func NewMsgCreatePeriodicVestingAccount(fromAddr,
 }
 
 // NewMsgCreateCliffVestingAccount returns a reference to a new MsgCreateCliffVestingAccount.
-//
-//nolint:interfacer
 func NewMsgCreateCliffVestingAccount(fromAddr,
 	toAddr sdk.AccAddress,
 	amount sdk.Coins,

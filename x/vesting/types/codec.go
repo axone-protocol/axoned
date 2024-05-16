@@ -16,13 +16,15 @@ import (
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterInterface((*exported.VestingAccount)(nil), nil)
 	cdc.RegisterConcrete(&BaseVestingAccount{}, "cosmos-sdk/BaseVestingAccount", nil)
-	cdc.RegisterConcrete(&CliffVestingAccount{}, "cosmos-sdk/CliffVestingAccount", nil)
 	cdc.RegisterConcrete(&ContinuousVestingAccount{}, "cosmos-sdk/ContinuousVestingAccount", nil)
 	cdc.RegisterConcrete(&DelayedVestingAccount{}, "cosmos-sdk/DelayedVestingAccount", nil)
 	cdc.RegisterConcrete(&PeriodicVestingAccount{}, "cosmos-sdk/PeriodicVestingAccount", nil)
 	cdc.RegisterConcrete(&PermanentLockedAccount{}, "cosmos-sdk/PermanentLockedAccount", nil)
+	cdc.RegisterConcrete(&CliffVestingAccount{}, "cosmos-sdk/CliffVestingAccount", nil)
 	legacy.RegisterAminoMsg(cdc, &MsgCreateVestingAccount{}, "cosmos-sdk/MsgCreateVestingAccount")
 	legacy.RegisterAminoMsg(cdc, &MsgCreatePermanentLockedAccount{}, "cosmos-sdk/MsgCreatePermLockedAccount")
+	legacy.RegisterAminoMsg(cdc, &MsgCreatePeriodicVestingAccount{}, "cosmos-sdk/MsgCreatePeriodVestAccount")
+	legacy.RegisterAminoMsg(cdc, &MsgCreateCliffVestingAccount{}, "cosmos-sdk/MsgCreateCliffVestingAccount")
 }
 
 // RegisterInterface associates protoName with AccountI and VestingAccount
@@ -62,6 +64,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 		(*sdk.Msg)(nil),
 		&MsgCreateVestingAccount{},
 		&MsgCreatePermanentLockedAccount{},
+		&MsgCreateCliffVestingAccount{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_Msg_serviceDesc)

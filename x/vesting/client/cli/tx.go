@@ -2,11 +2,14 @@ package cli
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"strconv"
 
 	"github.com/spf13/cobra"
+
+	"cosmossdk.io/core/address"
 
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
@@ -16,13 +19,13 @@ import (
 	"github.com/axone-protocol/axoned/v8/x/vesting/types"
 )
 
-// FlagDelayed Transaction command flags.
+// Transaction command flags.
 const (
 	FlagDelayed = "delayed"
 )
 
 // GetTxCmd returns vesting module's transaction commands.
-func GetTxCmd() *cobra.Command {
+func GetTxCmd(ac address.Codec) *cobra.Command {
 	txCmd := &cobra.Command{
 		Use:                        types.ModuleName,
 		Short:                      "Vesting transaction subcommands",
@@ -32,10 +35,10 @@ func GetTxCmd() *cobra.Command {
 	}
 
 	txCmd.AddCommand(
-		NewMsgCreateVestingAccountCmd(),
-		NewMsgCreatePermanentLockedAccountCmd(),
-		NewMsgCreatePeriodicVestingAccountCmd(),
-		NewMsgCreateCliffVestingAccountCmd(),
+		NewMsgCreateVestingAccountCmd(ac),
+		NewMsgCreatePermanentLockedAccountCmd(ac),
+		NewMsgCreatePeriodicVestingAccountCmd(ac),
+		NewMsgCreateCliffVestingAccountCmd(ac),
 	)
 
 	return txCmd
@@ -43,7 +46,7 @@ func GetTxCmd() *cobra.Command {
 
 // NewMsgCreateVestingAccountCmd returns a CLI command handler for creating a
 // MsgCreateVestingAccount transaction.
-func NewMsgCreateVestingAccountCmd() *cobra.Command {
+func NewMsgCreateVestingAccountCmd(ac address.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-vesting-account [to_address] [amount] [end_time]",
 		Short: "Create a new vesting account funded with an allocation of tokens.",
@@ -58,9 +61,13 @@ timestamp.`,
 			if err != nil {
 				return err
 			}
-			toAddr, err := sdk.AccAddressFromBech32(args[0])
+			toAddr, err := ac.StringToBytes(args[0])
 			if err != nil {
 				return err
+			}
+
+			if args[1] == "" {
+				return errors.New("amount is empty")
 			}
 
 			amount, err := sdk.ParseCoinsNormalized(args[1])
@@ -76,7 +83,6 @@ timestamp.`,
 			delayed, _ := cmd.Flags().GetBool(FlagDelayed)
 
 			msg := types.NewMsgCreateVestingAccount(clientCtx.GetFromAddress(), toAddr, amount, endTime, delayed)
-
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
@@ -89,7 +95,7 @@ timestamp.`,
 
 // NewMsgCreatePermanentLockedAccountCmd returns a CLI command handler for creating a
 // MsgCreatePermanentLockedAccount transaction.
-func NewMsgCreatePermanentLockedAccountCmd() *cobra.Command {
+func NewMsgCreatePermanentLockedAccountCmd(ac address.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-permanent-locked-account [to_address] [amount]",
 		Short: "Create a new permanently locked account funded with an allocation of tokens.",
@@ -102,9 +108,13 @@ tokens.`,
 			if err != nil {
 				return err
 			}
-			toAddr, err := sdk.AccAddressFromBech32(args[0])
+			toAddr, err := ac.StringToBytes(args[0])
 			if err != nil {
 				return err
+			}
+
+			if args[1] == "" {
+				return errors.New("amount is empty")
 			}
 
 			amount, err := sdk.ParseCoinsNormalized(args[1])
@@ -113,7 +123,6 @@ tokens.`,
 			}
 
 			msg := types.NewMsgCreatePermanentLockedAccount(clientCtx.GetFromAddress(), toAddr, amount)
-
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
@@ -129,15 +138,15 @@ type VestingData struct {
 }
 
 type InputPeriod struct {
-	Coins         string `json:"coins"`
-	LengthSeconds int64  `json:"length_seconds"`
+	Coins  string `json:"coins"`
+	Length int64  `json:"length_seconds"` //nolint:tagliatelle
 }
 
 // NewMsgCreatePeriodicVestingAccountCmd returns a CLI command handler for creating a
 // MsgCreatePeriodicVestingAccountCmd transaction.
 //
 //nolint:funlen,lll
-func NewMsgCreatePeriodicVestingAccountCmd() *cobra.Command {
+func NewMsgCreatePeriodicVestingAccountCmd(ac address.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-periodic-vesting-account [to_address] [periods_json_file]",
 		Short: "Create a new vesting account funded with an allocation of tokens.",
@@ -146,7 +155,7 @@ func NewMsgCreatePeriodicVestingAccountCmd() *cobra.Command {
 
 		An array of coin strings and unix epoch times for coins to vest
 { "start_time": 1625204910,
-"period":[
+"periods":[
  {
   "coins": "10test",
   "length_seconds":2592000 //30 days
@@ -165,7 +174,7 @@ func NewMsgCreatePeriodicVestingAccountCmd() *cobra.Command {
 				return err
 			}
 
-			toAddr, err := sdk.AccAddressFromBech32(args[0])
+			toAddr, err := ac.StringToBytes(args[0])
 			if err != nil {
 				return err
 			}
@@ -190,15 +199,15 @@ func NewMsgCreatePeriodicVestingAccountCmd() *cobra.Command {
 					return err
 				}
 
-				if p.LengthSeconds < 0 {
-					return fmt.Errorf("invalid period length of %d in period %d, length must be greater than 0", p.LengthSeconds, i)
+				if p.Length < 0 {
+					return fmt.Errorf("invalid period length of %d in period %d, length must be greater than 0", p.Length, i)
 				}
-				period := types.Period{Length: p.LengthSeconds, Amount: amount}
+
+				period := types.Period{Length: p.Length, Amount: amount}
 				periods = append(periods, period)
 			}
 
 			msg := types.NewMsgCreatePeriodicVestingAccount(clientCtx.GetFromAddress(), toAddr, vestingData.StartTime, periods)
-
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
@@ -210,11 +219,11 @@ func NewMsgCreatePeriodicVestingAccountCmd() *cobra.Command {
 
 // NewMsgCreateCliffVestingAccountCmd returns a CLI command handler for creating a
 // MsgCreateCliffVestingAccount transaction.
-func NewMsgCreateCliffVestingAccountCmd() *cobra.Command {
+func NewMsgCreateCliffVestingAccountCmd(ac address.Codec) *cobra.Command {
 	cmd := &cobra.Command{
 		Use:   "create-cliff-vesting-account [to_address] [amount] [cliff_time] [end_time]",
 		Short: "Create a new vesting account funded with an allocation of tokens with cliff.",
-		Long: `Create a new vesting account funded with an allocation of tokens. The
+		Long: `Create a new vesting account funded with an allocation of tokens with cliff. The
 tokens allowed will be start vested but the token will be released only after the cliff time.
 All vesting accounts created will have their start time
 set by the committed block's time. The end_time and cliff_time must be provided as a UNIX epoch
@@ -225,9 +234,13 @@ timestamp.`,
 			if err != nil {
 				return err
 			}
-			toAddr, err := sdk.AccAddressFromBech32(args[0])
+			toAddr, err := ac.StringToBytes(args[0])
 			if err != nil {
 				return err
+			}
+
+			if args[1] == "" {
+				return errors.New("amount is empty")
 			}
 
 			amount, err := sdk.ParseCoinsNormalized(args[1])
@@ -246,7 +259,6 @@ timestamp.`,
 			}
 
 			msg := types.NewMsgCreateCliffVestingAccount(clientCtx.GetFromAddress(), toAddr, amount, endTime, cliffTime)
-
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
