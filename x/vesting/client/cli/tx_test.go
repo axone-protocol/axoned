@@ -139,6 +139,98 @@ func (s *CLITestSuite) TestNewMsgCreateVestingAccountCmd() {
 	}
 }
 
+func (s *CLITestSuite) TestNewMsgCreateCliffVestingAccountCmd() {
+	accounts := testutil.CreateKeyringAccounts(s.T(), s.kr, 1)
+	cmd := cli.NewMsgCreateCliffVestingAccountCmd(address.NewBech32Codec("cosmos"))
+	cmd.SetOutput(io.Discard)
+
+	extraArgs := []string{
+		fmt.Sprintf("--%s=%s", flags.FlagBroadcastMode, flags.BroadcastSync),
+		fmt.Sprintf("--%s=true", flags.FlagSkipConfirmation),
+		fmt.Sprintf("--%s=%s", flags.FlagFees, sdk.NewCoins(sdk.NewCoin("photon", sdkmath.NewInt(10))).String()),
+		fmt.Sprintf("--%s=test-chain", flags.FlagChainID),
+		fmt.Sprintf("--%s=%s", flags.FlagFrom, accounts[0].Address),
+	}
+
+	t := time.Date(2033, time.April, 1, 12, 34, 56, 789, time.UTC).Unix()
+
+	testCases := []struct {
+		name      string
+		ctxGen    func() client.Context
+		from, to  sdk.AccAddress
+		amount    sdk.Coins
+		cliffTime int64
+		endTime   int64
+		extraArgs []string
+		expectErr bool
+	}{
+		{
+			"valid transaction",
+			func() client.Context {
+				return s.baseCtx
+			},
+			accounts[0].Address,
+			accounts[0].Address,
+			sdk.NewCoins(
+				sdk.NewCoin("stake", sdkmath.NewInt(10)),
+				sdk.NewCoin("photon", sdkmath.NewInt(40)),
+			),
+			t,
+			t,
+			extraArgs,
+			false,
+		},
+		{
+			"invalid to Address",
+			func() client.Context {
+				return s.baseCtx
+			},
+			accounts[0].Address,
+			sdk.AccAddress{},
+			sdk.NewCoins(
+				sdk.NewCoin("stake", sdkmath.NewInt(10)),
+				sdk.NewCoin("photon", sdkmath.NewInt(40)),
+			),
+			t,
+			t,
+			extraArgs,
+			true,
+		},
+		{
+			"invalid coins",
+			func() client.Context {
+				return s.baseCtx
+			},
+			accounts[0].Address,
+			accounts[0].Address,
+			nil,
+			t,
+			t,
+			extraArgs,
+			true,
+		},
+	}
+
+	for _, tc := range testCases {
+		tc := tc
+		s.Run(tc.name, func() {
+			ctx := svrcmd.CreateExecuteContext(context.Background())
+
+			cmd.SetContext(ctx)
+			cmd.SetArgs(append([]string{tc.to.String(), tc.amount.String(), fmt.Sprint(tc.cliffTime), fmt.Sprint(tc.endTime)}, tc.extraArgs...))
+
+			s.Require().NoError(client.SetCmdClientContextHandler(tc.ctxGen(), cmd))
+
+			err := cmd.Execute()
+			if tc.expectErr {
+				s.Require().Error(err)
+			} else {
+				s.Require().NoError(err)
+			}
+		})
+	}
+}
+
 func (s *CLITestSuite) TestNewMsgCreatePermanentLockedAccountCmd() {
 	accounts := testutil.CreateKeyringAccounts(s.T(), s.kr, 1)
 	cmd := cli.NewMsgCreatePermanentLockedAccountCmd(address.NewBech32Codec("cosmos"))
