@@ -108,5 +108,6 @@ message CliffVestingAccount {
   BaseVestingAccount base_vesting_account = 1 [(gogoproto.embed) = true];
   // start_time defines the time at which the vesting period begins
   int64 start_time = 2;
+  // cliff_time defines the time at which the first portion of the vesting is unlocked
   int64 cliff_time = 3;
 }

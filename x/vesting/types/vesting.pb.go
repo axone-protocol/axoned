@@ -297,6 +297,7 @@ type CliffVestingAccount struct {
 	*BaseVestingAccount `protobuf:"bytes,1,opt,name=base_vesting_account,json=baseVestingAccount,proto3,embedded=base_vesting_account" json:"base_vesting_account,omitempty"`
 	// start_time defines the time at which the vesting period begins
 	StartTime int64 `protobuf:"varint,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
+	// cliff_time defines the time at which the first portion of the vesting is unlocked
 	CliffTime int64 `protobuf:"varint,3,opt,name=cliff_time,json=cliffTime,proto3" json:"cliff_time,omitempty"`
 }
 

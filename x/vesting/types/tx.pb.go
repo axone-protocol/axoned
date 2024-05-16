@@ -376,7 +376,8 @@ type MsgCreateCliffVestingAccount struct {
 	ToAddress   string                                   `protobuf:"bytes,2,opt,name=to_address,json=toAddress,proto3" json:"to_address,omitempty" yaml:"to_address"`
 	Amount      github_com_cosmos_cosmos_sdk_types.Coins `protobuf:"bytes,3,rep,name=amount,proto3,castrepeated=github.com/cosmos/cosmos-sdk/types.Coins" json:"amount"`
 	EndTime     int64                                    `protobuf:"varint,4,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	CliffTime   int64                                    `protobuf:"varint,5,opt,name=cliff_time,json=cliffTime,proto3" json:"cliff_time,omitempty"`
+	// cliff time as unix time (in seconds) is the time at which the first portion of the vesting is unlocked.
+	CliffTime int64 `protobuf:"varint,5,opt,name=cliff_time,json=cliffTime,proto3" json:"cliff_time,omitempty"`
 }
 
 func (m *MsgCreateCliffVestingAccount) Reset()         { *m = MsgCreateCliffVestingAccount{} }
