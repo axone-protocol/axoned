@@ -799,6 +799,107 @@ func TestTrackUndelegationPermLockedVestingAcc(t *testing.T) {
 	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(stakeDenom, 25)}, plva.DelegatedVesting)
 }
 
+func TestGetVestedCoinsCliffVestingAcc(t *testing.T) {
+	now := tmtime.Now()
+	cliffTime := now.Add(12 * time.Hour)
+	endTime := now.Add(24 * time.Hour)
+
+	bacc, origCoins := initBaseAccount()
+	cva, err := types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+
+	// require no coins vested before the cliff time
+	vestedCoins := cva.GetVestedCoins(now.Add(6 * time.Hour))
+	require.Nil(t, vestedCoins)
+
+	// require all coins vested at the end of the vesting schedule
+	vestedCoins = cva.GetVestedCoins(endTime)
+	require.Equal(t, origCoins, vestedCoins)
+
+	// require no coins vested at cliff time
+	vestedCoins = cva.GetVestedCoins(cliffTime)
+	require.Nil(t, vestedCoins)
+
+	// require 75% of coins vested
+	vestedCoins = cva.GetVestedCoins(now.Add(18 * time.Hour))
+	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 750), sdk.NewInt64Coin(stakeDenom, 75)}, vestedCoins)
+
+	// require all coins vested after end time
+	vestedCoins = cva.GetVestedCoins(endTime.Add(48 * time.Hour))
+	require.Equal(t, origCoins, vestedCoins)
+}
+
+func TestGetVestingCoinsCliffVestingAcc(t *testing.T) {
+	now := tmtime.Now()
+	cliffTime := now.Add(12 * time.Hour)
+	endTime := now.Add(24 * time.Hour)
+
+	bacc, origCoins := initBaseAccount()
+	cva, err := types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+
+	// require all coins vesting before the cliff time
+	vestingCoins := cva.GetVestingCoins(now.Add(6 * time.Hour))
+	require.Equal(t, origCoins, vestingCoins)
+
+	// require all coins vesting at cliff time
+	vestingCoins = cva.GetVestingCoins(cliffTime)
+	require.Equal(t, origCoins, vestingCoins)
+
+	// require no coins vesting at the end of the vesting schedule
+	vestingCoins = cva.GetVestingCoins(endTime)
+	require.Equal(t, emptyCoins, vestingCoins)
+
+	// require 25% of coins vesting
+	vestingCoins = cva.GetVestingCoins(now.Add(18 * time.Hour))
+	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 250), sdk.NewInt64Coin(stakeDenom, 25)}, vestingCoins)
+}
+
+func TestTrackDelegationCliffVestingAcc(t *testing.T) {
+	now := tmtime.Now()
+	cliffTime := now.Add(12 * time.Hour)
+	endTime := now.Add(24 * time.Hour)
+
+	bacc, origCoins := initBaseAccount()
+
+	// require the ability to delegate all vesting coins
+	cva, err := types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+	cva.TrackDelegation(now, origCoins, origCoins)
+	require.Equal(t, origCoins, cva.DelegatedVesting)
+	require.Nil(t, cva.DelegatedFree)
+
+	// require the ability to delegate all vested coins
+	cva, err = types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+	cva.TrackDelegation(endTime, origCoins, origCoins)
+	require.Nil(t, cva.DelegatedVesting)
+	require.Equal(t, origCoins, cva.DelegatedFree)
+
+	// require the ability to delegate all coins before the cliff time
+	cva, err = types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+	cva.TrackDelegation(now.Add(6*time.Hour), origCoins, origCoins)
+	require.Equal(t, origCoins, cva.DelegatedVesting)
+	require.Nil(t, cva.DelegatedFree)
+
+	// require the ability to delegate 25 % coins after 75% of vesting coins
+	cva, err = types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+	cva.TrackDelegation(now.Add(18*time.Hour), origCoins, origCoins)
+	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 250), sdk.NewInt64Coin(stakeDenom, 25)}, cva.DelegatedVesting)
+	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 750), sdk.NewInt64Coin(stakeDenom, 75)}, cva.DelegatedFree)
+
+	// require no modifications when delegation amount is zero or not enough funds
+	cva, err = types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+	require.Panics(t, func() {
+		cva.TrackDelegation(endTime, origCoins, sdk.Coins{sdk.NewInt64Coin(stakeDenom, 1000000)})
+	})
+	require.Nil(t, cva.DelegatedVesting)
+	require.Nil(t, cva.DelegatedFree)
+}
+
 func TestGenesisAccountValidate(t *testing.T) {
 	pubkey := secp256k1.GenPrivKey().PubKey()
 	addr := sdk.AccAddress(pubkey.Address())
