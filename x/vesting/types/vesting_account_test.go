@@ -900,6 +900,56 @@ func TestTrackDelegationCliffVestingAcc(t *testing.T) {
 	require.Nil(t, cva.DelegatedFree)
 }
 
+func TestTrackUndelegationCliffVestingAcc(t *testing.T) {
+	now := tmtime.Now()
+	cliffTime := now.Add(12 * time.Hour)
+	endTime := now.Add(24 * time.Hour)
+
+	bacc, origCoins := initBaseAccount()
+
+	// require the ability to undelegate all vesting coins
+	cva, err := types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+	cva.TrackDelegation(now, origCoins, origCoins)
+	cva.TrackUndelegation(origCoins)
+	require.Nil(t, cva.DelegatedFree)
+	require.Equal(t, emptyCoins, cva.DelegatedVesting)
+
+	// require the ability to undelegate all vested coins at endTime
+	cva, err = types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+	cva.TrackDelegation(endTime, origCoins, origCoins)
+	cva.TrackUndelegation(origCoins)
+	require.Equal(t, emptyCoins, cva.DelegatedFree)
+	require.Nil(t, cva.DelegatedVesting)
+
+	// require no modifications when the undelegation amount is zero
+	cva, err = types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+	require.Panics(t, func() {
+		cva.TrackUndelegation(sdk.Coins{sdk.NewInt64Coin(stakeDenom, 0)})
+	})
+	require.Nil(t, cva.DelegatedFree)
+	require.Nil(t, cva.DelegatedVesting)
+
+	// vest 50% and delegate to two validators
+	cva, err = types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+	cva.TrackDelegation(now.Add(12*time.Hour), origCoins, sdk.Coins{sdk.NewInt64Coin(stakeDenom, 50)})
+	cva.TrackDelegation(now.Add(12*time.Hour), origCoins, sdk.Coins{sdk.NewInt64Coin(stakeDenom, 50)})
+
+	// undelegate from one validator that got slashed 50%
+	cva.TrackUndelegation(sdk.Coins{sdk.NewInt64Coin(stakeDenom, 25)})
+
+	require.Nil(t, cva.DelegatedFree)
+	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(stakeDenom, 75)}, cva.DelegatedVesting)
+
+	// undelegate from the other validator that did not get slashed
+	cva.TrackUndelegation(sdk.Coins{sdk.NewInt64Coin(stakeDenom, 50)})
+	require.Nil(t, cva.DelegatedFree)
+	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(stakeDenom, 25)}, cva.DelegatedVesting)
+}
+
 func TestGenesisAccountValidate(t *testing.T) {
 	pubkey := secp256k1.GenPrivKey().PubKey()
 	addr := sdk.AccAddress(pubkey.Address())
