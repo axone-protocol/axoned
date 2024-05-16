@@ -855,6 +855,36 @@ func TestGetVestingCoinsCliffVestingAcc(t *testing.T) {
 	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 250), sdk.NewInt64Coin(stakeDenom, 25)}, vestingCoins)
 }
 
+func TestSpendableCoinsCliffVestingAcc(t *testing.T) {
+	now := tmtime.Now()
+	cliffTime := now.Add(12 * time.Hour)
+	endTime := now.Add(24 * time.Hour)
+
+	bacc, origCoins := initBaseAccount()
+	cva, err := types.NewCliffVestingAccount(bacc, origCoins, now.Unix(), cliffTime.Unix(), endTime.Unix())
+	require.NoError(t, err)
+
+	// require all coins are locked at the beginning of the vesting schedule
+	lockedCoins := cva.LockedCoins(now)
+	require.Equal(t, origCoins, lockedCoins)
+
+	// require all coins are locked before the cliff time but after the beginning
+	lockedCoins = cva.LockedCoins(now.Add(6 * time.Hour))
+	require.Equal(t, origCoins, lockedCoins)
+
+	// require no coins are locked at the end of the vesting schedule
+	lockedCoins = cva.LockedCoins(endTime)
+	require.Equal(t, sdk.NewCoins(), lockedCoins)
+
+	// require 50% of coins are locked at the cliff time
+	lockedCoins = cva.LockedCoins(cliffTime.Add(1 * time.Second))
+	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 500), sdk.NewInt64Coin(stakeDenom, 50)}, lockedCoins)
+
+	// require 25% of coins are locked
+	lockedCoins = cva.LockedCoins(now.Add(18 * time.Hour))
+	require.Equal(t, sdk.Coins{sdk.NewInt64Coin(feeDenom, 250), sdk.NewInt64Coin(stakeDenom, 25)}, lockedCoins)
+}
+
 func TestTrackDelegationCliffVestingAcc(t *testing.T) {
 	now := tmtime.Now()
 	cliffTime := now.Add(12 * time.Hour)
