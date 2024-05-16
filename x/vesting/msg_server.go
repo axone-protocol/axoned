@@ -257,6 +257,9 @@ func (s msgServer) CreateCliffVestingAccount(goCtx context.Context,
 	if msg.EndTime <= 0 {
 		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid end time")
 	}
+	if msg.CliffTime <= 0 {
+		return nil, errorsmod.Wrap(sdkerrors.ErrInvalidRequest, "invalid cliff time")
+	}
 
 	ctx := sdk.UnwrapSDKContext(goCtx)
 	if err := s.BankKeeper.IsSendEnabledCoins(ctx, msg.Amount...); err != nil {
