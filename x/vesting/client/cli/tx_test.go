@@ -7,8 +7,9 @@ import (
 	"testing"
 	"time"
 
-	rpcclientmock "github.com/cometbft/cometbft/rpc/client/mock"
 	"github.com/stretchr/testify/suite"
+
+	rpcclientmock "github.com/cometbft/cometbft/rpc/client/mock"
 
 	sdkmath "cosmossdk.io/math"
 
@@ -124,7 +125,6 @@ func (s *CLITestSuite) TestNewMsgCreateVestingAccountCmd() {
 			ctx := svrcmd.CreateExecuteContext(context.Background())
 
 			cmd.SetContext(ctx)
-			fmt.Println(tc.amount.String())
 			cmd.SetArgs(append([]string{tc.to.String(), tc.amount.String(), fmt.Sprint(tc.endTime)}, tc.extraArgs...))
 
 			s.Require().NoError(client.SetCmdClientContextHandler(tc.ctxGen(), cmd))
