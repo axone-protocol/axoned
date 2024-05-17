@@ -4,7 +4,7 @@ Create a new vesting account funded with an allocation of tokens with cliff.
 
 ### Synopsis
 
-Create a new vesting account funded with an allocation of tokens. The
+Create a new vesting account funded with an allocation of tokens with cliff. The
 tokens allowed will be start vested but the token will be released only after the cliff time.
 All vesting accounts created will have their start time
 set by the committed block's time. The end_time and cliff_time must be provided as a UNIX epoch
