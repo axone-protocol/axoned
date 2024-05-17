@@ -60,7 +60,7 @@ continuously vests by unlocking coins after a cliff period linearly with respect
 | ----- | ---- | ----- | ----------- |
 | `base_vesting_account` | [BaseVestingAccount](#vesting.v1beta1.BaseVestingAccount) |  | base_vesting_account implements the VestingAccount interface. It contains all the necessary fields needed for any vesting account implementation |
 | `start_time` | [int64](#int64) |  | start_time defines the time at which the vesting period begins |
-| `cliff_time` | [int64](#int64) |  |  |
+| `cliff_time` | [int64](#int64) |  | cliff_time defines the time at which the first portion of the vesting is unlocked |
 
 <a name="vesting.v1beta1.ContinuousVestingAccount"></a>
 
@@ -94,7 +94,7 @@ Period defines a length of time and amount of coins that will vest.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `length` | [int64](#int64) |  |  |
+| `length` | [int64](#int64) |  | Period duration in seconds. |
 | `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 
 <a name="vesting.v1beta1.PeriodicVestingAccount"></a>
@@ -150,7 +150,7 @@ account.
 | `to_address` | [string](#string) |  |  |
 | `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
 | `end_time` | [int64](#int64) |  |  |
-| `cliff_time` | [int64](#int64) |  |  |
+| `cliff_time` | [int64](#int64) |  | cliff time as unix time (in seconds) is the time at which the first portion of the vesting is unlocked. |
 
 <a name="vesting.v1beta1.MsgCreateCliffVestingAccountResponse"></a>
 
@@ -218,7 +218,7 @@ account.
 | `from_address` | [string](#string) |  |  |
 | `to_address` | [string](#string) |  |  |
 | `amount` | [cosmos.base.v1beta1.Coin](#cosmos.base.v1beta1.Coin) | repeated |  |
-| `end_time` | [int64](#int64) |  |  |
+| `end_time` | [int64](#int64) |  | end of vesting as unix time (in seconds). |
 | `delayed` | [bool](#bool) |  |  |
 
 <a name="vesting.v1beta1.MsgCreateVestingAccountResponse"></a>

@@ -319,7 +319,7 @@ doc: doc-proto doc-command doc-predicate ## Generate all the documentation
 doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 	@echo "${COLOR_CYAN} 📝 Generating doc from Protobuf files${COLOR_RESET}"
 	@$(DOCKER_PROTO_RUN) sh ./scripts/protocgen-doc.sh
-	@for MODULE in $(shell find proto -name '*.proto' -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
+	@for MODULE in $(shell find proto -name '*.proto' -maxdepth 3 -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
 		echo "${COLOR_CYAN} 📖 Generate documentation for $${MODULE} module${COLOR_RESET}" ; \
         DEFAULT_DATASOURCE="./docs/proto/templates/default.yaml" ; \
         MODULE_DATASOURCE="merge:./$${MODULE}/docs.yaml|$${DEFAULT_DATASOURCE}" ; \
