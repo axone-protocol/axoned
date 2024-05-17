@@ -1,7 +1,7 @@
 version: v1
 name: buf.build/axone-protocol/axoned
 deps:
-  - buf.build/cosmos/cosmos-sdk:v0.50.1
+  - buf.build/cosmos/cosmos-sdk:v0.50.4
   - buf.build/cosmos/cosmos-proto
   - buf.build/cosmos/gogo-proto
   - buf.build/googleapis/googleapis
