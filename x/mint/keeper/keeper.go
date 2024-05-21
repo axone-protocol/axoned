@@ -15,7 +15,7 @@ import (
 	"github.com/axone-protocol/axoned/v8/x/mint/types"
 )
 
-// Keeper of the mint store
+// Keeper of the mint store.
 type Keeper struct {
 	cdc              codec.BinaryCodec
 	storeService     storetypes.KVStoreService
@@ -32,7 +32,7 @@ type Keeper struct {
 	Minter collections.Item[types.Minter]
 }
 
-// NewKeeper creates a new mint Keeper instance
+// NewKeeper creates a new mint Keeper instance.
 func NewKeeper(
 	cdc codec.BinaryCodec,
 	storeService storetypes.KVStoreService,
@@ -80,8 +80,8 @@ func (k Keeper) Logger(ctx context.Context) log.Logger {
 
 // TokenSupply implements an alias call to the underlying bank keeper's
 // TokenSupply to be used in BeginBlocker.
-func (keeper Keeper) TokenSupply(ctx context.Context, denom string) math.Int {
-	return keeper.bankKeeper.GetSupply(ctx, denom).Amount
+func (k Keeper) TokenSupply(ctx context.Context, denom string) math.Int {
+	return k.bankKeeper.GetSupply(ctx, denom).Amount
 }
 
 // StakingTokenSupply implements an alias call to the underlying staking keeper's
