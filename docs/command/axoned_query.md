@@ -24,7 +24,6 @@ axoned query [flags]
 * [axoned query circuit](axoned_query_circuit.md)	 - Querying commands for the circuit module
 * [axoned query consensus](axoned_query_consensus.md)	 - Querying commands for the consensus module
 * [axoned query distribution](axoned_query_distribution.md)	 - Querying commands for the distribution module
-* [axoned query event-query-tx-for](axoned_query_event-query-tx-for.md)	 - Query for a transaction by hash
 * [axoned query evidence](axoned_query_evidence.md)	 - Querying commands for the evidence module
 * [axoned query feegrant](axoned_query_feegrant.md)	 - Querying commands for the feegrant module
 * [axoned query gov](axoned_query_gov.md)	 - Querying commands for the gov module
@@ -41,4 +40,5 @@ axoned query [flags]
 * [axoned query tx](axoned_query_tx.md)	 - Query for a transaction by hash, "&lt;addr&gt;/&lt;seq&gt;" combination or comma-separated signatures in a committed block
 * [axoned query txs](axoned_query_txs.md)	 - Query for paginated transactions that match a set of events
 * [axoned query upgrade](axoned_query_upgrade.md)	 - Querying commands for the upgrade module
+* [axoned query wait-tx](axoned_query_wait-tx.md)	 - Wait for a transaction to be included in a block
 * [axoned query wasm](axoned_query_wasm.md)	 - Querying commands for the wasm module

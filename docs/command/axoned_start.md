@@ -66,7 +66,7 @@ axoned start [flags]
       --iavl-disable-fastnode                           Disable fast node for IAVL tree
       --inter-block-cache                               Enable inter-block caching (default true)
       --inv-check-period uint                           Assert registered invariants every N blocks
-      --mempool.max-txs int                             Sets MaxTx value for the app-side mempool
+      --mempool.max-txs int                             Sets MaxTx value for the app-side mempool (default -1)
       --min-retain-blocks uint                          Minimum block height offset during ABCI commit to prune CometBFT blocks
       --minimum-gas-prices string                       Minimum gas prices to accept for transactions; Any fee in a tx must meet this minimum (e.g. 0.01photino;0.0001stake)
       --moniker string                                  node name (default "my-machine")
