@@ -1,5 +1,22 @@
 # ØKP4 protocol changelog
 
+## [7.2.0](https://github.com/axone-protocol/axoned/compare/v7.1.0...v7.2.0) (2024-05-21)
+
+
+### ⚠ BREAKING CHANGES
+
+* **renaming:** change denom name from uknow to uaxone
+
+### Features
+
+* **cli:** update narative of axone command description ([4ab2b38](https://github.com/axone-protocol/axoned/commit/4ab2b38bd1b868534d0e2856f8781c6421517b33))
+* **logic:** introduce "limit" flag to command "ask" ([58b4c45](https://github.com/axone-protocol/axoned/commit/58b4c45855c21885e65292482fddfe55d91ebaa5))
+
+
+### Code Refactoring
+
+* **renaming:** change denom name from uknow to uaxone ([88b9c92](https://github.com/axone-protocol/axoned/commit/88b9c92c6cfb559470f8b6bace299d8272c05bc4))
+
 ## [7.1.0](https://github.com/axone-protocol/axoned/compare/v7.0.1...v7.1.0) (2024-04-02)
 
 
