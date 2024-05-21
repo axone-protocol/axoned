@@ -1,0 +1,5 @@
+reviews:
+  path_filters:
+    - "!docs/command/**/*.md"
+    - "!docs/predicate/**/*.md"
+    - "!docs/proto/**/*.md"
