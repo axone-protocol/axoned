@@ -25,7 +25,7 @@ plugins:
     - preset: conventionalcommits
   - - "@semantic-release/changelog"
     - changelogFile: CHANGELOG.md
-      changelogTitle: "# ØKP4 protocol changelog"
+      changelogTitle: "# AXONE protocol changelog"
   - - "semantic-release-replace-plugin"
     - replacements:
         - files: [version]
