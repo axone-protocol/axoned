@@ -71,7 +71,7 @@ jobs:
                 "version": "${{ github.event.release.tag_name }}",
                 "repository": "${{github.repository}}",
                 "section": "predicates",
-                "docs_directory": "docs/predicates/*"
+                "docs_directory": "docs/predicate/*"
               }
             }
 
