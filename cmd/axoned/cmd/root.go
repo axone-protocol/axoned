@@ -40,10 +40,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
-	"github.com/axone-protocol/axoned/v7/app"
-	appparams "github.com/axone-protocol/axoned/v7/app/params"
-	"github.com/axone-protocol/axoned/v7/client/credential"
-	axonekeys "github.com/axone-protocol/axoned/v7/client/keys"
+	"github.com/axone-protocol/axoned/v8/app"
+	appparams "github.com/axone-protocol/axoned/v8/app/params"
+	"github.com/axone-protocol/axoned/v8/client/credential"
+	axonekeys "github.com/axone-protocol/axoned/v8/client/keys"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application.

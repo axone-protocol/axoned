@@ -5,7 +5,7 @@ import (
 
 	bech322 "github.com/cosmos/cosmos-sdk/types/bech32"
 
-	"github.com/axone-protocol/axoned/v7/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v8/x/logic/prolog"
 )
 
 // Bech32Address is a predicate that convert a [bech32] encoded string into [base64] bytes and give the address prefix,

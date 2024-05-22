@@ -8,7 +8,7 @@ import (
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
 
-	"github.com/axone-protocol/axoned/v7/x/logic/predicate"
+	"github.com/axone-protocol/axoned/v8/x/logic/predicate"
 )
 
 // registry is a map from predicate names (in the form of "atom/arity") to predicates functions.

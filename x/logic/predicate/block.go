@@ -5,7 +5,7 @@ import (
 
 	"github.com/ichiban/prolog/engine"
 
-	"github.com/axone-protocol/axoned/v7/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v8/x/logic/prolog"
 )
 
 // BlockHeight is a predicate which unifies the given term with the current block height.
