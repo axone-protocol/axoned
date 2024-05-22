@@ -21,6 +21,8 @@ plugins:
           release: patch
         - type: docs
           release: patch
+        - breaking: true
+          release: major
   - - "@semantic-release/release-notes-generator"
     - preset: conventionalcommits
   - - "@semantic-release/changelog"
