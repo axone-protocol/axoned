@@ -37,7 +37,7 @@ func NewMinterWithInflationCoef(
 	}
 	minter := NewMinter(inflationRate, inflationRate.MulInt(totalSupply))
 
-	return minter, minter.Validate()
+	return minter, ValidateMinter(minter)
 }
 
 // DefaultInitialMinter returns a default initial Minter object for a new chain
@@ -48,11 +48,11 @@ func DefaultInitialMinter() Minter {
 	)
 }
 
-// Validate validates the mint parameters.
-func (m Minter) Validate() error {
-	if m.Inflation.IsNegative() {
+// ValidateMinter does a basic validation on minter.
+func ValidateMinter(minter Minter) error {
+	if minter.Inflation.IsNegative() {
 		return fmt.Errorf("mint parameter Inflation should be positive, is %s",
-			m.Inflation.String())
+			minter.Inflation.String())
 	}
 	return nil
 }

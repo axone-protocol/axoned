@@ -70,7 +70,7 @@ func (s *GenesisTestSuite) SetupTest() {
 
 func (s *GenesisTestSuite) TestImportExportGenesis() {
 	genesisState := types.DefaultGenesisState()
-	genesisState.Minter = types.NewMinter(math.LegacyOneDec(), math.LegacyNewDecWithPrec(20, 2))
+	genesisState.Minter = types.NewMinter(math.LegacyNewDecWithPrec(20, 2), math.LegacyNewDec(1))
 	genesisState.Params = types.NewParams(
 		"testDenom",
 		math.LegacyNewDecWithPrec(69, 2),

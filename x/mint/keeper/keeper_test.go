@@ -39,6 +39,7 @@ func TestKeeperTestSuite(t *testing.T) {
 func (s *IntegrationTestSuite) SetupTest() {
 	encCfg := moduletestutil.MakeTestEncodingConfig(mint.AppModuleBasic{})
 	key := storetypes.NewKVStoreKey(types.StoreKey)
+	storeService := runtime.NewKVStoreService(key)
 	testCtx := testutil.DefaultContextWithDB(s.T(), key, storetypes.NewTransientStoreKey("transient_test"))
 	s.ctx = testCtx.Ctx
 
@@ -52,7 +53,7 @@ func (s *IntegrationTestSuite) SetupTest() {
 
 	s.mintKeeper = keeper.NewKeeper(
 		encCfg.Codec,
-		runtime.NewKVStoreService(key),
+		storeService,
 		stakingKeeper,
 		accountKeeper,
 		bankKeeper,

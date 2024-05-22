@@ -33,7 +33,7 @@ axoned query [flags]
 * [axoned query ibc-transfer](axoned_query_ibc-transfer.md)	 - IBC fungible token transfer query subcommands
 * [axoned query interchain-accounts](axoned_query_interchain-accounts.md)	 - IBC interchain accounts query subcommands
 * [axoned query logic](axoned_query_logic.md)	 - Querying commands for the logic module
-* [axoned query mint](axoned_query_mint.md)	 - Querying commands for the minting module
+* [axoned query mint](axoned_query_mint.md)	 - Querying commands for the mint module
 * [axoned query params](axoned_query_params.md)	 - Querying commands for the params module
 * [axoned query slashing](axoned_query_slashing.md)	 - Querying commands for the slashing module
 * [axoned query staking](axoned_query_staking.md)	 - Querying commands for the staking module

@@ -12,20 +12,19 @@ import (
 
 var _ types.MsgServer = msgServer{}
 
+// msgServer is a wrapper of Keeper.
 type msgServer struct {
 	Keeper
 }
 
-// NewMsgServerImpl returns an implementation of the MsgServer interface
-// for the provided Keeper.
-func NewMsgServerImpl(keeper Keeper) types.MsgServer {
-	return &msgServer{Keeper: keeper}
+// NewMsgServerImpl returns an implementation of the x/mint MsgServer interface.
+func NewMsgServerImpl(k Keeper) types.MsgServer {
+	return &msgServer{
+		Keeper: k,
+	}
 }
 
-// UpdateParams implements the gRPC MsgServer interface. When an UpdateParams
-// proposal passes, it updates the module parameters. The update can only be
-// performed if the requested authority is the Cosmos SDK governance module
-// account.
+// UpdateParams updates the params.
 func (ms msgServer) UpdateParams(ctx context.Context, msg *types.MsgUpdateParams) (*types.MsgUpdateParamsResponse, error) {
 	if ms.authority != msg.Authority {
 		return nil, errors.Wrapf(govtypes.ErrInvalidSigner, "invalid authority; expected %s, got %s", ms.authority, msg.Authority)
