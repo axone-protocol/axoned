@@ -44,7 +44,7 @@ require (
 	github.com/nuts-foundation/go-did v0.12.0
 	github.com/piprate/json-gold v0.5.0
 	github.com/princjef/gomarkdoc v1.1.0
-	github.com/prometheus/client_golang v1.19.0
+	github.com/prometheus/client_golang v1.19.1
 	github.com/samber/lo v1.39.0
 	github.com/sergi/go-diff v1.3.1
 	github.com/smartystreets/goconvey v1.8.1
