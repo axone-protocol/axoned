@@ -29,7 +29,7 @@ require (
 	github.com/cosmos/ibc-go/modules/capability v1.0.0
 	github.com/cosmos/ibc-go/v8 v8.0.0
 	github.com/cucumber/gherkin/go/v26 v26.2.0
-	github.com/cucumber/godog v0.14.0
+	github.com/cucumber/godog v0.14.1
 	github.com/cucumber/messages/go/v21 v21.0.1
 	github.com/dustinxie/ecc v0.0.0-20210511000915-959544187564
 	github.com/golang/mock v1.6.0
