@@ -47,7 +47,7 @@ jobs:
 
       - name: Find changed proto files
         id: changed-proto-files
-        uses: tj-actions/changed-files@v44.0.0
+        uses: tj-actions/changed-files@v44.5.1
         with:
           files: |
             proto/**/*.proto
