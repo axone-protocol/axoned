@@ -41,7 +41,7 @@ require (
 	github.com/ichiban/prolog v1.2.0
 	github.com/ignite/cli v0.27.2
 	github.com/muesli/reflow v0.3.0
-	github.com/nuts-foundation/go-did v0.12.0
+	github.com/nuts-foundation/go-did v0.13.0
 	github.com/piprate/json-gold v0.5.0
 	github.com/princjef/gomarkdoc v1.1.0
 	github.com/prometheus/client_golang v1.19.0
@@ -205,9 +205,9 @@ require (
 	github.com/kr/text v0.2.0 // indirect
 	github.com/lestrrat-go/blackmagic v1.0.2 // indirect
 	github.com/lestrrat-go/httpcc v1.0.1 // indirect
-	github.com/lestrrat-go/httprc v1.0.4 // indirect
+	github.com/lestrrat-go/httprc v1.0.5 // indirect
 	github.com/lestrrat-go/iter v1.0.2 // indirect
-	github.com/lestrrat-go/jwx/v2 v2.0.19 // indirect
+	github.com/lestrrat-go/jwx/v2 v2.0.21 // indirect
 	github.com/lestrrat-go/option v1.0.1 // indirect
 	github.com/lib/pq v1.10.9 // indirect
 	github.com/libp2p/go-buffer-pool v0.1.0 // indirect
