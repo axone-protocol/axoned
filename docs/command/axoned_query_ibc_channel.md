@@ -25,5 +25,8 @@ axoned query ibc channel [flags]
 * [axoned query ibc channel packet-commitment](axoned_query_ibc_channel_packet-commitment.md)	 - Query a packet commitment
 * [axoned query ibc channel packet-commitments](axoned_query_ibc_channel_packet-commitments.md)	 - Query all packet commitments associated with a channel
 * [axoned query ibc channel packet-receipt](axoned_query_ibc_channel_packet-receipt.md)	 - Query a packet receipt
+* [axoned query ibc channel params](axoned_query_ibc_channel_params.md)	 - Query the current ibc channel parameters
 * [axoned query ibc channel unreceived-acks](axoned_query_ibc_channel_unreceived-acks.md)	 - Query all the unreceived acks associated with a channel
 * [axoned query ibc channel unreceived-packets](axoned_query_ibc_channel_unreceived-packets.md)	 - Query all the unreceived packets associated with a channel
+* [axoned query ibc channel upgrade](axoned_query_ibc_channel_upgrade.md)	 - Query the upgrade
+* [axoned query ibc channel upgrade-error](axoned_query_ibc_channel_upgrade-error.md)	 - Query the upgrade error
