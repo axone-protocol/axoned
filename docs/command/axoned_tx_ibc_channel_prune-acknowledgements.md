@@ -1,18 +1,20 @@
-## axoned tx interchain-accounts controller register
+## axoned tx ibc channel prune-acknowledgements
 
-Register an interchain account on the provided connection.
+Prune expired packet acknowledgements stored in IBC state
 
 ### Synopsis
 
-Register an account on the counterparty chain via the
-connection id from the source chain. Connection identifier should be for the source chain
-and the interchain account will be created on the counterparty chain. Callers are expected to
-provide the appropriate application version string via \{version\} flag and the desired ordering
-via the \{ordering\} flag. Generates a new port identifier using the provided owner string, binds to the port identifier and claims
-the associated capability.
+Prune expired packet acknowledgements and receipts stored in IBC state. Packet ackwnowledgements and
+		receipts are considered expired if a channel has been upgraded.
 
 ```
-axoned tx interchain-accounts controller register [connection-id] [flags]
+axoned tx ibc channel prune-acknowledgements [port] [channel] [limit] [flags]
+```
+
+### Examples
+
+```
+axoned tx ibc channel prune-acknowledgements transfer channel-0 1000
 ```
 
 ### Options
@@ -31,23 +33,21 @@ axoned tx interchain-accounts controller register [connection-id] [flags]
       --gas-adjustment float     adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored  (default 1)
       --gas-prices string        Gas prices in decimal format to determine the transaction fee (e.g. 0.1uatom)
       --generate-only            Build an unsigned transaction and write it to STDOUT (when enabled, the local Keybase only accessed when providing a key name)
-  -h, --help                     help for register
+  -h, --help                     help for prune-acknowledgements
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "os")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --ledger                   Use a connected Ledger device
       --node string              <host>:<port> to CometBFT rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
-      --ordering string          Channel ordering, can be one of: ORDER_ORDERED, ORDER_UNORDERED (default "ORDER_ORDERED")
   -o, --output string            Output format (text|json) (default "json")
   -s, --sequence uint            The sequence number of the signing account (offline mode only)
       --sign-mode string         Choose sign mode (direct|amino-json|direct-aux|textual), this is an advanced feature
       --timeout-height uint      Set a block timeout height to prevent the tx from being committed past a certain height
       --tip string               Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator
-      --version string           Controller chain channel version
   -y, --yes                      Skip tx broadcasting prompt confirmation
 ```
 
 ### SEE ALSO
 
-* [axoned tx interchain-accounts controller](axoned_tx_interchain-accounts_controller.md)	 - IBC interchain accounts controller transaction subcommands
+* [axoned tx ibc channel](axoned_tx_ibc_channel.md)	 - IBC channel transaction subcommands
