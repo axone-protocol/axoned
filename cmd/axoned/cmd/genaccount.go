@@ -14,7 +14,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/server"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	vestingtypes "github.com/axone-protocol/axoned/v7/x/vesting/types"
+	vestingtypes "github.com/axone-protocol/axoned/v8/x/vesting/types"
 )
 
 const (
