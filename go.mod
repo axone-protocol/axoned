@@ -19,7 +19,7 @@ require (
 	cosmossdk.io/x/tx v0.13.3
 	cosmossdk.io/x/upgrade v0.1.2
 	dario.cat/mergo v1.0.0
-	github.com/CosmWasm/wasmd v0.51.0-rc.2
+	github.com/CosmWasm/wasmd v0.51.0
 	github.com/Masterminds/sprig/v3 v3.2.3
 	github.com/cometbft/cometbft v0.38.7
 	github.com/cosmos/cosmos-db v1.0.2
