@@ -57,6 +57,7 @@ jobs:
           env_vars: OS,GOLANG
           fail_ci_if_error: false
           verbose: true
+          token: ${{ secrets.CODECOV_TOKEN }}
 
   test-blockchain:
     runs-on: ubuntu-22.04

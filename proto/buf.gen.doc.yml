@@ -4,4 +4,4 @@ plugins:
   - name: doc
     out: ../docs/proto
     opt:
-      - ../docs/proto/templates/protodoc-markdown.tmpl,docs.md
+      - ../docs/proto/templates/protodoc-markdown.tmpl,docs.md:module/*
