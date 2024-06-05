@@ -80,7 +80,7 @@ func (w WasmHandler) Open(ctx context.Context, uri *url.URL) (fs.File, error) {
 
 		decoded, err := base64.StdEncoding.DecodeString(program)
 		if err != nil {
-			return nil, fmt.Errorf("failed decode wasm base64 respone: %w", err)
+			return nil, fmt.Errorf("failed decode wasm base64 response: %w", err)
 		}
 
 		return NewVirtualFile(decoded, uri, sdkCtx.BlockTime()), nil

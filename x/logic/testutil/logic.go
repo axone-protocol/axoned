@@ -40,7 +40,7 @@ func NewLightInterpreterMust(ctx context.Context) (i *prolog.Interpreter) {
 }
 
 // NewComprehensiveInterpreterMust returns a new Interpreter with the given context or panics if it fails.
-// The Interpreter is configured with the full boostrap but with a minimal set of predicates.
+// The Interpreter is configured with the full bootstrap but with a minimal set of predicates.
 func NewComprehensiveInterpreterMust(ctx context.Context) (i *prolog.Interpreter) {
 	i = &prolog.Interpreter{}
 	i.Register3(engine.NewAtom("op"), engine.Op)
