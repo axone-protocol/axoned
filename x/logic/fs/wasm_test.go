@@ -72,7 +72,7 @@ func TestWasmHandler(t *testing.T) {
 				data:            []byte("\"hey\""),
 				uri:             `cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
-				wantError:       fmt.Errorf("failed decode wasm base64 respone: illegal base64 data at input byte 0"),
+				wantError:       fmt.Errorf("failed decode wasm base64 response: illegal base64 data at input byte 0"),
 			},
 			{
 				contractAddress: "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk",
