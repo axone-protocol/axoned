@@ -6,13 +6,14 @@ import (
 	"testing"
 	"time"
 
-	"github.com/axone-protocol/axoned/v8/x/logic/fs/wasm"
 	"github.com/golang/mock/gomock"
 	"github.com/samber/lo"
 
+	. "github.com/smartystreets/goconvey/convey"
+
+	"github.com/axone-protocol/axoned/v8/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v8/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v8/x/logic/util"
-	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestSourceFile(t *testing.T) {

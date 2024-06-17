@@ -13,8 +13,6 @@ import (
 	"time"
 
 	"dario.cat/mergo"
-	"github.com/axone-protocol/axoned/v8/x/logic/fs/composite"
-	"github.com/axone-protocol/axoned/v8/x/logic/fs/wasm"
 	"github.com/cucumber/godog"
 	"github.com/golang/mock/gomock"
 	"github.com/sergi/go-diff/diffmatchpatch"
@@ -34,6 +32,8 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/axone-protocol/axoned/v8/x/logic"
+	"github.com/axone-protocol/axoned/v8/x/logic/fs/composite"
+	"github.com/axone-protocol/axoned/v8/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v8/x/logic/keeper"
 	logictestutil "github.com/axone-protocol/axoned/v8/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v8/x/logic/types"

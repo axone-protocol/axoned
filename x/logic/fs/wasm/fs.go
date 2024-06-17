@@ -56,43 +56,12 @@ func (f *vfs) ReadFile(name string) ([]byte, error) {
 }
 
 func (f *vfs) readFile(op string, name string) ([]byte, error) {
-	uri, err := f.validatePath(name)
+	contractAddr, query, base64Decode, err := f.parsePath(op, name)
 	if err != nil {
-		return nil, &fs.PathError{Op: op, Path: name, Err: fs.ErrInvalid}
+		return nil, err
 	}
+
 	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
-
-	paths := strings.SplitAfter(uri.Opaque, ":")
-	lastPart := paths[len(paths)-1]
-	contractAddr, err := sdk.AccAddressFromBech32(lastPart)
-	if err != nil {
-		return nil, &fs.PathError{
-			Op:   op,
-			Path: name,
-			Err:  fmt.Errorf("failed to convert path '%s' to contract address: %w", lastPart, err),
-		}
-	}
-
-	if !uri.Query().Has(queryKey) {
-		return nil, &fs.PathError{
-			Op:   op,
-			Path: name,
-			Err:  fmt.Errorf("uri should contains `query` params"),
-		}
-	}
-	query := uri.Query().Get(queryKey)
-
-	base64Decode := true
-	if uri.Query().Has(base64DecodeKey) {
-		if base64Decode, err = strconv.ParseBool(uri.Query().Get(base64DecodeKey)); err != nil {
-			return nil, &fs.PathError{
-				Op:   op,
-				Path: name,
-				Err:  fmt.Errorf("failed to convert 'base64Decode' query value to boolean: %w", err),
-			}
-		}
-	}
-
 	data, err := f.wasmKeeper.QuerySmart(sdkCtx, contractAddr, []byte(query))
 	if err != nil {
 		return nil, &fs.PathError{
@@ -126,23 +95,59 @@ func (f *vfs) readFile(op string, name string) ([]byte, error) {
 	return data, nil
 }
 
-// validatePath checks if the provided path is a valid URL.
-func (f *vfs) validatePath(path string) (*url.URL, error) {
+// parsePath parses the provided path and returns its component.
+func (f *vfs) parsePath(op string, path string) (sdk.AccAddress, string, bool, error) {
 	uri, err := url.Parse(path)
 	if err != nil {
-		return nil, err
+		return nil, "", false,
+			&fs.PathError{Op: op, Path: path, Err: fs.ErrInvalid}
 	}
 
 	if uri.Scheme != Scheme {
-		return nil, fmt.Errorf("invalid scheme, expected '%s', got '%s'", Scheme, uri.Scheme)
+		return nil, "", false,
+			&fs.PathError{Op: op, Path: path, Err: fmt.Errorf("invalid scheme, expected '%s', got '%s'", Scheme, uri.Scheme)}
 	}
 
 	paths := strings.SplitAfter(uri.Opaque, ":")
 	pathsLen := len(paths)
 	if pathsLen < 1 || paths[pathsLen-1] == "" {
-		return nil, fmt.Errorf("emtpy path given, should be '%s:{contractName}:{contractAddr}?query={query}'",
-			Scheme)
+		return nil, "", false,
+			&fs.PathError{Op: op, Path: path, Err: fmt.Errorf("emtpy path given, should be '%s:{contractName}:{contractAddr}?query={query}'",
+				Scheme)}
 	}
 
-	return uri, nil
+	lastPart := paths[len(paths)-1]
+	contractAddr, err := sdk.AccAddressFromBech32(lastPart)
+	if err != nil {
+		return nil, "", false,
+			&fs.PathError{
+				Op:   op,
+				Path: path,
+				Err:  fmt.Errorf("failed to convert path '%s' to contract address: %w", lastPart, err),
+			}
+	}
+
+	query := uri.Query().Get(queryKey)
+	if query == "" {
+		return nil, "", false,
+			&fs.PathError{
+				Op:   op,
+				Path: path,
+				Err:  fmt.Errorf("uri should contains `query` params"),
+			}
+	}
+
+	base64Decode := true
+	if uri.Query().Has(base64DecodeKey) {
+		if base64Decode, err = strconv.ParseBool(uri.Query().Get(base64DecodeKey)); err != nil {
+			return nil, "", false,
+				&fs.PathError{
+					Op:   op,
+					Path: path,
+					Err:  fmt.Errorf("failed to convert 'base64Decode' query value to boolean: %w", err),
+				}
+		}
+	}
+
+	return contractAddr, query, base64Decode, nil
 }

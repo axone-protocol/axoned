@@ -7,7 +7,6 @@ import (
 	"math"
 	"strings"
 
-	"github.com/axone-protocol/axoned/v8/x/logic/fs/filtered"
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
 	"github.com/samber/lo"
@@ -18,6 +17,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/axone-protocol/axoned/v8/x/logic/fs/filtered"
 	"github.com/axone-protocol/axoned/v8/x/logic/interpreter"
 	"github.com/axone-protocol/axoned/v8/x/logic/interpreter/bootstrap"
 	"github.com/axone-protocol/axoned/v8/x/logic/meter"
