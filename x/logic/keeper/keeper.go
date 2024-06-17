@@ -1,9 +1,7 @@
 package keeper
 
 import (
-	goctx "context"
 	"fmt"
-	"io/fs"
 
 	"cosmossdk.io/log"
 	storetypes "cosmossdk.io/store/types"
@@ -11,10 +9,9 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/axone-protocol/axoned/v8/x/logic/fs"
 	"github.com/axone-protocol/axoned/v8/x/logic/types"
 )
-
-type FSProvider = func(ctx goctx.Context) fs.FS
 
 type (
 	Keeper struct {
@@ -26,7 +23,7 @@ type (
 
 		authKeeper types.AccountKeeper
 		bankKeeper types.BankKeeper
-		fsProvider FSProvider
+		fsProvider fs.Provider
 	}
 )
 
@@ -37,7 +34,7 @@ func NewKeeper(
 	authority sdk.AccAddress,
 	authKeeper types.AccountKeeper,
 	bankKeeper types.BankKeeper,
-	fsProvider FSProvider,
+	fsProvider fs.Provider,
 ) *Keeper {
 	// ensure gov module account is set and is not nil
 	if err := sdk.VerifyAddressFormat(authority); err != nil {

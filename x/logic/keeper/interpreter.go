@@ -7,6 +7,7 @@ import (
 	"math"
 	"strings"
 
+	"github.com/axone-protocol/axoned/v8/x/logic/fs/filtered"
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
 	"github.com/samber/lo"
@@ -17,7 +18,6 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v8/x/logic/fs"
 	"github.com/axone-protocol/axoned/v8/x/logic/interpreter"
 	"github.com/axone-protocol/axoned/v8/x/logic/interpreter/bootstrap"
 	"github.com/axone-protocol/axoned/v8/x/logic/meter"
@@ -139,7 +139,7 @@ func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, fmt.St
 	options := []interpreter.Option{
 		interpreter.WithPredicates(ctx, interpreter.RegistryNames, hook),
 		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
-		interpreter.WithFS(fs.NewFilteredFS(whitelistUrls, blacklistUrls, k.fsProvider(ctx))),
+		interpreter.WithFS(filtered.NewFS(k.fsProvider(ctx), whitelistUrls, blacklistUrls)),
 		interpreter.WithUserOutputWriter(userOutputBuffer),
 	}
 
