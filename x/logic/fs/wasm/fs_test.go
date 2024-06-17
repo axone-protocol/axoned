@@ -24,6 +24,7 @@ import (
 	"github.com/axone-protocol/axoned/v8/x/logic/testutil"
 )
 
+//nolint:gocognit
 func TestWasmVFS(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()

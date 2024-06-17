@@ -1,6 +1,7 @@
 package composite
 
 import (
+	"errors"
 	"fmt"
 	"io"
 	"io/fs"
@@ -10,8 +11,8 @@ import (
 	"golang.org/x/exp/maps"
 )
 
-type CopositeFS interface {
-	fs.FS
+type FS interface {
+	fs.ReadFileFS
 
 	// Mount mounts a filesystem to the given mount point.
 	// The mount point is the scheme of the URI.
@@ -29,7 +30,7 @@ var (
 	_ fs.ReadFileFS = (*vfs)(nil)
 )
 
-func NewFS() CopositeFS {
+func NewFS() FS {
 	return &vfs{mounted: make(map[string]fs.FS)}
 }
 
@@ -58,18 +59,23 @@ func (f *vfs) ReadFile(name string) ([]byte, error) {
 	}
 
 	if vfs, ok := vfs.(fs.ReadFileFS); ok {
-		return vfs.ReadFile(name)
+		content, err := vfs.ReadFile(name)
+		if err != nil {
+			return nil, &fs.PathError{Op: "readfile", Path: name, Err: getUnderlyingError(err)}
+		}
+
+		return content, nil
 	}
 
 	file, err := vfs.Open(name)
 	if err != nil {
-		return nil, err
+		return nil, &fs.PathError{Op: "readfile", Path: name, Err: getUnderlyingError(err)}
 	}
 	defer file.Close()
 
 	content, err := io.ReadAll(file)
 	if err != nil {
-		return nil, err
+		return nil, &fs.PathError{Op: "readfile", Path: name, Err: getUnderlyingError(err)}
 	}
 
 	return content, nil
@@ -105,4 +111,14 @@ func (f *vfs) resolve(uri *url.URL) (fs.FS, error) {
 		return nil, fmt.Errorf("no filesystem mounted at: %s", uri.Scheme)
 	}
 	return vfs, nil
+}
+
+// getUnderlyingError returns the underlying error of a path error.
+// If it's not a path error it returns the error itself.
+func getUnderlyingError(err error) error {
+	var pathErr *fs.PathError
+	if errors.As(err, &pathErr) {
+		return pathErr.Err
+	}
+	return err
 }

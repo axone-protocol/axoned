@@ -84,7 +84,7 @@ func TestFilteredVFS(t *testing.T) {
 								time.Unix(1681389446, 0)), nil
 						})
 					mockedFS.EXPECT().ReadFile(tc.file).AnyTimes().
-						DoAndReturn(func(file string) ([]byte, error) {
+						DoAndReturn(func(_ string) ([]byte, error) {
 							return content, nil
 						})
 					Convey("and a filtered file system under test", func() {
