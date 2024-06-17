@@ -1,19 +1,18 @@
-package fs
+package filtered
 
 import (
 	"fmt"
 	"io/fs"
-	"net/url"
 	"testing"
 	"time"
 
+	"github.com/axone-protocol/axoned/v8/x/logic/fs/wasm"
 	"github.com/golang/mock/gomock"
 	"github.com/samber/lo"
 
-	. "github.com/smartystreets/goconvey/convey"
-
 	"github.com/axone-protocol/axoned/v8/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v8/x/logic/util"
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestSourceFile(t *testing.T) {
@@ -66,7 +65,7 @@ func TestSourceFile(t *testing.T) {
 				wantError: &fs.PathError{
 					Op:   "open",
 					Path: "https://foo{bar/",
-					Err:  &url.Error{Op: "parse", URL: "https://foo{bar/", Err: url.InvalidHostError("{")},
+					Err:  fmt.Errorf("invalid argument"),
 				},
 			},
 		}
@@ -76,17 +75,18 @@ func TestSourceFile(t *testing.T) {
 				Convey("and a mocked file system", func() {
 					mockedFS := testutil.NewMockFS(ctrl)
 					mockedFS.EXPECT().Open(tc.file).Times(lo.If(util.IsNil(tc.wantError), 1).Else(0)).
-						DoAndReturn(func(file string) (VirtualFile, error) {
-							return NewVirtualFile(
+						DoAndReturn(func(file string) (fs.File, error) {
+							return wasm.NewVirtualFile(
+								file,
 								[]byte("42"),
-								util.ParseURLMust(file),
 								time.Unix(1681389446, 0)), nil
 						})
 					Convey("and a filtered file system under test", func() {
-						filteredFS := NewFilteredFS(
+						filteredFS := NewFS(
+							mockedFS,
 							lo.Map(tc.whitelist, util.Indexed(util.ParseURLMust)),
 							lo.Map(tc.blacklist, util.Indexed(util.ParseURLMust)),
-							mockedFS)
+						)
 
 						Convey(fmt.Sprintf(`When the open("%s") is called`, tc.file), func() {
 							result, err := filteredFS.Open(tc.file)
