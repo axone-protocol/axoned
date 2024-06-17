@@ -377,6 +377,8 @@ mock: ## Generate all the mocks (for tests)
 	@mockgen -source=x/vesting/types/expected_keepers.go -package testutil -destination x/vesting/testutil/expected_keepers_mocks.go
 	@mockgen -source=x/logic/types/expected_keepers.go -package testutil -destination x/logic/testutil/expected_keepers_mocks.go
 	@mockgen -destination x/logic/testutil/gas_mocks.go -package testutil cosmossdk.io/store/types GasMeter
+	@mockgen -destination x/logic/testutil/fs_mocks.go -package testutil io/fs FS
+	@mockgen -destination x/logic/testutil/read_file_fs_mocks.go -package testutil io/fs ReadFileFS
 
 ## Release:
 .PHONY: release-assets
