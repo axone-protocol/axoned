@@ -20,7 +20,7 @@ var (
 
 // NewFS creates a new filtered filesystem that wraps the provided filesystem.
 // The whitelist and blacklist are used to filter the paths that can be accessed.
-func NewFS(underlyingFS fs.FS, whitelist, blacklist []*url.URL) fs.FS {
+func NewFS(underlyingFS fs.FS, whitelist, blacklist []*url.URL) fs.ReadFileFS {
 	return &vfs{fs: underlyingFS, whitelist: whitelist, blacklist: blacklist}
 }
 

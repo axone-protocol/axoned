@@ -16,7 +16,7 @@ import (
 	"github.com/axone-protocol/axoned/v8/x/logic/util"
 )
 
-func TestSourceFile(t *testing.T) {
+func TestFilteredVFS(t *testing.T) {
 	Convey("Given test cases", t, func() {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -74,13 +74,18 @@ func TestSourceFile(t *testing.T) {
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the test case #%d - file %s", nc, tc.file), func() {
 				Convey("and a mocked file system", func() {
-					mockedFS := testutil.NewMockFS(ctrl)
-					mockedFS.EXPECT().Open(tc.file).Times(lo.If(util.IsNil(tc.wantError), 1).Else(0)).
+					content := []byte("42")
+					mockedFS := testutil.NewMockReadFileFS(ctrl)
+					mockedFS.EXPECT().Open(tc.file).AnyTimes().
 						DoAndReturn(func(file string) (fs.File, error) {
 							return wasm.NewVirtualFile(
 								file,
-								[]byte("42"),
+								content,
 								time.Unix(1681389446, 0)), nil
+						})
+					mockedFS.EXPECT().ReadFile(tc.file).AnyTimes().
+						DoAndReturn(func(file string) ([]byte, error) {
+							return content, nil
 						})
 					Convey("and a filtered file system under test", func() {
 						filteredFS := NewFS(
@@ -89,10 +94,10 @@ func TestSourceFile(t *testing.T) {
 							lo.Map(tc.blacklist, util.Indexed(util.ParseURLMust)),
 						)
 
-						Convey(fmt.Sprintf(`When the open("%s") is called`, tc.file), func() {
+						Convey(fmt.Sprintf(`when the open("%s") is called`, tc.file), func() {
 							result, err := filteredFS.Open(tc.file)
 
-							Convey("Then the result should be as expected", func() {
+							Convey("then the result should be as expected", func() {
 								if util.IsNil(tc.wantError) {
 									So(err, ShouldBeNil)
 
@@ -107,9 +112,42 @@ func TestSourceFile(t *testing.T) {
 								}
 							})
 						})
+
+						Convey(fmt.Sprintf(`when the readFile("%s") is called`, tc.file), func() {
+							result, err := filteredFS.ReadFile(tc.file)
+
+							Convey("Then the result should be as expected", func() {
+								if util.IsNil(tc.wantError) {
+									So(err, ShouldBeNil)
+									So(result, ShouldResemble, content)
+								} else {
+									So(err, ShouldNotBeNil)
+									So(err, ShouldResemble, tc.wantError)
+								}
+							})
+						})
 					})
 				})
 			})
 		}
+	})
+
+	Convey("Given a mocked fs that does not implement ReadFileFS", t, func() {
+		ctrl := gomock.NewController(t)
+		defer ctrl.Finish()
+
+		mockedFS := testutil.NewMockFS(ctrl)
+		Convey("and a filtered file system under test", func() {
+			filteredFS := NewFS(mockedFS, nil, nil)
+
+			Convey("when readFile is called", func() {
+				_, err := filteredFS.ReadFile("file")
+
+				Convey("then an error should be returned", func() {
+					So(err, ShouldNotBeNil)
+					So(err, ShouldEqual, &fs.PathError{Op: "readfile", Path: "file", Err: fs.ErrInvalid})
+				})
+			})
+		})
 	})
 }
