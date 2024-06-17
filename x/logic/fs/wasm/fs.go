@@ -37,7 +37,7 @@ var (
 
 // NewFS creates a new filesystem that can read data from a WASM contract.
 // The URI should be in the format `cosmwasm:{contractName}:{contractAddr}?query={query}`.
-func NewFS(ctx context.Context, wasmKeeper types.WasmKeeper) fs.FS {
+func NewFS(ctx context.Context, wasmKeeper types.WasmKeeper) fs.ReadFileFS {
 	return &vfs{ctx: ctx, wasmKeeper: wasmKeeper}
 }
 
@@ -52,7 +52,7 @@ func (f *vfs) Open(name string) (fs.File, error) {
 }
 
 func (f *vfs) ReadFile(name string) ([]byte, error) {
-	return f.readFile("readFile", name)
+	return f.readFile("readfile", name)
 }
 
 func (f *vfs) readFile(op string, name string) ([]byte, error) {

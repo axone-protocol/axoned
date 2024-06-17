@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"io/fs"
 	"testing"
 
 	dbm "github.com/cosmos/cosmos-db"
@@ -23,7 +24,7 @@ import (
 	"github.com/axone-protocol/axoned/v8/x/logic/testutil"
 )
 
-func TestWasmHandler(t *testing.T) {
+func TestWasmVFS(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
@@ -34,8 +35,9 @@ func TestWasmHandler(t *testing.T) {
 			query           []byte
 			data            []byte
 			uri             string
+			fail            bool
 			wantResult      []byte
-			wantError       error
+			wantError       string
 		}{
 			{
 				contractAddress: contractAddress,
@@ -50,7 +52,7 @@ func TestWasmHandler(t *testing.T) {
 				data:            []byte("Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu"),
 				uri:             `cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
-				wantError:       fmt.Errorf("open cosmwasm:cw-storage:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: failed to unmarshal JSON WASM response to string: invalid character 'Y' looking for beginning of value", contractAddress),
+				wantError:       fmt.Sprintf("cosmwasm:cw-storage:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: failed to unmarshal JSON WASM response to string: invalid character 'Y' looking for beginning of value", contractAddress),
 			},
 			{
 				contractAddress: contractAddress,
@@ -64,7 +66,7 @@ func TestWasmHandler(t *testing.T) {
 				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
 				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
 				uri:             `axone:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				wantError:       fmt.Errorf("open axone:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: invalid scheme, expected 'cosmwasm', got 'axone'", contractAddress),
+				wantError:       fmt.Sprintf("axone:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: invalid scheme, expected 'cosmwasm', got 'axone'", contractAddress),
 			},
 			{
 				contractAddress: contractAddress,
@@ -72,7 +74,7 @@ func TestWasmHandler(t *testing.T) {
 				data:            []byte("\"hey\""),
 				uri:             `cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
-				wantError:       fmt.Errorf("open cosmwasm:cw-storage:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: failed to decode WASM base64 response: illegal base64 data at input byte 0", contractAddress),
+				wantError:       fmt.Sprintf("cosmwasm:cw-storage:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: failed to decode WASM base64 response: illegal base64 data at input byte 0", contractAddress),
 			},
 			{
 				contractAddress: contractAddress,
@@ -80,7 +82,7 @@ func TestWasmHandler(t *testing.T) {
 				data:            []byte("\"hey\""),
 				uri:             `cosmwasm:cw-storage?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
-				wantError:       fmt.Errorf("open cosmwasm:cw-storage?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: failed to convert path 'cw-storage' to contract address: decoding bech32 failed: invalid separator index -1"),
+				wantError:       fmt.Sprintf("cosmwasm:cw-storage?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: failed to convert path 'cw-storage' to contract address: decoding bech32 failed: invalid separator index -1"),
 			},
 			{
 				contractAddress: contractAddress,
@@ -88,7 +90,7 @@ func TestWasmHandler(t *testing.T) {
 				data:            []byte("\"hey\""),
 				uri:             `cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?wasm=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
-				wantError:       fmt.Errorf("open cosmwasm:cw-storage:%s?wasm=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: uri should contains `query` params", contractAddress),
+				wantError:       fmt.Sprintf("cosmwasm:cw-storage:%s?wasm=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: uri should contains `query` params", contractAddress),
 			},
 			{
 				contractAddress: contractAddress,
@@ -96,7 +98,7 @@ func TestWasmHandler(t *testing.T) {
 				data:            []byte("\"hey\""),
 				uri:             `cosmwasm:?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
-				wantError:       fmt.Errorf("open cosmwasm:?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: emtpy path given, should be 'cosmwasm:{contractName}:{contractAddr}?query={query}'"),
+				wantError:       fmt.Sprintf("cosmwasm:?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: emtpy path given, should be 'cosmwasm:{contractName}:{contractAddr}?query={query}'"),
 			},
 			{
 				contractAddress: contractAddress,
@@ -118,7 +120,23 @@ func TestWasmHandler(t *testing.T) {
 				data:            []byte("\"hey\""),
 				uri:             `cosmwasm:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=foo`,
 				wantResult:      []byte("\"\""),
-				wantError:       fmt.Errorf(`open cosmwasm:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D&base64Decode=foo: failed to convert 'base64Decode' query value to boolean: strconv.ParseBool: parsing "foo": invalid syntax`, contractAddress),
+				wantError:       fmt.Sprintf(`cosmwasm:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D&base64Decode=foo: failed to convert 'base64Decode' query value to boolean: strconv.ParseBool: parsing "foo": invalid syntax`, contractAddress),
+			},
+			{
+				contractAddress: contractAddress,
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("\"hey\""),
+				uri:             `% %`,
+				wantResult:      []byte("\"\""),
+				wantError:       "% %: invalid argument",
+			},
+			{
+				contractAddress: contractAddress,
+				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
+				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
+				uri:             `cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
+				fail:            true,
+				wantError:       "cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D: failed to query WASM contract axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk: failed to query smart contract",
 			},
 		}
 		for nc, tc := range cases {
@@ -134,23 +152,38 @@ func TestWasmHandler(t *testing.T) {
 					wasmKeeper.EXPECT().
 						QuerySmart(ctx, sdk.MustAccAddressFromBech32(tc.contractAddress), tc.query).
 						AnyTimes().
-						Return(tc.data, nil)
+						DoAndReturn(func(_, _, _ interface{}) ([]byte, error) {
+							if tc.fail {
+								return nil, errors.New("failed to query smart contract")
+							}
 
-					Convey("and wasm handler", func() {
-						handler := NewFS(ctx, wasmKeeper)
+							return tc.data, nil
+						})
 
-						Convey("When ask handler if it can open uri", func() {
-							file, err := handler.Open(tc.uri)
+					Convey("and a wasm file system under test", func() {
+						vfs := NewFS(ctx, wasmKeeper)
 
-							Convey("Then handler response should be as expected", func() {
-								if tc.wantError != nil {
+						Convey(fmt.Sprintf(`when the open("%s") is called`, tc.uri), func() {
+							file, err := vfs.Open(tc.uri)
+
+							Convey("then the result should be as expected", func() {
+								if tc.wantError != "" {
 									So(err, ShouldNotBeNil)
-									So(err.Error(), ShouldEqual, tc.wantError.Error())
+									So(err.Error(), ShouldEqual, fmt.Sprintf("open %s", tc.wantError))
 								} else {
 									So(err, ShouldBeNil)
 
 									defer file.Close()
-									info, _ := file.Stat()
+									info, err := file.Stat()
+									So(err, ShouldBeNil)
+
+									So(info.Name(), ShouldEqual, tc.uri)
+									So(info.Size(), ShouldEqual, int64(len(tc.wantResult)))
+									So(info.ModTime(), ShouldEqual, ctx.BlockTime())
+									So(info.IsDir(), ShouldBeFalse)
+									So(info.Mode(), ShouldEqual, fs.ModeIrregular)
+									So(info.Sys(), ShouldBeNil)
+
 									data := make([]byte, info.Size())
 									for {
 										_, err := file.Read(data)
@@ -162,6 +195,20 @@ func TestWasmHandler(t *testing.T) {
 
 									So(data, ShouldResemble, tc.wantResult)
 								}
+							})
+
+							Convey(fmt.Sprintf(`when the readFile("%s") is called`, tc.uri), func() {
+								result, err := vfs.ReadFile(tc.uri)
+
+								Convey("then the result should be as expected", func() {
+									if tc.wantError != "" {
+										So(err, ShouldNotBeNil)
+										So(err.Error(), ShouldEqual, fmt.Sprintf("readfile %s", tc.wantError))
+									} else {
+										So(err, ShouldBeNil)
+										So(result, ShouldResemble, tc.wantResult)
+									}
+								})
 							})
 						})
 					})
