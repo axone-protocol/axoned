@@ -25,7 +25,7 @@ where:
 
 This scenario demonstrates how to retrieve the block height of the current block.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** a block with the following header:
 
@@ -59,7 +59,7 @@ answer:
 This scenario demonstrates how to check that the block height is greater than 100. This predicate is useful for
 governance which requires a certain block height to be reached before a certain action is taken.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** a block with the following header:
 

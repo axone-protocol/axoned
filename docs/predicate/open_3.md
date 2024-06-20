@@ -32,7 +32,7 @@ purposes and obtaining the stream's properties.
 
 See the `open/4` predicate for a more detailed example.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
 
