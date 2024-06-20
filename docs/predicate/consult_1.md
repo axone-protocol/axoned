@@ -30,7 +30,7 @@ This scenario demonstrates how to consult (load) a Prolog program from a CosmWas
 Assuming the existence of a CosmWasm smart contract configured to store a Prolog program, we construct a URI to specifically
 identify this smart contract and pinpoint the Prolog program we want to consult via a query message.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
 
@@ -84,7 +84,7 @@ Note that the `:- multifile/1` directive is employed to enable a single predicat
 In the absence of this directive, encountering a new definition would lead the compiler to overwrite the existing
 predicate definition.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
 
@@ -146,7 +146,7 @@ answer:
 
 This scenario demonstrates the consultation of several Prolog programs from different CosmWasm smart contracts.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
 

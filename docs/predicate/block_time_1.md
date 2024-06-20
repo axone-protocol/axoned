@@ -25,7 +25,7 @@ where:
 
 This scenario demonstrates how to retrieve the block time of the current block.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** a block with the following header:
 
@@ -60,7 +60,7 @@ This scenario demonstrates how to check that the block time is greater than 1709
 using the `block_time/1` predicate. This predicate is useful for governance which requires a certain block time to be
 reached before a certain action is taken.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** a block with the following header:
 

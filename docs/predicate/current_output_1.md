@@ -30,7 +30,7 @@ The outcome of the stream's content throughout the execution of a query is provi
 This scenario demonstrates how to write a character to the current output, and get the content in the response of the
 request.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the module configuration:
 
@@ -76,7 +76,7 @@ user_output: |
 This scenario demonstrates how to write some characters to the current output, and get the content in the response of the
 request. This is helpful for debugging purposes.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the module configuration:
 
@@ -124,7 +124,7 @@ user_output: |
 This scenario demonstrates the process of writing characters to the current user output, with a limit configured
 in the logic module. So if the message is longer than this limit, the output will be truncated.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the module configuration:
 
@@ -172,7 +172,7 @@ Characters such as emojis require more space; for example, the wizard emoji (ðŸ§
 as four units. As a result, the limit is reached more quickly with these characters, which means that the number of
 characters in the user output is less than expected.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the module configuration:
 

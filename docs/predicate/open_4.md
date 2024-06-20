@@ -57,7 +57,7 @@ purposes and obtaining the stream's properties.
 Assuming the existence of a CosmWasm smart contract configured to store resources, we construct a URI to specifically
 identify the smart contract and pinpoint the resource we aim to retrieve via a query message.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
 
@@ -117,7 +117,7 @@ and read its content.
 
 The resource is opened for reading, and the content is read into a list of characters. Finally, the stream is closed.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
 
@@ -167,7 +167,7 @@ answer:
 This scenario is a variation of the previous one. The difference is that the smart contract returns a base64-encoded
 response. For this reason, we set the `base64Decode` parameter to `true` in the query (the default value is `false`).
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
 
@@ -216,7 +216,7 @@ answer:
 
 This scenario demonstrates the system's response to trying to open a non-existing resource.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the query:
 
@@ -242,7 +242,7 @@ answer:
 This scenario demonstrates the system's response to opening a resource for writing, but the resource does not allow
 writing. This is the case for resources hosted in smart contracts which are read-only.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the query:
 
@@ -268,7 +268,7 @@ answer:
 This scenario demonstrates the system's response to opening a resource for appending, but the resource does not allow
 appending. This is the case for resources hosted in smart contracts which are read-only.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the query:
 
@@ -293,7 +293,7 @@ answer:
 
 This scenario demonstrates the system's response to opening a resource with incorrect options.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the query:
 

@@ -30,7 +30,7 @@ An `Address` is a compound term `-` with two arguments, the first being the huma
 being the numeric address as a list of integers ranging from 0 to 255 representing the bytes of the address in
 base 64.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the query:
 
@@ -59,7 +59,7 @@ This scenario illustrates how to decode a bech32 address into the human-readable
 The process extracts these components from a given bech32 address string, showcasing the ability to parse and
 separate the address into its constituent parts.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the query:
 
@@ -89,7 +89,7 @@ answer:
 This scenario demonstrates how to extract the address from a bech32 address string, specifically for a known
 protocol, in this case, the axone protocol.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the query:
 
@@ -116,7 +116,7 @@ answer:
 
 This scenario demonstrates how to encode an `Address` pair representation into a bech32 address string.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the query:
 
@@ -143,7 +143,7 @@ answer:
 
 This scenario shows how to check if a bech32 address is part of the axone protocol.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the program:
 
@@ -175,7 +175,7 @@ This scenario demonstrates the system's response to an incorrect bech32 address 
 In this case, the system generates a `domain_error`, indicating that the provided argument does not meet the
 expected format for a bech32 address.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the query:
 
@@ -202,7 +202,7 @@ This scenario demonstrates the system's response to an incorrect bech32 address 
 In this case, the system generates a `type_error`, indicating that the provided argument does not meet the
 expected type.
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 
 - **Given** the query:
 

@@ -23,7 +23,7 @@ sidebar_position: {{ index (index globalCtx "frontmatter") "sidebar_position" }}
 {{- spacer -}}
 {{ .Scenario.Description | dedent }}
 
-Here's the steps of the scenario:
+Here are the steps of the scenario:
 {{- spacer -}}
 {{- range .Scenario.Steps }}
 - **{{ .Keyword | trim }}** {{ .Text }}
