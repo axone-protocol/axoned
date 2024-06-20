@@ -32,7 +32,8 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/axone-protocol/axoned/v8/x/logic"
-	logicfs "github.com/axone-protocol/axoned/v8/x/logic/fs"
+	"github.com/axone-protocol/axoned/v8/x/logic/fs/composite"
+	"github.com/axone-protocol/axoned/v8/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v8/x/logic/keeper"
 	logictestutil "github.com/axone-protocol/axoned/v8/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v8/x/logic/types"
@@ -296,8 +297,10 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		tc.accountKeeper,
 		tc.bankKeeper,
 		func(ctx context.Context) fs.FS {
-			wasmHandler := logicfs.NewWasmHandler(tc.wasmKeeper)
-			return logicfs.NewVirtualFS(ctx, []logicfs.URIHandler{wasmHandler})
+			vfs := composite.NewFS()
+			vfs.Mount(wasm.Scheme, wasm.NewFS(ctx, tc.wasmKeeper))
+
+			return vfs
 		},
 	)
 

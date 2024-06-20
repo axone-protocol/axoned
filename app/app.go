@@ -139,7 +139,8 @@ import (
 	axonewasm "github.com/axone-protocol/axoned/v8/app/wasm"
 	"github.com/axone-protocol/axoned/v8/docs"
 	logicmodule "github.com/axone-protocol/axoned/v8/x/logic"
-	logicfs "github.com/axone-protocol/axoned/v8/x/logic/fs"
+	"github.com/axone-protocol/axoned/v8/x/logic/fs/composite"
+	wasm2 "github.com/axone-protocol/axoned/v8/x/logic/fs/wasm"
 	logicmodulekeeper "github.com/axone-protocol/axoned/v8/x/logic/keeper"
 	logicmoduletypes "github.com/axone-protocol/axoned/v8/x/logic/types"
 	"github.com/axone-protocol/axoned/v8/x/mint"
@@ -1161,6 +1162,9 @@ func (app *App) SimulationManager() *module.SimulationManager {
 // provideFS is used to provide the virtual file system used for the logic module
 // to load external file.
 func (app *App) provideFS(ctx context.Context) fs.FS {
-	wasmHandler := logicfs.NewWasmHandler(app.WasmKeeper)
-	return logicfs.NewVirtualFS(ctx, []logicfs.URIHandler{wasmHandler})
+	vfs := composite.NewFS()
+
+	vfs.Mount(wasm2.Scheme, wasm2.NewFS(ctx, app.WasmKeeper))
+
+	return vfs
 }
