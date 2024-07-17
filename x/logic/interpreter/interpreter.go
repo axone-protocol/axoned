@@ -72,13 +72,13 @@ func WithFS(fs fs.FS) Option {
 func New(
 	opts ...Option,
 ) (*prolog.Interpreter, error) {
-	var i prolog.Interpreter
+	i := prolog.NewEmpty()
 
 	for _, opt := range opts {
-		if err := opt(&i); err != nil {
+		if err := opt(i); err != nil {
 			return nil, err
 		}
 	}
 
-	return &i, nil
+	return i, nil
 }
