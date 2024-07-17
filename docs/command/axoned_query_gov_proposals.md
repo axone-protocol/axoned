@@ -11,7 +11,7 @@ axoned query gov proposals [flags]
 ```
 axoned query gov proposals --depositor cosmos1...
 axoned query gov proposals --voter cosmos1...
-axoned query gov proposals --proposal-status (PROPOSAL_STATUS_DEPOSIT_PERIOD|PROPOSAL_STATUS_VOTING_PERIOD|PROPOSAL_STATUS_PASSED|PROPOSAL_STATUS_REJECTED|PROPOSAL_STATUS_FAILED)
+axoned query gov proposals --proposal-status (unspecified | deposit-period | voting-period | passed | rejected | failed)
 ```
 
 ### Options
