@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"fmt"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"io"
 	"math"
 	"strings"
@@ -107,12 +108,12 @@ func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, fmt.St
 
 			defer func() {
 				if r := recover(); r != nil {
-					if gasError, ok := r.(storetypes.ErrorOutOfGas); ok {
-						err = engine.ResourceError(prolog2.ResourceGas(gasError.Descriptor, gasMeter.GasConsumed(), gasMeter.Limit()), env)
-						return
+					switch rType := r.(type) {
+					case storetypes.ErrorOutOfGas:
+						err = errorsmod.Wrapf(sdkerrors.ErrOutOfGas, "out of gas in location: %v", rType.Descriptor)
+					default:
+						panic(r)
 					}
-
-					panic(r)
 				}
 			}()
 

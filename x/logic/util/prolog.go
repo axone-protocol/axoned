@@ -2,6 +2,10 @@ package util
 
 import (
 	"context"
+	errorsmod "cosmossdk.io/errors"
+	"errors"
+	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"strings"
 
 	"github.com/ichiban/prolog"
@@ -48,6 +52,12 @@ func QueryInterpreter(
 	if callErr != nil {
 		if sdkmath.NewUint(uint64(len(results))).LT(solutionsLimit) {
 			// error is not part of the look-ahead and should be included in the solutions
+			if errors.Is(callErr, sdkerrors.ErrOutOfGas) {
+				return nil, callErr
+			} else if sdk.UnwrapSDKContext(ctx).GasMeter().IsOutOfGas() {
+				return nil, errorsmod.Wrapf(sdkerrors.ErrOutOfGas, "out of gas in location: %v", callErr.Error())
+			}
+
 			results = append(results, types.Result{Error: callErr.Error()})
 		} else {
 			// error is part of the look-ahead, so let's consider that there's one more solution
