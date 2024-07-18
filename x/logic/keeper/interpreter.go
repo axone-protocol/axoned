@@ -3,7 +3,6 @@ package keeper
 import (
 	"context"
 	"fmt"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	"io"
 	"math"
 	"strings"
@@ -17,6 +16,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/axone-protocol/axoned/v8/x/logic/fs/filtered"
 	"github.com/axone-protocol/axoned/v8/x/logic/interpreter"
