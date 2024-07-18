@@ -606,7 +606,7 @@ func New(
 		app.GRPCQueryRouter(),
 		wasmDir,
 		wasmConfig,
-		axonewasm.AllCapabilities(),
+		wasmkeeper.BuiltInCapabilities(),
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 		wasmOpts...,
 	)
