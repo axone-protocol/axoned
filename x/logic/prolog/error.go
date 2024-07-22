@@ -2,8 +2,6 @@ package prolog
 
 import (
 	"github.com/ichiban/prolog/engine"
-
-	"cosmossdk.io/store/types"
 )
 
 var (
@@ -82,8 +80,6 @@ var (
 	// The module resource is the representation of the module with which the interaction is made.
 	// The module resource is denoted as a compound with the name of the module.
 	AtomResourceModule = engine.NewAtom("resource_module")
-	// AtomResourceGas is the atom denoting the "gas" resource.
-	AtomResourceGas = engine.NewAtom("gas")
 )
 
 // ResourceContext returns a term representing the context resource.
@@ -94,12 +90,6 @@ func ResourceContext() engine.Term {
 // ResourceModule returns a term representing the module resource with the given name.
 func ResourceModule(module string) engine.Term {
 	return AtomResourceModule.Apply(engine.NewAtom(module))
-}
-
-// ResourceGas returns a term representing the gas resource with the given descriptor, consumed and limit at the
-// given context.
-func ResourceGas(descriptor string, consumed types.Gas, limit types.Gas) engine.Term {
-	return AtomResourceGas.Apply(engine.NewAtom(descriptor), engine.Integer(int64(consumed)), engine.Integer(int64(limit)))
 }
 
 var (

@@ -66,7 +66,7 @@ func (k Keeper) execute(
 
 	answer, err := k.queryInterpreter(ctx, i, query, sdkmath.MinUint(solutionsLimit, *limits.MaxResultCount))
 	if err != nil {
-		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
+		return nil, err
 	}
 
 	return &types.QueryServiceAskResponse{
@@ -107,17 +107,17 @@ func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, fmt.St
 
 			defer func() {
 				if r := recover(); r != nil {
-					if gasError, ok := r.(storetypes.ErrorOutOfGas); ok {
-						err = engine.ResourceError(prolog2.ResourceGas(gasError.Descriptor, gasMeter.GasConsumed(), gasMeter.Limit()), env)
-						return
+					switch rType := r.(type) {
+					case storetypes.ErrorOutOfGas:
+						err = errorsmod.Wrapf(
+							types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
+							types.ModuleName, rType.Descriptor, sdkctx.GasMeter().GasConsumed(), sdkctx.GasMeter().Limit())
+					default:
+						panic(r)
 					}
-
-					panic(r)
 				}
 			}()
-
 			gasMeter.ConsumeGas(cost, predicate)
-
 			return err
 		}
 	}
