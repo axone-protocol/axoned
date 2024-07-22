@@ -13,7 +13,6 @@ import (
 	sdkmath "cosmossdk.io/math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/axone-protocol/axoned/v8/x/logic/types"
 )
@@ -29,7 +28,7 @@ func QueryInterpreter(
 	p := engine.NewParser(&i.VM, strings.NewReader(query))
 	t, err := p.Term()
 	if err != nil {
-		return nil, err
+		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
 	}
 
 	var env *engine.Env
@@ -47,17 +46,21 @@ func QueryInterpreter(
 
 	results, err := envsToResults(envs, p.Vars, i)
 	if err != nil {
-		return nil, err
+		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
 	}
 
 	if callErr != nil {
 		if sdkmath.NewUint(uint64(len(results))).LT(solutionsLimit) {
 			// error is not part of the look-ahead and should be included in the solutions
+			sdkCtx := sdk.UnwrapSDKContext(ctx)
+
 			switch {
-			case errors.Is(callErr, sdkerrors.ErrOutOfGas):
+			case errors.Is(callErr, types.LimitExceeded):
 				return nil, callErr
-			case sdk.UnwrapSDKContext(ctx).GasMeter().IsOutOfGas():
-				return nil, errorsmod.Wrapf(sdkerrors.ErrOutOfGas, "out of gas in location: %v", callErr.Error())
+			case sdkCtx.GasMeter().IsOutOfGas():
+				return nil, errorsmod.Wrapf(
+					types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
+					types.ModuleName, callErr.Error(), sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
 			default:
 				results = append(results, types.Result{Error: callErr.Error()})
 			}

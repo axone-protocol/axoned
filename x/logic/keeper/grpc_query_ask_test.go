@@ -142,7 +142,7 @@ func TestGRPCAsk(t *testing.T) {
 			{
 				query:         "bank_balances(X, Y).",
 				maxGas:        3000,
-				expectedError: "error executing query: out of gas in location: panic: {ValuePerByte}: out of gas: invalid argument",
+				expectedError: "out of gas: logic <panic: {ValuePerByte}> (4204/3000): limit exceeded",
 			},
 			{
 				query:  "block_height(X).",
@@ -150,7 +150,7 @@ func TestGRPCAsk(t *testing.T) {
 				predicateCosts: map[string]uint64{
 					"block_height/1": 10000,
 				},
-				expectedError: "error executing query: out of gas in location: block_height/1: out of gas: invalid argument",
+				expectedError: "out of gas: logic <block_height/1> (12353/3000): limit exceeded",
 			},
 			{
 				program: "father(bob, 'élodie').",

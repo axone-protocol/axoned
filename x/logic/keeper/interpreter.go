@@ -16,7 +16,6 @@ import (
 	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 
 	"github.com/axone-protocol/axoned/v8/x/logic/fs/filtered"
 	"github.com/axone-protocol/axoned/v8/x/logic/interpreter"
@@ -67,7 +66,7 @@ func (k Keeper) execute(
 
 	answer, err := k.queryInterpreter(ctx, i, query, sdkmath.MinUint(solutionsLimit, *limits.MaxResultCount))
 	if err != nil {
-		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
+		return nil, err
 	}
 
 	return &types.QueryServiceAskResponse{
@@ -110,15 +109,15 @@ func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, fmt.St
 				if r := recover(); r != nil {
 					switch rType := r.(type) {
 					case storetypes.ErrorOutOfGas:
-						err = errorsmod.Wrapf(sdkerrors.ErrOutOfGas, "out of gas in location: %v", rType.Descriptor)
+						err = errorsmod.Wrapf(
+							types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
+							types.ModuleName, rType.Descriptor, sdkctx.GasMeter().GasConsumed(), sdkctx.GasMeter().Limit())
 					default:
 						panic(r)
 					}
 				}
 			}()
-
 			gasMeter.ConsumeGas(cost, predicate)
-
 			return err
 		}
 	}
