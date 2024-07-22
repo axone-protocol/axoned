@@ -14,10 +14,10 @@ axoned query wait-tx [hash] [flags]
 
 ```
 By providing the transaction hash:
-$ axonedd q wait-tx [hash]
+$ axoned q wait-tx [hash]
 
 Or, by piping a "tx" command:
-$ axonedd tx [flags] | axonedd q wait-tx
+$ axoned tx [flags] | axoned q wait-tx
 
 ```
 
