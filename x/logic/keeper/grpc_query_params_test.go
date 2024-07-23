@@ -43,6 +43,7 @@ func TestGRPCParams(t *testing.T) {
 						types.WithMaxSize(math.NewUint(2)),
 						types.WithMaxResultCount(math.NewUint(3)),
 						types.WithMaxUserOutputSize(math.NewUint(4)),
+						types.WithMaxVariables(math.NewUint(5)),
 					),
 				),
 			},
