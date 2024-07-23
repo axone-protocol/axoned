@@ -133,6 +133,7 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
 		interpreter.WithFS(filtered.NewFS(k.fsProvider(ctx), whitelistUrls, blacklistUrls)),
 		interpreter.WithUserOutputWriter(userOutputBuffer),
+		interpreter.WithMaxVariables(limits.MaxVariables),
 	}
 
 	i, err := interpreter.New(options...)

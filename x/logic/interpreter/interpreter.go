@@ -2,6 +2,7 @@ package interpreter
 
 import (
 	goctx "context"
+	"cosmossdk.io/math"
 	"fmt"
 	"io"
 	"io/fs"
@@ -64,6 +65,17 @@ func WithUserOutputWriter(w io.Writer) Option {
 func WithFS(fs fs.FS) Option {
 	return func(i *prolog.Interpreter) error {
 		i.FS = fs
+		return nil
+	}
+}
+
+func WithMaxVariables(maxVariables *math.Uint) Option {
+	return func(i *prolog.Interpreter) error {
+		if maxVariables != nil {
+			i.SetMaxVariables(maxVariables.Uint64())
+		} else {
+			i.SetMaxVariables(0)
+		}
 		return nil
 	}
 }

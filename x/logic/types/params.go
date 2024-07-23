@@ -17,6 +17,7 @@ var (
 	DefaultPredicatesBlacklist = make([]string, 0)
 	DefaultMaxSize             = math.NewUint(uint64(5000))
 	DefaultMaxResultCount      = math.NewUint(uint64(1))
+	DefaultMaxVariables        = math.NewUint(uint64(100000))
 )
 
 // NewParams creates a new Params object.
@@ -146,6 +147,13 @@ func WithMaxUserOutputSize(maxUserOutputSize math.Uint) LimitsOption {
 	}
 }
 
+// WithMaxVariables sets the maximum number of variables that can be created by the interpreter.
+func WithMaxVariables(maxVariables math.Uint) LimitsOption {
+	return func(i *Limits) {
+		i.MaxVariables = &maxVariables
+	}
+}
+
 // NewLimits creates a new Limits object.
 func NewLimits(opts ...LimitsOption) Limits {
 	l := Limits{}
@@ -159,6 +167,10 @@ func NewLimits(opts ...LimitsOption) Limits {
 
 	if l.MaxResultCount == nil {
 		l.MaxResultCount = &DefaultMaxResultCount
+	}
+
+	if l.MaxVariables == nil {
+		l.MaxVariables = &DefaultMaxVariables
 	}
 
 	return l
