@@ -38,7 +38,7 @@ axoned tx interchain-accounts controller register [connection-id] [flags]
       --node string              <host>:<port> to CometBFT rpc interface for this chain (default "tcp://localhost:26657")
       --note string              Note to add a description to the transaction (previously --memo)
       --offline                  Offline mode (does not allow any online functionality)
-      --ordering string          Channel ordering, can be one of: ORDER_ORDERED, ORDER_UNORDERED (default "ORDER_ORDERED")
+      --ordering string          Channel ordering, can be one of: ORDER_ORDERED, ORDER_UNORDERED (default "ORDER_UNORDERED")
   -o, --output string            Output format (text|json) (default "json")
   -s, --sequence uint            The sequence number of the signing account (offline mode only)
       --sign-mode string         Choose sign mode (direct|amino-json|direct-aux|textual), this is an advanced feature
