@@ -488,7 +488,7 @@ func New(
 
 	app.GovKeeper = *govKeeper.SetHooks(
 		govtypes.NewMultiGovHooks(
-			// register the governance hooks
+		// register the governance hooks
 		),
 	)
 
@@ -873,17 +873,8 @@ func New(
 	app.setPostHandler()
 
 	// At startup, after all modules have been registered, check that all proto
-	// annotations are correct, ignoring `google.crypto.tink`.
-	fds, err := proto.MergedGlobalFileDescriptors()
-	if err != nil {
-		panic(err)
-	}
-	fds = &descriptorpb.FileDescriptorSet{
-		File: slices.DeleteFunc(fds.File, func(e *descriptorpb.FileDescriptorProto) bool {
-			return e.GetPackage() == "google.crypto.tink"
-		}),
-	}
-	protoFiles, err := protodesc.NewFiles(fds)
+	// annotations are correct.
+	protoFiles, err := proto.MergedRegistry()
 	if err != nil {
 		panic(err)
 	}
