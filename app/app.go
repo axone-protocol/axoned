@@ -628,7 +628,12 @@ func New(
 	var noAuthzModule ibcporttypes.IBCModule
 	icaControllerStack = icacontroller.NewIBCMiddleware(noAuthzModule, app.ICAControllerKeeper)
 	icaControllerStack = icacontroller.NewIBCMiddleware(icaControllerStack, app.ICAControllerKeeper)
-	icaControllerStack = ibccallbacks.NewIBCMiddleware(icaControllerStack, app.IBCFeeKeeper, wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas)
+	icaControllerStack = ibccallbacks.NewIBCMiddleware(
+		icaControllerStack,
+		app.IBCFeeKeeper,
+		wasmStackIBCHandler,
+		wasm.DefaultMaxIBCCallbackGas,
+	)
 	icaICS4Wrapper := icaControllerStack.(ibcporttypes.ICS4Wrapper)
 	icaControllerStack = ibcfee.NewIBCMiddleware(icaControllerStack, app.IBCFeeKeeper)
 
