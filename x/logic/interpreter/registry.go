@@ -2,12 +2,13 @@ package interpreter
 
 import (
 	"fmt"
-	orderedmap "github.com/wk8/go-ordered-map/v2"
 	"strconv"
 	"strings"
 
+	orderedmap "github.com/wk8/go-ordered-map/v2"
+
 	"github.com/ichiban/prolog"
-	engine "github.com/ichiban/prolog/engine"
+	"github.com/ichiban/prolog/engine"
 
 	"github.com/axone-protocol/axoned/v8/x/logic/predicate"
 )
