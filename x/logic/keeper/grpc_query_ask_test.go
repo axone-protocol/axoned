@@ -141,16 +141,16 @@ func TestGRPCAsk(t *testing.T) {
 			},
 			{
 				query:         "bank_balances(X, Y).",
-				maxGas:        3000,
-				expectedError: "out of gas: logic <panic: {ValuePerByte}> (4204/3000): limit exceeded",
+				maxGas:        3500,
+				expectedError: "out of gas: logic <panic: {ValuePerByte}> (5243/3500): limit exceeded",
 			},
 			{
 				query:  "block_height(X).",
-				maxGas: 3000,
+				maxGas: 3500,
 				predicateCosts: map[string]uint64{
 					"block_height/1": 10000,
 				},
-				expectedError: "out of gas: logic <block_height/1> (12353/3000): limit exceeded",
+				expectedError: "out of gas: logic <block_height/1> (13467/3500): limit exceeded",
 			},
 			{
 				program: "father(bob, 'élodie').",
@@ -351,10 +351,6 @@ foo(a4).
 					if tc.predicateBlacklist != nil {
 						params.Interpreter.PredicatesFilter.Blacklist = tc.predicateBlacklist
 					}
-					if tc.maxGas != 0 {
-						maxGas := sdkmath.NewUint(tc.maxGas)
-						params.Limits.MaxGas = &maxGas
-					}
 					if tc.predicateCosts != nil {
 						predicateCosts := make([]types.PredicateCost, 0, len(tc.predicateCosts))
 						for predicate, cost := range tc.predicateCosts {
@@ -369,6 +365,12 @@ foo(a4).
 					err := logicKeeper.SetParams(testCtx.Ctx, params)
 
 					So(err, ShouldBeNil)
+
+					if tc.maxGas != 0 {
+						testCtx.Ctx = testCtx.Ctx.WithGasMeter(storetypes.NewGasMeter(tc.maxGas))
+					} else {
+						testCtx.Ctx = testCtx.Ctx.WithGasMeter(storetypes.NewInfiniteGasMeter())
+					}
 
 					Convey("and given a query with program and query to grpc", func() {
 						queryHelper := baseapp.NewQueryServerTestHelper(testCtx.Ctx, encCfg.InterfaceRegistry)
