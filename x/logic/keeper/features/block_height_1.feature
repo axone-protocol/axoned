@@ -16,7 +16,7 @@ Feature: block_height/1
     Then the answer we get is:
       """ yaml
       height: 100
-      gas_used: 6032
+      gas_used: 3876
       answer:
         has_more: false
         variables: ["Height"]
@@ -43,7 +43,7 @@ Feature: block_height/1
     Then the answer we get is:
       """ yaml
       height: 101
-      gas_used: 6033
+      gas_used: 3877
       answer:
         has_more: false
         variables: ["Height"]

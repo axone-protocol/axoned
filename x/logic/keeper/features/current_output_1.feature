@@ -28,7 +28,7 @@ Feature: current_output/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6150
+      gas_used: 3976
       answer:
         has_more: false
         variables:
@@ -66,7 +66,7 @@ Feature: current_output/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6190
+      gas_used: 4010
       answer:
         has_more: false
         variables:
@@ -104,7 +104,7 @@ Feature: current_output/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6150
+      gas_used: 3976
       answer:
         has_more: false
         variables:
@@ -145,7 +145,7 @@ Feature: current_output/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6164
+      gas_used: 3990
       answer:
         has_more: false
         variables:
@@ -176,7 +176,7 @@ Feature: current_output/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6417
+      gas_used: 4261
       answer:
         has_more: false
         variables:

@@ -2,7 +2,7 @@ package keeper
 
 import (
 	goctx "context"
-
+	"math"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -37,16 +37,33 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 		}
 	}()
 
-	limits := k.limits(ctx)
-	if err := checkLimits(req, limits); err != nil {
+	params := k.GetParams(sdkCtx)
+	if err := checkLimits(req, params.Limits); err != nil {
 		return nil, err
 	}
 
 	return k.execute(
 		sdkCtx,
+		params,
 		req.Program,
 		req.Query,
 		util.DerefOrDefault(req.Limit, defaultSolutionsLimit))
+}
+
+func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) error {
+	size := sdkmath.NewUint(uint64(len(request.GetQuery())))
+	maxSize := util.DerefOrDefault(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
+	if size.GT(maxSize) {
+		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size.Uint64(), maxSize.Uint64())
+	}
+
+	resultCount := util.DerefOrDefault(request.Limit, defaultSolutionsLimit)
+	maxResultCount := util.DerefOrDefault(limits.MaxResultCount, sdkmath.NewUint(math.MaxInt64))
+	if resultCount.GT(maxResultCount) {
+		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxResultCount: %d", resultCount.Uint64(), maxResultCount.Uint64())
+	}
+
+	return nil
 }
 
 // withSafeGasMeter returns a new context with a gas meter that has the given limit.
