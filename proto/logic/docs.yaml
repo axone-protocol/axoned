@@ -180,7 +180,7 @@ description: |
 
   - `max_size`: the maximum size of the program that can be evaluated.
   - `max_result_count`: the maximum number of results that can be returned by a query.
-  
+
   The existing `query-gas-limit` configuration present in the `app.toml` can be used to constraint gas usage when not used
   in the context of a transaction.
 
