@@ -12,6 +12,8 @@ import (
 	"github.com/spf13/cobra"
 	"github.com/spf13/pflag"
 	"github.com/spf13/viper"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 
 	cmtcfg "github.com/cometbft/cometbft/config"
 
@@ -50,6 +52,8 @@ import (
 //
 //nolint:funlen
 func NewRootCmd() *cobra.Command {
+	sanitizeProtoRegistry()
+
 	// Set config
 	initSDKConfig()
 
@@ -407,4 +411,20 @@ var tempDir = func() string {
 	defer os.RemoveAll(dir)
 
 	return dir
+}
+
+// sanitizeProtoRegistry removes all the unused proto definitions from the global registry to avoid surprises as the
+// cosmos sdk rely on it.
+func sanitizeProtoRegistry() {
+	safeRegistry := new(protoregistry.Files)
+	protoregistry.GlobalFiles.RangeFiles(func(d protoreflect.FileDescriptor) bool {
+		if d.FullName() != "google.crypto.tink" {
+			if err := safeRegistry.RegisterFile(d); err != nil {
+				panic(err)
+			}
+		}
+		return true
+	})
+
+	protoregistry.GlobalFiles = safeRegistry
 }
