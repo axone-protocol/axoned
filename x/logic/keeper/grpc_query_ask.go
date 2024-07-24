@@ -3,6 +3,7 @@ package keeper
 import (
 	goctx "context"
 
+
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
@@ -17,18 +18,11 @@ import (
 var defaultSolutionsLimit = sdkmath.OneUint()
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-
 	if req == nil {
 		return nil, errorsmod.Wrap(types.InvalidArgument, "request is nil")
 	}
 
-	limits := k.limits(ctx)
-	if err := checkLimits(req, limits); err != nil {
-		return nil, err
-	}
-
-	sdkCtx = withGasMeter(sdkCtx, limits)
+	sdkCtx := withSafeGasMeter(sdk.UnwrapSDKContext(ctx))
 	defer func() {
 		if r := recover(); r != nil {
 			if gasError, ok := r.(storetypes.ErrorOutOfGas); ok {
@@ -42,7 +36,11 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 			panic(r)
 		}
 	}()
-	sdkCtx.GasMeter().ConsumeGas(sdkCtx.GasMeter().GasConsumed(), types.ModuleName)
+
+	limits := k.limits(ctx)
+	if err := checkLimits(req, limits); err != nil {
+		return nil, err
+	}
 
 	return k.execute(
 		sdkCtx,
@@ -51,10 +49,10 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 		util.DerefOrDefault(req.Limit, defaultSolutionsLimit))
 }
 
-// withGasMeter returns a new context with a gas meter that has the given limit.
+// withSafeGasMeter returns a new context with a gas meter that has the given limit.
 // The gas meter is go-router-safe.
-func withGasMeter(sdkCtx sdk.Context, limits types.Limits) sdk.Context {
-	gasMeter := meter.WithSafeMeter(storetypes.NewGasMeter(limits.MaxGas.Uint64()))
+func withSafeGasMeter(sdkCtx sdk.Context) sdk.Context {
+	gasMeter := meter.WithSafeMeter(sdkCtx.GasMeter())
 
 	return sdkCtx.WithGasMeter(gasMeter)
 }

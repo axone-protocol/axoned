@@ -9,16 +9,12 @@ import (
 
 // Parameter store keys.
 var (
-	ParamsKey      = []byte("Params")
-	KeyInterpreter = []byte("Interpreter")
-	KeyLimits      = []byte("Limits")
+	ParamsKey = []byte("Params")
 )
 
 var (
 	DefaultPredicatesWhitelist = make([]string, 0)
 	DefaultPredicatesBlacklist = make([]string, 0)
-	DefaultBootstrap           = ""
-	DefaultMaxGas              = math.NewUint(uint64(100000))
 	DefaultMaxSize             = math.NewUint(uint64(5000))
 	DefaultMaxResultCount      = math.NewUint(uint64(1))
 )
@@ -129,13 +125,6 @@ func validateInterpreter(i interface{}) error {
 // LimitsOption is a functional option for configuring the Limits.
 type LimitsOption func(*Limits)
 
-// WithMaxGas sets the max gas limits for interpreter.
-func WithMaxGas(maxGas math.Uint) LimitsOption {
-	return func(i *Limits) {
-		i.MaxGas = &maxGas
-	}
-}
-
 // WithMaxSize sets the max size limits accepted for a prolog program.
 func WithMaxSize(maxSize math.Uint) LimitsOption {
 	return func(i *Limits) {
@@ -162,10 +151,6 @@ func NewLimits(opts ...LimitsOption) Limits {
 	l := Limits{}
 	for _, opt := range opts {
 		opt(&l)
-	}
-
-	if l.MaxGas == nil {
-		l.MaxGas = &DefaultMaxGas
 	}
 
 	if l.MaxSize == nil {
