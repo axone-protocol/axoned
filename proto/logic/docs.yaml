@@ -178,9 +178,11 @@ description: |
 
   To control the cpu and memory usage of the module, the module is limited by several different mechanisms:
 
-  - `max_gas`: the maximum amount of gas that can be used to evaluate a query.
   - `max_size`: the maximum size of the program that can be evaluated.
   - `max_result_count`: the maximum number of results that can be returned by a query.
+  
+  The existing `query-gas-limit` configuration present in the `app.toml` can be used to constraint gas usage when not used
+  in the context of a transaction.
 
   Additional limitations are being considered for the future, such as restricting the number of variables that can be
   utilized within a query, or limiting the depth of the backtracking algorithm.
