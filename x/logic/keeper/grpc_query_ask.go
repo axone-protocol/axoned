@@ -2,6 +2,7 @@ package keeper
 
 import (
 	goctx "context"
+	"math"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -17,18 +18,11 @@ import (
 var defaultSolutionsLimit = sdkmath.OneUint()
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-
 	if req == nil {
 		return nil, errorsmod.Wrap(types.InvalidArgument, "request is nil")
 	}
 
-	limits := k.limits(ctx)
-	if err := checkLimits(req, limits); err != nil {
-		return nil, err
-	}
-
-	sdkCtx = withGasMeter(sdkCtx, limits)
+	sdkCtx := withSafeGasMeter(sdk.UnwrapSDKContext(ctx))
 	defer func() {
 		if r := recover(); r != nil {
 			if gasError, ok := r.(storetypes.ErrorOutOfGas); ok {
@@ -42,19 +36,40 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 			panic(r)
 		}
 	}()
-	sdkCtx.GasMeter().ConsumeGas(sdkCtx.GasMeter().GasConsumed(), types.ModuleName)
+
+	params := k.GetParams(sdkCtx)
+	if err := checkLimits(req, params.Limits); err != nil {
+		return nil, err
+	}
 
 	return k.execute(
 		sdkCtx,
+		params,
 		req.Program,
 		req.Query,
 		util.DerefOrDefault(req.Limit, defaultSolutionsLimit))
 }
 
-// withGasMeter returns a new context with a gas meter that has the given limit.
+func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) error {
+	size := sdkmath.NewUint(uint64(len(request.GetQuery())))
+	maxSize := util.DerefOrDefault(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
+	if size.GT(maxSize) {
+		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size.Uint64(), maxSize.Uint64())
+	}
+
+	resultCount := util.DerefOrDefault(request.Limit, defaultSolutionsLimit)
+	maxResultCount := util.DerefOrDefault(limits.MaxResultCount, sdkmath.NewUint(math.MaxInt64))
+	if resultCount.GT(maxResultCount) {
+		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxResultCount: %d", resultCount.Uint64(), maxResultCount.Uint64())
+	}
+
+	return nil
+}
+
+// withSafeGasMeter returns a new context with a gas meter that has the given limit.
 // The gas meter is go-router-safe.
-func withGasMeter(sdkCtx sdk.Context, limits types.Limits) sdk.Context {
-	gasMeter := meter.WithSafeMeter(storetypes.NewGasMeter(limits.MaxGas.Uint64()))
+func withSafeGasMeter(sdkCtx sdk.Context) sdk.Context {
+	gasMeter := meter.WithSafeMeter(sdkCtx.GasMeter())
 
 	return sdkCtx.WithGasMeter(gasMeter)
 }

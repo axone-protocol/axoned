@@ -35,16 +35,6 @@ message Params {
 message Limits {
   option (gogoproto.goproto_stringer) = true;
 
-  // max_gas specifies the maximum amount of computing power, measured in "gas," that is allowed to be consumed when
-  // executing a request by the interpreter. The interpreter calculates the gas consumption based on the number and type
-  // of operations that are executed, as well as, in some cases, the complexity of the processed data.
-  // nil value remove max gas limitation.
-  string max_gas = 1 [
-    (gogoproto.moretags) = "yaml:\"max_gas\",omitempty",
-    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
-    (gogoproto.nullable) = true
-  ];
-
   // max_size specifies the maximum size, in bytes, that is accepted for a program.
   // nil value remove size limitation.
   string max_size = 3 [

@@ -182,9 +182,11 @@ to submit transactions or make changes to the blockchain's state. It is therefor
 
 To control the cpu and memory usage of the module, the module is limited by several different mechanisms:
 
-- `max_gas`: the maximum amount of gas that can be used to evaluate a query.
 - `max_size`: the maximum size of the program that can be evaluated.
 - `max_result_count`: the maximum number of results that can be returned by a query.
+
+The existing `query-gas-limit` configuration present in the `app.toml` can be used to constraint gas usage when not used
+in the context of a transaction.
 
 Additional limitations are being considered for the future, such as restricting the number of variables that can be
 utilized within a query, or limiting the depth of the backtracking algorithm.
@@ -274,7 +276,6 @@ Limits defines the limits of the logic module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `max_gas` | [string](#string) |  | max_gas specifies the maximum amount of computing power, measured in "gas," that is allowed to be consumed when executing a request by the interpreter. The interpreter calculates the gas consumption based on the number and type of operations that are executed, as well as, in some cases, the complexity of the processed data. nil value remove max gas limitation. |
 | `max_size` | [string](#string) |  | max_size specifies the maximum size, in bytes, that is accepted for a program. nil value remove size limitation. |
 | `max_result_count` | [string](#string) |  | max_result_count specifies the maximum number of results that can be requested for a query. nil value remove max result count limitation. |
 | `max_user_output_size` | [string](#string) |  | max_user_output_size specifies the maximum number of bytes to keep in the user output. If the user output exceeds this size, the interpreter will overwrite the oldest bytes with the new ones to keep the size constant. nil value or 0 value means that no user output is used at all. |

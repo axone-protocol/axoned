@@ -36,7 +36,6 @@ func TestValidateParams(t *testing.T) {
 						types.WithVirtualFilesWhitelist([]string{"file2"}),
 					),
 					types.NewLimits(
-						types.WithMaxGas(math.NewUint(1)),
 						types.WithMaxSize(math.NewUint(2)),
 						types.WithMaxResultCount(math.NewUint(3)),
 						types.WithMaxUserOutputSize(math.NewUint(4)),

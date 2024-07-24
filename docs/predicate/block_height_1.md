@@ -44,7 +44,7 @@ block_height(Height).
 
 ```  yaml
 height: 100
-gas_used: 2222
+gas_used: 3876
 answer:
   has_more: false
   variables: ["Height"]
@@ -79,7 +79,7 @@ Height > 100.
 
 ```  yaml
 height: 101
-gas_used: 2223
+gas_used: 3877
 answer:
   has_more: false
   variables: ["Height"]

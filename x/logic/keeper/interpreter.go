@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"io"
-	"math"
 	"strings"
 
 	"github.com/ichiban/prolog"
@@ -37,11 +36,6 @@ type writerStringer interface {
 	fmt.Stringer
 }
 
-func (k Keeper) limits(ctx context.Context) types.Limits {
-	params := k.GetParams(sdk.UnwrapSDKContext(ctx))
-	return params.GetLimits()
-}
-
 func (k Keeper) enhanceContext(ctx context.Context) context.Context {
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 	sdkCtx = sdkCtx.WithValue(types.AuthKeeperContextKey, k.authKeeper)
@@ -50,13 +44,12 @@ func (k Keeper) enhanceContext(ctx context.Context) context.Context {
 }
 
 func (k Keeper) execute(
-	ctx context.Context, program, query string, solutionsLimit sdkmath.Uint,
+	ctx context.Context, params types.Params, program, query string, solutionsLimit sdkmath.Uint,
 ) (*types.QueryServiceAskResponse, error) {
 	ctx = k.enhanceContext(ctx)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	limits := k.limits(sdkCtx)
 
-	i, userOutput, err := k.newInterpreter(ctx)
+	i, userOutput, err := k.newInterpreter(ctx, params)
 	if err != nil {
 		return nil, errorsmod.Wrapf(types.Internal, "error creating interpreter: %v", err.Error())
 	}
@@ -64,7 +57,7 @@ func (k Keeper) execute(
 		return nil, errorsmod.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
 	}
 
-	answer, err := k.queryInterpreter(ctx, i, query, sdkmath.MinUint(solutionsLimit, *limits.MaxResultCount))
+	answer, err := k.queryInterpreter(ctx, i, query, solutionsLimit)
 	if err != nil {
 		return nil, err
 	}
@@ -85,9 +78,8 @@ func (k Keeper) queryInterpreter(
 }
 
 // newInterpreter creates a new interpreter properly configured.
-func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, fmt.Stringer, error) {
+func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolog.Interpreter, fmt.Stringer, error) {
 	sdkctx := sdk.UnwrapSDKContext(ctx)
-	params := k.GetParams(sdkctx)
 
 	interpreterParams := params.GetInterpreter()
 	gasPolicy := params.GetGasPolicy()
@@ -146,16 +138,6 @@ func (k Keeper) newInterpreter(ctx context.Context) (*prolog.Interpreter, fmt.St
 	i, err := interpreter.New(options...)
 
 	return i, userOutputBuffer, err
-}
-
-func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) error {
-	size := sdkmath.NewUint(uint64(len(request.GetQuery())))
-	maxSize := util.DerefOrDefault(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
-	if size.GT(maxSize) {
-		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size, maxSize)
-	}
-
-	return nil
 }
 
 func lookupCost(predicate string, defaultCost uint64, costs []types.PredicateCost) uint64 {

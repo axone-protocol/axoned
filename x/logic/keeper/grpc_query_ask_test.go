@@ -37,6 +37,7 @@ func TestGRPCAsk(t *testing.T) {
 			query              string
 			limit              int
 			maxResultCount     int
+			maxSize            int
 			predicateBlacklist []string
 			maxGas             uint64
 			predicateCosts     map[string]uint64
@@ -117,13 +118,13 @@ func TestGRPCAsk(t *testing.T) {
 				query:          "father(bob, X).",
 				limit:          2,
 				maxResultCount: 1,
-				expectedAnswer: &types.Answer{
-					HasMore:   true,
-					Variables: []string{"X"},
-					Results: []types.Result{{Substitutions: []types.Substitution{{
-						Variable: "X", Expression: "alice",
-					}}}},
-				},
+				expectedError:  "query: 2 > MaxResultCount: 1: limit exceeded",
+			},
+			{
+				program:       "father(bob, alice). father(bob, john).",
+				query:         "father(bob, X).",
+				maxSize:       5,
+				expectedError: "query: 15 > MaxSize: 5: limit exceeded",
 			},
 			{
 				query: "block_height(X).",
@@ -142,7 +143,7 @@ func TestGRPCAsk(t *testing.T) {
 			{
 				query:         "bank_balances(X, Y).",
 				maxGas:        3000,
-				expectedError: "out of gas: logic <panic: {ValuePerByte}> (4204/3000): limit exceeded",
+				expectedError: "out of gas: logic <panic: {ValuePerByte}> (3093/3000): limit exceeded",
 			},
 			{
 				query:  "block_height(X).",
@@ -150,7 +151,7 @@ func TestGRPCAsk(t *testing.T) {
 				predicateCosts: map[string]uint64{
 					"block_height/1": 10000,
 				},
-				expectedError: "out of gas: logic <block_height/1> (12353/3000): limit exceeded",
+				expectedError: "out of gas: logic <block_height/1> (11167/3000): limit exceeded",
 			},
 			{
 				program: "father(bob, 'élodie').",
@@ -283,8 +284,8 @@ foo(a3) :- throw(error(resource_error(foo))).
 foo(a4).
 `,
 				query:          `foo(X).`,
-				limit:          5,
-				maxResultCount: 3,
+				limit:          3,
+				maxResultCount: 5,
 				expectedAnswer: &types.Answer{
 					Variables: []string{"X"},
 					Results: []types.Result{
@@ -346,14 +347,12 @@ foo(a4).
 						},
 					)
 					maxResultCount := sdkmath.NewUint(uint64(lo.If(tc.maxResultCount == 0, 1).Else(tc.maxResultCount)))
+					maxSize := sdkmath.NewUint(uint64(lo.If(tc.maxSize == 0, 5000).Else(tc.maxSize)))
 					params := types.DefaultParams()
 					params.Limits.MaxResultCount = &maxResultCount
+					params.Limits.MaxSize = &maxSize
 					if tc.predicateBlacklist != nil {
 						params.Interpreter.PredicatesFilter.Blacklist = tc.predicateBlacklist
-					}
-					if tc.maxGas != 0 {
-						maxGas := sdkmath.NewUint(tc.maxGas)
-						params.Limits.MaxGas = &maxGas
 					}
 					if tc.predicateCosts != nil {
 						predicateCosts := make([]types.PredicateCost, 0, len(tc.predicateCosts))
@@ -369,6 +368,12 @@ foo(a4).
 					err := logicKeeper.SetParams(testCtx.Ctx, params)
 
 					So(err, ShouldBeNil)
+
+					if tc.maxGas != 0 {
+						testCtx.Ctx = testCtx.Ctx.WithGasMeter(storetypes.NewGasMeter(tc.maxGas))
+					} else {
+						testCtx.Ctx = testCtx.Ctx.WithGasMeter(storetypes.NewInfiniteGasMeter())
+					}
 
 					Convey("and given a query with program and query to grpc", func() {
 						queryHelper := baseapp.NewQueryServerTestHelper(testCtx.Ctx, encCfg.InterfaceRegistry)
