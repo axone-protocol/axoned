@@ -62,7 +62,7 @@ open(
 
 ```  yaml
 height: 42
-gas_used: 2223
+gas_used: 3877
 answer:
   has_more: false
   variables:

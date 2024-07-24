@@ -43,7 +43,7 @@ bech32_address(Address, 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
 
 ```  yaml
 height: 42
-gas_used: 2222
+gas_used: 3876
 answer:
   has_more: false
   variables: ["Address"]
@@ -72,7 +72,7 @@ bech32_address(-(Hrp, Address), 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
 
 ```  yaml
 height: 42
-gas_used: 2222
+gas_used: 3876
 answer:
   has_more: false
   variables: ["Hrp", "Address"]
@@ -102,7 +102,7 @@ bech32_address(-(axone, Address), 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4'
 
 ```  yaml
 height: 42
-gas_used: 2222
+gas_used: 3876
 answer:
   has_more: false
   variables: ["Address"]
@@ -129,7 +129,7 @@ bech32_address(-('axone', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,1
 
 ```  yaml
 height: 42
-gas_used: 2222
+gas_used: 3876
 answer:
   has_more: false
   variables: ["Bech32"]
@@ -162,7 +162,7 @@ axone_addr('axone1p8u47en82gmzfm259y6z93r9qe63l25d858vqu').
 
 ```  yaml
 height: 42
-gas_used: 2222
+gas_used: 3876
 answer:
   has_more: false
   results:
@@ -188,7 +188,7 @@ bech32_address(Address, axoneincorrect).
 
 ```  yaml
 height: 42
-gas_used: 2222
+gas_used: 3876
 answer:
   has_more: false
   variables: ["Address"]
@@ -215,7 +215,7 @@ bech32_address(-('axone', X), foo(bar)).
 
 ```  yaml
 height: 42
-gas_used: 2222
+gas_used: 3876
 answer:
   has_more: false
   variables: ["X"]
