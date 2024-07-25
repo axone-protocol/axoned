@@ -59,6 +59,14 @@ message Limits {
     (gogoproto.customtype) = "cosmossdk.io/math.Uint",
     (gogoproto.nullable) = true
   ];
+
+  // max_variables specifies the maximum number of variables that can be create by the interpreter.
+  // nil value or 0 value means that no limit is set.
+  string max_variables = 5 [
+    (gogoproto.moretags) = "yaml:\"max_variables\"",
+    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
+    (gogoproto.nullable) = true
+  ];
 }
 
 // Filter defines the parameters for filtering the set of strings which can designate anything.

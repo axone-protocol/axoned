@@ -54,16 +54,18 @@ func QueryInterpreter(
 			// error is not part of the look-ahead and should be included in the solutions
 			sdkCtx := sdk.UnwrapSDKContext(ctx)
 
+			var panicErr engine.PanicError
 			switch {
 			case errors.Is(callErr, types.LimitExceeded):
 				return nil, callErr
+			case errors.As(callErr, &panicErr) && errors.Is(panicErr.OriginErr, engine.ErrMaxVariables):
+				return nil, errorsmod.Wrapf(types.LimitExceeded, panicErr.OriginErr.Error())
 			case sdkCtx.GasMeter().IsOutOfGas():
 				return nil, errorsmod.Wrapf(
 					types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
 					types.ModuleName, callErr.Error(), sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
-			default:
-				results = append(results, types.Result{Error: callErr.Error()})
 			}
+			results = append(results, types.Result{Error: callErr.Error()})
 		} else {
 			// error is part of the look-ahead, so let's consider that there's one more solution
 			count = count.Incr()

@@ -8,6 +8,8 @@ import (
 
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
+
+	"cosmossdk.io/math"
 )
 
 // Option is a function that configures an Interpreter.
@@ -68,17 +70,28 @@ func WithFS(fs fs.FS) Option {
 	}
 }
 
+func WithMaxVariables(maxVariables *math.Uint) Option {
+	return func(i *prolog.Interpreter) error {
+		if maxVariables != nil {
+			i.SetMaxVariables(maxVariables.Uint64())
+		} else {
+			i.SetMaxVariables(0)
+		}
+		return nil
+	}
+}
+
 // New creates a new prolog.Interpreter with the specified options.
 func New(
 	opts ...Option,
 ) (*prolog.Interpreter, error) {
-	var i prolog.Interpreter
+	i := prolog.NewEmpty()
 
 	for _, opt := range opts {
-		if err := opt(&i); err != nil {
+		if err := opt(i); err != nil {
 			return nil, err
 		}
 	}
 
-	return &i, nil
+	return i, nil
 }

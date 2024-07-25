@@ -40,6 +40,7 @@ func TestGRPCAsk(t *testing.T) {
 			maxSize            int
 			predicateBlacklist []string
 			maxGas             uint64
+			maxVariables       uint64
 			predicateCosts     map[string]uint64
 			expectedAnswer     *types.Answer
 			expectedError      string
@@ -143,7 +144,7 @@ func TestGRPCAsk(t *testing.T) {
 			{
 				query:         "bank_balances(X, Y).",
 				maxGas:        3000,
-				expectedError: "out of gas: logic <panic: {ValuePerByte}> (3093/3000): limit exceeded",
+				expectedError: "out of gas: logic <panic: {ValuePerByte}> (3102/3000): limit exceeded",
 			},
 			{
 				query:  "block_height(X).",
@@ -151,7 +152,12 @@ func TestGRPCAsk(t *testing.T) {
 				predicateCosts: map[string]uint64{
 					"block_height/1": 10000,
 				},
-				expectedError: "out of gas: logic <block_height/1> (11167/3000): limit exceeded",
+				expectedError: "out of gas: logic <block_height/1> (11176/3000): limit exceeded",
+			},
+			{
+				query:         "length(List, 100000).",
+				maxVariables:  1000,
+				expectedError: "maximum number of variables reached: limit exceeded",
 			},
 			{
 				program: "father(bob, 'élodie').",
@@ -351,6 +357,8 @@ foo(a4).
 					params := types.DefaultParams()
 					params.Limits.MaxResultCount = &maxResultCount
 					params.Limits.MaxSize = &maxSize
+					maxVariables := sdkmath.NewUint(tc.maxVariables)
+					params.Limits.MaxVariables = &maxVariables
 					if tc.predicateBlacklist != nil {
 						params.Interpreter.PredicatesFilter.Blacklist = tc.predicateBlacklist
 					}
