@@ -2,13 +2,14 @@ package interpreter
 
 import (
 	goctx "context"
-	"cosmossdk.io/math"
 	"fmt"
 	"io"
 	"io/fs"
 
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
+
+	"cosmossdk.io/math"
 )
 
 // Option is a function that configures an Interpreter.

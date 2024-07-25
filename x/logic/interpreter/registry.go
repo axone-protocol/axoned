@@ -5,10 +5,9 @@ import (
 	"strconv"
 	"strings"
 
-	orderedmap "github.com/wk8/go-ordered-map/v2"
-
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
+	orderedmap "github.com/wk8/go-ordered-map/v2"
 
 	"github.com/axone-protocol/axoned/v8/x/logic/predicate"
 )
