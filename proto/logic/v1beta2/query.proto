@@ -2,6 +2,7 @@ syntax = "proto3";
 
 package logic.v1beta2;
 
+import "cosmos/query/v1/query.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "logic/v1beta2/params.proto";
@@ -13,6 +14,7 @@ option go_package = "github.com/axone-protocol/axoned/x/logic/types";
 service QueryService {
   // Params queries all parameters for the logic module.
   rpc Params(QueryServiceParamsRequest) returns (QueryServiceParamsResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/axone-protocol/axoned/logic/params";
   }
 
@@ -20,6 +22,7 @@ service QueryService {
   // Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee
   // is charged for this, but the execution is constrained by the current limits configured in the module.
   rpc Ask(QueryServiceAskRequest) returns (QueryServiceAskResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/axone-protocol/axoned/logic/ask";
   }
 }
