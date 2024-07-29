@@ -52,13 +52,13 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 
 func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) error {
 	size := sdkmath.NewUint(uint64(len(request.GetQuery())))
-	maxSize := util.DerefOrDefault(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
+	maxSize := util.NonZeroOrDefaultUInt(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
 	if size.GT(maxSize) {
 		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size.Uint64(), maxSize.Uint64())
 	}
 
 	resultCount := util.DerefOrDefault(request.Limit, defaultSolutionsLimit)
-	maxResultCount := util.DerefOrDefault(limits.MaxResultCount, sdkmath.NewUint(math.MaxInt64))
+	maxResultCount := util.NonZeroOrDefaultUInt(limits.MaxResultCount, sdkmath.NewUint(math.MaxInt64))
 	if resultCount.GT(maxResultCount) {
 		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxResultCount: %d", resultCount.Uint64(), maxResultCount.Uint64())
 	}

@@ -1,6 +1,7 @@
 package util
 
 import (
+	sdkmath "cosmossdk.io/math"
 	"fmt"
 	"testing"
 
@@ -48,6 +49,27 @@ func TestNonZeroOrDefault(t *testing.T) {
 			Convey(fmt.Sprintf("When the value is %v", tc.v), func() {
 				Convey(fmt.Sprintf("Then the default value %v is returned", tc.defaultValue), func() {
 					So(NonZeroOrDefault(tc.v, tc.defaultValue), ShouldEqual, tc.expected)
+				})
+			})
+		}
+	})
+}
+
+func TestNonZeroOrDefaultUInt(t *testing.T) {
+	Convey("Given a value", t, func() {
+		cases := []struct {
+			v            *sdkmath.Uint
+			defaultValue sdkmath.Uint
+			expected     sdkmath.Uint
+		}{
+			{nil, sdkmath.ZeroUint(), sdkmath.ZeroUint()},
+			{v: func() *sdkmath.Uint { u := sdkmath.ZeroUint(); return &u }(), defaultValue: sdkmath.NewUint(10), expected: sdkmath.NewUint(10)},
+			{v: func() *sdkmath.Uint { u := sdkmath.NewUint(1); return &u }(), defaultValue: sdkmath.ZeroUint(), expected: sdkmath.NewUint(1)},
+		}
+		for _, tc := range cases {
+			Convey(fmt.Sprintf("When the value is %v", tc.v), func() {
+				Convey(fmt.Sprintf("Then the default value %v is returned", tc.defaultValue), func() {
+					So(NonZeroOrDefaultUInt(tc.v, tc.defaultValue), ShouldEqual, tc.expected)
 				})
 			})
 		}
