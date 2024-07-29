@@ -8,8 +8,6 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
-	"github.com/samber/lo"
-
 	. "github.com/smartystreets/goconvey/convey"
 
 	sdkmath "cosmossdk.io/math"
@@ -36,8 +34,8 @@ func TestGRPCAsk(t *testing.T) {
 			program            string
 			query              string
 			limit              int
-			maxResultCount     int
-			maxSize            int
+			maxResultCount     uint64
+			maxSize            uint64
 			predicateBlacklist []string
 			maxGas             uint64
 			maxVariables       uint64
@@ -126,6 +124,18 @@ func TestGRPCAsk(t *testing.T) {
 				query:         "father(bob, X).",
 				maxSize:       5,
 				expectedError: "query: 15 > MaxSize: 5: limit exceeded",
+			},
+			{
+				program: "father(bob, alice). father(bob, john).",
+				query:   "father(bob, X).",
+				maxSize: 0,
+				expectedAnswer: &types.Answer{
+					HasMore:   true,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X", Expression: "alice",
+					}}}},
+				},
 			},
 			{
 				query: "block_height(X).",
@@ -248,11 +258,11 @@ func TestGRPCAsk(t *testing.T) {
 			},
 			{
 				program: `
-foo(a1).
-foo(a2).
-foo(a3) :- throw(error(resource_error(foo))).
-foo(a4).
-`,
+			foo(a1).
+			foo(a2).
+			foo(a3) :- throw(error(resource_error(foo))).
+			foo(a4).
+			`,
 				query:          `foo(X).`,
 				maxResultCount: 1,
 				expectedAnswer: &types.Answer{
@@ -265,11 +275,11 @@ foo(a4).
 			},
 			{
 				program: `
-foo(a1).
-foo(a2).
-foo(a3) :- throw(error(resource_error(foo))).
-foo(a4).
-`,
+			foo(a1).
+			foo(a2).
+			foo(a3) :- throw(error(resource_error(foo))).
+			foo(a4).
+			`,
 				query:          `foo(X).`,
 				limit:          2,
 				maxResultCount: 3,
@@ -284,11 +294,11 @@ foo(a4).
 			},
 			{
 				program: `
-foo(a1).
-foo(a2).
-foo(a3) :- throw(error(resource_error(foo))).
-foo(a4).
-`,
+			foo(a1).
+			foo(a2).
+			foo(a3) :- throw(error(resource_error(foo))).
+			foo(a4).
+			`,
 				query:          `foo(X).`,
 				limit:          3,
 				maxResultCount: 5,
@@ -303,14 +313,33 @@ foo(a4).
 			},
 			{
 				program: `
-foo(a1).
-foo(a2).
-foo(a3) :- throw(error(resource_error(foo))).
-foo(a4).
-`,
+			foo(a1).
+			foo(a2).
+			foo(a3) :- throw(error(resource_error(foo))).
+			foo(a4).
+			`,
 				query:          `foo(X).`,
 				limit:          5,
 				maxResultCount: 5,
+				expectedAnswer: &types.Answer{
+					Variables: []string{"X"},
+					Results: []types.Result{
+						{Substitutions: []types.Substitution{{Variable: "X", Expression: "a1"}}},
+						{Substitutions: []types.Substitution{{Variable: "X", Expression: "a2"}}},
+						{Error: "error(resource_error(foo))"},
+					},
+				},
+			},
+			{
+				program: `
+			foo(a1).
+			foo(a2).
+			foo(a3) :- throw(error(resource_error(foo))).
+			foo(a4).
+			`,
+				query:          `foo(X).`,
+				limit:          5,
+				maxResultCount: 0,
 				expectedAnswer: &types.Answer{
 					Variables: []string{"X"},
 					Results: []types.Result{
@@ -352,8 +381,8 @@ foo(a4).
 							return fsProvider
 						},
 					)
-					maxResultCount := sdkmath.NewUint(uint64(lo.If(tc.maxResultCount == 0, 1).Else(tc.maxResultCount)))
-					maxSize := sdkmath.NewUint(uint64(lo.If(tc.maxSize == 0, 5000).Else(tc.maxSize)))
+					maxResultCount := sdkmath.NewUint(tc.maxResultCount)
+					maxSize := sdkmath.NewUint(tc.maxSize)
 					params := types.DefaultParams()
 					params.Limits.MaxResultCount = &maxResultCount
 					params.Limits.MaxSize = &maxSize
