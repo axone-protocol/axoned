@@ -8,6 +8,7 @@ import (
 	"testing"
 
 	"github.com/golang/mock/gomock"
+
 	. "github.com/smartystreets/goconvey/convey"
 
 	sdkmath "cosmossdk.io/math"

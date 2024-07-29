@@ -1,11 +1,12 @@
 package util
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"fmt"
 	"testing"
 
 	. "github.com/smartystreets/goconvey/convey"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 func TestDerefOrDefault(t *testing.T) {
@@ -63,8 +64,16 @@ func TestNonZeroOrDefaultUInt(t *testing.T) {
 			expected     sdkmath.Uint
 		}{
 			{nil, sdkmath.ZeroUint(), sdkmath.ZeroUint()},
-			{v: func() *sdkmath.Uint { u := sdkmath.ZeroUint(); return &u }(), defaultValue: sdkmath.NewUint(10), expected: sdkmath.NewUint(10)},
-			{v: func() *sdkmath.Uint { u := sdkmath.NewUint(1); return &u }(), defaultValue: sdkmath.ZeroUint(), expected: sdkmath.NewUint(1)},
+			{
+				func() *sdkmath.Uint { u := sdkmath.ZeroUint(); return &u }(),
+				sdkmath.NewUint(10),
+				sdkmath.NewUint(10),
+			},
+			{
+				func() *sdkmath.Uint { u := sdkmath.NewUint(1); return &u }(),
+				sdkmath.ZeroUint(),
+				sdkmath.NewUint(1),
+			},
 		}
 		for _, tc := range cases {
 			Convey(fmt.Sprintf("When the value is %v", tc.v), func() {

@@ -1,8 +1,9 @@
 package util
 
 import (
-	sdkmath "cosmossdk.io/math"
 	"reflect"
+
+	sdkmath "cosmossdk.io/math"
 )
 
 // DerefOrDefault returns the value of the pointer if it is not nil, otherwise returns the default value.
