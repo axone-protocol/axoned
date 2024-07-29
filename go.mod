@@ -28,7 +28,7 @@ require (
 	github.com/cosmos/gogoproto v1.5.0
 	github.com/cosmos/ibc-go/modules/apps/callbacks v0.2.1-0.20231113120333-342c00b0f8bd
 	github.com/cosmos/ibc-go/modules/capability v1.0.0
-	github.com/cosmos/ibc-go/v8 v8.3.2
+	github.com/cosmos/ibc-go/v8 v8.4.0
 	github.com/cucumber/gherkin/go/v26 v26.2.0
 	github.com/cucumber/godog v0.14.1
 	github.com/cucumber/messages/go/v21 v21.0.1
