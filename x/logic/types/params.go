@@ -2,6 +2,7 @@ package types
 
 import (
 	"fmt"
+	"github.com/axone-protocol/axoned/v8/x/logic/interpreter"
 	"net/url"
 
 	"cosmossdk.io/math"
@@ -120,7 +121,27 @@ func validateInterpreter(i interface{}) error {
 		}
 	}
 
+	for _, predicate := range interpreter.PredicatesFilter.Whitelist {
+		if err := validatePredicate(predicate); err != nil {
+			return fmt.Errorf("invalide predicates filter whitelist : %v", err)
+		}
+	}
+
+	for _, predicate := range interpreter.PredicatesFilter.Blacklist {
+		if err := validatePredicate(predicate); err != nil {
+			return fmt.Errorf("invalide predicates filter blacklist : %v", err)
+		}
+	}
 	return nil
+}
+
+func validatePredicate(predicate string) error {
+	for _, p := range interpreter.RegistryNames {
+		if predicate == p {
+			return nil
+		}
+	}
+	return fmt.Errorf("unknown predicate: %s", predicate)
 }
 
 // LimitsOption is a functional option for configuring the Limits.
