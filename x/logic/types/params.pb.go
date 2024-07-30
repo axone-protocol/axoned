@@ -92,10 +92,10 @@ func (m *Params) GetGasPolicy() GasPolicy {
 // Limits defines the limits of the logic module.
 type Limits struct {
 	// max_size specifies the maximum size, in bytes, that is accepted for a program.
-	// nil value remove size limitation.
+	// nil value or 0 value remove size limitation.
 	MaxSize *cosmossdk_io_math.Uint `protobuf:"bytes,3,opt,name=max_size,json=maxSize,proto3,customtype=cosmossdk.io/math.Uint" json:"max_size,omitempty" yaml:"max_size"`
 	// max_result_count specifies the maximum number of results that can be requested for a query.
-	// nil value remove max result count limitation.
+	// nil value or 0 value remove max result count limitation.
 	MaxResultCount *cosmossdk_io_math.Uint `protobuf:"bytes,2,opt,name=max_result_count,json=maxResultCount,proto3,customtype=cosmossdk.io/math.Uint" json:"max_result_count,omitempty" yaml:"max_result_count"`
 	// max_user_output_size specifies the maximum number of bytes to keep in the user output. If the user output exceeds
 	// this size, the interpreter will overwrite the oldest bytes with the new ones to keep the size constant.

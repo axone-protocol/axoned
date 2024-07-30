@@ -36,7 +36,7 @@ message Limits {
   option (gogoproto.goproto_stringer) = true;
 
   // max_size specifies the maximum size, in bytes, that is accepted for a program.
-  // nil value remove size limitation.
+  // nil value or 0 value remove size limitation.
   string max_size = 3 [
     (gogoproto.moretags) = "yaml:\"max_size\"",
     (gogoproto.customtype) = "cosmossdk.io/math.Uint",
@@ -44,7 +44,7 @@ message Limits {
   ];
 
   // max_result_count specifies the maximum number of results that can be requested for a query.
-  // nil value remove max result count limitation.
+  // nil value or 0 value remove max result count limitation.
   string max_result_count = 2 [
     (gogoproto.moretags) = "yaml:\"max_result_count\"",
     (gogoproto.customtype) = "cosmossdk.io/math.Uint",

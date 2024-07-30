@@ -276,8 +276,8 @@ Limits defines the limits of the logic module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `max_size` | [string](#string) |  | max_size specifies the maximum size, in bytes, that is accepted for a program. nil value remove size limitation. |
-| `max_result_count` | [string](#string) |  | max_result_count specifies the maximum number of results that can be requested for a query. nil value remove max result count limitation. |
+| `max_size` | [string](#string) |  | max_size specifies the maximum size, in bytes, that is accepted for a program. nil value or 0 value remove size limitation. |
+| `max_result_count` | [string](#string) |  | max_result_count specifies the maximum number of results that can be requested for a query. nil value or 0 value remove max result count limitation. |
 | `max_user_output_size` | [string](#string) |  | max_user_output_size specifies the maximum number of bytes to keep in the user output. If the user output exceeds this size, the interpreter will overwrite the oldest bytes with the new ones to keep the size constant. nil value or 0 value means that no user output is used at all. |
 | `max_variables` | [string](#string) |  | max_variables specifies the maximum number of variables that can be create by the interpreter. nil value or 0 value means that no limit is set. |
 
