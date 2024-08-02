@@ -7,8 +7,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v8/x/logic/prolog"
-	"github.com/axone-protocol/axoned/v8/x/logic/types"
+	"github.com/axone-protocol/axoned/v9/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v9/x/logic/types"
 )
 
 // SortBalances by coin denomination.

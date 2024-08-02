@@ -3,7 +3,7 @@ package keeper
 import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v8/x/logic/types"
+	"github.com/axone-protocol/axoned/v9/x/logic/types"
 )
 
 // GetParams get all parameters as types.Params.

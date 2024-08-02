@@ -22,10 +22,10 @@ import (
 	bankypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/axone-protocol/axoned/v8/x/logic"
-	"github.com/axone-protocol/axoned/v8/x/logic/keeper"
-	logictestutil "github.com/axone-protocol/axoned/v8/x/logic/testutil"
-	"github.com/axone-protocol/axoned/v8/x/logic/types"
+	"github.com/axone-protocol/axoned/v9/x/logic"
+	"github.com/axone-protocol/axoned/v9/x/logic/keeper"
+	logictestutil "github.com/axone-protocol/axoned/v9/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v9/x/logic/types"
 )
 
 func TestGRPCAsk(t *testing.T) {

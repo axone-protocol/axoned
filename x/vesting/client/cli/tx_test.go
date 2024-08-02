@@ -23,8 +23,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	testutilmod "github.com/cosmos/cosmos-sdk/types/module/testutil"
 
-	"github.com/axone-protocol/axoned/v8/x/vesting"
-	"github.com/axone-protocol/axoned/v8/x/vesting/client/cli"
+	"github.com/axone-protocol/axoned/v9/x/vesting"
+	"github.com/axone-protocol/axoned/v9/x/vesting/client/cli"
 )
 
 type CLITestSuite struct {

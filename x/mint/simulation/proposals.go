@@ -10,7 +10,7 @@ import (
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 	"github.com/cosmos/cosmos-sdk/x/simulation"
 
-	"github.com/axone-protocol/axoned/v8/x/mint/types"
+	"github.com/axone-protocol/axoned/v9/x/mint/types"
 )
 
 // Simulation operation weights constants.

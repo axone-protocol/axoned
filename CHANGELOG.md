@@ -1,5 +1,50 @@
 # AXONE protocol changelog
 
+## [9.0.0](https://github.com/axone-protocol/axoned/compare/v8.0.0...v9.0.0) (2024-08-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* **logic:** remove unsafe prolog predicates from registry
+* **logic:** add max_variables limits params
+* **logic:** change interpreter by our fork axone-protocol/prolog
+* **logic:** remove max gas module parameter
+* **wasm:** bump wasm to 0.52.0
+
+### Features
+
+* **app:** update application init ([cee814a](https://github.com/axone-protocol/axoned/commit/cee814a391f1d1ec6fa6a73408bf90e9bc831d84))
+* handle MaxVariables error limit exceeded ([040a765](https://github.com/axone-protocol/axoned/commit/040a765ea934eb5c5dd0fa466758bd0385234a7e))
+* **logic:** add max_variables limits params ([94e54e0](https://github.com/axone-protocol/axoned/commit/94e54e04ee22c73d7fbf4fcddf20097b9b727816))
+* **logic:** mark rpc queries as safe ([66b1b8c](https://github.com/axone-protocol/axoned/commit/66b1b8cc4b4c35d94115b8fd80f7c3418de9ca9a))
+* **vesting:** update to align with cosmos-sdk v0.50.4 ([7536aee](https://github.com/axone-protocol/axoned/commit/7536aee0d8f84e5dfb11d26d3819289c45a2013f))
+* **wasm:** bump wasm to 0.52.0 ([c1e404c](https://github.com/axone-protocol/axoned/commit/c1e404c7ebd6684a9cb048046c905e1d71f399de))
+* **wasm:** use wasm provided build in capabilities ([77c1063](https://github.com/axone-protocol/axoned/commit/77c10635a901963768f6f2e55f011994235cfd2f))
+
+
+### Bug Fixes
+
+* **docs:** generate docs with module subfolder on proto ([fde166c](https://github.com/axone-protocol/axoned/commit/fde166cda8dec105b958a4f2ba4b5f1a15284b34))
+* **gov:** properly configure legacy props router ([74df1c7](https://github.com/axone-protocol/axoned/commit/74df1c73637329be6af5ec7e637321b01d0201a1))
+* **logic:** handle and return out of gas error at GRPC level ([ff3de76](https://github.com/axone-protocol/axoned/commit/ff3de76a201811d44eb8ca80b80c892b9feed767))
+* **logic:** remove max gas module parameter ([db9164b](https://github.com/axone-protocol/axoned/commit/db9164b7037e91c656d738d0f9f6b9c6f3027a3e))
+* **logic:** remove unsafe prolog predicates from registry ([293da10](https://github.com/axone-protocol/axoned/commit/293da10e8c24ec1712c8c700330beb9e213c3819))
+* **logic:** use ordered predicate register ([0c99e9c](https://github.com/axone-protocol/axoned/commit/0c99e9c3ae6d367f5870bab484694e031348516f))
+* **proto:** remove unused proto def from global registry ([798fdcd](https://github.com/axone-protocol/axoned/commit/798fdcded13ee8c4336b408dabd0d490bfc6d95e))
+* use new method for instantiate interpreter ([e08560d](https://github.com/axone-protocol/axoned/commit/e08560d02564c5d0fa6e21360703c8229e6897dc))
+* **vesting:** format and lint ([c018447](https://github.com/axone-protocol/axoned/commit/c018447c95832720e419282c7695d0655765a775))
+* **vesting:** reintroduce the add-genesis-account custom command to include cliff vesting account ([4b4bafb](https://github.com/axone-protocol/axoned/commit/4b4bafbc61a8d2ffb46fa1a4ca28eb35435b0d70))
+
+
+### Performance Improvements
+
+* **logic:** reduce read params in ask query ([92e6d05](https://github.com/axone-protocol/axoned/commit/92e6d054d06cd3096a199d3a1ba8d504ec4a3520))
+
+
+### Code Refactoring
+
+* **logic:** change interpreter by our fork axone-protocol/prolog ([c1b3035](https://github.com/axone-protocol/axoned/commit/c1b30352f084aeb6e91347d3c274f5a361bc6858))
+
 ## [8.0.0](https://github.com/axone-protocol/axoned/compare/v7.1.0...v8.0.0) (2024-05-22)
 
 

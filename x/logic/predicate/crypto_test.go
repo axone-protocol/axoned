@@ -19,7 +19,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v8/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v9/x/logic/testutil"
 )
 
 func TestCryptoOperations(t *testing.T) {

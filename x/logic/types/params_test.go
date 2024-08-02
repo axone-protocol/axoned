@@ -8,7 +8,7 @@ import (
 
 	"cosmossdk.io/math"
 
-	"github.com/axone-protocol/axoned/v8/x/logic/types"
+	"github.com/axone-protocol/axoned/v9/x/logic/types"
 )
 
 func TestValidateParams(t *testing.T) {

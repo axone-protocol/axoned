@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v8/x/mint/types"
+	"github.com/axone-protocol/axoned/v9/x/mint/types"
 )
 
 // Keeper of the mint store.

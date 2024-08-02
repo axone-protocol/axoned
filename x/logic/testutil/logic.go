@@ -8,7 +8,7 @@ import (
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
 
-	"github.com/axone-protocol/axoned/v8/x/logic/interpreter/bootstrap"
+	"github.com/axone-protocol/axoned/v9/x/logic/interpreter/bootstrap"
 )
 
 type TermResults map[string]prolog.TermString

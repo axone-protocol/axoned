@@ -5,7 +5,7 @@ import (
 
 	"github.com/spf13/cobra/doc"
 
-	"github.com/axone-protocol/axoned/v8/cmd/axoned/cmd"
+	"github.com/axone-protocol/axoned/v9/cmd/axoned/cmd"
 )
 
 func generateCommandDocumentation() error {
