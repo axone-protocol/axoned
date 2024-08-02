@@ -59,58 +59,24 @@ All releases can be found [here](https://github.com/axone-protocol/axoned/releas
 `axoned` follows the [Semantic Versioning 2.0.0](https://semver.org/) to determine when and how the version changes, and
 we also apply the philosophical principles of [release early - release often](https://en.wikipedia.org/wiki/Release_early,_release_often).
 
-## Docker image
+## Install
 
-For a quick start, a docker image is officially available on [Docker hub](https://hub.docker.com/r/axone-protocol/axoned).
+### From release
 
-```bash
-docker pull axone-protocol/axoned:latest
+```sh
+curl https://i.jpillora.com/axone-protocol/axoned! | bash
 ```
 
-### Get the documentation
+### From source
 
-```bash
-docker run axone-protocol/axoned:latest --help
+```sh
+make install
 ```
 
-### Query a running network
+### Using docker
 
-Example:
-
-```bash
-API_URL=https://api.devnet.okp4.network:443/rpc
-WALLET=okp41pmkq300lrngpkeprygfrtag0xpgp9z92c7eskm
-
-docker run axone-protocol/axoned:latest query bank balances $WALLET --chain-id axone-devnet-1 --node $API_URL
- ```
-
-### Create a wallet
-
-```bash
-docker run -v $(pwd)/home:/home axone-protocol/axoned:latest keys add my-wallet --keyring-backend test --home /home 
-```
-
-### Start a node
-
-Everything you need to start a node and more is explained here: <https://docs.axone.xyz/docs/nodes/run-node>
-
-```bash
-MONIKER=node-in-my-name
-CHAIN_ID=localnet-axone-1
-
-docker run -v $(pwd)/home:/home axone-protocol/axoned:latest init $MONIKER --chain-id $CHAIN_ID --home /home 
-```
-
-This will create a home folder, you can then update the `config/genesis.json` with one of this ones : <https://github.com/axone-protocol/axoned/tree/main/chains/>
-
-#### Join a running network
-
-Set `persistent_peers` in `config/config.toml` file.
-
-#### Then start the node
-
-```bash
-docker run -v $(pwd)/home:/home axone-protocol/axoned:latest start --home /home
+```sh
+docker run -ti --rm axoneprotocol/axoned --help
 ```
 
 ## Developing & contributing
