@@ -155,6 +155,28 @@ make build
 
 The binary will be generated under the folder `target/dist`.
 
+### Run a local network
+
+To initialize a local network configuration, invoke the goal `chain-init` of the `Makefile`:
+
+```sh
+make chain-init
+```
+
+The node home directory will be generated under the folder `target/deployment/localnet`. The configuration contains a single validator node.
+
+To start the network, invoke the goal `chain-start` of the `Makefile`:
+
+```sh
+make chain-start
+```
+
+A wallet is preconfigured with some tokens, you can use it as follows:
+
+```sh
+axoned --home target/deployment/localnet tx bank send validator [to_address] [amount]
+```
+
 ## Bug reports & feature requests
 
 If you notice anything not behaving how you expected, if you would like to make a suggestion or would like
