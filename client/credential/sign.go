@@ -106,7 +106,6 @@ func runSignCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	documentLoader := newDocumentLoader(schemaMap)
-
 	vc, err := loadVerifiableCredential(documentLoader, bs)
 	if err != nil {
 		return errorsmod.Wrapf(sdkerr.ErrInvalidRequest, "failed to load verifiable credential: %v", err)
@@ -119,17 +118,14 @@ func runSignCmd(cmd *cobra.Command, args []string) error {
 	if overrideProofs {
 		vc.Proofs = nil
 	}
-
 	date, err := parseStringAsDate(cmd, flagDate)
 	if err != nil {
-		return err
+		return errorsmod.Wrapf(sdkerr.ErrInvalidType, "%s is not a valid date: %v", flagDate, err)
 	}
-
 	purpose, err := cmd.Flags().GetString(flagPurpose)
 	if err != nil {
-		return err
+		return errorsmod.Wrapf(sdkerr.ErrInvalidType, "%s is not a valid string: %v", flagPurpose, err)
 	}
-
 	err = signVerifiableCredential(documentLoader, vc, signer, date, purpose)
 	if err != nil {
 		return errorsmod.Wrapf(sdkerr.ErrInvalidRequest, "failed to sign: %v", err)
