@@ -36,6 +36,7 @@ const (
 	flagOverwrite = "overwrite"
 	flagDate      = "date"
 	flagSchemaMap = "schema-map"
+	flagPurpose   = "purpose"
 )
 
 const (
@@ -65,6 +66,9 @@ It will read a verifiable credential from a file (or stdin), sign it, and print 
 			"Multiple mappings can be provided by repeating the flag. Example usage: "+
 			"--%[1]s originalURI1=alternativeURI1 --%[1]s originalURI2=alternativeURI2",
 		flagSchemaMap))
+	cmd.Flags().String(flagPurpose, "assertionMethod", "Proof that describes credential purpose, helps prevent it from being "+
+		"misused for some other purpose. Example of commonly used proof purpose values:  "+
+		"authentication, assertionMethod, keyAgreement, capabilityDelegation, capabilityInvocation.")
 
 	_ = cmd.MarkFlagRequired(flags.FlagFrom)
 
@@ -102,7 +106,6 @@ func runSignCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 	documentLoader := newDocumentLoader(schemaMap)
-
 	vc, err := loadVerifiableCredential(documentLoader, bs)
 	if err != nil {
 		return errorsmod.Wrapf(sdkerr.ErrInvalidRequest, "failed to load verifiable credential: %v", err)
@@ -115,12 +118,15 @@ func runSignCmd(cmd *cobra.Command, args []string) error {
 	if overrideProofs {
 		vc.Proofs = nil
 	}
-
 	date, err := parseStringAsDate(cmd, flagDate)
 	if err != nil {
-		return err
+		return errorsmod.Wrapf(sdkerr.ErrInvalidType, "%s is not a valid date: %v", flagDate, err)
 	}
-	err = signVerifiableCredential(documentLoader, vc, signer, date)
+	purpose, err := cmd.Flags().GetString(flagPurpose)
+	if err != nil {
+		return errorsmod.Wrapf(sdkerr.ErrInvalidType, "%s is not a valid string: %v", flagPurpose, err)
+	}
+	err = signVerifiableCredential(documentLoader, vc, signer, date, purpose)
 	if err != nil {
 		return errorsmod.Wrapf(sdkerr.ErrInvalidRequest, "failed to sign: %v", err)
 	}
@@ -245,7 +251,7 @@ func loadVerifiableCredential(documentLoader ld.DocumentLoader, bs []byte) (*ver
 }
 
 func signVerifiableCredential(
-	documentLoader ld.DocumentLoader, vc *verifiable.Credential, signer KeyringSigner, date time.Time,
+	documentLoader ld.DocumentLoader, vc *verifiable.Credential, signer KeyringSigner, date time.Time, purpose string,
 ) error {
 	didKeyID, err := signer.DIDKeyID()
 	if err != nil {
@@ -265,6 +271,7 @@ func signVerifiableCredential(
 			Suite:                   ed25519signature2020.New(suite.WithSigner(signer)),
 			SignatureRepresentation: verifiable.SignatureProofValue,
 			VerificationMethod:      didKeyID,
+			Purpose:                 purpose,
 		}, jsonld.WithDocumentLoader(documentLoader))
 	case *secp256k1.PubKey:
 		return vc.AddLinkedDataProof(&verifiable.LinkedDataProofContext{
@@ -273,6 +280,7 @@ func signVerifiableCredential(
 			Suite:                   ecdsasecp256k1signature2019.New(suite.WithSigner(signer)),
 			SignatureRepresentation: verifiable.SignatureJWS,
 			VerificationMethod:      didKeyID,
+			Purpose:                 purpose,
 		}, jsonld.WithDocumentLoader(documentLoader))
 	default:
 		return fmt.Errorf("invalid pubkey type: %s; expected oneof %+q",
