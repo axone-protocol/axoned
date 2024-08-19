@@ -66,8 +66,8 @@ It will read a verifiable credential from a file (or stdin), sign it, and print 
 			"Multiple mappings can be provided by repeating the flag. Example usage: "+
 			"--%[1]s originalURI1=alternativeURI1 --%[1]s originalURI2=alternativeURI2",
 		flagSchemaMap))
-	cmd.Flags().String(flagPurpose, "assertionMethod", "Proof that describes credential purpose, helps prevent it from being misused for some other purpose."+
-		"Example of commonly used proof purpose values:  "+
+	cmd.Flags().String(flagPurpose, "assertionMethod", "Proof that describes credential purpose, helps prevent it from being "+
+		"misused for some other purpose. Example of commonly used proof purpose values:  "+
 		"authentication, assertionMethod, keyAgreement, capabilityDelegation, capabilityInvocation.")
 
 	_ = cmd.MarkFlagRequired(flags.FlagFrom)
