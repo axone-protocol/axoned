@@ -1,6 +1,6 @@
 ## axoned config home
 
-Outputs the folder used as the binary home. No home directory is set when using the tool standalone.
+Outputs the folder used as the binary home. No home directory is set when using the `confix` tool standalone.
 
 ### Synopsis
 

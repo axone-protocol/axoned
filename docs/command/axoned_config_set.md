@@ -4,7 +4,7 @@ Set an application config value
 
 ### Synopsis
 
-Set an application config value. The [config] argument must be the path of the file when using the tool standalone, otherwise it must be the name of the config file without the .toml extension.
+Set an application config value. The [config] argument must be the path of the file when using the `confix` tool standalone, otherwise it must be the name of the config file without the .toml extension.
 
 ```
 axoned config set [config] [key] [value] [flags]
