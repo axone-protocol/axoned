@@ -17,7 +17,7 @@ axoned query blocks [flags]
 ### Examples
 
 ```
-$ axoned query blocks --query "message.sender='cosmos1...' AND block.height > 7" --page 1 --limit 30 --order-by ASC
+$ axoned query blocks --query "message.sender='cosmos1...' AND block.height > 7" --page 1 --limit 30 --order_by asc
 ```
 
 ### Options
