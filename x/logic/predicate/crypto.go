@@ -5,8 +5,8 @@ import (
 
 	"github.com/ichiban/prolog/engine"
 
-	"github.com/axone-protocol/axoned/v9/x/logic/prolog"
-	"github.com/axone-protocol/axoned/v9/x/logic/util"
+	"github.com/axone-protocol/axoned/v10/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v10/x/logic/util"
 )
 
 // CryptoDataHash is a predicate that computes the Hash of the given Data using different algorithms.

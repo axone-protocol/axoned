@@ -9,7 +9,7 @@ import (
 	"github.com/ichiban/prolog/engine"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
-	"github.com/axone-protocol/axoned/v9/x/logic/predicate"
+	"github.com/axone-protocol/axoned/v10/x/logic/predicate"
 )
 
 // registry is a map from predicate names (in the form of "atom/arity") to predicates functions.

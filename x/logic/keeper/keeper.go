@@ -9,8 +9,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v9/x/logic/fs"
-	"github.com/axone-protocol/axoned/v9/x/logic/types"
+	"github.com/axone-protocol/axoned/v10/x/logic/fs"
+	"github.com/axone-protocol/axoned/v10/x/logic/types"
 )
 
 type (

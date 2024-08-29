@@ -17,7 +17,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v9/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v10/x/logic/testutil"
 )
 
 func TestChainID(t *testing.T) {

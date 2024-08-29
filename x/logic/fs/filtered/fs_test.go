@@ -11,9 +11,9 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/axone-protocol/axoned/v9/x/logic/fs/wasm"
-	"github.com/axone-protocol/axoned/v9/x/logic/testutil"
-	"github.com/axone-protocol/axoned/v9/x/logic/util"
+	"github.com/axone-protocol/axoned/v10/x/logic/fs/wasm"
+	"github.com/axone-protocol/axoned/v10/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v10/x/logic/util"
 )
 
 func TestFilteredVFS(t *testing.T) {

@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
 
-	"github.com/axone-protocol/axoned/v9/x/logic/types"
+	"github.com/axone-protocol/axoned/v10/x/logic/types"
 )
 
 var (

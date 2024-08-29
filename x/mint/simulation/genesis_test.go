@@ -15,8 +15,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/axone-protocol/axoned/v9/x/mint/simulation"
-	"github.com/axone-protocol/axoned/v9/x/mint/types"
+	"github.com/axone-protocol/axoned/v10/x/mint/simulation"
+	"github.com/axone-protocol/axoned/v10/x/mint/types"
 )
 
 // TestRandomizedGenState tests the normal scenario of applying RandomizedGenState.

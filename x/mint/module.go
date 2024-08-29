@@ -21,9 +21,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/axone-protocol/axoned/v9/x/mint/keeper"
-	"github.com/axone-protocol/axoned/v9/x/mint/simulation"
-	"github.com/axone-protocol/axoned/v9/x/mint/types"
+	"github.com/axone-protocol/axoned/v10/x/mint/keeper"
+	"github.com/axone-protocol/axoned/v10/x/mint/simulation"
+	"github.com/axone-protocol/axoned/v10/x/mint/types"
 )
 
 // ConsensusVersion defines the current x/mint module consensus version.

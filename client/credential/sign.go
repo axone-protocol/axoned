@@ -29,7 +29,7 @@ import (
 	sdkerr "github.com/cosmos/cosmos-sdk/types/errors"
 	"github.com/cosmos/cosmos-sdk/types/tx/signing"
 
-	"github.com/axone-protocol/axoned/v9/x/logic/util"
+	"github.com/axone-protocol/axoned/v10/x/logic/util"
 )
 
 const (

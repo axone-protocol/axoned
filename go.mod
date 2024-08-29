@@ -1,4 +1,4 @@
-module github.com/axone-protocol/axoned/v9
+module github.com/axone-protocol/axoned/v10
 
 go 1.21
 

@@ -16,10 +16,10 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/axone-protocol/axoned/v9/x/mint"
-	"github.com/axone-protocol/axoned/v9/x/mint/keeper"
-	minttestutil "github.com/axone-protocol/axoned/v9/x/mint/testutil"
-	"github.com/axone-protocol/axoned/v9/x/mint/types"
+	"github.com/axone-protocol/axoned/v10/x/mint"
+	"github.com/axone-protocol/axoned/v10/x/mint/keeper"
+	minttestutil "github.com/axone-protocol/axoned/v10/x/mint/testutil"
+	"github.com/axone-protocol/axoned/v10/x/mint/types"
 )
 
 type IntegrationTestSuite struct {

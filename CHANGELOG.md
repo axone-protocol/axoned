@@ -1,5 +1,24 @@
 # AXONE protocol changelog
 
+## [10.0.0](https://github.com/axone-protocol/axoned/compare/v9.0.0...v10.0.0) (2024-08-29)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** bump docker image wasmvm
+* **deps:** bump wasmd to v0.53.0
+
+### Features
+
+* **credential:** allow choose proof purpose when signing ([b30ff57](https://github.com/axone-protocol/axoned/commit/b30ff57c5791b2cbdd41f141b1d631fa5a7905b3))
+
+
+### Bug Fixes
+
+* **credential:** correctly wraps error on parsing arg ([643dab4](https://github.com/axone-protocol/axoned/commit/643dab4ed6cdf8bc53ca2e2754ca74f39acfda25))
+* **deps:** bump docker image wasmvm ([3fb333c](https://github.com/axone-protocol/axoned/commit/3fb333cc89834da0cc8932edd5670460b14e15de))
+* **deps:** bump wasmd to v0.53.0 ([1283233](https://github.com/axone-protocol/axoned/commit/1283233eb6e02300b775275b0c2c38f2d18c7bc8))
+
 ## [9.0.0](https://github.com/axone-protocol/axoned/compare/v8.0.0...v9.0.0) (2024-08-02)
 
 
