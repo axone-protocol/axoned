@@ -186,6 +186,12 @@ you're willing to give!
 > Don't hesitate to ask if you are having trouble setting up your project repository, creating your first branch or
 > configuring your development environment. Mentors and maintainers are here to help!
 
+## Audit
+
+| Date | Auditor | Version | Report |
+|---|---|---|---|
+| 2024/08/22 | [BlockApex](https://blockapex.io/) | [2f0f84d (v10.0.0)](https://github.com/axone-protocol/axoned/tree/2f0f84d369852bdb178e299a88c1b8eeb0654b8e) | [Axone Blockchain - Final Audit Report.pdf](https://github.com/BlockApex/Audit-Reports/blob/15d8765ac45b4a83bb2f1446fc9bf869c123f8d2/Axone%20Blockchain%20-%20Final%20Audit%20Report.pdf)|
+
 ## Community
 
 The [**AXONE Discord Server**](https://discord.gg/axone) is our primary chat channel for the open-source community,
