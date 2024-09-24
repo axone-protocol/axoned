@@ -120,18 +120,17 @@ Targets:
     chain-init          Initialize the blockchain with default settings.
     chain-start         Start the blockchain with existing configuration (see chain-init)
     chain-stop          Stop the blockchain
-    chain-upgrade       Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION
+    chain-upgrade       Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION. You can pass also the proposal json file on PROPOSAL var
   Clean:
     clean               Remove all the files from the target folder
   Proto:
     proto               Generate all resources for proto files (go, doc, etc.)
-    proto-format        Format Protobuf files
-    proto-build         Build all Protobuf files
     proto-gen           Generate all the code from the Protobuf files
   Documentation:
     doc                 Generate all the documentation
     doc-proto           Generate the documentation from the Protobuf files
     doc-command         Generate markdown documentation for the command
+    doc-predicate       Generate markdown documentation for all the predicates (module logic)
   Mock:
     mock                Generate all the mocks (for tests)
   Release:
