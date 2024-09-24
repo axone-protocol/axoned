@@ -239,7 +239,29 @@ func TestGRPCAsk(t *testing.T) {
 				expectedAnswer: &types.Answer{
 					HasMore:   false,
 					Variables: []string{"X"},
-					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_height/1),block_height/1)"}},
+					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_height/1),root)"}},
+				},
+			},
+			{
+				program:            "contains_forbidden_predicate(X) :- block_height(X).",
+				query:              "contains_forbidden_predicate(X).",
+				predicateBlacklist: []string{"block_height/1"},
+				expectedAnswer: &types.Answer{
+					HasMore:   false,
+					Variables: []string{"X"},
+					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_height/1),contains_forbidden_predicate/1)"}},
+				},
+			},
+			{
+				program:            "cannot_be_blacklisted(X) :- X = 42.",
+				query:              "cannot_be_blacklisted(X).",
+				predicateBlacklist: []string{"cannot_be_blacklisted/1"},
+				expectedAnswer: &types.Answer{
+					HasMore:   false,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X", Expression: "42",
+					}}}},
 				},
 			},
 			{
