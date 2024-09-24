@@ -28,6 +28,7 @@ import (
 	"github.com/axone-protocol/axoned/v10/x/logic/types"
 )
 
+//nolint:lll
 func TestGRPCAsk(t *testing.T) {
 	emptySolution := types.Result{}
 	Convey("Given a test cases", t, func() {
@@ -170,6 +171,12 @@ func TestGRPCAsk(t *testing.T) {
 				query:         "recursionOfDeath.",
 				maxGas:        3000,
 				expectedError: "out of gas: logic <recursionOfDeath/0> (3001/3000): limit exceeded",
+			},
+			{
+				program:       "backtrackOfDeath :- repeat, fail.",
+				query:         "backtrackOfDeath.",
+				maxGas:        3014,
+				expectedError: "out of gas: logic <fail/0> (3015/3014): limit exceeded",
 			},
 			{
 				query:         "length(List, 100000).",
