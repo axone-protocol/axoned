@@ -17,10 +17,10 @@ type Option func(*prolog.Interpreter) error
 
 // WithPredicates configures the interpreter to register the specified predicates.
 // See WithPredicate for more details.
-func WithPredicates(ctx goctx.Context, predicates []string, hook Hook) Option {
+func WithPredicates(ctx goctx.Context, predicates []string) Option {
 	return func(i *prolog.Interpreter) error {
 		for _, predicate := range predicates {
-			if err := WithPredicate(ctx, predicate, hook)(i); err != nil {
+			if err := WithPredicate(ctx, predicate)(i); err != nil {
 				return err
 			}
 		}
@@ -28,14 +28,12 @@ func WithPredicates(ctx goctx.Context, predicates []string, hook Hook) Option {
 	}
 }
 
-// WithPredicate configures the interpreter to register the specified predicate with the specified hook.
-// The hook is a function that is called before the predicate is executed and can be used to check some conditions,
-// like the gas consumption or the permission to execute the predicate.
+// WithPredicate configures the interpreter to register the specified predicate.
 //
 // The predicates names must be present in the registry, otherwise the function will return an error.
-func WithPredicate(_ goctx.Context, predicate string, hook Hook) Option {
+func WithPredicate(_ goctx.Context, predicate string) Option {
 	return func(i *prolog.Interpreter) error {
-		if err := Register(i, predicate, hook); err != nil {
+		if err := Register(i, predicate); err != nil {
 			return fmt.Errorf("error registering predicate '%s': %w", predicate, err)
 		}
 		return nil
@@ -70,6 +68,7 @@ func WithFS(fs fs.FS) Option {
 	}
 }
 
+// WithMaxVariables configures the interpreter to use the specified maximum number of variables.
 func WithMaxVariables(maxVariables *math.Uint) Option {
 	return func(i *prolog.Interpreter) error {
 		if maxVariables != nil {
@@ -77,6 +76,16 @@ func WithMaxVariables(maxVariables *math.Uint) Option {
 		} else {
 			i.SetMaxVariables(0)
 		}
+		return nil
+	}
+}
+
+// WithHooks configures the interpreter to use the specified hooks.
+func WithHooks(hooks ...engine.HookFunc) Option {
+	return func(i *prolog.Interpreter) error {
+		i.InstallHook(
+			engine.CompositeHook(hooks...),
+		)
 		return nil
 	}
 }

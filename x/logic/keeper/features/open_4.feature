@@ -43,7 +43,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4146
+      gas_used: 4153
       answer:
         has_more: false
         variables: ["URI"]
@@ -86,7 +86,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
      height: 42
-      gas_used: 4142
+      gas_used: 4144
       answer:
         has_more: false
         variables: ["Chars"]
@@ -127,7 +127,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4142
+      gas_used: 4144
       answer:
         has_more: false
         variables: ["Chars"]

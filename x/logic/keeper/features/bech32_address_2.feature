@@ -109,7 +109,7 @@ Feature: bech32_address/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4140
+      gas_used: 4141
       answer:
         has_more: false
         results:
@@ -130,7 +130,7 @@ Feature: bech32_address/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4140
+      gas_used: 4141
       answer:
         has_more: false
         results:
