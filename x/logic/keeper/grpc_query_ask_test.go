@@ -166,6 +166,12 @@ func TestGRPCAsk(t *testing.T) {
 				expectedError: "out of gas: logic <block_height/1> (11167/3000): limit exceeded",
 			},
 			{
+				program:       "recursionOfDeath :- recursionOfDeath.",
+				query:         "recursionOfDeath.",
+				maxGas:        3000,
+				expectedError: "out of gas: logic <recursionOfDeath/0> (3001/3000): limit exceeded",
+			},
+			{
 				query:         "length(List, 100000).",
 				maxVariables:  1000,
 				expectedError: "maximum number of variables reached: limit exceeded",
