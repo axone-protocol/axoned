@@ -100,7 +100,7 @@ open(URI, read, _, []).
 
 ```  yaml
 height: 42
-gas_used: 4146
+gas_used: 4153
 answer:
   has_more: false
   variables: ["URI"]
@@ -152,7 +152,7 @@ read_resource('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08x
 
 ```  yaml
 height: 42
-gas_used: 4142
+gas_used: 4144
 answer:
   has_more: false
   variables: ["Chars"]
@@ -202,7 +202,7 @@ read_resource('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08x
 
 ```  yaml
 height: 42
-gas_used: 4142
+gas_used: 4144
 answer:
   has_more: false
   variables: ["Chars"]
