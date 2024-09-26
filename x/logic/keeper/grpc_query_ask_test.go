@@ -28,6 +28,7 @@ import (
 	"github.com/axone-protocol/axoned/v10/x/logic/types"
 )
 
+//nolint:lll
 func TestGRPCAsk(t *testing.T) {
 	emptySolution := types.Result{}
 	Convey("Given a test cases", t, func() {
@@ -166,6 +167,18 @@ func TestGRPCAsk(t *testing.T) {
 				expectedError: "out of gas: logic <block_height/1> (11167/3000): limit exceeded",
 			},
 			{
+				program:       "recursionOfDeath :- recursionOfDeath.",
+				query:         "recursionOfDeath.",
+				maxGas:        3000,
+				expectedError: "out of gas: logic <recursionOfDeath/0> (3001/3000): limit exceeded",
+			},
+			{
+				program:       "backtrackOfDeath :- repeat, fail.",
+				query:         "backtrackOfDeath.",
+				maxGas:        3014,
+				expectedError: "out of gas: logic <fail/0> (3015/3014): limit exceeded",
+			},
+			{
 				query:         "length(List, 100000).",
 				maxVariables:  1000,
 				expectedError: "maximum number of variables reached: limit exceeded",
@@ -239,7 +252,29 @@ func TestGRPCAsk(t *testing.T) {
 				expectedAnswer: &types.Answer{
 					HasMore:   false,
 					Variables: []string{"X"},
-					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_height/1),block_height/1)"}},
+					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_height/1),root)"}},
+				},
+			},
+			{
+				program:            "contains_forbidden_predicate(X) :- block_height(X).",
+				query:              "contains_forbidden_predicate(X).",
+				predicateBlacklist: []string{"block_height/1"},
+				expectedAnswer: &types.Answer{
+					HasMore:   false,
+					Variables: []string{"X"},
+					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_height/1),contains_forbidden_predicate/1)"}},
+				},
+			},
+			{
+				program:            "cannot_be_blacklisted(X) :- X = 42.",
+				query:              "cannot_be_blacklisted(X).",
+				predicateBlacklist: []string{"cannot_be_blacklisted/1"},
+				expectedAnswer: &types.Answer{
+					HasMore:   false,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X", Expression: "42",
+					}}}},
 				},
 			},
 			{

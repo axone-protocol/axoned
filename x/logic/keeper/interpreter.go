@@ -9,6 +9,7 @@ import (
 	"github.com/ichiban/prolog"
 	"github.com/ichiban/prolog/engine"
 	"github.com/samber/lo"
+	orderedmap "github.com/wk8/go-ordered-map/v2"
 
 	errorsmod "cosmossdk.io/errors"
 	sdkmath "cosmossdk.io/math"
@@ -82,37 +83,8 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 	sdkctx := sdk.UnwrapSDKContext(ctx)
 
 	interpreterParams := params.GetInterpreter()
-	gasPolicy := params.GetGasPolicy()
-	limits := params.GetLimits()
-	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), nonNilNorZeroOrDefaultUint64(gasPolicy.WeightingFactor, defaultWeightFactor))
-
 	whitelistPredicates := util.NonZeroOrDefault(interpreterParams.PredicatesFilter.Whitelist, interpreter.RegistryNames)
 	blacklistPredicates := interpreterParams.PredicatesFilter.Blacklist
-
-	hook := func(predicate string) func(env *engine.Env) (err error) {
-		return func(env *engine.Env) (err error) {
-			if !util.WhitelistBlacklistMatches(whitelistPredicates, blacklistPredicates, prolog2.PredicateMatches)(predicate) {
-				return engine.PermissionError(
-					prolog2.AtomOperationExecute, prolog2.AtomPermissionForbiddenPredicate, engine.NewAtom(predicate), env)
-			}
-			cost := lookupCost(predicate, defaultPredicateCost, gasPolicy.PredicateCosts)
-
-			defer func() {
-				if r := recover(); r != nil {
-					switch rType := r.(type) {
-					case storetypes.ErrorOutOfGas:
-						err = errorsmod.Wrapf(
-							types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
-							types.ModuleName, rType.Descriptor, sdkctx.GasMeter().GasConsumed(), sdkctx.GasMeter().Limit())
-					default:
-						panic(r)
-					}
-				}
-			}()
-			gasMeter.ConsumeGas(cost, predicate)
-			return err
-		}
-	}
 
 	whitelistUrls := lo.Map(
 		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
@@ -122,6 +94,7 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 		util.Indexed(util.ParseURLMust))
 
 	var userOutputBuffer writerStringer
+	limits := params.GetLimits()
 	if limits.MaxUserOutputSize != nil && limits.MaxUserOutputSize.GT(sdkmath.ZeroUint()) {
 		userOutputBuffer = util.NewBoundedBufferMust(int(limits.MaxUserOutputSize.Uint64()))
 	} else {
@@ -129,7 +102,11 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 	}
 
 	options := []interpreter.Option{
-		interpreter.WithPredicates(ctx, interpreter.RegistryNames, hook),
+		interpreter.WithHooks(
+			whitelistBlacklistHookFn(whitelistPredicates, blacklistPredicates),
+			gasMeterHookFn(sdkctx, params.GetGasPolicy()),
+		),
+		interpreter.WithPredicates(ctx, interpreter.RegistryNames),
 		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
 		interpreter.WithFS(filtered.NewFS(k.fsProvider(ctx), whitelistUrls, blacklistUrls)),
 		interpreter.WithUserOutputWriter(userOutputBuffer),
@@ -141,7 +118,86 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 	return i, userOutputBuffer, err
 }
 
+// whitelistBlacklistHookFn returns a hook function that checks if the given predicate is allowed to be executed.
+// The predicate is allowed if it is in the whitelist or not in the blacklist.
+func whitelistBlacklistHookFn(whitelist, blacklist []string) engine.HookFunc {
+	allowed := lo.Reduce(
+		lo.Filter(interpreter.RegistryNames,
+			util.Indexed(util.WhitelistBlacklistMatches(whitelist, blacklist, prolog2.PredicateMatches))),
+		func(agg *orderedmap.OrderedMap[string, struct{}], item string, _ int) *orderedmap.OrderedMap[string, struct{}] {
+			agg.Set(item, struct{}{})
+			return agg
+		},
+		orderedmap.New[string, struct{}](orderedmap.WithCapacity[string, struct{}](len(interpreter.RegistryNames))))
+
+	return func(opcode engine.Opcode, operand engine.Term, env *engine.Env) error {
+		if opcode != engine.OpCall {
+			return nil
+		}
+
+		predicateStringer, ok := operand.(fmt.Stringer)
+		if !ok {
+			return engine.SyntaxError(operand, env)
+		}
+
+		predicate := predicateStringer.String()
+
+		if interpreter.IsRegistered(predicate) {
+			if _, found := allowed.Get(predicate); !found {
+				return engine.PermissionError(
+					prolog2.AtomOperationExecute,
+					prolog2.AtomPermissionForbiddenPredicate,
+					engine.NewAtom(predicate),
+					env,
+				)
+			}
+		}
+		return nil
+	}
+}
+
+// gasMeterHookFn returns a hook function that consumes gas based on the cost of the executed predicate.
+func gasMeterHookFn(ctx context.Context, gasPolicy types.GasPolicy) engine.HookFunc {
+	sdkctx := sdk.UnwrapSDKContext(ctx)
+	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), nonNilNorZeroOrDefaultUint64(gasPolicy.WeightingFactor, defaultWeightFactor))
+
+	return func(opcode engine.Opcode, operand engine.Term, env *engine.Env) (err error) {
+		if opcode != engine.OpCall {
+			return nil
+		}
+
+		operandStringer, ok := operand.(fmt.Stringer)
+		if !ok {
+			return engine.SyntaxError(operand, env)
+		}
+
+		predicate := operandStringer.String()
+
+		cost := lookupCost(predicate, defaultPredicateCost, gasPolicy.PredicateCosts)
+
+		defer func() {
+			if r := recover(); r != nil {
+				switch rType := r.(type) {
+				case storetypes.ErrorOutOfGas:
+					err = errorsmod.Wrapf(
+						types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
+						types.ModuleName, rType.Descriptor, sdkctx.GasMeter().GasConsumed(), sdkctx.GasMeter().Limit())
+				default:
+					panic(r)
+				}
+			}
+		}()
+		gasMeter.ConsumeGas(cost, predicate)
+
+		return nil
+	}
+}
+
 func lookupCost(predicate string, defaultCost uint64, costs []types.PredicateCost) uint64 {
+	if !interpreter.IsRegistered(predicate) {
+		return defaultCost
+	}
+
 	for _, c := range costs {
 		if prolog2.PredicateMatches(predicate)(c.Predicate) {
 			return nonNilNorZeroOrDefaultUint64(c.Cost, defaultCost)

@@ -162,7 +162,7 @@ axone_addr('axone1p8u47en82gmzfm259y6z93r9qe63l25d858vqu').
 
 ```  yaml
 height: 42
-gas_used: 4140
+gas_used: 4141
 answer:
   has_more: false
   results:
