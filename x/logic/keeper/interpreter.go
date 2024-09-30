@@ -173,7 +173,9 @@ func gasMeterHookFn(ctx context.Context, gasPolicy types.GasPolicy) engine.HookF
 
 		predicate := operandStringer.String()
 
-		cost := lookupCost(predicate, defaultPredicateCost, gasPolicy.PredicateCosts)
+		cost := lookupCost(predicate,
+			nonNilNorZeroOrDefaultUint64(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
+			gasPolicy.PredicateCosts)
 
 		defer func() {
 			if r := recover(); r != nil {
