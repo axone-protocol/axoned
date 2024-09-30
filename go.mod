@@ -46,7 +46,7 @@ require (
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f
 	github.com/princjef/gomarkdoc v1.1.0
 	github.com/prometheus/client_golang v1.20.3
-	github.com/samber/lo v1.39.0
+	github.com/samber/lo v1.47.0
 	github.com/sergi/go-diff v1.3.1
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/spf13/cast v1.7.0
