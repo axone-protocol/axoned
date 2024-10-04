@@ -12,6 +12,8 @@ import (
 	"github.com/golang/mock/gomock"
 	"github.com/ichiban/prolog/engine"
 	"github.com/samber/lo"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	. "github.com/smartystreets/goconvey/convey"
 
@@ -606,11 +608,12 @@ func TestAccount(t *testing.T) {
 		defer ctrl.Finish()
 
 		cases := []struct {
-			ctx        context.Context
-			addresses  []string
-			program    string
-			query      string
-			wantAnswer *types.Answer
+			ctx                         context.Context
+			addresses                   []string
+			authQueryServiceKeeperError bool
+			program                     string
+			query                       string
+			wantAnswer                  *types.Answer
 		}{
 			{
 				addresses: []string{
@@ -753,6 +756,20 @@ func TestAccount(t *testing.T) {
 					},
 				},
 			},
+			{
+				addresses:                   []string{},
+				authQueryServiceKeeperError: true,
+				query:                       `account(X).`,
+				wantAnswer: &types.Answer{
+					HasMore:   false,
+					Variables: []string{"X"},
+					Results: []types.Result{
+						{
+							Error: "error(resource_error(resource_module(auth)),[r,p,c, ,e,r,r,o,r,:, ,c,o,d,e, ,=, ,P,e,r,m,i,s,s,i,o,n,D,e,n,i,e,d, ,d,e,s,c, ,=, ,n,o,t, ,a,l,l,o,w,e,d],account/1)",
+						},
+					},
+				},
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
@@ -800,6 +817,10 @@ func TestAccount(t *testing.T) {
 							Accounts(gomock.Any(), gomock.Any()).
 							AnyTimes().
 							DoAndReturn(func(_ context.Context, req *authtypes.QueryAccountsRequest) (*authtypes.QueryAccountsResponse, error) {
+								if tc.authQueryServiceKeeperError {
+									return nil, status.Error(codes.PermissionDenied, "not allowed")
+								}
+
 								start := 0
 								limit := 5
 								toCursor := func(idx int) []byte { return []byte(fmt.Sprintf("%d", idx)) }
