@@ -6,6 +6,7 @@ import (
 	"github.com/ichiban/prolog/engine"
 	"github.com/samber/lo"
 
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/axone-protocol/axoned/v10/x/logic/prolog"
@@ -96,18 +97,24 @@ func BankLockedBalances(vm *engine.VM, address, balances engine.Term, cont engin
 // # Examples:
 //
 //	# Query the locked coins of the account.
-//	- account('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).
+//	- account('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa').
 //
 //	# Query the all accounts existing in the blockchain.
-//	- account(Acc).
+//	- account(Address).
 func account(vm *engine.VM, address engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		sdkContext, err := prolog.UnwrapSDKContext(ctx, env)
+		authKeeper, err := prolog.ContextValue[types.AccountKeeper](ctx, types.AuthKeeperContextKey, env)
 		if err != nil {
 			return engine.Error(err)
 		}
-		authKeeper := sdkContext.Value(types.AuthKeeperContextKey).(types.AccountKeeper)
-		authQueryService := sdkContext.Value(types.AuthQueryServiceContextKey).(types.AuthQueryService)
+		authQueryService, err := prolog.ContextValue[types.AuthQueryService](ctx, types.AuthQueryServiceContextKey, env)
+		if err != nil {
+			return engine.Error(err)
+		}
+		interfaceRegistry, err := prolog.ContextValue[cdctypes.InterfaceRegistry](ctx, types.InterfaceRegistryContextKey, env)
+		if err != nil {
+			return engine.Error(err)
+		}
 
 		switch acc := env.Resolve(address).(type) {
 		case engine.Atom:
@@ -125,7 +132,7 @@ func account(vm *engine.VM, address engine.Term, cont engine.Cont, env *engine.E
 					return cont(env)
 				})
 		case engine.Variable:
-			return engine.DelaySeq(IterMap(Accounts(ctx, authQueryService),
+			return engine.DelaySeq(IterMap(Accounts(ctx, authQueryService, interfaceRegistry),
 				func(it lo.Tuple2[sdk.AccountI, error]) engine.PromiseFunc {
 					return func(_ context.Context) *engine.Promise {
 						addr, err := lo.Unpack2(it)
@@ -147,11 +154,10 @@ func fetchBalances(vm *engine.VM, address engine.Term, balances engine.Term, coi
 	bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins, cont engine.Cont, env *engine.Env,
 ) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		sdkContext, err := prolog.UnwrapSDKContext(ctx, env)
+		bankKeeper, err := prolog.ContextValue[types.BankKeeper](ctx, types.BankKeeperContextKey, env)
 		if err != nil {
 			return engine.Error(err)
 		}
-		bankKeeper := sdkContext.Value(types.BankKeeperContextKey).(types.BankKeeper)
 
 		return account(vm, address, func(env *engine.Env) *engine.Promise {
 			switch acc := env.Resolve(address).(type) {
