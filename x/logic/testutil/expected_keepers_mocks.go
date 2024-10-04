@@ -9,7 +9,7 @@ import (
 	reflect "reflect"
 
 	types "github.com/cosmos/cosmos-sdk/types"
-	types0 "github.com/cosmos/cosmos-sdk/x/bank/types"
+	types0 "github.com/cosmos/cosmos-sdk/x/auth/types"
 	gomock "github.com/golang/mock/gomock"
 )
 
@@ -50,6 +50,44 @@ func (mr *MockAccountKeeperMockRecorder) GetAccount(ctx, addr interface{}) *gomo
 	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccount", reflect.TypeOf((*MockAccountKeeper)(nil).GetAccount), ctx, addr)
 }
 
+// MockAuthQueryService is a mock of AuthQueryService interface.
+type MockAuthQueryService struct {
+	ctrl     *gomock.Controller
+	recorder *MockAuthQueryServiceMockRecorder
+}
+
+// MockAuthQueryServiceMockRecorder is the mock recorder for MockAuthQueryService.
+type MockAuthQueryServiceMockRecorder struct {
+	mock *MockAuthQueryService
+}
+
+// NewMockAuthQueryService creates a new mock instance.
+func NewMockAuthQueryService(ctrl *gomock.Controller) *MockAuthQueryService {
+	mock := &MockAuthQueryService{ctrl: ctrl}
+	mock.recorder = &MockAuthQueryServiceMockRecorder{mock}
+	return mock
+}
+
+// EXPECT returns an object that allows the caller to indicate expected use.
+func (m *MockAuthQueryService) EXPECT() *MockAuthQueryServiceMockRecorder {
+	return m.recorder
+}
+
+// Accounts mocks base method.
+func (m *MockAuthQueryService) Accounts(ctx context.Context, req *types0.QueryAccountsRequest) (*types0.QueryAccountsResponse, error) {
+	m.ctrl.T.Helper()
+	ret := m.ctrl.Call(m, "Accounts", ctx, req)
+	ret0, _ := ret[0].(*types0.QueryAccountsResponse)
+	ret1, _ := ret[1].(error)
+	return ret0, ret1
+}
+
+// Accounts indicates an expected call of Accounts.
+func (mr *MockAuthQueryServiceMockRecorder) Accounts(ctx, req interface{}) *gomock.Call {
+	mr.mock.ctrl.T.Helper()
+	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "Accounts", reflect.TypeOf((*MockAuthQueryService)(nil).Accounts), ctx, req)
+}
+
 // MockBankKeeper is a mock of BankKeeper interface.
 type MockBankKeeper struct {
 	ctrl     *gomock.Controller
@@ -71,20 +109,6 @@ func NewMockBankKeeper(ctrl *gomock.Controller) *MockBankKeeper {
 // EXPECT returns an object that allows the caller to indicate expected use.
 func (m *MockBankKeeper) EXPECT() *MockBankKeeperMockRecorder {
 	return m.recorder
-}
-
-// GetAccountsBalances mocks base method.
-func (m *MockBankKeeper) GetAccountsBalances(ctx context.Context) []types0.Balance {
-	m.ctrl.T.Helper()
-	ret := m.ctrl.Call(m, "GetAccountsBalances", ctx)
-	ret0, _ := ret[0].([]types0.Balance)
-	return ret0
-}
-
-// GetAccountsBalances indicates an expected call of GetAccountsBalances.
-func (mr *MockBankKeeperMockRecorder) GetAccountsBalances(ctx interface{}) *gomock.Call {
-	mr.mock.ctrl.T.Helper()
-	return mr.mock.ctrl.RecordCallWithMethodType(mr.mock, "GetAccountsBalances", reflect.TypeOf((*MockBankKeeper)(nil).GetAccountsBalances), ctx)
 }
 
 // GetAllBalances mocks base method.

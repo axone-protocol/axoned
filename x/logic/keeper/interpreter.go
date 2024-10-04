@@ -38,10 +38,11 @@ type writerStringer interface {
 }
 
 func (k Keeper) enhanceContext(ctx context.Context) context.Context {
-	sdkCtx := sdk.UnwrapSDKContext(ctx)
-	sdkCtx = sdkCtx.WithValue(types.AuthKeeperContextKey, k.authKeeper)
-	sdkCtx = sdkCtx.WithValue(types.BankKeeperContextKey, k.bankKeeper)
-	return sdkCtx
+	return sdk.UnwrapSDKContext(ctx).
+		WithValue(types.InterfaceRegistryContextKey, k.interfaceRegistry).
+		WithValue(types.AuthKeeperContextKey, k.authKeeper).
+		WithValue(types.AuthQueryServiceContextKey, k.authQueryService).
+		WithValue(types.BankKeeperContextKey, k.bankKeeper)
 }
 
 func (k Keeper) execute(

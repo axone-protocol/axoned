@@ -22,6 +22,8 @@ const (
 )
 
 // QueryInterpreter interprets a query and returns the solutions up to the given limit.
+//
+//nolint:nestif,funlen
 func QueryInterpreter(
 	ctx context.Context, i *prolog.Interpreter, query string, solutionsLimit sdkmath.Uint,
 ) (*types.Answer, error) {
@@ -43,7 +45,6 @@ func QueryInterpreter(
 	}, env).Force(ctx)
 
 	vars := parsedVarsToVars(p.Vars)
-
 	results, err := envsToResults(envs, p.Vars, i)
 	if err != nil {
 		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
@@ -52,19 +53,30 @@ func QueryInterpreter(
 	if callErr != nil {
 		if sdkmath.NewUint(uint64(len(results))).LT(solutionsLimit) {
 			// error is not part of the look-ahead and should be included in the solutions
-			sdkCtx := sdk.UnwrapSDKContext(ctx)
+			if errors.Is(callErr, types.LimitExceeded) {
+				return nil, callErr
+			}
 
 			var panicErr engine.PanicError
-			switch {
-			case errors.Is(callErr, types.LimitExceeded):
-				return nil, callErr
-			case errors.As(callErr, &panicErr) && errors.Is(panicErr.OriginErr, engine.ErrMaxVariables):
+			if errors.As(callErr, &panicErr) && errors.Is(panicErr.OriginErr, engine.ErrMaxVariables) {
 				return nil, errorsmod.Wrapf(types.LimitExceeded, panicErr.OriginErr.Error())
-			case sdkCtx.GasMeter().IsOutOfGas():
-				return nil, errorsmod.Wrapf(
-					types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
-					types.ModuleName, callErr.Error(), sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
 			}
+
+			if err = func() error {
+				defer func() {
+					_ = recover()
+				}()
+				sdkCtx := sdk.UnwrapSDKContext(ctx)
+				if sdkCtx.GasMeter().IsOutOfGas() {
+					return errorsmod.Wrapf(
+						types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
+						types.ModuleName, callErr.Error(), sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
+				}
+				return nil
+			}(); err != nil {
+				return nil, err
+			}
+
 			results = append(results, types.Result{Error: callErr.Error()})
 		} else {
 			// error is part of the look-ahead, so let's consider that there's one more solution
