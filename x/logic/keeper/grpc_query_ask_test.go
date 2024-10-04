@@ -16,10 +16,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	"github.com/cosmos/cosmos-sdk/testutil"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
-	bankypes "github.com/cosmos/cosmos-sdk/x/bank/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/axone-protocol/axoned/v10/x/logic"
@@ -152,11 +150,6 @@ func TestGRPCAsk(t *testing.T) {
 				query:         "block_height(X).",
 				maxGas:        1000,
 				expectedError: "out of gas: logic <ReadPerByte> (1018/1000): limit exceeded",
-			},
-			{
-				query:         "bank_balances(X, Y).",
-				maxGas:        3000,
-				expectedError: "out of gas: logic <panic: {ValuePerByte}> (3093/3000): limit exceeded",
 			},
 			{
 				query:  "block_height(X).",
@@ -398,25 +391,22 @@ func TestGRPCAsk(t *testing.T) {
 					// gomock initializations
 					ctrl := gomock.NewController(t)
 					accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
+					authQueryService := logictestutil.NewMockAuthQueryService(ctrl)
 					bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 					fsProvider := logictestutil.NewMockFS(ctrl)
 
-					bankKeeper.EXPECT().GetAccountsBalances(gomock.Any()).Do(func(ctx gocontext.Context) []bankypes.Balance {
-						sdk.UnwrapSDKContext(ctx).GasMeter().ConsumeGas(2000, "ValuePerByte")
-						return nil
-					}).AnyTimes()
-
 					logicKeeper := keeper.NewKeeper(
 						encCfg.Codec,
+						encCfg.InterfaceRegistry,
 						key,
 						key,
 						authtypes.NewModuleAddress(govtypes.ModuleName),
 						accountKeeper,
+						authQueryService,
 						bankKeeper,
 						func(_ gocontext.Context) fs.FS {
 							return fsProvider
-						},
-					)
+						})
 					maxResultCount := sdkmath.NewUint(tc.maxResultCount)
 					maxSize := sdkmath.NewUint(tc.maxSize)
 					params := types.DefaultParams()

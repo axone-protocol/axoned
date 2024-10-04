@@ -59,20 +59,22 @@ func TestGRPCParams(t *testing.T) {
 					// gomock initializations
 					ctrl := gomock.NewController(t)
 					accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
+					authQueryService := logictestutil.NewMockAuthQueryService(ctrl)
 					bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 					fsProvider := logictestutil.NewMockFS(ctrl)
 
 					logicKeeper := keeper.NewKeeper(
 						encCfg.Codec,
+						encCfg.InterfaceRegistry,
 						key,
 						key,
 						authtypes.NewModuleAddress(govtypes.ModuleName),
 						accountKeeper,
+						authQueryService,
 						bankKeeper,
 						func(_ gocontext.Context) fs.FS {
 							return fsProvider
-						},
-					)
+						})
 
 					Convey("and given params to the keeper", func() {
 						err := logicKeeper.SetParams(testCtx.Ctx, tc.params)

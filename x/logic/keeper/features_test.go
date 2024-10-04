@@ -57,13 +57,14 @@ func TestFeatures(t *testing.T) {
 }
 
 type testCase struct {
-	ctx           sdktestutil.TestContext
-	accountKeeper *logictestutil.MockAccountKeeper
-	bankKeeper    *logictestutil.MockBankKeeper
-	wasmKeeper    *logictestutil.MockWasmKeeper
-	params        types.Params
-	request       types.QueryServiceAskRequest
-	got           *types.QueryServiceAskResponse
+	ctx              sdktestutil.TestContext
+	accountKeeper    *logictestutil.MockAccountKeeper
+	authQueryService *logictestutil.MockAuthQueryService
+	bankKeeper       *logictestutil.MockBankKeeper
+	wasmKeeper       *logictestutil.MockWasmKeeper
+	params           types.Params
+	request          types.QueryServiceAskRequest
+	got              *types.QueryServiceAskResponse
 }
 
 type SmartContractConfiguration struct {
@@ -291,18 +292,19 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 	encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
 	logicKeeper := keeper.NewKeeper(
 		encCfg.Codec,
+		encCfg.InterfaceRegistry,
 		key,
 		key,
 		authtypes.NewModuleAddress(govtypes.ModuleName),
 		tc.accountKeeper,
+		tc.authQueryService,
 		tc.bankKeeper,
 		func(ctx context.Context) fs.FS {
 			vfs := composite.NewFS()
 			vfs.Mount(wasm.Scheme, wasm.NewFS(ctx, tc.wasmKeeper))
 
 			return vfs
-		},
-	)
+		})
 
 	if err := logicKeeper.SetParams(tc.ctx.Ctx, tc.params); err != nil {
 		return nil, err
