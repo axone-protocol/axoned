@@ -4,7 +4,6 @@ package predicate
 import (
 	"context"
 	"fmt"
-	"strconv"
 	"strings"
 	"testing"
 
@@ -26,10 +25,8 @@ import (
 	"cosmossdk.io/x/evidence"
 
 	codecaddress "github.com/cosmos/cosmos-sdk/codec/address"
-	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
-	query "github.com/cosmos/cosmos-sdk/types/query"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 
@@ -44,6 +41,7 @@ func TestBank(t *testing.T) {
 		defer ctrl.Finish()
 
 		cases := []struct {
+			ctx            context.Context
 			balances       []bank.Balance
 			spendableCoins []bank.Balance
 			lockedCoins    []bank.Balance
@@ -53,14 +51,19 @@ func TestBank(t *testing.T) {
 			wantError      error
 		}{
 			{
+				balances:   []bank.Balance{},
+				query:      `bank_balances(X, Y).`,
+				wantResult: nil,
+			},
+			{
 				balances: []bank.Balance{
 					{
 						Address: "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 						Coins:   sdk.NewCoins(sdk.NewCoin("uaxone", math.NewInt(100))),
 					},
 				},
-				query:      `bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).`,
-				wantResult: []testutil.TermResults{{"X": "[uaxone-100]"}},
+				query:      `bank_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', X).`,
+				wantResult: nil,
 			},
 			{
 				balances: []bank.Balance{
@@ -172,6 +175,13 @@ func TestBank(t *testing.T) {
 				wantResult: []testutil.TermResults{{"X": "[uaxone-100]"}},
 				wantError: fmt.Errorf("error(domain_error(encoding(bech32),foo),[%s],bank_balances/2)",
 					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
+			},
+			{
+				ctx:        context.Background(),
+				balances:   []bank.Balance{},
+				query:      `bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).`,
+				wantResult: []testutil.TermResults{{"X": "[uaxone-100]"}},
+				wantError:  fmt.Errorf("error(resource_error(resource_context(bankKeeper)),bank_balances/2)"),
 			},
 			{
 				balances: []bank.Balance{
@@ -456,14 +466,17 @@ func TestBank(t *testing.T) {
 					authQueryServiceKeeper := testutil.NewMockAuthQueryService(ctrl)
 					bankKeeper := testutil.NewMockBankKeeper(ctrl)
 					encCfg := moduletestutil.MakeTestEncodingConfig(evidence.AppModuleBasic{})
-
-					ctx := sdk.
-						NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger()).
-						WithValue(types.BankKeeperContextKey, bankKeeper).
-						WithValue(types.AuthKeeperContextKey, accountKeeper).
-						WithValue(types.AuthQueryServiceContextKey, authQueryServiceKeeper).
-						WithValue(types.InterfaceRegistryContextKey, encCfg.InterfaceRegistry)
 					sdk.GetConfig().SetBech32PrefixForAccount("axone", "axonepub")
+
+					ctx := tc.ctx
+					if ctx == nil {
+						ctx = sdk.
+							NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger()).
+							WithValue(types.BankKeeperContextKey, bankKeeper).
+							WithValue(types.AuthKeeperContextKey, accountKeeper).
+							WithValue(types.AuthQueryServiceContextKey, authQueryServiceKeeper).
+							WithValue(types.InterfaceRegistryContextKey, encCfg.InterfaceRegistry)
+					}
 
 					Convey("and a bank keeper initialized with the preconfigured balances", func(c C) {
 						addresses := lo.Uniq(
@@ -489,53 +502,7 @@ func TestBank(t *testing.T) {
 
 								return authtypes.NewBaseAccountWithAddress(accAddr)
 							})
-						authQueryServiceKeeper.
-							EXPECT().
-							Accounts(gomock.Any(), gomock.Any()).
-							AnyTimes().
-							DoAndReturn(func(_ context.Context, req *authtypes.QueryAccountsRequest) (*authtypes.QueryAccountsResponse, error) {
-								start := 0
-								limit := 5
-								toCursor := func(idx int) []byte { return []byte(fmt.Sprintf("%d", idx)) }
-								fromCursor := func(k []byte) int {
-									idx, err := strconv.Atoi(string(k))
-									c.So(err, ShouldBeNil)
-
-									return idx
-								}
-
-								if req.Pagination != nil {
-									if req.Pagination.Key != nil {
-										start = fromCursor(req.Pagination.Key)
-									}
-									if req.Pagination.Limit != 0 {
-										limit = int(req.Pagination.GetLimit())
-									}
-								}
-								accounts := lo.Map(
-									lo.Slice(addresses, start, start+limit),
-									func(acc string, _ int) *codectypes.Any {
-										addr, err := sdk.AccAddressFromBech32(acc)
-										c.So(err, ShouldBeNil)
-
-										accI := authtypes.ProtoBaseAccount()
-										err = accI.SetAddress(addr)
-										c.So(err, ShouldBeNil)
-
-										anyV, err := codectypes.NewAnyWithValue(accI)
-										c.So(err, ShouldBeNil)
-
-										return anyV
-									})
-
-								return &authtypes.QueryAccountsResponse{
-									Accounts: accounts,
-									Pagination: &query.PageResponse{
-										NextKey: toCursor(start + 1),
-										Total:   0,
-									},
-								}, nil
-							})
+						testutil.MockAuthQueryServiceWithAddresses(authQueryServiceKeeper, addresses)
 						for _, balance := range tc.balances {
 							bankKeeper.
 								EXPECT().
@@ -750,7 +717,41 @@ func TestAccount(t *testing.T) {
 					Variables: []string{},
 					Results: []types.Result{
 						{
-							Error:         "error(resource_error(resource_context),account/1)",
+							Error:         "error(resource_error(resource_context(authKeeper)),account/1)",
+							Substitutions: nil,
+						},
+					},
+				},
+			},
+			{
+				ctx:       context.WithValue(context.Background(), types.AuthKeeperContextKey, testutil.NewMockAccountKeeper(ctrl)),
+				addresses: []string{},
+				query:     `account(dont_care).`,
+				wantAnswer: &types.Answer{
+					HasMore:   false,
+					Variables: []string{},
+					Results: []types.Result{
+						{
+							Error:         "error(resource_error(resource_context(authQueryService)),account/1)",
+							Substitutions: nil,
+						},
+					},
+				},
+			},
+			{
+				ctx: context.WithValue(
+					context.WithValue(
+						context.Background(),
+						types.AuthKeeperContextKey, testutil.NewMockAccountKeeper(ctrl)),
+					types.AuthQueryServiceContextKey, testutil.NewMockAuthQueryService(ctrl)),
+				addresses: []string{},
+				query:     `account(dont_care).`,
+				wantAnswer: &types.Answer{
+					HasMore:   false,
+					Variables: []string{},
+					Results: []types.Result{
+						{
+							Error:         "error(resource_error(resource_context(interfaceRegistry)),account/1)",
 							Substitutions: nil,
 						},
 					},
@@ -812,57 +813,11 @@ func TestAccount(t *testing.T) {
 								return authtypes.NewBaseAccountWithAddress(accAddr)
 							})
 
-						authQueryServiceKeeper.
-							EXPECT().
-							Accounts(gomock.Any(), gomock.Any()).
-							AnyTimes().
-							DoAndReturn(func(_ context.Context, req *authtypes.QueryAccountsRequest) (*authtypes.QueryAccountsResponse, error) {
-								if tc.authQueryServiceKeeperError {
-									return nil, status.Error(codes.PermissionDenied, "not allowed")
-								}
-
-								start := 0
-								limit := 5
-								toCursor := func(idx int) []byte { return []byte(fmt.Sprintf("%d", idx)) }
-								fromCursor := func(k []byte) int {
-									idx, err := strconv.Atoi(string(k))
-									c.So(err, ShouldBeNil)
-
-									return idx
-								}
-
-								if req.Pagination != nil {
-									if req.Pagination.Key != nil {
-										start = fromCursor(req.Pagination.Key)
-									}
-									if req.Pagination.Limit != 0 {
-										limit = int(req.Pagination.GetLimit())
-									}
-								}
-								accounts := lo.Map(
-									lo.Slice(tc.addresses, start, start+limit),
-									func(acc string, _ int) *codectypes.Any {
-										addr, err := sdk.AccAddressFromBech32(acc)
-										c.So(err, ShouldBeNil)
-
-										accI := authtypes.ProtoBaseAccount()
-										err = accI.SetAddress(addr)
-										c.So(err, ShouldBeNil)
-
-										anyV, err := codectypes.NewAnyWithValue(accI)
-										c.So(err, ShouldBeNil)
-
-										return anyV
-									})
-
-								return &authtypes.QueryAccountsResponse{
-									Accounts: accounts,
-									Pagination: &query.PageResponse{
-										NextKey: toCursor(start + 1),
-										Total:   0,
-									},
-								}, nil
-							})
+						if tc.authQueryServiceKeeperError {
+							testutil.MockAuthQueryServiceWithError(authQueryServiceKeeper, status.Error(codes.PermissionDenied, "not allowed"))
+						} else {
+							testutil.MockAuthQueryServiceWithAddresses(authQueryServiceKeeper, tc.addresses)
+						}
 
 						Convey("and a vm with the account predicate registered", func() {
 							interpreter := testutil.NewLightInterpreterMust(ctx)
