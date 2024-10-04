@@ -76,7 +76,7 @@ replace (
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
 
 	// Use cutom fork of prolog interpreter
-	github.com/ichiban/prolog => github.com/axone-protocol/prolog v1.0.1-0.20240924120526-53584b2b5c0b
+	github.com/ichiban/prolog => github.com/axone-protocol/prolog v1.0.1-0.20240930131208-a7e37dcfde82
 
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7
