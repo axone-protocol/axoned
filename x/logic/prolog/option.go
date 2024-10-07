@@ -11,6 +11,7 @@ import (
 // If no option is found nil is returned.
 func GetOption(name engine.Atom, options engine.Term, env *engine.Env) (engine.Term, error) {
 	extractOption := func(opt engine.Term) (engine.Term, error) {
+		//nolint:nilnil
 		switch v := env.Resolve(opt).(type) {
 		case engine.Compound:
 			if v.Functor() == name {
