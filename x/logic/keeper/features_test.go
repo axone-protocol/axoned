@@ -206,7 +206,7 @@ func whenTheQueryIsRun(ctx context.Context) error {
 func whenTheQueryIsRunLimitedToNSolutions(ctx context.Context, n int) error {
 	request := testCaseFromContext(ctx).request
 
-	limit := sdkmath.NewUint(uint64(n))
+	limit := sdkmath.NewUint(uint64(n)) //nolint:gosec // disable G115
 	request.Limit = &limit
 
 	testCaseFromContext(ctx).request = request

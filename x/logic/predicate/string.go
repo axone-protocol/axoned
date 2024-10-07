@@ -50,7 +50,7 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 
 	var maxLength uint64
 	if maxLen, ok := env.Resolve(length).(engine.Integer); ok {
-		maxLength = uint64(maxLen)
+		maxLength = uint64(maxLen) //nolint:gosec // disable G115
 	}
 
 	var builder strings.Builder
@@ -63,7 +63,7 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 			}
 			return engine.Error(engine.SyntaxError(prolog.ErrorTerm(err), env))
 		}
-		totalLen += uint64(l)
+		totalLen += uint64(l) //nolint:gosec // disable G115
 		_, err = builder.WriteRune(r)
 		if err != nil {
 			return engine.Error(engine.SyntaxError(prolog.ErrorTerm(err), env))
@@ -73,7 +73,7 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 	var r engine.Term = engine.NewAtom(builder.String())
 	return engine.Unify(
 		vm, prolog.Tuple(result, length),
-		prolog.Tuple(r, engine.Integer(totalLen)), cont, env)
+		prolog.Tuple(r, engine.Integer(totalLen)), cont, env) //nolint:gosec // disable G115
 }
 
 // StringBytes is a predicate that unifies a string with a list of bytes, returning true when the (Unicode) String is

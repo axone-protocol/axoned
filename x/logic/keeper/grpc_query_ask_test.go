@@ -446,7 +446,7 @@ func TestGRPCAsk(t *testing.T) {
 
 						var limit *sdkmath.Uint
 						if tc.limit != 0 {
-							v := sdkmath.NewUint(uint64(tc.limit))
+							v := sdkmath.NewUint(uint64(tc.limit)) //nolint:gosec // disable G115
 							limit = &v
 						}
 						query := types.QueryServiceAskRequest{
