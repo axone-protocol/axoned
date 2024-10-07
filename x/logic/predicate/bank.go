@@ -4,7 +4,9 @@ import (
 	"context"
 
 	"github.com/ichiban/prolog/engine"
+	"github.com/samber/lo"
 
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/axone-protocol/axoned/v10/x/logic/prolog"
@@ -15,10 +17,10 @@ import (
 //
 // The signature is as follows:
 //
-//	bank_balances(?Account, ?Balances)
+//	bank_balances(?Address, ?Balances)
 //
 // where:
-//   - Account represents the account address (in Bech32 format).
+//   - Address represents the account address (in Bech32 format).
 //   - Balances represents the balances of the account as a list of pairs of coin denomination and amount.
 //
 // # Examples:
@@ -31,29 +33,18 @@ import (
 //
 //	# Query the first balance of the given account by unifying the denomination and amount with the given terms.
 //	- bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A), _]).
-func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances(
-		account,
-		balances,
-		vm,
-		env,
-		cont,
-		func(ctx sdk.Context, bankKeeper types.BankKeeper, coins sdk.Coins, address sdk.AccAddress) sdk.Coins {
-			if coins != nil {
-				return coins
-			}
-			return AllBalancesSorted(ctx, bankKeeper, address)
-		})
+func BankBalances(vm *engine.VM, address, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return fetchBalances(vm, address, balances, AllBalancesSorted, cont, env)
 }
 
 // BankSpendableBalances is a predicate which unifies the given terms with the list of spendable coins of the given account.
 //
 // The signature is as follows:
 //
-//	bank_spendable_balances(?Account, ?Balances)
+//	bank_spendable_balances(?Address, ?Balances)
 //
 // where:
-//   - Account represents the account address (in Bech32 format).
+//   - Address represents the account address (in Bech32 format).
 //   - Balances represents the spendable balances of the account as a list of pairs of coin denomination and amount.
 //
 // # Examples:
@@ -66,26 +57,18 @@ func BankBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont
 //
 //	# Query the first spendable balances of the given account by unifying the denomination and amount with the given terms.
 //	- bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A), _]).
-func BankSpendableBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances(
-		account,
-		balances,
-		vm,
-		env,
-		cont,
-		func(ctx sdk.Context, bankKeeper types.BankKeeper, _ sdk.Coins, address sdk.AccAddress) sdk.Coins {
-			return SpendableCoinsSorted(ctx, bankKeeper, address)
-		})
+func BankSpendableBalances(vm *engine.VM, address, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return fetchBalances(vm, address, balances, SpendableCoinsSorted, cont, env)
 }
 
 // BankLockedBalances is a predicate which unifies the given terms with the list of locked coins of the given account.
 //
 // The signature is as follows:
 //
-//	bank_locked_balances(?Account, ?Balances)
+//	bank_locked_balances(?Address, ?Balances)
 //
 // where:
-//   - Account represents the account address (in Bech32 format).
+//   - Address represents the account address (in Bech32 format).
 //   - Balances represents the locked balances of the account as a list of pairs of coin denomination and amount.
 //
 // # Examples:
@@ -98,79 +81,93 @@ func BankSpendableBalances(vm *engine.VM, account, balances engine.Term, cont en
 //
 //	# Query the first locked balances of the given account by unifying the denomination and amount with the given terms.
 //	- bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A), _]).
-func BankLockedBalances(vm *engine.VM, account, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return fetchBalances(
-		account,
-		balances,
-		vm,
-		env,
-		cont,
-		func(ctx sdk.Context, bankKeeper types.BankKeeper, _ sdk.Coins, address sdk.AccAddress) sdk.Coins {
-			return LockedCoinsSorted(ctx, bankKeeper, address)
-		})
+func BankLockedBalances(vm *engine.VM, address, balances engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return fetchBalances(vm, address, balances, LockedCoinsSorted, cont, env)
 }
 
-func getBech32(env *engine.Env, account engine.Term) (sdk.AccAddress, error) {
-	switch acc := env.Resolve(account).(type) {
-	case engine.Variable:
-	case engine.Atom:
-		addr, err := sdk.AccAddressFromBech32(acc.String())
+// account is a predicate which unifies the given term with the list of account addresses existing in the blockchain.
+//
+// The signature is as follows:
+//
+//	account(?Address)
+//
+// where:
+//   - Address represents the account address (in Bech32 format).
+//
+// # Examples:
+//
+//	# Query the locked coins of the account.
+//	- account('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa').
+//
+//	# Query the all accounts existing in the blockchain.
+//	- account(Address).
+func account(vm *engine.VM, address engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return engine.Delay(func(ctx context.Context) *engine.Promise {
+		authKeeper, err := prolog.ContextValue[types.AccountKeeper](ctx, types.AuthKeeperContextKey, env)
 		if err != nil {
-			return nil, prolog.WithError(engine.ResourceError(prolog.ResourceModule("bank"), env), err, env)
+			return engine.Error(err)
 		}
-		return addr, nil
-	default:
-		return nil, engine.TypeError(prolog.AtomTypeAtom, account, env)
-	}
-	return sdk.AccAddress(nil), nil
+		authQueryService, err := prolog.ContextValue[types.AuthQueryService](ctx, types.AuthQueryServiceContextKey, env)
+		if err != nil {
+			return engine.Error(err)
+		}
+		interfaceRegistry, err := prolog.ContextValue[cdctypes.InterfaceRegistry](ctx, types.InterfaceRegistryContextKey, env)
+		if err != nil {
+			return engine.Error(err)
+		}
+
+		switch acc := env.Resolve(address).(type) {
+		case engine.Atom:
+			return engine.Delay(
+				func(ctx context.Context) *engine.Promise {
+					addr, err := sdk.AccAddressFromBech32(acc.String())
+					if err != nil {
+						return engine.Error(prolog.WithError(
+							engine.DomainError(prolog.ValidEncoding("bech32"), engine.NewAtom(acc.String()), env), err, env))
+					}
+					if exists := authKeeper.GetAccount(ctx, addr) != nil; !exists {
+						return engine.Bool(false)
+					}
+
+					return cont(env)
+				})
+		case engine.Variable:
+			return engine.DelaySeq(IterMap(Accounts(ctx, authQueryService, interfaceRegistry),
+				func(it lo.Tuple2[sdk.AccountI, error]) engine.PromiseFunc {
+					return func(_ context.Context) *engine.Promise {
+						addr, err := lo.Unpack2(it)
+						if err != nil {
+							return engine.Error(prolog.WithError(engine.ResourceError(prolog.ResourceModule("auth"), env), err, env))
+						}
+						return engine.Unify(vm, address, engine.NewAtom(addr.GetAddress().String()), cont, env)
+					}
+				}))
+		default:
+			return engine.Error(engine.TypeError(prolog.AtomTypeAtom, address, env))
+		}
+	})
 }
 
-func fetchBalances(
-	account, balances engine.Term,
-	vm *engine.VM,
-	env *engine.Env,
-	cont engine.Cont,
-	coinsFn func(ctx sdk.Context, bankKeeper types.BankKeeper, coins sdk.Coins, address sdk.AccAddress) sdk.Coins,
+// fetchBalances is a helper function to fetch the balances of the given account using a given function which returns the coins for
+// the given address.
+func fetchBalances(vm *engine.VM, address engine.Term, balances engine.Term, coinsFn func(ctx context.Context,
+	bankKeeper types.BankKeeper, address sdk.AccAddress) sdk.Coins, cont engine.Cont, env *engine.Env,
 ) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		sdkContext, err := prolog.UnwrapSDKContext(ctx, env)
-		if err != nil {
-			return engine.Error(err)
-		}
-		bankKeeper := sdkContext.Value(types.BankKeeperContextKey).(types.BankKeeper)
-
-		bech32Addr, err := getBech32(env, account)
+		bankKeeper, err := prolog.ContextValue[types.BankKeeper](ctx, types.BankKeeperContextKey, env)
 		if err != nil {
 			return engine.Error(err)
 		}
 
-		if bech32Addr != nil {
-			fetchedBalances := coinsFn(sdkContext, bankKeeper, nil, bech32Addr)
-			return engine.Unify(vm, CoinsToTerm(fetchedBalances), balances, cont, env)
-		}
+		return account(vm, address, func(env *engine.Env) *engine.Promise {
+			switch acc := env.Resolve(address).(type) {
+			case engine.Atom:
+				coins := coinsFn(ctx, bankKeeper, sdk.MustAccAddressFromBech32(acc.String()))
 
-		allBalances := bankKeeper.GetAccountsBalances(sdkContext)
-		promises := make([]func(ctx context.Context) *engine.Promise, 0, len(allBalances))
-		for _, balance := range allBalances {
-			address := balance.Address
-			bech32Addr, err = sdk.AccAddressFromBech32(address)
-			if err != nil {
-				return engine.Error(prolog.WithError(engine.ResourceError(prolog.ResourceModule("bank"), env), err, env))
+				return engine.Unify(vm, CoinsToTerm(coins), balances, cont, env)
+			default:
+				return engine.Error(engine.TypeError(prolog.AtomTypeAtom, address, env))
 			}
-			coins := coinsFn(sdkContext, bankKeeper, balance.Coins, bech32Addr)
-
-			promises = append(
-				promises,
-				func(_ context.Context) *engine.Promise {
-					return engine.Unify(
-						vm,
-						prolog.Tuple(engine.NewAtom(address), CoinsToTerm(coins)),
-						prolog.Tuple(account, balances),
-						cont,
-						env,
-					)
-				})
-		}
-		return engine.Delay(promises...)
+		}, env)
 	})
 }

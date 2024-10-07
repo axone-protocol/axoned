@@ -379,6 +379,9 @@ mock: ## Generate all the mocks (for tests)
 	@mockgen -destination x/logic/testutil/gas_mocks.go -package testutil cosmossdk.io/store/types GasMeter
 	@mockgen -destination x/logic/testutil/fs_mocks.go -package testutil io/fs FS
 	@mockgen -destination x/logic/testutil/read_file_fs_mocks.go -package testutil io/fs ReadFileFS
+	@mockgen -source "$$(go list -f '{{.Dir}}' github.com/cosmos/cosmos-sdk/codec/types)/interface_registry.go" \
+    	-package testutil \
+    	-destination x/logic/testutil/interface_registry_mocks.go
 
 ## Release:
 .PHONY: release-assets

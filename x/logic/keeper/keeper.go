@@ -7,6 +7,7 @@ import (
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
+	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/axone-protocol/axoned/v10/x/logic/fs"
@@ -15,25 +16,22 @@ import (
 
 type (
 	Keeper struct {
-		cdc      codec.BinaryCodec
-		storeKey storetypes.StoreKey
-		memKey   storetypes.StoreKey
+		cdc               codec.BinaryCodec
+		interfaceRegistry cdctypes.InterfaceRegistry
+		storeKey          storetypes.StoreKey
+		memKey            storetypes.StoreKey
 		// the address capable of executing a MsgUpdateParams message. Typically, this should be the x/gov module account.
 		authority sdk.AccAddress
 
-		authKeeper types.AccountKeeper
-		bankKeeper types.BankKeeper
-		fsProvider fs.Provider
+		authKeeper       types.AccountKeeper
+		authQueryService types.AuthQueryService
+		bankKeeper       types.BankKeeper
+		fsProvider       fs.Provider
 	}
 )
 
-func NewKeeper(
-	cdc codec.BinaryCodec,
-	storeKey,
-	memKey storetypes.StoreKey,
-	authority sdk.AccAddress,
-	authKeeper types.AccountKeeper,
-	bankKeeper types.BankKeeper,
+func NewKeeper(cdc codec.BinaryCodec, interfaceRegistry cdctypes.InterfaceRegistry, storeKey, memKey storetypes.StoreKey,
+	authority sdk.AccAddress, authKeeper types.AccountKeeper, authQueryService types.AuthQueryService, bankKeeper types.BankKeeper,
 	fsProvider fs.Provider,
 ) *Keeper {
 	// ensure gov module account is set and is not nil
@@ -42,13 +40,15 @@ func NewKeeper(
 	}
 
 	return &Keeper{
-		cdc:        cdc,
-		storeKey:   storeKey,
-		memKey:     memKey,
-		authority:  authority,
-		authKeeper: authKeeper,
-		bankKeeper: bankKeeper,
-		fsProvider: fsProvider,
+		cdc:               cdc,
+		interfaceRegistry: interfaceRegistry,
+		storeKey:          storeKey,
+		memKey:            memKey,
+		authority:         authority,
+		authKeeper:        authKeeper,
+		authQueryService:  authQueryService,
+		bankKeeper:        bankKeeper,
+		fsProvider:        fsProvider,
 	}
 }
 

@@ -12,12 +12,12 @@ sidebar_position: 1
 The signature is as follows:
 
 ```text
-bank_balances(?Account, ?Balances)
+bank_balances(?Address, ?Balances)
 ```
 
 where:
 
-- Account represents the account address \(in Bech32 format\).
+- Address represents the account address \(in Bech32 format\).
 - Balances represents the balances of the account as a list of pairs of coin denomination and amount.
 
 ## Examples

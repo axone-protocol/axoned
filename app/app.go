@@ -568,10 +568,12 @@ func New(
 
 	app.LogicKeeper = *logicmodulekeeper.NewKeeper(
 		appCodec,
+		app.interfaceRegistry,
 		keys[logicmoduletypes.StoreKey],
 		keys[logicmoduletypes.MemStoreKey],
 		authtypes.NewModuleAddress(govtypes.ModuleName),
 		app.AccountKeeper,
+		authkeeper.NewQueryServer(app.AccountKeeper),
 		app.BankKeeper,
 		app.provideFS,
 	)

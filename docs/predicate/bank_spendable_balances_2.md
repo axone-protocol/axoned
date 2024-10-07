@@ -12,12 +12,12 @@ sidebar_position: 3
 The signature is as follows:
 
 ```text
-bank_spendable_balances(?Account, ?Balances)
+bank_spendable_balances(?Address, ?Balances)
 ```
 
 where:
 
-- Account represents the account address \(in Bech32 format\).
+- Address represents the account address \(in Bech32 format\).
 - Balances represents the spendable balances of the account as a list of pairs of coin denomination and amount.
 
 ## Examples

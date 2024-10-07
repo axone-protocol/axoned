@@ -87,6 +87,11 @@ func ResourceContext() engine.Term {
 	return AtomResourceContext
 }
 
+// ResourceContextValue returns a term representing the context resource with the given key.
+func ResourceContextValue(key string) engine.Term {
+	return AtomResourceContext.Apply(engine.NewAtom(key))
+}
+
 // ResourceModule returns a term representing the module resource with the given name.
 func ResourceModule(module string) engine.Term {
 	return AtomResourceModule.Apply(engine.NewAtom(module))
