@@ -3,7 +3,7 @@ package prolog
 import (
 	"context"
 
-	"github.com/ichiban/prolog/engine"
+	"github.com/axone-protocol/prolog/engine"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 

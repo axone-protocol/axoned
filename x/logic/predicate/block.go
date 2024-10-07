@@ -3,7 +3,7 @@ package predicate
 import (
 	"context"
 
-	"github.com/ichiban/prolog/engine"
+	"github.com/axone-protocol/prolog/engine"
 
 	"github.com/axone-protocol/axoned/v10/x/logic/prolog"
 )

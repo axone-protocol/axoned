@@ -6,8 +6,8 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/axone-protocol/prolog/engine"
 	dbm "github.com/cosmos/cosmos-db"
-	"github.com/ichiban/prolog/engine"
 
 	. "github.com/smartystreets/goconvey/convey"
 

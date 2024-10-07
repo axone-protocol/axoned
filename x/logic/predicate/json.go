@@ -6,7 +6,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/ichiban/prolog/engine"
+	"github.com/axone-protocol/prolog/engine"
 	"github.com/samber/lo"
 
 	"cosmossdk.io/math"

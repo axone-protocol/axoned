@@ -3,7 +3,7 @@ package predicate
 import (
 	"context"
 
-	"github.com/ichiban/prolog/engine"
+	"github.com/axone-protocol/prolog/engine"
 	"github.com/samber/lo"
 
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
