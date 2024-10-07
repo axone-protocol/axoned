@@ -1,6 +1,6 @@
 package prolog
 
-import "github.com/ichiban/prolog/engine"
+import "github.com/axone-protocol/prolog/engine"
 
 var (
 	// AtomAs is the term used to indicate the as encoding type option.

@@ -1,7 +1,7 @@
 package prolog
 
 import (
-	"github.com/ichiban/prolog/engine"
+	"github.com/axone-protocol/prolog/engine"
 )
 
 // GetOption returns the value of the first option with the given name in the given options.

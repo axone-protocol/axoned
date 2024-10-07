@@ -1,6 +1,6 @@
 package prolog
 
-import "github.com/ichiban/prolog/engine"
+import "github.com/axone-protocol/prolog/engine"
 
 // ConvertFunc is a function mapping a domain which is a list of terms with a codomain which is a set of terms.
 // Domains and co-domains can have different cardinalities.

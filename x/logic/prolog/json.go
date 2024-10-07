@@ -1,7 +1,7 @@
 package prolog
 
 import (
-	"github.com/ichiban/prolog/engine"
+	"github.com/axone-protocol/prolog/engine"
 )
 
 // JSONNull returns the compound term @(null).

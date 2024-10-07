@@ -21,6 +21,7 @@ require (
 	dario.cat/mergo v1.0.1
 	github.com/CosmWasm/wasmd v0.53.0
 	github.com/Masterminds/sprig/v3 v3.3.0
+	github.com/axone-protocol/prolog v1.0.1-0.20241007111431-c4c18d4393b9
 	github.com/cometbft/cometbft v0.38.12
 	github.com/cosmos/cosmos-db v1.0.2
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
@@ -39,7 +40,6 @@ require (
 	github.com/hashicorp/go-metrics v0.5.3
 	github.com/huandu/xstrings v1.5.0
 	github.com/hyperledger/aries-framework-go v0.3.2
-	github.com/ichiban/prolog v1.2.0
 	github.com/ignite/cli v0.27.2
 	github.com/muesli/reflow v0.3.0
 	github.com/nuts-foundation/go-did v0.14.0
@@ -74,9 +74,6 @@ replace (
 	// Fix upstream GHSA-h395-qcrw-5vmq and GHSA-3vp4-m3rf-835h vulnerabilities.
 	// TODO Remove it: https://github.com/cosmos/cosmos-sdk/issues/10409
 	github.com/gin-gonic/gin => github.com/gin-gonic/gin v1.9.0
-
-	// Use cutom fork of prolog interpreter
-	github.com/ichiban/prolog => github.com/axone-protocol/prolog v1.0.1-0.20240930131208-a7e37dcfde82
 
 	// replace broken goleveldb
 	github.com/syndtr/goleveldb => github.com/syndtr/goleveldb v1.0.1-0.20210819022825-2ae1ddf74ef7

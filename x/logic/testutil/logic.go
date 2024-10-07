@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"regexp"
 
-	"github.com/ichiban/prolog"
-	"github.com/ichiban/prolog/engine"
+	"github.com/axone-protocol/prolog"
+	"github.com/axone-protocol/prolog/engine"
 
 	"github.com/axone-protocol/axoned/v10/x/logic/interpreter/bootstrap"
 )

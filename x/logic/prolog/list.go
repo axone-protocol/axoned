@@ -1,6 +1,6 @@
 package prolog
 
-import "github.com/ichiban/prolog/engine"
+import "github.com/axone-protocol/prolog/engine"
 
 // ListHead returns the first element of the given list.
 func ListHead(list engine.Term, env *engine.Env) engine.Term {

@@ -3,7 +3,7 @@ package prolog
 import (
 	"encoding/hex"
 
-	"github.com/ichiban/prolog/engine"
+	"github.com/axone-protocol/prolog/engine"
 )
 
 // TermHexToBytes try to convert an hexadecimal encoded atom to native golang []byte.

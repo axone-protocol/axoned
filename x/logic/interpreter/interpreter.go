@@ -6,8 +6,8 @@ import (
 	"io"
 	"io/fs"
 
-	"github.com/ichiban/prolog"
-	"github.com/ichiban/prolog/engine"
+	"github.com/axone-protocol/prolog"
+	"github.com/axone-protocol/prolog/engine"
 
 	"cosmossdk.io/math"
 )

@@ -6,8 +6,8 @@ import (
 	"io"
 	"strings"
 
-	"github.com/ichiban/prolog"
-	"github.com/ichiban/prolog/engine"
+	"github.com/axone-protocol/prolog"
+	"github.com/axone-protocol/prolog/engine"
 	"github.com/samber/lo"
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
