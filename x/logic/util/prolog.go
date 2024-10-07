@@ -59,7 +59,7 @@ func QueryInterpreter(
 
 			var panicErr engine.PanicError
 			if errors.As(callErr, &panicErr) && errors.Is(panicErr.OriginErr, engine.ErrMaxVariables) {
-				return nil, errorsmod.Wrapf(types.LimitExceeded, panicErr.OriginErr.Error())
+				return nil, errorsmod.Wrapf(types.LimitExceeded, panicErr.OriginErr.Error()) //nolint:govet
 			}
 
 			if err = func() error {
