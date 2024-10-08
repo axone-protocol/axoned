@@ -38,7 +38,7 @@ func MockAuthQueryServiceWithAddresses(mock *MockAuthQueryService, addresses []s
 					start = fromCursor(req.Pagination.Key)
 				}
 				if req.Pagination.Limit != 0 {
-					limit = int(req.Pagination.GetLimit())
+					limit = int(req.Pagination.GetLimit()) //nolint:gosec // disable G115
 				}
 			}
 			accounts := lo.Map(
@@ -67,7 +67,7 @@ func MockAuthQueryServiceWithAddresses(mock *MockAuthQueryService, addresses []s
 				Accounts: accounts,
 				Pagination: &query.PageResponse{
 					NextKey: lo.If(start+limit < total, toCursor(start+1)).Else(nil),
-					Total:   uint64(total),
+					Total:   uint64(total), //nolint:gosec // disable G115
 				},
 			}, nil
 		})

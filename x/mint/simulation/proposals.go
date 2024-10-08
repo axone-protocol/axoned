@@ -37,7 +37,7 @@ func SimulateMsgUpdateParams(r *rand.Rand, _ sdk.Context, _ []simtypes.Account) 
 	var authority sdk.AccAddress = address.Module("gov")
 
 	params := types.DefaultParams()
-	params.BlocksPerYear = uint64(simtypes.RandIntBetween(r, 1, 1000000))
+	params.BlocksPerYear = uint64(simtypes.RandIntBetween(r, 1, 1000000)) //nolint:gosec // disable G115
 	params.InflationCoef = math.LegacyNewDecWithPrec(int64(simtypes.RandIntBetween(r, 1, 100)), 2)
 	params.MintDenom = simtypes.RandStringOfLength(r, 10)
 

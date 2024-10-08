@@ -65,7 +65,7 @@ func (k Keeper) execute(
 	}
 
 	return &types.QueryServiceAskResponse{
-		Height:     uint64(sdkCtx.BlockHeight()),
+		Height:     uint64(sdkCtx.BlockHeight()), //nolint:gosec // disable G115
 		GasUsed:    sdkCtx.GasMeter().GasConsumed(),
 		Answer:     answer,
 		UserOutput: userOutput.String(),
@@ -97,7 +97,7 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 	var userOutputBuffer writerStringer
 	limits := params.GetLimits()
 	if limits.MaxUserOutputSize != nil && limits.MaxUserOutputSize.GT(sdkmath.ZeroUint()) {
-		userOutputBuffer = util.NewBoundedBufferMust(int(limits.MaxUserOutputSize.Uint64()))
+		userOutputBuffer = util.NewBoundedBufferMust(int(limits.MaxUserOutputSize.Uint64())) //nolint:gosec // disable G115
 	} else {
 		userOutputBuffer = new(strings.Builder)
 	}

@@ -87,14 +87,14 @@ func validateInflationCoef(i interface{}) error {
 	return nil
 }
 
-func validateBounds(min, max interface{}) error {
-	vmin, ok := min.(*math.LegacyDec)
+func validateBounds(minBound, maxBound interface{}) error {
+	vmin, ok := minBound.(*math.LegacyDec)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", min)
+		return fmt.Errorf("invalid parameter type: %T", minBound)
 	}
-	vmax, ok := max.(*math.LegacyDec)
+	vmax, ok := maxBound.(*math.LegacyDec)
 	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", max)
+		return fmt.Errorf("invalid parameter type: %T", maxBound)
 	}
 
 	for _, v := range []*math.LegacyDec{vmin, vmax} {
@@ -104,7 +104,7 @@ func validateBounds(min, max interface{}) error {
 	}
 
 	if vmin != nil && vmax != nil && vmin.GT(*vmax) {
-		return fmt.Errorf("inflation min cannot greater than inflation max")
+		return fmt.Errorf("inflation min cannot be greater than inflation max")
 	}
 
 	return nil
