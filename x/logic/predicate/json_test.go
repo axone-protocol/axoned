@@ -38,10 +38,10 @@ func TestJsonProlog(t *testing.T) {
 				wantError:   fmt.Errorf("error(instantiation_error,json_prolog/2)"),
 			},
 			{
-				description: "two variable",
+				description: "incorrect 1st argument",
 				query:       `json_prolog(ooo(r), Term).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(atom,ooo(r)),json_prolog/2)"),
+				wantError:   fmt.Errorf("error(type_error(text,ooo(r)),json_prolog/2)"),
 			},
 
 			// ** JSON -> Prolog **
@@ -67,6 +67,15 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json object into prolog",
 				query:       `json_prolog('{"foo": "bar"}', Term).`,
+				wantResult: []testutil.TermResults{{
+					"Term": "json([foo-bar])",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json object (given as string) into prolog",
+				query: `json_prolog("{\"foo\": \"bar\"}"
+				, Term).`,
 				wantResult: []testutil.TermResults{{
 					"Term": "json([foo-bar])",
 				}},
@@ -131,12 +140,10 @@ func TestJsonProlog(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
-				description: "convert large json number with exponent into prolog",
-				query:       `json_prolog('1e+30', Term).`,
-				wantResult: []testutil.TermResults{{
-					"Term": "1.0e+30",
-				}},
-				wantSuccess: true,
+				description: "convert large json number with ridonculous exponent into prolog",
+				query:       `json_prolog('1E30923434', Term).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("error(domain_error(encoding(json),1E30923434),[u,n,d,e,f,i,n,e,d],json_prolog/2)"),
 			},
 			// ** JSON -> Prolog **
 			// Bool
@@ -336,6 +343,20 @@ func TestJsonProlog(t *testing.T) {
 				}},
 				wantSuccess: true,
 			},
+			{
+				description: "convert prolog decimal with exponent",
+				query:       `json_prolog(Json, 1.0E99).`,
+				wantResult: []testutil.TermResults{{
+					"Json": "'1e+99'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert prolog decimal with ridonculous exponent",
+				query:       `json_prolog(Json, 1.8e308).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("error(domain_error(encoding(json),1.8e+308),[s,t,r,c,o,n,v,.,P,a,r,s,e,F,l,o,a,t,:, ,p,a,r,s,i,n,g, ,\",1,.,8,e,+,3,0,8,\",:, ,v,a,l,u,e, ,o,u,t, ,o,f, ,r,a,n,g,e],json_prolog/2)"),
+			},
 			// ** Prolog -> Json **
 			// Array
 			{
@@ -489,27 +510,27 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 				json:        "'{\"employee\":{\"age\":30,\"city\":\"New York\",\"name\":\"John\"}}'",
 				term:        "json([employee-json([age-30.0,city-'New York',name-'John'])])",
 				wantSuccess: true,
-			}, /*
-				{
-					json:        "'{\"cosmos\":[\"axone\",{\"name\":\"localnet\"}]}'",
-					term:        "json([cosmos-[axone,json([name-localnet])]])",
-					wantSuccess: true,
-				},
-				{
-					json:        "'{\"object\":{\"array\":[1,2,3],\"arrayobject\":[{\"name\":\"toto\"},{\"name\":\"tata\"}],\"bool\":true,\"boolean\":false,\"null\":null}}'",
-					term:        "json([object-json([array-[1.0,2.0,3.0],arrayobject-[json([name-toto]),json([name-tata])],bool- @(true),boolean- @(false),null- @(null)])])",
-					wantSuccess: true,
-				},
-				{
-					json:        "'{\"foo\":\"bar\"}'",
-					term:        "json([a-b])",
-					wantSuccess: false,
-				},
-				{
-					json:        `'{"key1":null,"key2":[],"key3":{"nestedKey1":null,"nestedKey2":[],"nestedKey3":["a",null,null]}}'`,
-					term:        `json([key1- @(null),key2- @([]),key3-json([nestedKey1- @(null),nestedKey2- @([]),nestedKey3-[a,@(null),@(null)]])])`,
-					wantSuccess: true,
-				},*/
+			},
+			{
+				json:        "'{\"cosmos\":[\"axone\",{\"name\":\"localnet\"}]}'",
+				term:        "json([cosmos-[axone,json([name-localnet])]])",
+				wantSuccess: true,
+			},
+			{
+				json:        "'{\"object\":{\"array\":[1,2,3],\"arrayobject\":[{\"name\":\"toto\"},{\"name\":\"tata\"}],\"bool\":true,\"boolean\":false,\"null\":null}}'",
+				term:        "json([object-json([array-[1.0,2.0,3.0],arrayobject-[json([name-toto]),json([name-tata])],bool- @(true),boolean- @(false),null- @(null)])])",
+				wantSuccess: true,
+			},
+			{
+				json:        "'{\"foo\":\"bar\"}'",
+				term:        "json([a-b])",
+				wantSuccess: false,
+			},
+			{
+				json:        `'{"key1":null,"key2":[],"key3":{"nestedKey1":null,"nestedKey2":[],"nestedKey3":["a",null,null]}}'`,
+				term:        `json([key1- @(null),key2- @([]),key3-json([nestedKey1- @(null),nestedKey2- @([]),nestedKey3-[a,@(null),@(null)]])])`,
+				wantSuccess: true,
+			},
 		}
 		for nc, tc := range cases {
 			Convey(fmt.Sprintf("#%d : given the json: %s and the term %s", nc, tc.json, tc.term), func() {
