@@ -26,6 +26,7 @@ Want to lean more about AXONE network? Complete documentation is available at: [
 * [axoned genesis](axoned_genesis.md)	 - Application's genesis-related subcommands
 * [axoned init](axoned_init.md)	 - Initialize private validator, p2p, genesis, and application configuration files
 * [axoned keys](axoned_keys.md)	 - Manage your application's keys
+* [axoned module-hash-by-height](axoned_module-hash-by-height.md)	 - Get module hashes at a given height
 * [axoned prune](axoned_prune.md)	 - Prune app history states by keeping the recent heights and deleting old heights
 * [axoned query](axoned_query.md)	 - Querying subcommands
 * [axoned rollback](axoned_rollback.md)	 - rollback Cosmos SDK and CometBFT state by one height
