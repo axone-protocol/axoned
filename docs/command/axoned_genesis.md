@@ -16,6 +16,7 @@ axoned genesis [flags]
 
 * [axoned](axoned.md)	 - Axone - Orchestration Layer for AI
 * [axoned genesis add-genesis-account](axoned_genesis_add-genesis-account.md)	 - Add a genesis account to genesis.json
+* [axoned genesis bulk-add-genesis-account](axoned_genesis_bulk-add-genesis-account.md)	 - Bulk add genesis accounts to genesis.json
 * [axoned genesis collect-gentxs](axoned_genesis_collect-gentxs.md)	 - Collect genesis txs and output a genesis.json file
 * [axoned genesis gentx](axoned_genesis_gentx.md)	 - Generate a genesis tx carrying a self delegation
 * [axoned genesis migrate](axoned_genesis_migrate.md)	 - Migrate genesis to a specified target version
