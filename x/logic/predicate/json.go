@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/axone-protocol/prolog/engine"
 	"github.com/samber/lo"
-
-	"cosmossdk.io/math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -102,6 +101,16 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 		return asDomainError(json.Marshal(t.String()))
 	case engine.Integer:
 		return asDomainError(json.Marshal(t))
+	case engine.Float:
+		return asDomainError(func() ([]byte, error) {
+			str := t.String()
+			float, err := strconv.ParseFloat(str, 64)
+			if err != nil {
+				return nil, err
+			}
+
+			return json.Marshal(float)
+		}())
 	case engine.Compound:
 		switch {
 		case t.Functor() == prolog.AtomDot:
@@ -155,17 +164,9 @@ func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 func jsonToTerms(value any) (engine.Term, error) {
 	switch v := value.(type) {
 	case string:
-		var r engine.Term = engine.NewAtom(v)
-		return r, nil
+		return engine.NewAtom(v), nil
 	case json.Number:
-		r, ok := math.NewIntFromString(string(v))
-		if !ok {
-			return nil, fmt.Errorf("could not convert number '%s' into integer term, decimal number is not handled yet", v)
-		}
-		if !r.IsInt64() {
-			return nil, fmt.Errorf("could not convert number '%s' into integer term, overflow", v)
-		}
-		return engine.Integer(r.Int64()), nil
+		return engine.NewFloatFromString(v.String())
 	case bool:
 		return prolog.JSONBool(v), nil
 	case nil:
