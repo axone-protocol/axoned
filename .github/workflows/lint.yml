@@ -99,7 +99,7 @@ jobs:
         uses: actions/setup-go@v5.0.2
         if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
-          go-version: "1.21"
+          go-version: "1.23"
           cache: false
 
       - name: Lint go code (golangci-lint)
@@ -143,7 +143,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v5.0.2
         with:
-          go-version: "1.21"
+          go-version: "1.23"
           cache: false
 
       - name: Initialize CodeQL
@@ -198,7 +198,7 @@ jobs:
       - name: Setup Go environment
         uses: actions/setup-go@v5.0.2
         with:
-          go-version: "1.21"
+          go-version: "1.23"
 
       - name: Generate command documentation
         run: |

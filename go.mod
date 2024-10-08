@@ -1,6 +1,6 @@
 module github.com/axone-protocol/axoned/v10
 
-go 1.21
+go 1.23
 
 require (
 	cosmossdk.io/api v0.7.6
