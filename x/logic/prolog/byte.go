@@ -30,3 +30,8 @@ func BytesToByteListTerm(in []byte) engine.Term {
 	}
 	return engine.List(terms...)
 }
+
+// BytesToAtom converts a given golang []byte into an Atom.
+func BytesToAtom(in []byte) engine.Atom {
+	return engine.NewAtom(string(in))
+}
