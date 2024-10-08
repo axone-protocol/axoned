@@ -6,11 +6,14 @@ Convert raw bytes output (eg. [10 21 13 255]) to hex
 
 Convert raw-bytes to hex.
 
-Example:
-$ axoned debug raw-bytes [72 101 108 108 111 44 32 112 108 97 121 103 114 111 117 110 100]
+```
+axoned debug raw-bytes <raw-bytes> [flags]
+```
+
+### Examples
 
 ```
-axoned debug raw-bytes [raw-bytes] [flags]
+axoned debug raw-bytes '[72 101 108 108 111 44 32 112 108 97 121 103 114 111 117 110 100]'
 ```
 
 ### Options
