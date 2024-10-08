@@ -23,8 +23,19 @@ import (
 //	json_prolog(?Json, ?Term) is det
 //
 // Where:
-//   - Json is the textual representation of the json, as an atom, a list of character codes, or list of characters.
-//   - Term is a term that represents the JSON in the prolog world.
+//   - Json is the textual representation of the JSON, as either an atom, a list of character codes, or a list of characters.
+//   - Term is the Prolog term that represents the JSON structure.
+//
+// # JSON canonical representation
+//
+// The canonical representation for Term is:
+//   - A JSON object is mapped to a Prolog term json(NameValueList), where NameValueList is a list of Name-Value pairs.
+//     Name is an atom created from the JSON string.
+//   - A JSON array is mapped to a Prolog list of JSON values.
+//   - A JSON string is mapped to a Prolog atom.
+//   - A JSON number is mapped to a Prolog number.
+//   - The JSON constants true and false are mapped to @(true) and @(false).
+//   - The JSON constant null is mapped to the Prolog term @(null).
 //
 // # Examples:
 //
