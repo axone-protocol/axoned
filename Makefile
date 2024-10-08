@@ -141,7 +141,7 @@ format-go: ## Format go files
   		-w /app \
   		${DOCKER_IMAGE_GOLANG} \
   		sh -c \
-		"go install mvdan.cc/gofumpt@v0.4.0; gofumpt -w -l ."
+		"go install mvdan.cc/gofumpt@v0.7.0; gofumpt -w -l ."
 
 .PHONY: format-proto
 format-proto: ## Format proto files
