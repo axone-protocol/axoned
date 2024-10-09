@@ -2,31 +2,40 @@ package predicate
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sort"
+	"strconv"
 	"strings"
 
 	"github.com/axone-protocol/prolog/engine"
 	"github.com/samber/lo"
-
-	"cosmossdk.io/math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/axone-protocol/axoned/v10/x/logic/prolog"
 )
 
-// JSONProlog is a predicate that will unify a JSON string into prolog terms and vice versa.
+// JSONProlog is a predicate that unifies a JSON into a prolog term and vice versa.
 //
 // The signature is as follows:
 //
 //	json_prolog(?Json, ?Term) is det
 //
 // Where:
-//   - Json is the string representation of the json
-//   - Term is an Atom that would be unified by the JSON representation as Prolog terms.
+//   - Json is the textual representation of the JSON, as either an atom, a list of character codes, or a list of characters.
+//   - Term is the Prolog term that represents the JSON structure.
 //
-// In addition, when passing Json and Term, this predicate return true if both result match.
+// # JSON canonical representation
+//
+// The canonical representation for Term is:
+//   - A JSON object is mapped to a Prolog term json(NameValueList), where NameValueList is a list of Name-Value pairs.
+//     Name is an atom created from the JSON string.
+//   - A JSON array is mapped to a Prolog list of JSON values.
+//   - A JSON string is mapped to a Prolog atom.
+//   - A JSON number is mapped to a Prolog number.
+//   - The JSON constants true and false are mapped to @(true) and @(false).
+//   - The JSON constant null is mapped to the Prolog term @(null).
 //
 // # Examples:
 //
@@ -37,14 +46,12 @@ func JSONProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engin
 
 	switch t1 := env.Resolve(j).(type) {
 	case engine.Variable:
-	case engine.Atom:
-		terms, err := jsonStringToTerms(t1, env)
+	default:
+		terms, err := decodeJSONToTerm(t1, env)
 		if err != nil {
 			return engine.Error(err)
 		}
 		result = terms
-	default:
-		return engine.Error(engine.TypeError(prolog.AtomTypeAtom, j, env))
 	}
 
 	switch t2 := env.Resolve(term).(type) {
@@ -54,7 +61,7 @@ func JSONProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engin
 		}
 		return engine.Unify(vm, term, result, cont, env)
 	default:
-		b, err := termsToJSON(t2, env)
+		b, err := encodeTermToJSON(t2, env)
 		if err != nil {
 			return engine.Error(err)
 		}
@@ -65,14 +72,20 @@ func JSONProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engin
 				prolog.WithError(
 					engine.DomainError(prolog.ValidEncoding("json"), term, env), err, env))
 		}
-		var r engine.Term = engine.NewAtom(string(b))
+		var r engine.Term = prolog.BytesToAtom(b)
 		return engine.Unify(vm, j, r, cont, env)
 	}
 }
 
-func jsonStringToTerms(j engine.Atom, env *engine.Env) (engine.Term, error) {
+// decodeJSONToTerm decode a JSON, given as a prolog text, into a prolog term.
+func decodeJSONToTerm(j engine.Term, env *engine.Env) (engine.Term, error) {
+	payload, err := prolog.TextTermToString(j, env)
+	if err != nil {
+		return nil, err
+	}
+
 	var values any
-	decoder := json.NewDecoder(strings.NewReader(j.String()))
+	decoder := json.NewDecoder(strings.NewReader(payload))
 	decoder.UseNumber() // unmarshal a number into an interface{} as a Number instead of as a float64
 
 	if err := decoder.Decode(&values); err != nil {
@@ -80,7 +93,7 @@ func jsonStringToTerms(j engine.Atom, env *engine.Env) (engine.Term, error) {
 			engine.DomainError(prolog.ValidEncoding("json"), j, env), err, env)
 	}
 
-	term, err := jsonToTerms(values)
+	term, err := jsonToTerm(values)
 	if err != nil {
 		return nil, prolog.WithError(
 			engine.DomainError(prolog.ValidEncoding("json"), j, env), err, env)
@@ -89,83 +102,89 @@ func jsonStringToTerms(j engine.Atom, env *engine.Env) (engine.Term, error) {
 	return term, nil
 }
 
-func termsToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
-	asDomainError := func(bs []byte, err error) ([]byte, error) {
-		if err != nil {
-			return bs, prolog.WithError(
-				engine.DomainError(prolog.ValidEncoding("json"), term, env), err, env)
-		}
-		return bs, err
+// encodeTermToJSON converts a Prolog term to a JSON byte array.
+func encodeTermToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
+	bs, err := termToJSON(term, env)
+
+	var exception engine.Exception
+	if err != nil && !errors.As(err, &exception) {
+		return nil, prolog.WithError(engine.DomainError(prolog.ValidEncoding("json"), term, env), err, env)
 	}
+
+	return bs, err
+}
+
+func termToJSON(term engine.Term, env *engine.Env) ([]byte, error) {
 	switch t := term.(type) {
 	case engine.Atom:
-		return asDomainError(json.Marshal(t.String()))
+		return json.Marshal(t.String())
 	case engine.Integer:
-		return asDomainError(json.Marshal(t))
-	case engine.Compound:
-		switch {
-		case t.Functor() == prolog.AtomDot:
-			iter, err := prolog.ListIterator(t, env)
-			if err != nil {
-				return nil, err
-			}
-
-			elements := make([]json.RawMessage, 0)
-			for iter.Next() {
-				element, err := termsToJSON(env.Resolve(iter.Current()), env)
-				if err != nil {
-					return nil, err
-				}
-				elements = append(elements, element)
-			}
-			return asDomainError(json.Marshal(elements))
-		case t.Functor() == prolog.AtomJSON:
-			terms, err := prolog.ExtractJSONTerm(t, env)
-			if err != nil {
-				return nil, err
-			}
-
-			attributes := make(map[string]json.RawMessage, len(terms))
-			for key, term := range terms {
-				raw, err := termsToJSON(env.Resolve(term), env)
-				if err != nil {
-					return nil, err
-				}
-				attributes[key] = raw
-			}
-			return asDomainError(json.Marshal(attributes))
-		case prolog.JSONBool(true).Compare(t, env) == 0:
-			return asDomainError(json.Marshal(true))
-		case prolog.JSONBool(false).Compare(t, env) == 0:
-			return asDomainError(json.Marshal(false))
-		case prolog.JSONEmptyArray().Compare(t, env) == 0:
-			return asDomainError(json.Marshal([]json.RawMessage{}))
-		case prolog.JSONNull().Compare(t, env) == 0:
-			return asDomainError(json.Marshal(nil))
-		default:
-			// no-op
+		return json.Marshal(t)
+	case engine.Float:
+		float, err := strconv.ParseFloat(t.String(), 64)
+		if err != nil {
+			return nil, err
 		}
-	default:
-		// no-op
+
+		return json.Marshal(float)
+	case engine.Compound:
+		return compoundToJSON(t, env)
 	}
 
 	return nil, engine.TypeError(prolog.AtomTypeJSON, term, env)
 }
 
-func jsonToTerms(value any) (engine.Term, error) {
+func compoundToJSON(term engine.Compound, env *engine.Env) ([]byte, error) {
+	switch {
+	case term.Functor() == prolog.AtomDot:
+		iter, err := prolog.ListIterator(term, env)
+		if err != nil {
+			return nil, err
+		}
+
+		elements := make([]json.RawMessage, 0)
+		for iter.Next() {
+			element, err := termToJSON(iter.Current(), env)
+			if err != nil {
+				return nil, err
+			}
+			elements = append(elements, element)
+		}
+		return json.Marshal(elements)
+	case term.Functor() == prolog.AtomJSON:
+		terms, err := prolog.ExtractJSONTerm(term, env)
+		if err != nil {
+			return nil, err
+		}
+
+		attributes := make(map[string]json.RawMessage, len(terms))
+		for key, term := range terms {
+			raw, err := termToJSON(term, env)
+			if err != nil {
+				return nil, err
+			}
+			attributes[key] = raw
+		}
+		return json.Marshal(attributes)
+	case prolog.JSONBool(true).Compare(term, env) == 0:
+		return json.Marshal(true)
+	case prolog.JSONBool(false).Compare(term, env) == 0:
+		return json.Marshal(false)
+	case prolog.JSONEmptyArray().Compare(term, env) == 0:
+		return json.Marshal([]json.RawMessage{})
+	case prolog.JSONNull().Compare(term, env) == 0:
+		return json.Marshal(nil)
+	}
+
+	return nil, engine.TypeError(prolog.AtomTypeJSON, term, env)
+}
+
+func jsonToTerm(value any) (engine.Term, error) {
 	switch v := value.(type) {
 	case string:
-		var r engine.Term = engine.NewAtom(v)
-		return r, nil
+		return prolog.StringToAtom(v), nil
 	case json.Number:
-		r, ok := math.NewIntFromString(string(v))
-		if !ok {
-			return nil, fmt.Errorf("could not convert number '%s' into integer term, decimal number is not handled yet", v)
-		}
-		if !r.IsInt64() {
-			return nil, fmt.Errorf("could not convert number '%s' into integer term, overflow", v)
-		}
-		return engine.Integer(r.Int64()), nil
+		return engine.NewFloatFromString(v.String())
 	case bool:
 		return prolog.JSONBool(v), nil
 	case nil:
@@ -176,26 +195,26 @@ func jsonToTerms(value any) (engine.Term, error) {
 
 		attributes := make([]engine.Term, 0, len(v))
 		for _, key := range keys {
-			attributeValue, err := jsonToTerms(v[key])
+			attributeValue, err := jsonToTerm(v[key])
 			if err != nil {
 				return nil, err
 			}
-			attributes = append(attributes, prolog.AtomPair.Apply(engine.NewAtom(key), attributeValue))
+			attributes = append(attributes, prolog.AtomPair.Apply(prolog.StringToAtom(key), attributeValue))
 		}
 		return prolog.AtomJSON.Apply(engine.List(attributes...)), nil
 	case []any:
-		elements := make([]engine.Term, 0, len(v))
 		if len(v) == 0 {
 			return prolog.JSONEmptyArray(), nil
 		}
-
+		elements := make([]engine.Term, 0, len(v))
 		for _, element := range v {
-			term, err := jsonToTerms(element)
+			term, err := jsonToTerm(element)
 			if err != nil {
 				return nil, err
 			}
 			elements = append(elements, term)
 		}
+
 		return engine.List(elements...), nil
 	default:
 		return nil, fmt.Errorf("unsupported type: %T", v)

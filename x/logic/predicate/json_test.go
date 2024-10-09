@@ -3,7 +3,6 @@ package predicate
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/axone-protocol/prolog/engine"
@@ -39,10 +38,10 @@ func TestJsonProlog(t *testing.T) {
 				wantError:   fmt.Errorf("error(instantiation_error,json_prolog/2)"),
 			},
 			{
-				description: "two variable",
+				description: "incorrect 1st argument",
 				query:       `json_prolog(ooo(r), Term).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(atom,ooo(r)),json_prolog/2)"),
+				wantError:   fmt.Errorf("error(type_error(text,ooo(r)),json_prolog/2)"),
 			},
 
 			// ** JSON -> Prolog **
@@ -68,6 +67,15 @@ func TestJsonProlog(t *testing.T) {
 			{
 				description: "convert json object into prolog",
 				query:       `json_prolog('{"foo": "bar"}', Term).`,
+				wantResult: []testutil.TermResults{{
+					"Term": "json([foo-bar])",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json object (given as string) into prolog",
+				query: `json_prolog("{\"foo\": \"bar\"}"
+				, Term).`,
 				wantResult: []testutil.TermResults{{
 					"Term": "json([foo-bar])",
 				}},
@@ -100,26 +108,42 @@ func TestJsonProlog(t *testing.T) {
 			// ** JSON -> Prolog **
 			// Number
 			{
-				description: "convert json number into prolog",
+				description: "convert json 0 number into prolog",
+				query:       `json_prolog('0', Term).`,
+				wantResult: []testutil.TermResults{{
+					"Term": "0.0",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json 10 number into prolog",
 				query:       `json_prolog('10', Term).`,
 				wantResult: []testutil.TermResults{{
-					"Term": "10",
+					"Term": "10.0",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert json -10.9 number into prolog",
+				query:       `json_prolog('-10.9', Term).`,
+				wantResult: []testutil.TermResults{{
+					"Term": "-10.9",
 				}},
 				wantSuccess: true,
 			},
 			{
 				description: "convert large json number into prolog",
 				query:       `json_prolog('100000000000000000000', Term).`,
-				wantSuccess: false,
-				wantError: fmt.Errorf("error(domain_error(encoding(json),100000000000000000000),[%s],json_prolog/2)",
-					strings.Join(strings.Split("could not convert number '100000000000000000000' into integer term, overflow", ""), ",")),
+				wantResult: []testutil.TermResults{{
+					"Term": "100000000000000000000.0",
+				}},
+				wantSuccess: true,
 			},
 			{
-				description: "decimal number not compatible yet",
-				query:       `json_prolog('10.4', Term).`,
+				description: "convert large json number with ridonculous exponent into prolog",
+				query:       `json_prolog('1E30923434', Term).`,
 				wantSuccess: false,
-				wantError: fmt.Errorf("error(domain_error(encoding(json),10.4),[%s],json_prolog/2)",
-					strings.Join(strings.Split("could not convert number '10.4' into integer term, decimal number is not handled yet", ""), ",")),
+				wantError:   fmt.Errorf("error(domain_error(encoding(json),1E30923434),[u,n,d,e,f,i,n,e,d],json_prolog/2)"),
 			},
 			// ** JSON -> Prolog **
 			// Bool
@@ -183,7 +207,6 @@ func TestJsonProlog(t *testing.T) {
 				}},
 				wantSuccess: true,
 			},
-
 			// ** Prolog -> JSON **
 			// String
 			{
@@ -281,7 +304,15 @@ func TestJsonProlog(t *testing.T) {
 			// ** Prolog -> JSON **
 			// Number
 			{
-				description: "convert json number from prolog",
+				description: "convert prolog 0 number",
+				query:       `json_prolog(Json, 0).`,
+				wantResult: []testutil.TermResults{{
+					"Json": "'0'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert prolog 10 number",
 				query:       `json_prolog(Json, 10).`,
 				wantResult: []testutil.TermResults{{
 					"Json": "'10'",
@@ -289,10 +320,42 @@ func TestJsonProlog(t *testing.T) {
 				wantSuccess: true,
 			},
 			{
-				description: "decimal number not compatible yet",
+				description: "convert prolog decimal 10.4 number",
 				query:       `json_prolog(Json, 10.4).`,
+				wantResult: []testutil.TermResults{{
+					"Json": "'10.4'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert prolog decimal -10.4 number",
+				query:       `json_prolog(Json, -10.4).`,
+				wantResult: []testutil.TermResults{{
+					"Json": "'-10.4'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert big prolog decimal",
+				query:       `json_prolog(Json, 100000000000000000000.0).`,
+				wantResult: []testutil.TermResults{{
+					"Json": "'100000000000000000000'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert prolog decimal with exponent",
+				query:       `json_prolog(Json, 1.0E99).`,
+				wantResult: []testutil.TermResults{{
+					"Json": "'1e+99'",
+				}},
+				wantSuccess: true,
+			},
+			{
+				description: "convert prolog decimal with ridonculous exponent",
+				query:       `json_prolog(Json, 1.8e308).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(json,10.4),json_prolog/2)"),
+				wantError:   fmt.Errorf("error(domain_error(encoding(json),1.8e+308),[s,t,r,c,o,n,v,.,P,a,r,s,e,F,l,o,a,t,:, ,p,a,r,s,i,n,g, ,\",1,.,8,e,+,3,0,8,\",:, ,v,a,l,u,e, ,o,u,t, ,o,f, ,r,a,n,g,e],json_prolog/2)"),
 			},
 			// ** Prolog -> Json **
 			// Array
@@ -445,7 +508,7 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 			},
 			{
 				json:        "'{\"employee\":{\"age\":30,\"city\":\"New York\",\"name\":\"John\"}}'",
-				term:        "json([employee-json([age-30,city-'New York',name-'John'])])",
+				term:        "json([employee-json([age-30.0,city-'New York',name-'John'])])",
 				wantSuccess: true,
 			},
 			{
@@ -455,7 +518,7 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 			},
 			{
 				json:        "'{\"object\":{\"array\":[1,2,3],\"arrayobject\":[{\"name\":\"toto\"},{\"name\":\"tata\"}],\"bool\":true,\"boolean\":false,\"null\":null}}'",
-				term:        "json([object-json([array-[1,2,3],arrayobject-[json([name-toto]),json([name-tata])],bool- @(true),boolean- @(false),null- @(null)])])",
+				term:        "json([object-json([array-[1.0,2.0,3.0],arrayobject-[json([name-toto]),json([name-tata])],bool- @(true),boolean- @(false),null- @(null)])])",
 				wantSuccess: true,
 			},
 			{
