@@ -11,8 +11,6 @@ import (
 	"github.com/axone-protocol/prolog/engine"
 	"github.com/samber/lo"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
-
 	"github.com/axone-protocol/axoned/v10/x/logic/prolog"
 )
 
@@ -41,40 +39,23 @@ import (
 //
 //	# JSON conversion to Prolog.
 //	- json_prolog('{"foo": "bar"}', json([foo-bar])).
-func JSONProlog(vm *engine.VM, j, term engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	var result engine.Term
-
-	switch t1 := env.Resolve(j).(type) {
-	case engine.Variable:
-	default:
-		terms, err := decodeJSONToTerm(t1, env)
+func JSONProlog(_ *engine.VM, json, term engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	forwardConverter := func(json []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
+		term, err := decodeJSONToTerm(json[0], env)
 		if err != nil {
-			return engine.Error(err)
+			return nil, err
 		}
-		result = terms
+		return []engine.Term{term}, nil
 	}
-
-	switch t2 := env.Resolve(term).(type) {
-	case engine.Variable:
-		if result == nil {
-			return engine.Error(engine.InstantiationError(env))
-		}
-		return engine.Unify(vm, term, result, cont, env)
-	default:
-		b, err := encodeTermToJSON(t2, env)
+	backwardConverter := func(term []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
+		b, err := encodeTermToJSON(term[0], env)
 		if err != nil {
-			return engine.Error(err)
+			return nil, err
 		}
-
-		b, err = sdk.SortJSON(b)
-		if err != nil {
-			return engine.Error(
-				prolog.WithError(
-					engine.DomainError(prolog.ValidEncoding("json"), term, env), err, env))
-		}
-		var r engine.Term = prolog.BytesToAtom(b)
-		return engine.Unify(vm, j, r, cont, env)
+		return []engine.Term{prolog.BytesToAtom(b)}, nil
 	}
+	return prolog.UnifyFunctionalPredicate(
+		[]engine.Term{json}, []engine.Term{term}, prolog.AtomEmpty, forwardConverter, backwardConverter, cont, env)
 }
 
 // decodeJSONToTerm decode a JSON, given as a prolog text, into a prolog term.
