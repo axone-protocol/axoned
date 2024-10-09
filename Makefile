@@ -9,7 +9,7 @@ CMD_ROOT               :=./cmd/${BINARY_NAME}
 LEDGER_ENABLED         ?= true
 
 # Docker images
-DOCKER_IMAGE_GOLANG		  = golang:1.21-alpine3.17
+DOCKER_IMAGE_GOLANG		  = golang:1.23-alpine3.20
 DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v1.61
 DOCKER_IMAGE_PROTO        = ghcr.io/cosmos/proto-builder:0.14.0
 DOCKER_IMAGE_BUF          = bufbuild/buf:1.4.0
@@ -141,7 +141,7 @@ format-go: ## Format go files
   		-w /app \
   		${DOCKER_IMAGE_GOLANG} \
   		sh -c \
-		"go install mvdan.cc/gofumpt@v0.4.0; gofumpt -w -l ."
+		"go install mvdan.cc/gofumpt@v0.7.0; gofumpt -w -l ."
 
 .PHONY: format-proto
 format-proto: ## Format proto files

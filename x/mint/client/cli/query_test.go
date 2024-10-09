@@ -61,8 +61,6 @@ mint_denom: ""`,
 	}
 
 	for _, tc := range testCases {
-		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := svrcmd.CreateExecuteContext(context.Background())
 
@@ -121,8 +119,6 @@ func TestGetCmdQueryInflation(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := svrcmd.CreateExecuteContext(context.Background())
 
@@ -181,8 +177,6 @@ func TestGetCmdQueryAnnualProvisions(t *testing.T) {
 	}
 
 	for _, tc := range testCases {
-		tc := tc
-
 		t.Run(tc.name, func(t *testing.T) {
 			ctx := svrcmd.CreateExecuteContext(context.Background())
 
