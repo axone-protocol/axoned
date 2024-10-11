@@ -46,7 +46,7 @@ var (
 	// AtomTypePair is the term used to indicate the pair type.
 	AtomTypePair = engine.NewAtom("pair")
 	// AtomTypeJSON is the term used to indicate the json type.
-	AtomTypeJSON = AtomJSON
+	AtomTypeJSON = engine.NewAtom("json")
 	// AtomTypeURIComponent is the term used to represent the URI component type.
 	AtomTypeURIComponent = engine.NewAtom("uri_component")
 )
@@ -56,7 +56,7 @@ var (
 	// The valid encoding atom is a compound with the name of the encoding which is a valid encoding with
 	// regard to the predicate where it is used.
 	//
-	// For instance: valid_encoding(utf8), valid_encoding(hex).
+	// For instance: encoding(utf8), encoding(hex).
 	AtomValidEncoding = engine.NewAtom("encoding")
 	// AtomValidEmptyList is the atom denoting a valid empty list.
 	AtomValidEmptyList = engine.NewAtom("empty_list")
