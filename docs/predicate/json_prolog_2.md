@@ -24,7 +24,7 @@ Where:
 
 The canonical representation for Term is:
 
-- A JSON object is mapped to a Prolog term json\(NameValueList\), where NameValueList is a list of Name\-Value pairs. Name is an atom created from the JSON string.
+- A JSON object is mapped to a Prolog term json\(NameValueList\), where NameValueList is a list of Name=Value key values. Name is an atom created from the JSON string.
 - A JSON array is mapped to a Prolog list of JSON values.
 - A JSON string is mapped to a Prolog atom.
 - A JSON number is mapped to a Prolog number.
@@ -35,5 +35,5 @@ The canonical representation for Term is:
 
 ```text
 # JSON conversion to Prolog.
-- json_prolog('{"foo": "bar"}', json([foo-bar])).
+- json_prolog('{"foo": "bar"}', json([foo=bar])).
 ```
