@@ -5,10 +5,9 @@ import (
 )
 
 var (
-	nullTerm       = AtomAt.Apply(AtomNull)
-	emptyArrayTerm = AtomAt.Apply(AtomEmptyArray)
-	trueTerm       = AtomAt.Apply(AtomTrue)
-	falseTerm      = AtomAt.Apply(AtomFalse)
+	nullTerm  = AtomAt.Apply(AtomNull)
+	trueTerm  = AtomAt.Apply(AtomTrue)
+	falseTerm = AtomAt.Apply(AtomFalse)
 )
 
 // JSONNull returns the compound term @(null).
@@ -24,12 +23,6 @@ func JSONBool(b bool) engine.Term {
 	}
 
 	return falseTerm
-}
-
-// JSONEmptyArray returns is the compound term @([]).
-// It is used to represent the empty array in json objects.
-func JSONEmptyArray() engine.Term {
-	return emptyArrayTerm
 }
 
 // AssertJSON resolves a term as a JSON object and returns it as engine.Compound.

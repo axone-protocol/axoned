@@ -171,7 +171,7 @@ func TestJsonProlog(t *testing.T) {
 				description: "convert empty json array into prolog",
 				query:       `json_prolog('[]', Term).`,
 				wantResult: []testutil.TermResults{{
-					"Term": "@([])",
+					"Term": "[]",
 				}},
 				wantSuccess: true,
 			},
@@ -268,14 +268,6 @@ func TestJsonProlog(t *testing.T) {
 				query:       `json_prolog(Json, 'foo bar').`,
 				wantResult: []testutil.TermResults{{
 					"Json": "'\"foo bar\"'",
-				}},
-				wantSuccess: true,
-			},
-			{
-				description: "convert empty-list atom term to json",
-				query:       `json_prolog(Json, []).`,
-				wantResult: []testutil.TermResults{{
-					"Json": "'\"[]\"'",
 				}},
 				wantSuccess: true,
 			},
@@ -411,7 +403,7 @@ func TestJsonProlog(t *testing.T) {
 			// Array
 			{
 				description: "convert empty json array from prolog",
-				query:       `json_prolog(Json, @([])).`,
+				query:       `json_prolog(Json, []).`,
 				wantResult: []testutil.TermResults{{
 					"Json": "[]",
 				}},
@@ -585,7 +577,7 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 			},
 			{
 				json:        `'{"key1":null,"key2":[],"key3":{"nestedKey1":null,"nestedKey2":[],"nestedKey3":["a",null,null]}}'`,
-				term:        `json([key1- @(null),key2- @([]),key3-json([nestedKey1- @(null),nestedKey2- @([]),nestedKey3-[a,@(null),@(null)]])])`,
+				term:        `json([key1- @(null),key2-[],key3-json([nestedKey1- @(null),nestedKey2-[],nestedKey3-[a,@(null),@(null)]])])`,
 				wantSuccess: true,
 			},
 		}

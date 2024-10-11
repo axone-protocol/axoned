@@ -13,8 +13,6 @@ var (
 	AtomDot = engine.NewAtom(".")
 	// AtomEmpty is the term used to represent empty.
 	AtomEmpty = engine.NewAtom("")
-	// AtomEmptyArray is the term [].
-	AtomEmptyArray = engine.NewAtom("[]")
 	// AtomEmptyList is the term used to represent an empty list.
 	AtomEmptyList = engine.NewAtom("[]")
 	// AtomEncoding is the term used to indicate the encoding type option.

@@ -89,32 +89,31 @@ func JSONProlog(_ *engine.VM, j, p engine.Term, cont engine.Cont, env *engine.En
 }
 
 func encodeTermToJSON(term engine.Term, buf *bytes.Buffer, env *engine.Env) (err error) {
+	marshalToBuffer := func(data any) error {
+		bs, err := json.Marshal(data)
+		if err != nil {
+			return prologErrorToException(term, err, env)
+		}
+		buf.Write(bs)
+
+		return nil
+	}
+
 	switch t := term.(type) {
 	case engine.Atom:
-		bs, err := json.Marshal(t.String())
-		if err != nil {
-			return prologErrorToException(t, err, env)
+		if term == prolog.AtomEmptyList {
+			buf.Write([]byte("[]"))
+		} else {
+			return marshalToBuffer(t.String())
 		}
-
-		buf.Write(bs)
 	case engine.Integer:
-		bs, err := json.Marshal(t)
-		if err != nil {
-			return prologErrorToException(t, err, env)
-		}
-
-		buf.Write(bs)
+		return marshalToBuffer(t)
 	case engine.Float:
 		float, err := strconv.ParseFloat(t.String(), 64)
 		if err != nil {
 			return prologErrorToException(t, err, env)
 		}
-		bs, err := json.Marshal(float)
-		if err != nil {
-			return prologErrorToException(t, err, env)
-		}
-
-		buf.Write(bs)
+		return marshalToBuffer(float)
 	case engine.Compound:
 		return encodeCompoundToJSON(t, buf, env)
 	default:
@@ -134,8 +133,6 @@ func encodeCompoundToJSON(term engine.Compound, buf *bytes.Buffer, env *engine.E
 		buf.Write([]byte("true"))
 	case prolog.JSONBool(false).Compare(term, env) == 0:
 		buf.Write([]byte("false"))
-	case prolog.JSONEmptyArray().Compare(term, env) == 0:
-		buf.Write([]byte("[]"))
 	case prolog.JSONNull().Compare(term, env) == 0:
 		buf.Write([]byte("null"))
 	default:
@@ -289,10 +286,6 @@ func decodeJSONArrayToTerm(decoder *json.Decoder, env *engine.Env) (engine.Term,
 			return nil, err
 		}
 		terms = append(terms, value)
-	}
-
-	if len(terms) == 0 {
-		return prolog.JSONEmptyArray(), nil
 	}
 
 	return engine.List(terms...), nil
