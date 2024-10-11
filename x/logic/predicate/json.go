@@ -45,7 +45,7 @@ var (
 // # JSON canonical representation
 //
 // The canonical representation for Term is:
-//   - A JSON object is mapped to a Prolog term json(NameValueList), where NameValueList is a list of Name-Value pairs.
+//   - A JSON object is mapped to a Prolog term json(NameValueList), where NameValueList is a list of Name=Value key values.
 //     Name is an atom created from the JSON string.
 //   - A JSON array is mapped to a Prolog list of JSON values.
 //   - A JSON string is mapped to a Prolog atom.
@@ -56,7 +56,7 @@ var (
 // # Examples:
 //
 //	# JSON conversion to Prolog.
-//	- json_prolog('{"foo": "bar"}', json([foo-bar])).
+//	- json_prolog('{"foo": "bar"}', json([foo=bar])).
 func JSONProlog(_ *engine.VM, j, p engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	forwardConverter := func(in []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
 		payload, err := prolog.TextTermToString(in[0], env)
@@ -89,36 +89,36 @@ func JSONProlog(_ *engine.VM, j, p engine.Term, cont engine.Cont, env *engine.En
 }
 
 func encodeTermToJSON(term engine.Term, buf *bytes.Buffer, env *engine.Env) (err error) {
-	marshalToBuffer := func(data any) error {
-		bs, err := json.Marshal(data)
-		if err != nil {
-			return prologErrorToException(term, err, env)
-		}
-		buf.Write(bs)
-
-		return nil
-	}
-
 	switch t := term.(type) {
 	case engine.Atom:
 		if term == prolog.AtomEmptyList {
 			buf.Write([]byte("[]"))
 		} else {
-			return marshalToBuffer(t.String())
+			return marshalToBuffer(t.String(), term, buf, env)
 		}
 	case engine.Integer:
-		return marshalToBuffer(t)
+		return marshalToBuffer(t, term, buf, env)
 	case engine.Float:
 		float, err := strconv.ParseFloat(t.String(), 64)
 		if err != nil {
 			return prologErrorToException(t, err, env)
 		}
-		return marshalToBuffer(float)
+		return marshalToBuffer(float, term, buf, env)
 	case engine.Compound:
 		return encodeCompoundToJSON(t, buf, env)
 	default:
 		return engine.TypeError(prolog.AtomTypeJSON, term, env)
 	}
+
+	return nil
+}
+
+func marshalToBuffer(data any, term engine.Term, buf *bytes.Buffer, env *engine.Env) error {
+	bs, err := json.Marshal(data)
+	if err != nil {
+		return prologErrorToException(term, err, env)
+	}
+	buf.Write(bs)
 
 	return nil
 }
@@ -148,19 +148,13 @@ func encodeObjectToJSON(term engine.Compound, buf *bytes.Buffer, env *engine.Env
 	}
 	buf.Write([]byte("{"))
 	if err := prolog.ForEach(term.Arg(0), env, func(t engine.Term, hasNext bool) error {
-		k, v, err := prolog.AssertPair(t, env)
+		k, v, err := prolog.AssertKeyValue(t, env)
 		if err != nil {
 			return err
 		}
-		key, err := prolog.AssertAtom(k, env)
-		if err != nil {
+		if err := marshalToBuffer(k.String(), term, buf, env); err != nil {
 			return err
 		}
-		bs, err := json.Marshal(key.String())
-		if err != nil {
-			return prologErrorToException(t, err, env)
-		}
-		buf.Write(bs)
 		buf.Write([]byte(":"))
 		if err := encodeTermToJSON(v, buf, env); err != nil {
 			return err
@@ -174,7 +168,6 @@ func encodeObjectToJSON(term engine.Compound, buf *bytes.Buffer, env *engine.Env
 		return err
 	}
 	buf.Write([]byte("}"))
-
 	return nil
 }
 
@@ -303,7 +296,7 @@ func decodeJSONObjectToTerm(decoder *json.Decoder, env *engine.Env) (engine.Term
 		if err != nil {
 			return nil, err
 		}
-		terms = append(terms, prolog.AtomPair.Apply(prolog.StringToAtom(key), value))
+		terms = append(terms, prolog.AtomKeyValue.Apply(prolog.StringToAtom(key), value))
 	}
 
 	return prolog.AtomJSON.Apply(engine.List(terms...)), nil

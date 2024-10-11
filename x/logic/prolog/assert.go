@@ -154,15 +154,40 @@ func AssertList(term engine.Term, env *engine.Env) (engine.Term, error) {
 // AssertPair resolves a term as a pair and returns the pair components.
 // If conversion fails, the function returns nil and the error.
 func AssertPair(term engine.Term, env *engine.Env) (engine.Term, engine.Term, error) {
+	return AssertTuple2WithFunctor(term, AtomPair, AtomTypePair, env)
+}
+
+// AssertKeyValue resolves a term as a key-value and returns its components, the key as an atom,
+// and the value as a term.
+// If conversion fails, the function returns nil and the error.
+func AssertKeyValue(term engine.Term, env *engine.Env) (engine.Atom, engine.Term, error) {
+	k, v, err := AssertTuple2WithFunctor(term, AtomKeyValue, AtomTypeKeyValue, env)
+	if err != nil {
+		return AtomEmpty, nil, err
+	}
+
+	key, err := AssertAtom(k, env)
+	if err != nil {
+		return AtomEmpty, nil, err
+	}
+
+	return key, v, err
+}
+
+// AssertTuple2WithFunctor resolves a term as a tuple and returns the tuple components based on the given functor.
+// If conversion fails, the function returns nil and an error.
+func AssertTuple2WithFunctor(
+	term engine.Term, functor engine.Atom, functorType engine.Atom, env *engine.Env,
+) (engine.Term, engine.Term, error) {
 	term, err := AssertIsGround(term, env)
 	if err != nil {
 		return nil, nil, err
 	}
-	if term, ok := term.(engine.Compound); ok && term.Functor() == AtomPair && term.Arity() == 2 {
-		return term.Arg(0), term.Arg(1), nil
+	if compound, ok := term.(engine.Compound); ok && compound.Functor() == functor && compound.Arity() == 2 {
+		return compound.Arg(0), compound.Arg(1), nil
 	}
 
-	return nil, nil, engine.TypeError(AtomTypePair, term, env)
+	return nil, nil, engine.TypeError(functorType, term, env)
 }
 
 // AssertURIComponent resolves a term as a URI component and returns it as an URIComponent.

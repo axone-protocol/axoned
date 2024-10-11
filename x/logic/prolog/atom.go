@@ -36,6 +36,9 @@ var (
 	// AtomPair are terms with principal functor (-)/2.
 	// For example, the term -(A, B) denotes the pair of elements A and B.
 	AtomPair = engine.NewAtom("-")
+	// AtomKeyValue are terms with principal functor (=)/2.
+	// For example, the term =(A, B) denotes the mapping of key A with value B.
+	AtomKeyValue = engine.NewAtom("=")
 	// AtomPath is the term used to indicate the path component.
 	AtomPath = engine.NewAtom("path")
 	// AtomQueryValue is the term used to indicate the query value component.

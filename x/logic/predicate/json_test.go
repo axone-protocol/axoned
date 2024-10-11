@@ -67,7 +67,7 @@ func TestJsonProlog(t *testing.T) {
 				description: "convert json object into prolog",
 				query:       `json_prolog('{"foo": "bar"}', Term).`,
 				wantResult: []testutil.TermResults{{
-					"Term": "json([foo-bar])",
+					"Term": "json([foo=bar])",
 				}},
 				wantSuccess: true,
 			},
@@ -75,7 +75,7 @@ func TestJsonProlog(t *testing.T) {
 				description: "convert json object (given as string) into prolog",
 				query:       `json_prolog("{\"foo\": \"bar\"}", Term).`,
 				wantResult: []testutil.TermResults{{
-					"Term": "json([foo-bar])",
+					"Term": "json([foo=bar])",
 				}},
 				wantSuccess: true,
 			},
@@ -83,7 +83,7 @@ func TestJsonProlog(t *testing.T) {
 				description: "convert json object with multiple attribute into prolog",
 				query:       `json_prolog('{"foo": "bar", "foobar": "bar foo"}', Term).`,
 				wantResult: []testutil.TermResults{{
-					"Term": "json([foo-bar,foobar-'bar foo'])",
+					"Term": "json([foo=bar,foobar='bar foo'])",
 				}},
 				wantSuccess: true,
 			},
@@ -91,7 +91,7 @@ func TestJsonProlog(t *testing.T) {
 				description: "convert json object with attribute with a space into prolog",
 				query:       `json_prolog('{"string with space": "bar"}', Term).`,
 				wantResult: []testutil.TermResults{{
-					"Term": "json(['string with space'-bar])",
+					"Term": "json(['string with space'=bar])",
 				}},
 				wantSuccess: true,
 			},
@@ -99,7 +99,7 @@ func TestJsonProlog(t *testing.T) {
 				description: "ensure prolog encoded json follows same order as json",
 				query:       `json_prolog('{"b": "a", "a": "b"}', Term).`,
 				wantResult: []testutil.TermResults{{
-					"Term": "json([b-a,a-b])",
+					"Term": "json([b=a,a=b])",
 				}},
 				wantSuccess: true,
 			},
@@ -275,7 +275,7 @@ func TestJsonProlog(t *testing.T) {
 			// Object
 			{
 				description: "convert json object from prolog",
-				query:       `json_prolog(Json, json([foo-bar])).`,
+				query:       `json_prolog(Json, json([foo=bar])).`,
 				wantResult: []testutil.TermResults{{
 					"Json": "'{\"foo\":\"bar\"}'",
 				}},
@@ -283,7 +283,7 @@ func TestJsonProlog(t *testing.T) {
 			},
 			{
 				description: "convert json object with multiple attribute from prolog",
-				query:       `json_prolog(Json, json([foo-bar,foobar-'bar foo'])).`,
+				query:       `json_prolog(Json, json([foo=bar,foobar='bar foo'])).`,
 				wantResult: []testutil.TermResults{{
 					"Json": "'{\"foo\":\"bar\",\"foobar\":\"bar foo\"}'",
 				}},
@@ -291,7 +291,7 @@ func TestJsonProlog(t *testing.T) {
 			},
 			{
 				description: "convert json object with attribute with a space into prolog",
-				query:       `json_prolog(Json, json(['string with space'-bar])).`,
+				query:       `json_prolog(Json, json(['string with space'=bar])).`,
 				wantResult: []testutil.TermResults{{
 					"Json": "'{\"string with space\":\"bar\"}'",
 				}},
@@ -299,7 +299,7 @@ func TestJsonProlog(t *testing.T) {
 			},
 			{
 				description: "ensure json follows same order as prolog encoded",
-				query:       `json_prolog(Json, json([b-a,a-b])).`,
+				query:       `json_prolog(Json, json([b=a,a=b])).`,
 				wantResult: []testutil.TermResults{{
 					"Json": "'{\"b\":\"a\",\"a\":\"b\"}'",
 				}},
@@ -307,9 +307,9 @@ func TestJsonProlog(t *testing.T) {
 			},
 			{
 				description: "invalid json term compound",
-				query:       `json_prolog(Json, foo([a-b])).`,
+				query:       `json_prolog(Json, foo([a=b])).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(json,foo([-(a,b)])),json_prolog/2)"),
+				wantError:   fmt.Errorf("error(type_error(json,foo([=(a,b)])),json_prolog/2)"),
 			},
 			{
 				description: "convert json term object from prolog with error inside",
@@ -319,21 +319,27 @@ func TestJsonProlog(t *testing.T) {
 			},
 			{
 				description: "convert json term object from prolog with error inside another object",
-				query:       `json_prolog(Json, ['string with space',json([key-json(error)])]).`,
+				query:       `json_prolog(Json, ['string with space',json([key=json(error)])]).`,
 				wantSuccess: false,
 				wantError:   fmt.Errorf("error(type_error(list,error),json_prolog/2)"),
 			},
 			{
 				description: "convert json term object which incorrectly defines key/value pair",
-				query:       `json_prolog(Json, json([not_a_pair(key,value)])).`,
+				query:       `json_prolog(Json, json([not_a_key_value(key,value)])).`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(pair,not_a_pair(key,value)),json_prolog/2)"),
+				wantError:   fmt.Errorf("error(type_error(key_value,not_a_key_value(key,value)),json_prolog/2)"),
 			},
 			{
 				description: "convert json term object which uses a non atom for key",
-				query:       `json_prolog(Json, json([-(42,value)])).`,
+				query:       `json_prolog(Json, json([=(42,value)])).`,
 				wantSuccess: false,
 				wantError:   fmt.Errorf("error(type_error(atom,42),json_prolog/2)"),
+			},
+			{
+				description: "convert json term object with arity > 2",
+				query:       `json_prolog(Json, json(a,b,c)).`,
+				wantSuccess: false,
+				wantError:   fmt.Errorf("error(type_error(json,json(a,b,c)),json_prolog/2)"),
 			},
 			// ** Prolog -> JSON **
 			// Number
@@ -470,7 +476,7 @@ func TestJsonProlog(t *testing.T) {
 			// ** JSON <-> Prolog **
 			{
 				description: "ensure unification doesn't depend on formatting",
-				query:       `json_prolog('{\n\t"foo": "bar"\n}', json( [ foo  -  bar ] )).`,
+				query:       `json_prolog('{\n\t"foo": "bar"\n}', json( [ foo  =  bar ] )).`,
 				wantResult:  []testutil.TermResults{{}},
 				wantSuccess: true,
 			},
@@ -542,42 +548,42 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 		}{
 			{
 				json:        "'{\"foo\":\"bar\"}'",
-				term:        "json([foo-bar])",
+				term:        "json([foo=bar])",
 				wantSuccess: true,
 			},
 			{
 				json:        "'{\"foo\":\"null\"}'",
-				term:        "json([foo-null])",
+				term:        "json([foo=null])",
 				wantSuccess: true,
 			},
 			{
 				json:        "'{\"foo\":null}'",
-				term:        "json([foo- @(null)])",
+				term:        "json([foo= @(null)])",
 				wantSuccess: true,
 			},
 			{
 				json:        "'{\"employee\":{\"age\":30,\"city\":\"New York\",\"name\":\"John\"}}'",
-				term:        "json([employee-json([age-30.0,city-'New York',name-'John'])])",
+				term:        "json([employee=json([age=30.0,city='New York',name='John'])])",
 				wantSuccess: true,
 			},
 			{
 				json:        "'{\"cosmos\":[\"axone\",{\"name\":\"localnet\"}]}'",
-				term:        "json([cosmos-[axone,json([name-localnet])]])",
+				term:        "json([cosmos=[axone,json([name=localnet])]])",
 				wantSuccess: true,
 			},
 			{
 				json:        "'{\"object\":{\"array\":[1,2,3],\"arrayobject\":[{\"name\":\"toto\"},{\"name\":\"tata\"}],\"bool\":true,\"boolean\":false,\"null\":null}}'",
-				term:        "json([object-json([array-[1.0,2.0,3.0],arrayobject-[json([name-toto]),json([name-tata])],bool- @(true),boolean- @(false),null- @(null)])])",
+				term:        "json([object=json([array=[1.0,2.0,3.0],arrayobject=[json([name=toto]),json([name=tata])],bool= @(true),boolean= @(false),null= @(null)])])",
 				wantSuccess: true,
 			},
 			{
 				json:        "'{\"foo\":\"bar\"}'",
-				term:        "json([a-b])",
+				term:        "json([a=b])",
 				wantSuccess: false,
 			},
 			{
 				json:        `'{"key1":null,"key2":[],"key3":{"nestedKey1":null,"nestedKey2":[],"nestedKey3":["a",null,null]}}'`,
-				term:        `json([key1- @(null),key2-[],key3-json([nestedKey1- @(null),nestedKey2-[],nestedKey3-[a,@(null),@(null)]])])`,
+				term:        `json([key1= @(null),key2=[],key3=json([nestedKey1= @(null),nestedKey2=[],nestedKey3=[a,@(null),@(null)]])])`,
 				wantSuccess: true,
 			},
 		}

@@ -45,6 +45,8 @@ var (
 	AtomTypeOption = engine.NewAtom("option")
 	// AtomTypePair is the term used to indicate the pair type.
 	AtomTypePair = engine.NewAtom("pair")
+	// AtomTypeKeyValue is the term used to indicate the key-value type.
+	AtomTypeKeyValue = engine.NewAtom("key_value")
 	// AtomTypeJSON is the term used to indicate the json type.
 	AtomTypeJSON = engine.NewAtom("json")
 	// AtomTypeURIComponent is the term used to represent the URI component type.
