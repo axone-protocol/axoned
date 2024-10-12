@@ -154,14 +154,14 @@ func AssertList(term engine.Term, env *engine.Env) (engine.Term, error) {
 // AssertPair resolves a term as a pair and returns the pair components.
 // If conversion fails, the function returns nil and the error.
 func AssertPair(term engine.Term, env *engine.Env) (engine.Term, engine.Term, error) {
-	return AssertTuple2WithFunctor(term, AtomPair, AtomTypePair, env)
+	return assertTuple2WithFunctor(term, AtomPair, AtomTypePair, env)
 }
 
 // AssertKeyValue resolves a term as a key-value and returns its components, the key as an atom,
 // and the value as a term.
 // If conversion fails, the function returns nil and the error.
 func AssertKeyValue(term engine.Term, env *engine.Env) (engine.Atom, engine.Term, error) {
-	k, v, err := AssertTuple2WithFunctor(term, AtomKeyValue, AtomTypeKeyValue, env)
+	k, v, err := assertTuple2WithFunctor(term, AtomKeyValue, AtomTypeKeyValue, env)
 	if err != nil {
 		return AtomEmpty, nil, err
 	}
@@ -174,9 +174,9 @@ func AssertKeyValue(term engine.Term, env *engine.Env) (engine.Atom, engine.Term
 	return key, v, err
 }
 
-// AssertTuple2WithFunctor resolves a term as a tuple and returns the tuple components based on the given functor.
+// assertTuple2WithFunctor resolves a term as a tuple and returns the tuple components based on the given functor.
 // If conversion fails, the function returns nil and an error.
-func AssertTuple2WithFunctor(
+func assertTuple2WithFunctor(
 	term engine.Term, functor engine.Atom, functorType engine.Atom, env *engine.Env,
 ) (engine.Term, engine.Term, error) {
 	term, err := AssertIsGround(term, env)

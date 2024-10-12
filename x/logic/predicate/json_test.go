@@ -202,6 +202,12 @@ func TestJsonProlog(t *testing.T) {
 			// ** JSON -> Prolog **
 			// Pathological
 			{
+				description: "convert an object with an invalid key type (numeric) to Prolog",
+				query:       `json_prolog('{5:"bar"}', Term).`,
+				wantError:   fmt.Errorf("error(syntax_error(json(malformed_json(1))),json_prolog/2)"),
+				wantSuccess: false,
+			},
+			{
 				description: "convert incorrect json into prolog",
 				query:       `json_prolog('@wtf!', Term).`,
 				wantError:   fmt.Errorf("error(syntax_error(json(malformed_json(1))),json_prolog/2)"),
