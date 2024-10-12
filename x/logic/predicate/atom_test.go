@@ -140,3 +140,107 @@ func TestTermToAtom(t *testing.T) {
 		}
 	})
 }
+
+func TestAtomicListConcat(t *testing.T) {
+	Convey("Given a test cases", t, func() {
+		cases := []struct {
+			query       string
+			wantResult  []testutil.TermResults
+			wantError   error
+			wantSuccess bool
+		}{
+			{
+				query:     "atomic_list_concat(X, Y).",
+				wantError: fmt.Errorf("error(instantiation_error,atomic_list_concat/2)"),
+			},
+			{
+				query:       "atomic_list_concat([], X).",
+				wantResult:  []testutil.TermResults{{"X": "''"}},
+				wantSuccess: true,
+			},
+			{
+				query:       "atomic_list_concat([a, 42], X).",
+				wantResult:  []testutil.TermResults{{"X": "a42"}},
+				wantSuccess: true,
+			},
+			{
+				query:       "atomic_list_concat([a,b], X).",
+				wantResult:  []testutil.TermResults{{"X": "ab"}},
+				wantSuccess: true,
+			},
+			{
+				query:       `atomic_list_concat(["a","b"], X).`,
+				wantResult:  []testutil.TermResults{{"X": "'[a][b]'"}},
+				wantSuccess: true,
+			},
+			{
+				query:     `atomic_list_concat([a,_X,c], X).`,
+				wantError: fmt.Errorf("error(instantiation_error,atomic_list_concat/2)"),
+			},
+			{
+				query:     `atomic_list_concat(foo, X).`,
+				wantError: fmt.Errorf("error(type_error(list,foo),atomic_list_concat/2)"),
+			},
+			{
+				query: "atomic_list_concat([a,b,c], foo).",
+			},
+			{
+				query:       "atomic_list_concat([a,b,c], abc).",
+				wantResult:  []testutil.TermResults{{}},
+				wantSuccess: true,
+			},
+		}
+
+		for nc, tc := range cases {
+			Convey(fmt.Sprintf("Given the query #%d: %s", nc, tc.query), func() {
+				Convey("and a context", func() {
+					db := dbm.NewMemDB()
+					stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
+					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
+
+					Convey("and a vm", func() {
+						interpreter := testutil.NewLightInterpreterMust(ctx)
+						interpreter.Register2(engine.NewAtom("atomic_list_concat"), AtomicListConcat2)
+
+						Convey("When the predicate is called", func() {
+							sols, err := interpreter.QueryContext(ctx, tc.query)
+
+							Convey("Then the error should be nil", func() {
+								So(err, ShouldBeNil)
+								So(sols, ShouldNotBeNil)
+
+								Convey("and the bindings should be as expected", func() {
+									var got []testutil.TermResults
+									for sols.Next() {
+										m := testutil.TermResults{}
+										err := sols.Scan(m)
+										So(err, ShouldBeNil)
+
+										got = append(got, m)
+									}
+									if tc.wantError != nil {
+										So(sols.Err(), ShouldNotBeNil)
+										So(sols.Err().Error(), ShouldEqual, tc.wantError.Error())
+									} else {
+										So(sols.Err(), ShouldBeNil)
+
+										if tc.wantSuccess {
+											So(len(got), ShouldEqual, len(tc.wantResult))
+											for iGot, resultGot := range got {
+												for varGot, termGot := range resultGot {
+													So(testutil.ReindexUnknownVariables(termGot), ShouldEqual, tc.wantResult[iGot][varGot])
+												}
+											}
+										} else {
+											So(len(got), ShouldEqual, 0)
+										}
+									}
+								})
+							})
+						})
+					})
+				})
+			})
+		}
+	})
+}
