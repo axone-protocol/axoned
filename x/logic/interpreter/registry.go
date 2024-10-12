@@ -118,6 +118,7 @@ var registry = orderedmap.New[string, any](
 		{Key: "eddsa_verify/4", Value: predicate.EDDSAVerify},
 		{Key: "ecdsa_verify/4", Value: predicate.ECDSAVerify},
 		{Key: "string_bytes/3", Value: predicate.StringBytes},
+		{Key: "term_to_atom/2", Value: predicate.TermToAtom},
 	}...),
 )
 
