@@ -314,3 +314,175 @@ func TestAssertIsGround(t *testing.T) {
 		})
 	})
 }
+
+func TestAssertPair(t *testing.T) {
+	X := engine.NewVariable()
+
+	Convey("Given a test cases", t, func() {
+		cases := []struct {
+			name       string
+			term       engine.Term
+			wantFirst  engine.Term
+			wantSecond engine.Term
+			wantError  error
+		}{
+			{
+				name:       "a valid pair",
+				term:       AtomPair.Apply(StringToAtom("foo"), StringToAtom("bar")),
+				wantFirst:  StringToAtom("foo"),
+				wantSecond: StringToAtom("bar"),
+			},
+			{
+				name:       "a pair with bounded variable",
+				term:       AtomPair.Apply(X, engine.Integer(42)),
+				wantFirst:  StringToAtom("x"),
+				wantSecond: engine.Integer(42),
+			},
+			{
+				name:      "a pair with unbounded variable",
+				term:      AtomPair.Apply(engine.NewVariable(), StringToAtom("bar")),
+				wantError: fmt.Errorf("error(instantiation_error,root)"),
+			},
+			{
+				name:      "an atom",
+				term:      StringToAtom("x"),
+				wantError: fmt.Errorf("error(type_error(pair,x),root)"),
+			},
+			{
+				name:      "an integer",
+				term:      engine.Integer(42),
+				wantError: fmt.Errorf("error(type_error(pair,42),root)"),
+			},
+			{
+				name:      "a compound",
+				term:      engine.NewAtom("foo").Apply(engine.NewAtom("bar")),
+				wantError: fmt.Errorf("error(type_error(pair,foo(bar)),root)"),
+			},
+			{
+				name:      "a pair with arity 1",
+				term:      AtomPair.Apply(StringToAtom("foo")),
+				wantError: fmt.Errorf("error(type_error(pair,-(foo)),root)"),
+			},
+			{
+				name:      "a pair with arity > 1",
+				term:      AtomPair.Apply(engine.Integer(1), engine.Integer(2), engine.Integer(3)),
+				wantError: fmt.Errorf("error(type_error(pair,-(1,2,3)),root)"),
+			},
+		}
+
+		Convey("and an environment", func() {
+			env, _ := engine.NewEnv().Unify(X, engine.NewAtom("x"))
+			for nc, tc := range cases {
+				Convey(
+					fmt.Sprintf("Given the test case %s (#%d)", tc.name, nc), func() {
+						Convey("When the function AssertPair() is called", func() {
+							first, second, err := AssertPair(tc.term, env)
+							Convey("Then it should return the expected output", func() {
+								if tc.wantError == nil {
+									So(first, ShouldEqual, tc.wantFirst)
+									So(second, ShouldEqual, tc.wantSecond)
+									So(err, ShouldBeNil)
+								} else {
+									So(err, ShouldBeError, tc.wantError)
+								}
+							})
+						})
+					})
+			}
+		})
+	})
+}
+
+func TestAssertKeyValue(t *testing.T) {
+	X := engine.NewVariable()
+
+	Convey("Given a test cases", t, func() {
+		cases := []struct {
+			name      string
+			term      engine.Term
+			wantKey   engine.Atom
+			wantValue engine.Term
+			wantError error
+		}{
+			{
+				name:      "a valid key-value pair",
+				term:      AtomKeyValue.Apply(StringToAtom("key"), StringToAtom("value")),
+				wantKey:   StringToAtom("key"),
+				wantValue: StringToAtom("value"),
+			},
+			{
+				name:      "a key-value pair with bounded variable key",
+				term:      AtomKeyValue.Apply(X, engine.Integer(42)),
+				wantKey:   StringToAtom("x"),
+				wantValue: engine.Integer(42),
+			},
+			{
+				name:      "a key-value pair with bounded variable value",
+				term:      AtomKeyValue.Apply(StringToAtom("key"), X),
+				wantKey:   StringToAtom("key"),
+				wantValue: StringToAtom("x"),
+			},
+			{
+				name:      "a key-value pair with non-atom key",
+				term:      AtomKeyValue.Apply(engine.Integer(42), StringToAtom("value")),
+				wantError: fmt.Errorf("error(type_error(atom,42),root)"),
+			},
+			{
+				name:      "a key-value pair with unbounded variable key",
+				term:      AtomKeyValue.Apply(engine.NewVariable(), StringToAtom("value")),
+				wantError: fmt.Errorf("error(instantiation_error,root)"),
+			},
+			{
+				name:      "a key-value pair with unbounded variable value",
+				term:      AtomKeyValue.Apply(StringToAtom("key"), engine.NewVariable()),
+				wantError: fmt.Errorf("error(instantiation_error,root)"),
+			},
+			{
+				name:      "an atom",
+				term:      StringToAtom("x"),
+				wantError: fmt.Errorf("error(type_error(key_value,x),root)"),
+			},
+			{
+				name:      "an integer",
+				term:      engine.Integer(42),
+				wantError: fmt.Errorf("error(type_error(key_value,42),root)"),
+			},
+			{
+				name:      "a compound",
+				term:      engine.NewAtom("foo").Apply(engine.NewAtom("bar")),
+				wantError: fmt.Errorf("error(type_error(key_value,foo(bar)),root)"),
+			},
+			{
+				name:      "a key-value pair with arity 1",
+				term:      AtomKeyValue.Apply(StringToAtom("key")),
+				wantError: fmt.Errorf("error(type_error(key_value,=(key)),root)"),
+			},
+			{
+				name:      "a key-value pair with arity > 2",
+				term:      AtomKeyValue.Apply(engine.Integer(1), engine.Integer(2), engine.Integer(3)),
+				wantError: fmt.Errorf("error(type_error(key_value,=(1,2,3)),root)"),
+			},
+		}
+
+		Convey("and an environment", func() {
+			env, _ := engine.NewEnv().Unify(X, engine.NewAtom("x"))
+			for nc, tc := range cases {
+				Convey(
+					fmt.Sprintf("Given the test case %s (#%d)", tc.name, nc), func() {
+						Convey("When the function AssertKeyValue() is called", func() {
+							key, value, err := AssertKeyValue(tc.term, env)
+							Convey("Then it should return the expected output", func() {
+								if tc.wantError == nil {
+									So(key, ShouldEqual, tc.wantKey)
+									So(value, ShouldEqual, tc.wantValue)
+									So(err, ShouldBeNil)
+								} else {
+									So(err, ShouldBeError, tc.wantError)
+								}
+							})
+						})
+					})
+			}
+		})
+	})
+}

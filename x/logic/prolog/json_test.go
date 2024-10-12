@@ -9,71 +9,86 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
-func TestExtractJsonTerm(t *testing.T) {
-	Convey("Given a test cases", t, func() {
+func TestJSONNull(t *testing.T) {
+	Convey("Given an environment", t, func() {
+		env := engine.NewEnv()
+		Convey("When calling JSONNull", func() {
+			got := JSONNull()
+			want := nullTerm
+			Convey("Then it should return the JSON null atom", func() {
+				So(got, ShouldNotBeNil)
+				So(got.Compare(want, env), ShouldEqual, 0)
+			})
+		})
+	})
+}
+
+func TestJSONBool(t *testing.T) {
+	Convey("Given a boolean value", t, func() {
 		cases := []struct {
-			compound    engine.Compound
-			result      map[string]engine.Term
-			wantSuccess bool
-			wantError   error
+			input bool
+			want  engine.Term
 		}{
 			{
-				compound:    engine.NewAtom("foo").Apply(engine.NewAtom("bar")).(engine.Compound),
-				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(json,foo(bar)),root)"),
+				input: true,
+				want:  trueTerm,
 			},
 			{
-				compound:    engine.NewAtom("json").Apply(engine.NewAtom("bar"), engine.NewAtom("foobar")).(engine.Compound),
-				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(json,json(bar,foobar)),root)"),
-			},
-			{
-				compound:    engine.NewAtom("json").Apply(engine.NewAtom("bar")).(engine.Compound),
-				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(list,bar),root)"),
-			},
-			{
-				compound: AtomJSON.Apply(engine.List(AtomPair.Apply(engine.NewAtom("foo"), engine.NewAtom("bar")))).(engine.Compound),
-				result: map[string]engine.Term{
-					"foo": engine.NewAtom("bar"),
-				},
-				wantSuccess: true,
-			},
-			{
-				compound:    AtomJSON.Apply(engine.List(engine.NewAtom("foo"), engine.NewAtom("bar"))).(engine.Compound),
-				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(pair,foo),root)"),
-			},
-			{
-				compound:    AtomJSON.Apply(engine.List(AtomPair.Apply(engine.Integer(10), engine.NewAtom("bar")))).(engine.Compound),
-				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(atom,10),root)"),
+				input: false,
+				want:  falseTerm,
 			},
 		}
-		for nc, tc := range cases {
-			Convey(fmt.Sprintf("Given the term compound #%d: %s", nc, tc.compound), func() {
-				Convey("when extract json term", func() {
-					env := engine.NewEnv()
-					result, err := ExtractJSONTerm(tc.compound, env)
 
-					if tc.wantSuccess {
-						Convey("then no error should be thrown", func() {
-							So(err, ShouldBeNil)
-							So(result, ShouldNotBeNil)
+		for _, tc := range cases {
+			Convey(fmt.Sprintf("When calling JSONBool(%v)", tc.input), func() {
+				got := JSONBool(tc.input)
 
-							Convey("and result should be as expected", func() {
-								So(result, ShouldResemble, tc.result)
-							})
-						})
+				Convey("Then the result should be as expected", func() {
+					So(got, ShouldEqual, tc.want)
+				})
+			})
+		}
+	})
+}
+
+func TestAssertJSON(t *testing.T) {
+	Convey("Given test cases", t, func() {
+		env := engine.NewEnv()
+		cases := []struct {
+			description string
+			input       engine.Term
+			wantError   error
+			wantResult  string
+		}{
+			{
+				description: "valid JSON object",
+				input:       AtomJSON.Apply(engine.NewAtom("valid")),
+				wantError:   nil,
+			},
+			{
+				description: "non-compound term",
+				input:       engine.NewAtom("notACompound"),
+				wantError:   fmt.Errorf("error(type_error(json,notACompound),root)"),
+			},
+			{
+				description: "compound term with arity > 1",
+				input:       AtomJSON.Apply(engine.NewAtom("foo"), engine.NewAtom("bar")),
+				wantError:   fmt.Errorf("error(type_error(json,json(foo,bar)),root)"),
+			},
+		}
+
+		for _, tc := range cases {
+			Convey(fmt.Sprintf("When calling AssertJSON(%s)", tc.input), func() {
+				got, err := AssertJSON(tc.input, env)
+
+				Convey("Then the result should match the expected value", func() {
+					if tc.wantError != nil {
+						So(got, ShouldBeNil)
+						So(err, ShouldBeError, tc.wantError)
 					} else {
-						Convey("then error should occurs", func() {
-							So(err, ShouldNotBeNil)
-							So(tc.wantError, ShouldNotBeNil)
-
-							Convey("and should be as expected", func() {
-								So(err.Error(), ShouldEqual, tc.wantError.Error())
-							})
-						})
+						So(err, ShouldBeNil)
+						So(got, ShouldNotBeNil)
+						So(got.Compare(tc.input, env), ShouldEqual, 0)
 					}
 				})
 			})
