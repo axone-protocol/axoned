@@ -2,7 +2,11 @@
 package predicate
 
 import (
+	"bytes"
+	"context"
 	"fmt"
+	"regexp"
+	"strings"
 	"testing"
 
 	"github.com/axone-protocol/prolog/engine"
@@ -497,6 +501,7 @@ func TestJsonProlog(t *testing.T) {
 					Convey("and a vm", func() {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("json_prolog"), JSONProlog)
+						interpreter.Register2(engine.NewAtom("json_read"), JSONRead)
 
 						err := interpreter.Compile(ctx, tc.program)
 						So(err, ShouldBeNil)
@@ -700,6 +705,65 @@ func TestJsonPrologWithMoreComplexStructBidirectional(t *testing.T) {
 									}
 								})
 							})
+						})
+					})
+				})
+			})
+		}
+	})
+}
+
+func TestJSONRead(t *testing.T) {
+	Convey("Given a test cases for JSONRead", t, func() {
+		cases := []struct {
+			stream         func() engine.Term
+			wantSuccess    bool
+			wantErrorMatch string
+		}{
+			{
+				stream:         func() engine.Term { return engine.NewInputBinaryStream(strings.NewReader("{}")) },
+				wantErrorMatch: `error\(permission_error\(input,text_stream,<stream>\(0x[[:xdigit:]]+\)\),root\)`,
+			},
+			{
+				stream: func() engine.Term {
+					var buf bytes.Buffer
+					return engine.NewOutputTextStream(&buf)
+				},
+				wantErrorMatch: `error\(permission_error\(input,stream,<stream>\(0x[[:xdigit:]]+\)\),root\)`,
+			},
+			{
+				stream: func() engine.Term {
+					return engine.NewAtom("not a stream")
+				},
+				wantErrorMatch: `error\(type_error\(stream,not a stream\),root\)`,
+			},
+		}
+
+		for nc, tc := range cases {
+			Convey(fmt.Sprintf("Given a stream (#%d)", nc), func() {
+				stream := tc.stream()
+				defer func() {
+					if s, ok := stream.(*engine.Stream); ok {
+						_ = s.Close()
+					}
+				}()
+
+				Convey("and an interpreter", func() {
+					ctx := context.Background()
+					interpreter := testutil.NewLightInterpreterMust(ctx)
+					env := engine.NewEnv()
+
+					Convey("When the predicate is called", func() {
+						got := engine.NewVariable()
+						ok, err := JSONRead(&interpreter.VM, stream, got, engine.Success, env).Force(ctx)
+
+						Convey("Then the result should be as expected", func() {
+							So(ok, ShouldEqual, tc.wantSuccess)
+							if tc.wantErrorMatch != "" {
+								So(err, ShouldNotBeNil)
+								SoMsg(fmt.Sprintf("%s ~ %s", err, tc.wantErrorMatch),
+									regexp.MustCompile(tc.wantErrorMatch).FindStringIndex(err.Error()), ShouldNotBeNil)
+							}
 						})
 					})
 				})
