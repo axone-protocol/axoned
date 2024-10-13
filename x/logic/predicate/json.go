@@ -8,6 +8,7 @@ import (
 	"io"
 	"strconv"
 	"strings"
+	"unicode/utf8"
 
 	"github.com/axone-protocol/prolog/engine"
 	"github.com/samber/lo"
@@ -31,6 +32,49 @@ var (
 	// AtomValidJSONNumber is the atom denoting a valid JSON number.
 	AtomValidJSONNumber = engine.NewAtom("json_number")
 )
+
+var (
+	errWrongStreamType = errors.New("wrong stream type")
+	errWrongIOMode     = errors.New("wrong i/o mode")
+	errPastEndOfStream = errors.New("past end of stream")
+)
+
+var (
+	operationInput                = engine.NewAtom("input")
+	permissionTypeStream          = engine.NewAtom("stream")
+	permissionTypeTextStream      = engine.NewAtom("text_stream")
+	permissionTypePastEndOfStream = engine.NewAtom("past_end_of_stream")
+)
+
+// JSONRead is a predicate that reads a JSON from a stream and unifies it with a Prolog term.
+//
+// See json_prolog/2 for the canonical representation of the JSON term.
+//
+// The signature is as follows:
+//
+//	json_read(+Stream, -Term) is det
+//
+// Where:
+//   - Stream is the input stream from which the JSON is read.
+//   - Term is the Prolog term that represents the JSON structure.
+func JSONRead(vm *engine.VM, stream, term engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	is, err := prolog.AssertStream(stream, env)
+	if err != nil {
+		return engine.Error(err)
+	}
+
+	decoder := newTextStreamDecoder(is)
+	decoded, err := decodeJSONToTerm(decoder, env)
+	if err != nil {
+		return engine.Error(err)
+	}
+	if _, err := decoder.Token(); !errors.Is(err, io.EOF) {
+		return engine.Error(
+			engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomMalformedJSON.Apply(engine.Integer(decoder.InputOffset()))), env))
+	}
+
+	return engine.Unify(vm, term, decoded, cont, env)
+}
 
 // JSONProlog is a predicate that unifies a JSON into a prolog term and vice versa.
 //
@@ -57,35 +101,27 @@ var (
 //
 //	# JSON conversion to Prolog.
 //	- json_prolog('{"foo": "bar"}', json([foo=bar])).
-func JSONProlog(_ *engine.VM, j, p engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	forwardConverter := func(in []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
-		payload, err := prolog.TextTermToString(in[0], env)
+func JSONProlog(vm *engine.VM, j, p engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	switch {
+	case prolog.IsGround(j, env):
+		payload, err := prolog.TextTermToString(j, env)
 		if err != nil {
-			return nil, err
+			return engine.Error(err)
 		}
+		is := engine.NewInputTextStream(strings.NewReader(payload))
+		defer is.Close()
 
-		decoder := json.NewDecoder(strings.NewReader(payload))
-		term, err := decodeJSONToTerm(decoder, env)
-		if err != nil {
-			return nil, err
-		}
-		if _, err := decoder.Token(); !errors.Is(err, io.EOF) {
-			return nil, engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomMalformedJSON.Apply(engine.Integer(decoder.InputOffset()))), env)
-		}
-
-		return []engine.Term{term}, nil
-	}
-	backwardConverter := func(in []engine.Term, _ engine.Term, env *engine.Env) ([]engine.Term, error) {
+		return JSONRead(vm, is, p, cont, env)
+	case prolog.IsGround(p, env):
 		var buf bytes.Buffer
-		err := encodeTermToJSON(in[0], &buf, env)
+		err := encodeTermToJSON(p, &buf, env)
 		if err != nil {
-			return nil, err
+			return engine.Error(err)
 		}
-
-		return []engine.Term{prolog.BytesToAtom(buf.Bytes())}, nil
+		return engine.Unify(vm, prolog.BytesToAtom(buf.Bytes()), j, cont, env)
+	default:
+		return engine.Error(engine.InstantiationError(env))
 	}
-	return prolog.UnifyFunctionalPredicate(
-		[]engine.Term{j}, []engine.Term{p}, prolog.AtomEmpty, forwardConverter, backwardConverter, cont, env)
 }
 
 func encodeTermToJSON(term engine.Term, buf *bytes.Buffer, env *engine.Env) (err error) {
@@ -192,13 +228,20 @@ func encodeArrayToJSON(term engine.Compound, buf *bytes.Buffer, env *engine.Env)
 	return nil
 }
 
-func jsonErrorToException(err error, env *engine.Env) engine.Exception {
+func jsonErrorToException(stream engine.Term, err error, env *engine.Env) engine.Exception {
 	if err, ok := lo.ErrorsAs[*json.SyntaxError](err); ok {
 		return engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomMalformedJSON.Apply(engine.Integer(err.Offset))), env)
 	}
 
-	if errors.Is(err, io.EOF) {
+	switch {
+	case errors.Is(err, io.EOF):
 		return engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomEOF), env)
+	case err.Error() == errWrongIOMode.Error():
+		return engine.PermissionError(operationInput, permissionTypeStream, stream, env)
+	case err.Error() == errWrongStreamType.Error():
+		return engine.PermissionError(operationInput, permissionTypeTextStream, stream, env)
+	case err.Error() == errPastEndOfStream.Error():
+		return engine.PermissionError(operationInput, permissionTypePastEndOfStream, stream, env)
 	}
 
 	if err, ok := lo.ErrorsAs[*json.UnmarshalTypeError](err); ok {
@@ -219,15 +262,15 @@ func prologErrorToException(culprit engine.Term, err error, env *engine.Env) eng
 		engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomUnknown), env), err, env)
 }
 
-func nextToken(decoder *json.Decoder, env *engine.Env) (json.Token, error) {
+func nextToken(decoder *textStreamDecoder, env *engine.Env) (json.Token, error) {
 	t, err := decoder.Token()
 	if err != nil {
-		return nil, jsonErrorToException(err, env)
+		return nil, jsonErrorToException(decoder.stream, err, env)
 	}
 	return t, nil
 }
 
-func decodeJSONToTerm(decoder *json.Decoder, env *engine.Env) (engine.Term, error) {
+func decodeJSONToTerm(decoder *textStreamDecoder, env *engine.Env) (engine.Term, error) {
 	t, err := nextToken(decoder, env)
 	if errors.Is(err, io.EOF) {
 		return prolog.JSONNull(), nil
@@ -268,10 +311,10 @@ func decodeJSONToTerm(decoder *json.Decoder, env *engine.Env) (engine.Term, erro
 		return prolog.JSONNull(), nil
 	}
 
-	return nil, jsonErrorToException(fmt.Errorf("unexpected token: %v", t), env)
+	return nil, jsonErrorToException(decoder.stream, fmt.Errorf("unexpected token: %v", t), env)
 }
 
-func decodeJSONArrayToTerm(decoder *json.Decoder, env *engine.Env) (engine.Term, error) {
+func decodeJSONArrayToTerm(decoder *textStreamDecoder, env *engine.Env) (engine.Term, error) {
 	var terms []engine.Term
 	for decoder.More() {
 		value, err := decodeJSONToTerm(decoder, env)
@@ -284,7 +327,7 @@ func decodeJSONArrayToTerm(decoder *json.Decoder, env *engine.Env) (engine.Term,
 	return engine.List(terms...), nil
 }
 
-func decodeJSONObjectToTerm(decoder *json.Decoder, env *engine.Env) (engine.Term, error) {
+func decodeJSONObjectToTerm(decoder *textStreamDecoder, env *engine.Env) (engine.Term, error) {
 	var terms []engine.Term
 	for decoder.More() {
 		keyToken, err := nextToken(decoder, env)
@@ -300,4 +343,36 @@ func decodeJSONObjectToTerm(decoder *json.Decoder, env *engine.Env) (engine.Term
 	}
 
 	return prolog.AtomJSON.Apply(engine.List(terms...)), nil
+}
+
+type textStreamDecoder struct {
+	stream *engine.Stream
+	*json.Decoder
+}
+
+func newTextStreamDecoder(stream *engine.Stream) *textStreamDecoder {
+	decoder := &textStreamDecoder{
+		stream: stream,
+	}
+	decoder.Decoder = json.NewDecoder(decoder)
+
+	return decoder
+}
+
+func (s *textStreamDecoder) Read(p []byte) (n int, err error) {
+	if len(p) == 0 {
+		return 0, nil
+	}
+
+	r, size, err := s.stream.ReadRune()
+	if err != nil {
+		return 0, err
+	}
+
+	n = utf8.EncodeRune(p, r)
+	if n < size {
+		return n, io.ErrShortBuffer
+	}
+
+	return n, nil
 }

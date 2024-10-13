@@ -38,14 +38,9 @@ import (
 //	String = 'Hello World'
 //	Length = 11
 func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	var s *engine.Stream
-	switch st := env.Resolve(stream).(type) {
-	case engine.Variable:
-		return engine.Error(engine.InstantiationError(env))
-	case *engine.Stream:
-		s = st
-	default:
-		return engine.Error(engine.TypeError(prolog.AtomTypeStream, stream, env))
+	is, err := prolog.AssertStream(stream, env)
+	if err != nil {
+		return engine.Error(err)
 	}
 
 	var maxLength uint64
@@ -56,7 +51,7 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 	var builder strings.Builder
 	var totalLen uint64
 	for {
-		r, l, err := s.ReadRune()
+		r, l, err := is.ReadRune()
 		if err != nil || (maxLength != 0 && totalLen >= maxLength) {
 			if errors.Is(err, io.EOF) || totalLen >= maxLength {
 				break
