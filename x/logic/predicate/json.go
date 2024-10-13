@@ -37,10 +37,15 @@ var (
 	errWrongStreamType = errors.New("wrong stream type")
 	errWrongIOMode     = errors.New("wrong i/o mode")
 	errPastEndOfStream = errors.New("past end of stream")
+	errInvalidUTF8     = errors.New("invalid UTF-8")
 )
 
 var (
-	operationInput                = engine.NewAtom("input")
+	operationInput  = engine.NewAtom("input")
+	operationOutput = engine.NewAtom("output")
+)
+
+var (
 	permissionTypeStream          = engine.NewAtom("stream")
 	permissionTypeTextStream      = engine.NewAtom("text_stream")
 	permissionTypePastEndOfStream = engine.NewAtom("past_end_of_stream")
@@ -52,7 +57,7 @@ var (
 //
 // The signature is as follows:
 //
-//	json_read(+Stream, -Term) is det
+//	json_read(+Stream, ?Term) is det
 //
 // Where:
 //   - Stream is the input stream from which the JSON is read.
@@ -74,6 +79,31 @@ func JSONRead(vm *engine.VM, stream, term engine.Term, cont engine.Cont, env *en
 	}
 
 	return engine.Unify(vm, term, decoded, cont, env)
+}
+
+// JSONWrite is a predicate that writes a Prolog term as a JSON to a stream.
+//
+// The JSON object is of the same format as produced by json_read/2.
+//
+// The signature is as follows:
+//
+//	json_write(+Stream, +Term) is det
+//
+// Where:
+//   - Stream is the output stream to which the JSON is written.
+//   - Term is the Prolog term that represents the JSON structure.
+func JSONWrite(_ *engine.VM, stream, term engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	os, err := prolog.AssertStream(stream, env)
+	if err != nil {
+		return engine.Error(err)
+	}
+
+	buf := newTextStreamWriter(os)
+	if err := encodeTermToJSON(term, buf, env); err != nil {
+		return engine.Error(err)
+	}
+
+	return cont(env)
 }
 
 // JSONProlog is a predicate that unifies a JSON into a prolog term and vice versa.
@@ -112,36 +142,39 @@ func JSONProlog(vm *engine.VM, j, p engine.Term, cont engine.Cont, env *engine.E
 		defer is.Close()
 
 		return JSONRead(vm, is, p, cont, env)
-	case prolog.IsGround(p, env):
-		var buf bytes.Buffer
-		err := encodeTermToJSON(p, &buf, env)
-		if err != nil {
-			return engine.Error(err)
-		}
-		return engine.Unify(vm, prolog.BytesToAtom(buf.Bytes()), j, cont, env)
 	default:
-		return engine.Error(engine.InstantiationError(env))
+		var buf bytes.Buffer
+		os := engine.NewOutputTextStream(&buf)
+		defer os.Close()
+
+		return JSONWrite(vm, os, p, func(env *engine.Env) *engine.Promise {
+			return engine.Unify(vm, j, prolog.StringToAtom(buf.String()), cont, env)
+		}, env)
 	}
 }
 
-func encodeTermToJSON(term engine.Term, buf *bytes.Buffer, env *engine.Env) (err error) {
+func encodeTermToJSON(term engine.Term, writer *textStreamWriter, env *engine.Env) (err error) {
 	switch t := term.(type) {
 	case engine.Atom:
 		if term == prolog.AtomEmptyList {
-			buf.Write([]byte("[]"))
+			if err := writeToStream(writer, []byte("[]"), env); err != nil {
+				return err
+			}
 		} else {
-			return marshalToBuffer(t.String(), term, buf, env)
+			return marshalToStream(t.String(), term, writer, env)
 		}
 	case engine.Integer:
-		return marshalToBuffer(t, term, buf, env)
+		return marshalToStream(t, term, writer, env)
 	case engine.Float:
 		float, err := strconv.ParseFloat(t.String(), 64)
 		if err != nil {
 			return prologErrorToException(t, err, env)
 		}
-		return marshalToBuffer(float, term, buf, env)
+		return marshalToStream(float, term, writer, env)
 	case engine.Compound:
-		return encodeCompoundToJSON(t, buf, env)
+		return encodeCompoundToJSON(t, writer, env)
+	case engine.Variable:
+		return engine.InstantiationError(env)
 	default:
 		return engine.TypeError(prolog.AtomTypeJSON, term, env)
 	}
@@ -149,28 +182,24 @@ func encodeTermToJSON(term engine.Term, buf *bytes.Buffer, env *engine.Env) (err
 	return nil
 }
 
-func marshalToBuffer(data any, term engine.Term, buf *bytes.Buffer, env *engine.Env) error {
-	bs, err := json.Marshal(data)
-	if err != nil {
-		return prologErrorToException(term, err, env)
-	}
-	buf.Write(bs)
-
-	return nil
-}
-
-func encodeCompoundToJSON(term engine.Compound, buf *bytes.Buffer, env *engine.Env) error {
+func encodeCompoundToJSON(term engine.Compound, writer *textStreamWriter, env *engine.Env) error {
 	switch {
 	case term.Functor() == prolog.AtomDot:
-		return encodeArrayToJSON(term, buf, env)
+		return encodeArrayToJSON(term, writer, env)
 	case term.Functor() == prolog.AtomJSON:
-		return encodeObjectToJSON(term, buf, env)
+		return encodeObjectToJSON(term, writer, env)
 	case prolog.JSONBool(true).Compare(term, env) == 0:
-		buf.Write([]byte("true"))
+		if err := writeToStream(writer, []byte("true"), env); err != nil {
+			return err
+		}
 	case prolog.JSONBool(false).Compare(term, env) == 0:
-		buf.Write([]byte("false"))
+		if err := writeToStream(writer, []byte("false"), env); err != nil {
+			return err
+		}
 	case prolog.JSONNull().Compare(term, env) == 0:
-		buf.Write([]byte("null"))
+		if err := writeToStream(writer, []byte("null"), env); err != nil {
+			return err
+		}
 	default:
 		return engine.TypeError(prolog.AtomTypeJSON, term, env)
 	}
@@ -178,79 +207,86 @@ func encodeCompoundToJSON(term engine.Compound, buf *bytes.Buffer, env *engine.E
 	return nil
 }
 
-func encodeObjectToJSON(term engine.Compound, buf *bytes.Buffer, env *engine.Env) error {
+func encodeObjectToJSON(term engine.Compound, writer *textStreamWriter, env *engine.Env) error {
 	if _, err := prolog.AssertJSON(term, env); err != nil {
 		return err
 	}
-	buf.Write([]byte("{"))
+	if err := writeToStream(writer, []byte("{"), env); err != nil {
+		return err
+	}
 	if err := prolog.ForEach(term.Arg(0), env, func(t engine.Term, hasNext bool) error {
 		k, v, err := prolog.AssertKeyValue(t, env)
 		if err != nil {
 			return err
 		}
-		if err := marshalToBuffer(k.String(), term, buf, env); err != nil {
+		if err := marshalToStream(k.String(), term, writer, env); err != nil {
 			return err
 		}
-		buf.Write([]byte(":"))
-		if err := encodeTermToJSON(v, buf, env); err != nil {
+		if err := writeToStream(writer, []byte(":"), env); err != nil {
+			return err
+		}
+		if err := encodeTermToJSON(v, writer, env); err != nil {
 			return err
 		}
 
 		if hasNext {
-			buf.Write([]byte(","))
+			if err := writeToStream(writer, []byte(","), env); err != nil {
+				return err
+			}
 		}
 		return nil
 	}); err != nil {
 		return err
 	}
-	buf.Write([]byte("}"))
+	if err := writeToStream(writer, []byte("}"), env); err != nil {
+		return err
+	}
 	return nil
 }
 
-func encodeArrayToJSON(term engine.Compound, buf *bytes.Buffer, env *engine.Env) error {
-	buf.Write([]byte("["))
+func encodeArrayToJSON(term engine.Compound, writer *textStreamWriter, env *engine.Env) error {
+	if err := writeToStream(writer, []byte("["), env); err != nil {
+		return err
+	}
 	if err := prolog.ForEach(term, env, func(t engine.Term, hasNext bool) error {
-		err := encodeTermToJSON(t, buf, env)
+		err := encodeTermToJSON(t, writer, env)
 		if err != nil {
 			return err
 		}
 
 		if hasNext {
-			buf.Write([]byte(","))
+			if err := writeToStream(writer, []byte(","), env); err != nil {
+				return err
+			}
 		}
 
 		return nil
 	}); err != nil {
 		return err
 	}
-	buf.Write([]byte("]"))
+	if err := writeToStream(writer, []byte("]"), env); err != nil {
+		return err
+	}
 
 	return nil
 }
 
-func jsonErrorToException(stream engine.Term, err error, env *engine.Env) engine.Exception {
-	if err, ok := lo.ErrorsAs[*json.SyntaxError](err); ok {
-		return engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomMalformedJSON.Apply(engine.Integer(err.Offset))), env)
+func marshalToStream(data any, term engine.Term, writer *textStreamWriter, env *engine.Env) error {
+	bs, err := json.Marshal(data)
+	if err != nil {
+		return prologErrorToException(term, err, env)
 	}
-
-	switch {
-	case errors.Is(err, io.EOF):
-		return engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomEOF), env)
-	case err.Error() == errWrongIOMode.Error():
-		return engine.PermissionError(operationInput, permissionTypeStream, stream, env)
-	case err.Error() == errWrongStreamType.Error():
-		return engine.PermissionError(operationInput, permissionTypeTextStream, stream, env)
-	case err.Error() == errPastEndOfStream.Error():
-		return engine.PermissionError(operationInput, permissionTypePastEndOfStream, stream, env)
+	if err := writeToStream(writer, bs, env); err != nil {
+		return err
 	}
+	return nil
+}
 
-	if err, ok := lo.ErrorsAs[*json.UnmarshalTypeError](err); ok {
-		return engine.SyntaxError(
-			AtomSyntaxErrorJSON.Apply(AtomMalformedJSON.Apply(engine.Integer(err.Offset), prolog.StringToAtom(err.Value))), env)
+func writeToStream(writer *textStreamWriter, data []byte, env *engine.Env) error {
+	if _, err := writer.Write(data); err != nil {
+		return prologErrorToException(writer.stream, err, env)
 	}
-
-	return prolog.WithError(
-		engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomUnknown), env), err, env)
+	return nil
 }
 
 func prologErrorToException(culprit engine.Term, err error, env *engine.Env) engine.Exception {
@@ -258,16 +294,19 @@ func prologErrorToException(culprit engine.Term, err error, env *engine.Env) eng
 		return engine.DomainError(AtomValidJSONNumber, culprit, env)
 	}
 
+	switch {
+	case errors.Is(err, io.EOF):
+		return engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomEOF), env)
+	case err.Error() == errWrongIOMode.Error():
+		return engine.PermissionError(operationOutput, permissionTypeStream, culprit, env)
+	case err.Error() == errWrongStreamType.Error():
+		return engine.PermissionError(operationOutput, permissionTypeTextStream, culprit, env)
+	case err.Error() == errPastEndOfStream.Error():
+		return engine.PermissionError(operationOutput, permissionTypePastEndOfStream, culprit, env)
+	}
+
 	return prolog.WithError(
 		engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomUnknown), env), err, env)
-}
-
-func nextToken(decoder *textStreamDecoder, env *engine.Env) (json.Token, error) {
-	t, err := decoder.Token()
-	if err != nil {
-		return nil, jsonErrorToException(decoder.stream, err, env)
-	}
-	return t, nil
 }
 
 func decodeJSONToTerm(decoder *textStreamDecoder, env *engine.Env) (engine.Term, error) {
@@ -345,6 +384,39 @@ func decodeJSONObjectToTerm(decoder *textStreamDecoder, env *engine.Env) (engine
 	return prolog.AtomJSON.Apply(engine.List(terms...)), nil
 }
 
+func jsonErrorToException(culprit engine.Term, err error, env *engine.Env) engine.Exception {
+	if err, ok := lo.ErrorsAs[*json.SyntaxError](err); ok {
+		return engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomMalformedJSON.Apply(engine.Integer(err.Offset))), env)
+	}
+
+	switch {
+	case errors.Is(err, io.EOF):
+		return engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomEOF), env)
+	case err.Error() == errWrongIOMode.Error():
+		return engine.PermissionError(operationInput, permissionTypeStream, culprit, env)
+	case err.Error() == errWrongStreamType.Error():
+		return engine.PermissionError(operationInput, permissionTypeTextStream, culprit, env)
+	case err.Error() == errPastEndOfStream.Error():
+		return engine.PermissionError(operationInput, permissionTypePastEndOfStream, culprit, env)
+	}
+
+	if err, ok := lo.ErrorsAs[*json.UnmarshalTypeError](err); ok {
+		return engine.SyntaxError(
+			AtomSyntaxErrorJSON.Apply(AtomMalformedJSON.Apply(engine.Integer(err.Offset), prolog.StringToAtom(err.Value))), env)
+	}
+
+	return prolog.WithError(
+		engine.SyntaxError(AtomSyntaxErrorJSON.Apply(AtomUnknown), env), err, env)
+}
+
+func nextToken(decoder *textStreamDecoder, env *engine.Env) (json.Token, error) {
+	t, err := decoder.Token()
+	if err != nil {
+		return nil, jsonErrorToException(decoder.stream, err, env)
+	}
+	return t, nil
+}
+
 type textStreamDecoder struct {
 	stream *engine.Stream
 	*json.Decoder
@@ -374,5 +446,30 @@ func (s *textStreamDecoder) Read(p []byte) (n int, err error) {
 		return n, io.ErrShortBuffer
 	}
 
+	return n, nil
+}
+
+type textStreamWriter struct {
+	stream *engine.Stream
+}
+
+func newTextStreamWriter(stream *engine.Stream) *textStreamWriter {
+	return &textStreamWriter{
+		stream: stream,
+	}
+}
+
+func (s *textStreamWriter) Write(p []byte) (n int, err error) {
+	for len(p) > 0 {
+		r, size := utf8.DecodeRune(p)
+		if r == utf8.RuneError && size == 1 {
+			return n, errInvalidUTF8
+		}
+		if _, err := s.stream.WriteRune(r); err != nil {
+			return n, err
+		}
+		p = p[size:]
+		n += size
+	}
 	return n, nil
 }
