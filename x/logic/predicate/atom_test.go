@@ -154,13 +154,37 @@ func TestAtomicListConcat(t *testing.T) {
 				wantError: fmt.Errorf("error(instantiation_error,atomic_list_concat/2)"),
 			},
 			{
+				query:     "atomic_list_concat([1,2], Y, Z).",
+				wantError: fmt.Errorf("error(instantiation_error,atomic_list_concat/3)"),
+			},
+			{
 				query:       "atomic_list_concat([], X).",
+				wantResult:  []testutil.TermResults{{"X": "''"}},
+				wantSuccess: true,
+			},
+			{
+				query:       "atomic_list_concat([], '', X).",
 				wantResult:  []testutil.TermResults{{"X": "''"}},
 				wantSuccess: true,
 			},
 			{
 				query:       "atomic_list_concat([a, 42], X).",
 				wantResult:  []testutil.TermResults{{"X": "a42"}},
+				wantSuccess: true,
+			},
+			{
+				query:       "atomic_list_concat([a, '=', 42], X).",
+				wantResult:  []testutil.TermResults{{"X": "'a=42'"}},
+				wantSuccess: true,
+			},
+			{
+				query:       "atomic_list_concat([a, 42], '=', X).",
+				wantResult:  []testutil.TermResults{{"X": "'a=42'"}},
+				wantSuccess: true,
+			},
+			{
+				query:       "atomic_list_concat([a, '=', 42], ' ', X).",
+				wantResult:  []testutil.TermResults{{"X": "'a = 42'"}},
 				wantSuccess: true,
 			},
 			{
@@ -201,6 +225,7 @@ func TestAtomicListConcat(t *testing.T) {
 					Convey("and a vm", func() {
 						interpreter := testutil.NewLightInterpreterMust(ctx)
 						interpreter.Register2(engine.NewAtom("atomic_list_concat"), AtomicListConcat2)
+						interpreter.Register3(engine.NewAtom("atomic_list_concat"), AtomicListConcat3)
 
 						Convey("When the predicate is called", func() {
 							sols, err := interpreter.QueryContext(ctx, tc.query)
