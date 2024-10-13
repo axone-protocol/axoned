@@ -120,6 +120,7 @@ var registry = orderedmap.New[string, any](
 		{Key: "string_bytes/3", Value: predicate.StringBytes},
 		{Key: "term_to_atom/2", Value: predicate.TermToAtom},
 		{Key: "atomic_list_concat/2", Value: predicate.AtomicListConcat2},
+		{Key: "atomic_list_concat/3", Value: predicate.AtomicListConcat3},
 	}...),
 )
 

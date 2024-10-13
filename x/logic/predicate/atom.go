@@ -61,6 +61,24 @@ func TermToAtom(vm *engine.VM, term, atom engine.Term, k engine.Cont, env *engin
 //   - List is a list of strings, atoms, integers, floating point numbers or non-integer rationals
 //   - Atom is an Atom representing the concatenation of the elements of List
 func AtomicListConcat2(vm *engine.VM, list, atom engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
+	return AtomicListConcat3(vm, list, prolog.AtomEmpty, atom, k, env)
+}
+
+// AtomicListConcat3 is a predicate that unifies an Atom with the concatenated elements of a List
+// using a given separator.
+//
+// The atomic_list_concat/3 predicate creates an atom just like atomic_list_concat/2, but inserts Separator
+// between each pair of inputs.
+//
+// # Signature
+//
+//	atomic_list_concat(+List, +Separator, ?Atom)
+//
+// where:
+//   - List is a list of strings, atoms, integers, floating point numbers or non-integer rationals
+//   - Separator is an atom (possibly empty)
+//   - Atom is an Atom representing the concatenation of the elements of List
+func AtomicListConcat3(vm *engine.VM, list, sep, atom engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
 	if !prolog.IsGround(list, env) {
 		return engine.Error(engine.InstantiationError(env))
 	}
@@ -70,16 +88,26 @@ func AtomicListConcat2(vm *engine.VM, list, atom engine.Term, k engine.Cont, env
 		return engine.Error(err)
 	}
 
-	switch {
-	case !it.Next():
+	if !it.Next() {
 		return engine.Unify(vm, prolog.AtomEmpty, atom, k, env)
-	default:
-		headAtom := engine.NewVariable()
-		return TermToAtom(vm, it.Current(), headAtom, func(env *engine.Env) *engine.Promise {
-			tailAtom := engine.NewVariable()
-			return AtomicListConcat2(vm, it.Suffix(), tailAtom, func(env *engine.Env) *engine.Promise {
-				return engine.AtomConcat(vm, headAtom, tailAtom, atom, k, env)
-			}, env)
-		}, env)
 	}
+
+	if !prolog.IsGround(sep, env) {
+		return engine.Error(engine.InstantiationError(env))
+	}
+
+	head := engine.NewVariable()
+	return TermToAtom(vm, it.Current(), head, func(env *engine.Env) *engine.Promise {
+		tail := engine.NewVariable()
+		return AtomicListConcat3(vm, it.Suffix(), sep, tail, func(env *engine.Env) *engine.Promise {
+			temp := engine.NewVariable()
+			if tail.Compare(prolog.AtomEmpty, env) != 0 {
+				return engine.AtomConcat(vm, head, sep, temp, func(env *engine.Env) *engine.Promise {
+					return engine.AtomConcat(vm, temp, tail, atom, k, env)
+				}, env)
+			}
+
+			return engine.Unify(vm, atom, head, k, env)
+		}, env)
+	}, env)
 }
