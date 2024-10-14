@@ -4,33 +4,55 @@ on:
   release:
     types: [published]
 
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (leave empty for last one)"
 jobs:
+  set-env:
+    runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.set-env.outputs.tag }}
+      repo_name: ${{ steps.set-env.outputs.repo_name }}
+    steps:
+      - name: Expose tag and repo_name
+        id: set-env
+        run: |
+          if [ -n "$INPUT_TAG" ]; then
+            TAG="$INPUT_TAG"
+          else
+            TAG=$(gh release view --json tagName -q '.tagName')
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+          REPO_NAME=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+
   notify-github-discussion:
     runs-on: ubuntu-22.04
+    needs: set-env
     steps:
       - name: Check out repository
         uses: actions/checkout@v4
-
-      - name: Set ENV variables
-        run: |
-          echo "REPO_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}" >> $GITHUB_ENV
 
       - name: Extract changelog for tag
         run: |
           {
             echo 'CHANGELOG<<EOF'
-            gh release view $TAG --json body -q '.body'
+            gh release view ${{ needs.set-env.outputs.tag }} --json body -q '.body'
             echo 'EOF'
           } >> "$GITHUB_ENV"
         env:
-          TAG: ${{ github.event.release.tag_name }}
+          GH_TOKEN: ${{ secrets.OPS_TOKEN }}
 
       - name: Create an announcement discussion for release
         uses: abirismyname/create-discussion@v1.2.0
         with:
-          title: 🎉 ${{ env.REPO_NAME }} ${{ github.event.release.tag_name }} released!
+          title: 🎉 ${{ needs.set-env.outputs.repo_name }} ${{ needs.set-env.outputs.tag }} released!
           body: |
-            Hey frens! [${{ github.repository }}](https://github.com/${{ github.repository }}) `${{ github.event.release.tag_name }}` just dropped! 🚀
+            Hey frens! [${{ github.repository }}](https://github.com/${{ github.repository }}) `${{ needs.set-env.outputs.tag }}` just dropped! 🚀
 
             Some fresh updates are here. Dive into the changelog and see what's cooking! 🔥
 
@@ -40,7 +62,7 @@ jobs:
 
             # Resources
 
-            📄 Changelog: <https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}>
+            📄 Changelog: <https://github.com/${{ github.repository }}/releases/tag/${{ needs.set-env.outputs.tag }}>
             🛠️ Official repo: <https://github.com/${{ github.repository }}>
             💬 Vibe with us on Discord: <${{ env.DISCORD_URL }}>
             🐦 Catch us on Twitter: <${{ env.TWITTER_URL }}>
@@ -48,13 +70,14 @@ jobs:
           category-id: ${{ env.CATEGORY_ID }}
         env:
           GH_TOKEN: ${{ secrets.OPS_TOKEN }}
-          DISCORD_URL: "https://discord.gg/axone"
-          TWITTER_URL: "https://twitter.com/axonexyz"
-          REPOSITORY_ID: "R_kgDOLsWt6A"
-          CATEGORY_ID: "DIC_kwDOLsWt6M4CemGO"
+          DISCORD_URL: ${{ vars.DISCORD_URL }}
+          TWITTER_URL: ${{ vars.TWITTER_URL }}
+          REPOSITORY_ID: ${{ vars.DISCUSSIONS_REPOSITORY_ID }}
+          CATEGORY_ID: ${{ vars.DISCUSSIONS_CATEGORY_ID }}
 
   update-docs:
     runs-on: ubuntu-22.04
+    if: github.event_name != 'workflow_dispatch'
     steps:
       - name: Update modules docs repository
         uses: fjogeleit/http-request-action@v1
@@ -109,6 +132,7 @@ jobs:
 
   update-docs-version:
     runs-on: ubuntu-22.04
+    if: github.event_name != 'workflow_dispatch'
     steps:
       - name: Update docs version
         uses: fjogeleit/http-request-action@v1
