@@ -12,7 +12,7 @@ jobs:
         uses: fjogeleit/http-request-action@v1
         with:
           url: ${{ secrets.DISCORD_WEBHOOK }}
-          method: 'POST'
+          method: "POST"
           customHeaders: '{"Content-Type": "application/json"}'
           data: |-
             {
@@ -21,14 +21,62 @@ jobs:
               "content": "🚨 A new version of @${{github.repository}} ${{ github.event.release.tag_name }} has been released! 🎉\n\n👉 Changelog: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}\n👉 Official repo: https://github.com/${{ github.repository }}"
             }
 
+  notify-github-discussion:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set ENV variables
+        run: |
+          echo "REPO_NAME=${GITHUB_REPOSITORY#$GITHUB_REPOSITORY_OWNER/}" >> $GITHUB_ENV
+
+      - name: Extract changelog for tag
+        run: |
+          {
+            echo 'CHANGELOG<<EOF'
+            gh release view $TAG --json body -q '.body'
+            echo 'EOF'
+          } >> "$GITHUB_ENV"
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+
+      - name: Create an announcement discussion for release
+        uses: abirismyname/create-discussion@v1.2.0
+        with:
+          title: 🎉 ${{ env.REPO_NAME }} ${{ github.event.release.tag_name }} released!
+          body: |
+            Hey frens! [${{ github.repository }}](https://github.com/${{ github.repository }}) `${{ github.event.release.tag_name }}` just dropped! 🚀
+
+            Some fresh updates are here. Dive into the changelog and see what's cooking! 🔥
+
+            # Changelog
+
+            ${{ env.CHANGELOG }}
+
+            # Resources
+
+            📄 Changelog: <https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}>
+            🛠️ Official repo: <https://github.com/${{ github.repository }}>
+            💬 Vibe with us on Discord: <${{ env.DISCORD_URL }}>
+            🐦 Catch us on Twitter: <${{ env.TWITTER_URL }}>
+          repository-id: ${{ env.REPOSITORY_ID }}
+          category-id: ${{ env.CATEGORY_ID }}
+        env:
+          GH_TOKEN: ${{ secrets.OPS_TOKEN }}
+          DISCORD_URL: "https://discord.gg/axone"
+          TWITTER_URL: "https://twitter.com/axonexyz"
+          REPOSITORY_ID: "R_kgDOLsWt6A"
+          CATEGORY_ID: "DIC_kwDOLsWt6M4CemGO"
+
   update-docs:
     runs-on: ubuntu-22.04
     steps:
       - name: Update modules docs repository
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches'
-          method: 'POST'
+          url: "https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches"
+          method: "POST"
           customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
@@ -44,8 +92,8 @@ jobs:
       - name: Update commands docs repository
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches'
-          method: 'POST'
+          url: "https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches"
+          method: "POST"
           customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
@@ -61,8 +109,8 @@ jobs:
       - name: Update predicates docs repository
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches'
-          method: 'POST'
+          url: "https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches"
+          method: "POST"
           customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
@@ -81,8 +129,8 @@ jobs:
       - name: Update docs version
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/98246586/dispatches'
-          method: 'POST'
+          url: "https://api.github.com/repos/axone-protocol/docs/actions/workflows/98246586/dispatches"
+          method: "POST"
           customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
