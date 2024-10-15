@@ -4,31 +4,86 @@ on:
   release:
     types: [published]
 
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: "Release tag (leave empty for last one)"
 jobs:
-  notify-discord:
+  set-env:
     runs-on: ubuntu-22.04
+    outputs:
+      tag: ${{ steps.set-env.outputs.tag }}
+      repo_name: ${{ steps.set-env.outputs.repo_name }}
     steps:
-      - name: Notify Discord
-        uses: fjogeleit/http-request-action@v1
+      - name: Expose tag and repo_name
+        id: set-env
+        run: |
+          if [ -n "$INPUT_TAG" ]; then
+            TAG="$INPUT_TAG"
+          else
+            TAG=$(gh release view --json tagName -q '.tagName')
+          fi
+          echo "tag=$TAG" >> $GITHUB_OUTPUT
+
+          REPO_NAME=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}
+          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+        env:
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+
+  notify-github-discussion:
+    runs-on: ubuntu-22.04
+    needs: set-env
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Extract changelog for tag
+        run: |
+          {
+            echo 'CHANGELOG<<EOF'
+            gh release view ${{ needs.set-env.outputs.tag }} --json body -q '.body'
+            echo 'EOF'
+          } >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ secrets.OPS_TOKEN }}
+
+      - name: Create an announcement discussion for release
+        uses: abirismyname/create-discussion@v1.2.0
         with:
-          url: ${{ secrets.DISCORD_WEBHOOK }}
-          method: 'POST'
-          customHeaders: '{"Content-Type": "application/json"}'
-          data: |-
-            {
-              "avatar_url": "https://avatars.githubusercontent.com/u/98603954?v=4",
-              "username": "Bot Anik",
-              "content": "🚨 A new version of @${{github.repository}} ${{ github.event.release.tag_name }} has been released! 🎉\n\n👉 Changelog: https://github.com/${{ github.repository }}/releases/tag/${{ github.event.release.tag_name }}\n👉 Official repo: https://github.com/${{ github.repository }}"
-            }
+          title: 🎉 ${{ needs.set-env.outputs.repo_name }} ${{ needs.set-env.outputs.tag }} released!
+          body: |
+            Hey frens! [${{ github.repository }}](https://github.com/${{ github.repository }}) `${{ needs.set-env.outputs.tag }}` just dropped! 🚀
+
+            Some fresh updates are here. Dive into the changelog and see what's cooking! 🔥
+
+            # Changelog
+
+            ${{ env.CHANGELOG }}
+
+            # Resources
+
+            📄 Changelog: <https://github.com/${{ github.repository }}/releases/tag/${{ needs.set-env.outputs.tag }}>
+            🛠️ Official repo: <https://github.com/${{ github.repository }}>
+            💬 Vibe with us on Discord: <${{ env.DISCORD_URL }}>
+            🐦 Catch us on Twitter: <${{ env.TWITTER_URL }}>
+          repository-id: ${{ env.REPOSITORY_ID }}
+          category-id: ${{ env.CATEGORY_ID }}
+        env:
+          GH_TOKEN: ${{ secrets.OPS_TOKEN }}
+          DISCORD_URL: ${{ vars.DISCORD_URL }}
+          TWITTER_URL: ${{ vars.TWITTER_URL }}
+          REPOSITORY_ID: ${{ vars.DISCUSSIONS_REPOSITORY_ID }}
+          CATEGORY_ID: ${{ vars.DISCUSSIONS_CATEGORY_ID }}
 
   update-docs:
     runs-on: ubuntu-22.04
+    if: github.event_name != 'workflow_dispatch'
     steps:
       - name: Update modules docs repository
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches'
-          method: 'POST'
+          url: "https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches"
+          method: "POST"
           customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
@@ -44,8 +99,8 @@ jobs:
       - name: Update commands docs repository
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches'
-          method: 'POST'
+          url: "https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches"
+          method: "POST"
           customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
@@ -61,8 +116,8 @@ jobs:
       - name: Update predicates docs repository
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches'
-          method: 'POST'
+          url: "https://api.github.com/repos/axone-protocol/docs/actions/workflows/39152549/dispatches"
+          method: "POST"
           customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
@@ -77,12 +132,13 @@ jobs:
 
   update-docs-version:
     runs-on: ubuntu-22.04
+    if: github.event_name != 'workflow_dispatch'
     steps:
       - name: Update docs version
         uses: fjogeleit/http-request-action@v1
         with:
-          url: 'https://api.github.com/repos/axone-protocol/docs/actions/workflows/98246586/dispatches'
-          method: 'POST'
+          url: "https://api.github.com/repos/axone-protocol/docs/actions/workflows/98246586/dispatches"
+          method: "POST"
           customHeaders: '{"Accept": "application/vnd.github+json", "Authorization": "Bearer ${{ secrets.OPS_TOKEN }}"}'
           data: |-
             {
