@@ -205,3 +205,16 @@ func AssertURIComponent(term engine.Term, env *engine.Env) (util.URIComponent, e
 		return 0, engine.TypeError(AtomTypeURIComponent, term, env)
 	}
 }
+
+// AssertStream resolves a term as a stream and returns it as an engine.Stream.
+// If conversion fails, the function returns nil and the error.
+func AssertStream(stream engine.Term, env *engine.Env) (*engine.Stream, error) {
+	switch st := env.Resolve(stream).(type) {
+	case engine.Variable:
+		return nil, engine.InstantiationError(env)
+	case *engine.Stream:
+		return st, nil
+	default:
+		return nil, engine.TypeError(AtomTypeStream, stream, env)
+	}
+}

@@ -67,8 +67,8 @@ var registry = orderedmap.New[string, any](
 		{Key: "get_byte/2", Value: engine.GetByte},
 		{Key: "peek_byte/2", Value: engine.PeekByte},
 		{Key: "put_byte/2", Value: engine.PutByte},
-		{Key: "read_term/3", Value: engine.ReadTerm},
-		{Key: "write_term/3", Value: engine.WriteTerm},
+		{Key: "read_term/3", Value: predicate.ReadTerm3},
+		{Key: "write_term/3", Value: predicate.WriteTerm3},
 		{Key: "op/3", Value: engine.Op},
 		{Key: "current_op/3", Value: engine.CurrentOp},
 		{Key: "char_conversion/2", Value: engine.CharConversion},
@@ -118,6 +118,11 @@ var registry = orderedmap.New[string, any](
 		{Key: "eddsa_verify/4", Value: predicate.EDDSAVerify},
 		{Key: "ecdsa_verify/4", Value: predicate.ECDSAVerify},
 		{Key: "string_bytes/3", Value: predicate.StringBytes},
+		{Key: "term_to_atom/2", Value: predicate.TermToAtom},
+		{Key: "atomic_list_concat/2", Value: predicate.AtomicListConcat2},
+		{Key: "atomic_list_concat/3", Value: predicate.AtomicListConcat3},
+		{Key: "json_read/2", Value: predicate.JSONRead},
+		{Key: "json_write/2", Value: predicate.JSONWrite},
 	}...),
 )
 
