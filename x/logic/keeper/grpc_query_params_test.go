@@ -96,4 +96,31 @@ func TestGRPCParams(t *testing.T) {
 				})
 		}
 	})
+
+	Convey("Given a keeper", t, func() {
+		encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
+		key := storetypes.NewKVStoreKey(types.StoreKey)
+		testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+
+		logicKeeper := keeper.NewKeeper(
+			encCfg.Codec,
+			encCfg.InterfaceRegistry,
+			key,
+			key,
+			authtypes.NewModuleAddress(govtypes.ModuleName),
+			nil,
+			nil,
+			nil,
+			nil)
+
+		Convey("When the query params is called with a nil query", func() {
+			params, err := logicKeeper.Params(testCtx.Ctx, nil)
+
+			Convey("Then it should return an error", func() {
+				So(err, ShouldNotBeNil)
+				So(err.Error(), ShouldEqual, "rpc error: code = InvalidArgument desc = invalid request")
+				So(params, ShouldBeNil)
+			})
+		})
+	})
 }

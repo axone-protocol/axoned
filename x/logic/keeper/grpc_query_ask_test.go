@@ -471,4 +471,31 @@ func TestGRPCAsk(t *testing.T) {
 				})
 		}
 	})
+
+	Convey("Given a keeper", t, func() {
+		encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
+		key := storetypes.NewKVStoreKey(types.StoreKey)
+		testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+
+		logicKeeper := keeper.NewKeeper(
+			encCfg.Codec,
+			encCfg.InterfaceRegistry,
+			key,
+			key,
+			authtypes.NewModuleAddress(govtypes.ModuleName),
+			nil,
+			nil,
+			nil,
+			nil)
+
+		Convey("When the query ask is called with a nil query", func() {
+			response, err := logicKeeper.Ask(testCtx.Ctx, nil)
+
+			Convey("Then it should return an error", func() {
+				So(err, ShouldNotBeNil)
+				So(err.Error(), ShouldEqual, "request is nil: invalid argument")
+				So(response, ShouldBeNil)
+			})
+		})
+	})
 }
