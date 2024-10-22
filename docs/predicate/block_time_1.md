@@ -44,7 +44,7 @@ block_time(Time).
 
 ```  yaml
 height: 42
-gas_used: 3612
+gas_used: 3975
 answer:
   has_more: false
   variables: ["Time"]
@@ -80,7 +80,7 @@ Time > 1709550216.
 
 ```  yaml
 height: 42
-gas_used: 3613
+gas_used: 3976
 answer:
   has_more: false
   variables: ["Time"]

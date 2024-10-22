@@ -193,44 +193,44 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
 
 ## Table of Contents
 
-- [logic/v1beta2/params.proto](#logic/v1beta2/params.proto)
-  - [Filter](#logic.v1beta2.Filter)
-  - [GasPolicy](#logic.v1beta2.GasPolicy)
-  - [Interpreter](#logic.v1beta2.Interpreter)
-  - [Limits](#logic.v1beta2.Limits)
-  - [Params](#logic.v1beta2.Params)
-  - [PredicateCost](#logic.v1beta2.PredicateCost)
+- [logic/v1beta3/params.proto](#logic/v1beta3/params.proto)
+  - [Filter](#logic.v1beta3.Filter)
+  - [GasPolicy](#logic.v1beta3.GasPolicy)
+  - [Interpreter](#logic.v1beta3.Interpreter)
+  - [Limits](#logic.v1beta3.Limits)
+  - [Params](#logic.v1beta3.Params)
+  - [PredicateCost](#logic.v1beta3.PredicateCost)
   
-- [logic/v1beta2/genesis.proto](#logic/v1beta2/genesis.proto)
-  - [GenesisState](#logic.v1beta2.GenesisState)
+- [logic/v1beta3/genesis.proto](#logic/v1beta3/genesis.proto)
+  - [GenesisState](#logic.v1beta3.GenesisState)
   
-- [logic/v1beta2/types.proto](#logic/v1beta2/types.proto)
-  - [Answer](#logic.v1beta2.Answer)
-  - [Result](#logic.v1beta2.Result)
-  - [Substitution](#logic.v1beta2.Substitution)
+- [logic/v1beta3/types.proto](#logic/v1beta3/types.proto)
+  - [Answer](#logic.v1beta3.Answer)
+  - [Result](#logic.v1beta3.Result)
+  - [Substitution](#logic.v1beta3.Substitution)
   
-- [logic/v1beta2/query.proto](#logic/v1beta2/query.proto)
-  - [QueryServiceAskRequest](#logic.v1beta2.QueryServiceAskRequest)
-  - [QueryServiceAskResponse](#logic.v1beta2.QueryServiceAskResponse)
-  - [QueryServiceParamsRequest](#logic.v1beta2.QueryServiceParamsRequest)
-  - [QueryServiceParamsResponse](#logic.v1beta2.QueryServiceParamsResponse)
+- [logic/v1beta3/query.proto](#logic/v1beta3/query.proto)
+  - [QueryServiceAskRequest](#logic.v1beta3.QueryServiceAskRequest)
+  - [QueryServiceAskResponse](#logic.v1beta3.QueryServiceAskResponse)
+  - [QueryServiceParamsRequest](#logic.v1beta3.QueryServiceParamsRequest)
+  - [QueryServiceParamsResponse](#logic.v1beta3.QueryServiceParamsResponse)
   
-  - [QueryService](#logic.v1beta2.QueryService)
+  - [QueryService](#logic.v1beta3.QueryService)
   
-- [logic/v1beta2/tx.proto](#logic/v1beta2/tx.proto)
-  - [MsgUpdateParams](#logic.v1beta2.MsgUpdateParams)
-  - [MsgUpdateParamsResponse](#logic.v1beta2.MsgUpdateParamsResponse)
+- [logic/v1beta3/tx.proto](#logic/v1beta3/tx.proto)
+  - [MsgUpdateParams](#logic.v1beta3.MsgUpdateParams)
+  - [MsgUpdateParamsResponse](#logic.v1beta3.MsgUpdateParamsResponse)
   
-  - [MsgService](#logic.v1beta2.MsgService)
+  - [MsgService](#logic.v1beta3.MsgService)
   
 - [Scalar Value Types](#scalar-value-types)
 
-<a name="logic/v1beta2/params.proto"></a>
+<a name="logic/v1beta3/params.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta2/params.proto
+## logic/v1beta3/params.proto
 
-<a name="logic.v1beta2.Filter"></a>
+<a name="logic.v1beta3.Filter"></a>
 
 ### Filter
 
@@ -242,7 +242,7 @@ The filter is used to whitelist or blacklist strings.
 | `whitelist` | [string](#string) | repeated | whitelist specifies a list of strings that are allowed. If this field is not specified, all strings (in the context of the filter) are allowed. |
 | `blacklist` | [string](#string) | repeated | blacklist specifies a list of strings that are excluded from the set of allowed strings. If a string is included in both whitelist and blacklist, it will be excluded. This means that blacklisted strings prevails over whitelisted ones. If this field is not specified, no strings are excluded. |
 
-<a name="logic.v1beta2.GasPolicy"></a>
+<a name="logic.v1beta3.GasPolicy"></a>
 
 ### GasPolicy
 
@@ -252,11 +252,11 @@ if not specified in the list, and a weighting factor that is applied to the unit
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `weighting_factor` | [string](#string) |  | WeightingFactor is the factor that is applied to the unit cost of each predicate to yield the gas value. If not provided or set to 0, the value is set to 1. |
-| `default_predicate_cost` | [string](#string) |  | DefaultPredicateCost is the default unit cost of a predicate when not specified in the PredicateCosts list. If not provided or set to 0, the value is set to 1. |
-| `predicate_costs` | [PredicateCost](#logic.v1beta2.PredicateCost) | repeated | PredicateCosts is the list of predicates and their associated unit costs. |
+| `weighting_factor` | [uint64](#uint64) |  | WeightingFactor is the factor that is applied to the unit cost of each predicate to yield the gas value. If set to 0, the value considered is 1. |
+| `default_predicate_cost` | [uint64](#uint64) |  | DefaultPredicateCost is the default unit cost of a predicate when not specified in the PredicateCosts list. If set to 0, the value considered is 1. |
+| `predicate_costs` | [PredicateCost](#logic.v1beta3.PredicateCost) | repeated | PredicateCosts is the list of predicates and their associated unit costs. |
 
-<a name="logic.v1beta2.Interpreter"></a>
+<a name="logic.v1beta3.Interpreter"></a>
 
 ### Interpreter
 
@@ -264,11 +264,11 @@ Interpreter defines the various parameters for the interpreter.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `predicates_filter` | [Filter](#logic.v1beta2.Filter) |  | predicates_filter specifies the filter for the predicates that are allowed to be used by the interpreter. The filter is used to whitelist or blacklist predicates represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity is included in the filter, then all predicates with that name will be considered regardless of arity. For example, if `call` is included in the filter, then all predicates `call/1`, `call/2`, `call/3`... will be allowed. |
+| `predicates_filter` | [Filter](#logic.v1beta3.Filter) |  | predicates_filter specifies the filter for the predicates that are allowed to be used by the interpreter. The filter is used to whitelist or blacklist predicates represented as `<predicate_name>/[<arity>]`, for example: `findall/3`, or `call`. If a predicate name without arity is included in the filter, then all predicates with that name will be considered regardless of arity. For example, if `call` is included in the filter, then all predicates `call/1`, `call/2`, `call/3`... will be allowed. |
 | `bootstrap` | [string](#string) |  | bootstrap specifies the initial program to run when booting the logic interpreter. If not specified, the default boot sequence will be executed. |
-| `virtual_files_filter` | [Filter](#logic.v1beta2.Filter) |  | virtual_files_filter specifies the filter for the virtual files that are allowed to be used by the interpreter. The filter is used to whitelist or blacklist virtual files represented as URI, for example: `file:///path/to/file`, `cosmwasm:cw-storage:axone...?query=foo` The filter is applied to the components of the URI, for example: `file:///path/to/file` -> `file`, `/path/to/file` `cosmwasm:cw-storage:axone...?query=foo` -> `cosmwasm`, `cw-storage`, `axone...`, `query=foo` If a component is included in the filter, then all components with that name will be considered, starting from the beginning of the URI. For example, if `file` is included in the filter, then all URIs that start with `file` will be allowed, regardless of the rest of the components. But `file2` will not be allowed. If the component is not included in the filter, then the component is ignored and the next component is considered. |
+| `virtual_files_filter` | [Filter](#logic.v1beta3.Filter) |  | virtual_files_filter specifies the filter for the virtual files that are allowed to be used by the interpreter. The filter is used to whitelist or blacklist virtual files represented as URI, for example: `file:///path/to/file`, `cosmwasm:cw-storage:axone...?query=foo` The filter is applied to the components of the URI, for example: `file:///path/to/file` -> `file`, `/path/to/file` `cosmwasm:cw-storage:axone...?query=foo` -> `cosmwasm`, `cw-storage`, `axone...`, `query=foo` If a component is included in the filter, then all components with that name will be considered, starting from the beginning of the URI. For example, if `file` is included in the filter, then all URIs that start with `file` will be allowed, regardless of the rest of the components. But `file2` will not be allowed. If the component is not included in the filter, then the component is ignored and the next component is considered. |
 
-<a name="logic.v1beta2.Limits"></a>
+<a name="logic.v1beta3.Limits"></a>
 
 ### Limits
 
@@ -276,12 +276,12 @@ Limits defines the limits of the logic module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `max_size` | [string](#string) |  | max_size specifies the maximum size, in bytes, that is accepted for a program. nil value or 0 value remove size limitation. |
-| `max_result_count` | [string](#string) |  | max_result_count specifies the maximum number of results that can be requested for a query. nil value or 0 value remove max result count limitation. |
-| `max_user_output_size` | [string](#string) |  | max_user_output_size specifies the maximum number of bytes to keep in the user output. If the user output exceeds this size, the interpreter will overwrite the oldest bytes with the new ones to keep the size constant. nil value or 0 value means that no user output is used at all. |
-| `max_variables` | [string](#string) |  | max_variables specifies the maximum number of variables that can be create by the interpreter. nil value or 0 value means that no limit is set. |
+| `max_size` | [uint64](#uint64) |  | max_size specifies the maximum size, in bytes, that is accepted for a program. A value of 0 means that there is no limit on the size of the program. |
+| `max_result_count` | [uint64](#uint64) |  | max_result_count specifies the maximum number of results that can be requested for a query. A value of 0 means that there is no limit on the number of results. |
+| `max_user_output_size` | [uint64](#uint64) |  | max_user_output_size specifies the maximum number of bytes to keep in the user output. If the user output exceeds this size, the interpreter will overwrite the oldest bytes with the new ones to keep the size constant. A value of 0 means the user output is disabled. |
+| `max_variables` | [uint64](#uint64) |  | max_variables specifies the maximum number of variables that can be create by the interpreter. A value of 0 means that there is no limit on the number of variables. |
 
-<a name="logic.v1beta2.Params"></a>
+<a name="logic.v1beta3.Params"></a>
 
 ### Params
 
@@ -289,11 +289,11 @@ Params defines all the configuration parameters of the "logic" module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `interpreter` | [Interpreter](#logic.v1beta2.Interpreter) |  | Interpreter specifies the parameter for the logic interpreter. |
-| `limits` | [Limits](#logic.v1beta2.Limits) |  | Limits defines the limits of the logic module. The limits are used to prevent the interpreter from running for too long. If the interpreter runs for too long, the execution will be aborted. |
-| `gas_policy` | [GasPolicy](#logic.v1beta2.GasPolicy) |  | GasPolicy defines the parameters for calculating predicate invocation costs. |
+| `interpreter` | [Interpreter](#logic.v1beta3.Interpreter) |  | Interpreter specifies the parameter for the logic interpreter. |
+| `limits` | [Limits](#logic.v1beta3.Limits) |  | Limits defines the limits of the logic module. The limits are used to prevent the interpreter from running for too long. If the interpreter runs for too long, the execution will be aborted. |
+| `gas_policy` | [GasPolicy](#logic.v1beta3.GasPolicy) |  | GasPolicy defines the parameters for calculating predicate invocation costs. |
 
-<a name="logic.v1beta2.PredicateCost"></a>
+<a name="logic.v1beta3.PredicateCost"></a>
 
 ### PredicateCost
 
@@ -302,7 +302,7 @@ PredicateCost defines the unit cost of a predicate during its invocation by the 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `predicate` | [string](#string) |  | Predicate is the name of the predicate, optionally followed by its arity (e.g. "findall/3"). If no arity is specified, the unit cost is applied to all predicates with the same name. |
-| `cost` | [string](#string) |  | Cost is the unit cost of the predicate. |
+| `cost` | [uint64](#uint64) |  | Cost is the unit cost of the predicate. If set to 0, the value considered is 1. |
 
  [//]: # (end messages)
 
@@ -312,12 +312,12 @@ PredicateCost defines the unit cost of a predicate during its invocation by the 
 
  [//]: # (end services)
 
-<a name="logic/v1beta2/genesis.proto"></a>
+<a name="logic/v1beta3/genesis.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta2/genesis.proto
+## logic/v1beta3/genesis.proto
 
-<a name="logic.v1beta2.GenesisState"></a>
+<a name="logic.v1beta3.GenesisState"></a>
 
 ### GenesisState
 
@@ -325,7 +325,7 @@ GenesisState defines the logic module's genesis state.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `params` | [Params](#logic.v1beta2.Params) |  | The state parameters for the logic module. |
+| `params` | [Params](#logic.v1beta3.Params) |  | The state parameters for the logic module. |
 
  [//]: # (end messages)
 
@@ -335,12 +335,12 @@ GenesisState defines the logic module's genesis state.
 
  [//]: # (end services)
 
-<a name="logic/v1beta2/types.proto"></a>
+<a name="logic/v1beta3/types.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta2/types.proto
+## logic/v1beta3/types.proto
 
-<a name="logic.v1beta2.Answer"></a>
+<a name="logic.v1beta3.Answer"></a>
 
 ### Answer
 
@@ -350,9 +350,9 @@ Answer represents the answer to a logic query.
 | ----- | ---- | ----- | ----------- |
 | `has_more` | [bool](#bool) |  | has_more specifies if there are more solutions than the ones returned. |
 | `variables` | [string](#string) | repeated | variables represent all the variables in the query. |
-| `results` | [Result](#logic.v1beta2.Result) | repeated | results represent all the results of the query. |
+| `results` | [Result](#logic.v1beta3.Result) | repeated | results represent all the results of the query. |
 
-<a name="logic.v1beta2.Result"></a>
+<a name="logic.v1beta3.Result"></a>
 
 ### Result
 
@@ -361,9 +361,9 @@ Result represents the result of a query.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `error` | [string](#string) |  | error specifies the error message if the query caused an error. |
-| `substitutions` | [Substitution](#logic.v1beta2.Substitution) | repeated | substitutions represent all the substitutions made to the variables in the query to obtain the answer. |
+| `substitutions` | [Substitution](#logic.v1beta3.Substitution) | repeated | substitutions represent all the substitutions made to the variables in the query to obtain the answer. |
 
-<a name="logic.v1beta2.Substitution"></a>
+<a name="logic.v1beta3.Substitution"></a>
 
 ### Substitution
 
@@ -382,12 +382,12 @@ Substitution represents a substitution made to the variables in the query to obt
 
  [//]: # (end services)
 
-<a name="logic/v1beta2/query.proto"></a>
+<a name="logic/v1beta3/query.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta2/query.proto
+## logic/v1beta3/query.proto
 
-<a name="logic.v1beta2.QueryServiceAskRequest"></a>
+<a name="logic.v1beta3.QueryServiceAskRequest"></a>
 
 ### QueryServiceAskRequest
 
@@ -397,9 +397,9 @@ QueryServiceAskRequest is request type for the QueryService/Ask RPC method.
 | ----- | ---- | ----- | ----------- |
 | `program` | [string](#string) |  | program is the logic program to be queried. |
 | `query` | [string](#string) |  | query is the query string to be executed. |
-| `limit` | [string](#string) |  | limit specifies the maximum number of solutions to be returned. This field is governed by max_result_count, which defines the upper limit of results that may be requested per query. If this field is not explicitly set, a default value of 1 is applied. |
+| `limit` | [uint64](#uint64) |  | limit specifies the maximum number of solutions to be returned. This field is governed by max_result_count, which defines the upper limit of results that may be requested per query. If this field is not explicitly set, a default value of 1 is applied. |
 
-<a name="logic.v1beta2.QueryServiceAskResponse"></a>
+<a name="logic.v1beta3.QueryServiceAskResponse"></a>
 
 ### QueryServiceAskResponse
 
@@ -409,16 +409,16 @@ QueryServiceAskResponse is response type for the QueryService/Ask RPC method.
 | ----- | ---- | ----- | ----------- |
 | `height` | [uint64](#uint64) |  | height is the block height at which the query was executed. |
 | `gas_used` | [uint64](#uint64) |  | gas_used is the amount of gas used to execute the query. |
-| `answer` | [Answer](#logic.v1beta2.Answer) |  | answer is the answer to the query. |
+| `answer` | [Answer](#logic.v1beta3.Answer) |  | answer is the answer to the query. |
 | `user_output` | [string](#string) |  | user_output is the output of the query execution, if any. the length of the output is limited by the max_query_output_size parameter. |
 
-<a name="logic.v1beta2.QueryServiceParamsRequest"></a>
+<a name="logic.v1beta3.QueryServiceParamsRequest"></a>
 
 ### QueryServiceParamsRequest
 
 QueryServiceParamsRequest is request type for the QueryService/Params RPC method.
 
-<a name="logic.v1beta2.QueryServiceParamsResponse"></a>
+<a name="logic.v1beta3.QueryServiceParamsResponse"></a>
 
 ### QueryServiceParamsResponse
 
@@ -426,7 +426,7 @@ QueryServiceParamsResponse is response type for the QueryService/Params RPC meth
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `params` | [Params](#logic.v1beta2.Params) |  | params holds all the parameters of this module. |
+| `params` | [Params](#logic.v1beta3.Params) |  | params holds all the parameters of this module. |
 
  [//]: # (end messages)
 
@@ -434,7 +434,7 @@ QueryServiceParamsResponse is response type for the QueryService/Params RPC meth
 
  [//]: # (end HasExtensions)
 
-<a name="logic.v1beta2.QueryService"></a>
+<a name="logic.v1beta3.QueryService"></a>
 
 ### QueryService
 
@@ -442,17 +442,17 @@ QueryService defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `Params` | [QueryServiceParamsRequest](#logic.v1beta2.QueryServiceParamsRequest) | [QueryServiceParamsResponse](#logic.v1beta2.QueryServiceParamsResponse) | Params queries all parameters for the logic module. | GET|/axone-protocol/axoned/logic/params|
-| `Ask` | [QueryServiceAskRequest](#logic.v1beta2.QueryServiceAskRequest) | [QueryServiceAskResponse](#logic.v1beta2.QueryServiceAskResponse) | Ask executes a logic query and returns the solutions found. Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee is charged for this, but the execution is constrained by the current limits configured in the module. | GET|/axone-protocol/axoned/logic/ask|
+| `Params` | [QueryServiceParamsRequest](#logic.v1beta3.QueryServiceParamsRequest) | [QueryServiceParamsResponse](#logic.v1beta3.QueryServiceParamsResponse) | Params queries all parameters for the logic module. | GET|/axone-protocol/axoned/logic/params|
+| `Ask` | [QueryServiceAskRequest](#logic.v1beta3.QueryServiceAskRequest) | [QueryServiceAskResponse](#logic.v1beta3.QueryServiceAskResponse) | Ask executes a logic query and returns the solutions found. Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee is charged for this, but the execution is constrained by the current limits configured in the module. | GET|/axone-protocol/axoned/logic/ask|
 
  [//]: # (end services)
 
-<a name="logic/v1beta2/tx.proto"></a>
+<a name="logic/v1beta3/tx.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta2/tx.proto
+## logic/v1beta3/tx.proto
 
-<a name="logic.v1beta2.MsgUpdateParams"></a>
+<a name="logic.v1beta3.MsgUpdateParams"></a>
 
 ### MsgUpdateParams
 
@@ -461,9 +461,9 @@ MsgUpdateParams defines a Msg for updating the x/logic module parameters.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `authority` | [string](#string) |  | authority is the address of the governance account. |
-| `params` | [Params](#logic.v1beta2.Params) |  | params defines the x/logic parameters to update. NOTE: All parameters must be supplied. |
+| `params` | [Params](#logic.v1beta3.Params) |  | params defines the x/logic parameters to update. NOTE: All parameters must be supplied. |
 
-<a name="logic.v1beta2.MsgUpdateParamsResponse"></a>
+<a name="logic.v1beta3.MsgUpdateParamsResponse"></a>
 
 ### MsgUpdateParamsResponse
 
@@ -476,7 +476,7 @@ MsgUpdateParams message.
 
  [//]: # (end HasExtensions)
 
-<a name="logic.v1beta2.MsgService"></a>
+<a name="logic.v1beta3.MsgService"></a>
 
 ### MsgService
 
@@ -485,7 +485,7 @@ Do nothing for now as the service is without any side effects.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `UpdateParams` | [MsgUpdateParams](#logic.v1beta2.MsgUpdateParams) | [MsgUpdateParamsResponse](#logic.v1beta2.MsgUpdateParamsResponse) | UpdateParams defined a governance operation for updating the x/logic module parameters. The authority is hard-coded to the Cosmos SDK x/gov module account | |
+| `UpdateParams` | [MsgUpdateParams](#logic.v1beta3.MsgUpdateParams) | [MsgUpdateParamsResponse](#logic.v1beta3.MsgUpdateParamsResponse) | UpdateParams defined a governance operation for updating the x/logic module parameters. The authority is hard-coded to the Cosmos SDK x/gov module account | |
 
  [//]: # (end services)
 
