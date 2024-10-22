@@ -6,8 +6,6 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"cosmossdk.io/math"
-
 	"github.com/axone-protocol/axoned/v10/x/logic/types"
 )
 
@@ -36,10 +34,10 @@ func TestValidateParams(t *testing.T) {
 						types.WithVirtualFilesWhitelist([]string{"file2"}),
 					),
 					types.NewLimits(
-						types.WithMaxSize(math.NewUint(2)),
-						types.WithMaxResultCount(math.NewUint(3)),
-						types.WithMaxUserOutputSize(math.NewUint(4)),
-						types.WithMaxVariables(math.NewUint(5)),
+						types.WithMaxSize(2),
+						types.WithMaxResultCount(3),
+						types.WithMaxUserOutputSize(4),
+						types.WithMaxVariables(5),
 					),
 				),
 				expectErr: false,

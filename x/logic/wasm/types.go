@@ -1,8 +1,6 @@
 package wasm
 
 import (
-	sdkmath "cosmossdk.io/math"
-
 	"github.com/axone-protocol/axoned/v10/x/logic/types"
 )
 
@@ -10,9 +8,9 @@ import (
 // to keep control in case of eventual breaking change in the logic module definition, and to decouple the
 // serialization logic.
 type AskQuery struct {
-	Program string        `json:"program"`
-	Query   string        `json:"query"`
-	Limit   *sdkmath.Uint `json:"limit"`
+	Program string `json:"program"`
+	Query   string `json:"query"`
+	Limit   uint64 `json:"limit"`
 }
 
 // AskResponse implements the Ask query response JSON schema in a wasm custom query purpose, it redefines the existing

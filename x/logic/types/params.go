@@ -3,8 +3,6 @@ package types
 import (
 	"fmt"
 	"net/url"
-
-	"cosmossdk.io/math"
 )
 
 // Parameter store keys.
@@ -15,9 +13,6 @@ var (
 var (
 	DefaultPredicatesWhitelist = make([]string, 0)
 	DefaultPredicatesBlacklist = make([]string, 0)
-	DefaultMaxSize             = math.NewUint(uint64(5000))
-	DefaultMaxResultCount      = math.NewUint(uint64(1))
-	DefaultMaxVariables        = math.NewUint(uint64(100000))
 )
 
 // NewParams creates a new Params object.
@@ -127,30 +122,30 @@ func validateInterpreter(i interface{}) error {
 type LimitsOption func(*Limits)
 
 // WithMaxSize sets the max size limits accepted for a prolog program.
-func WithMaxSize(maxSize math.Uint) LimitsOption {
+func WithMaxSize(maxSize uint64) LimitsOption {
 	return func(i *Limits) {
-		i.MaxSize = &maxSize
+		i.MaxSize = maxSize
 	}
 }
 
 // WithMaxResultCount sets the maximum number of results that can be requested for a query.
-func WithMaxResultCount(maxResultCount math.Uint) LimitsOption {
+func WithMaxResultCount(maxResultCount uint64) LimitsOption {
 	return func(i *Limits) {
-		i.MaxResultCount = &maxResultCount
+		i.MaxResultCount = maxResultCount
 	}
 }
 
 // WithMaxUserOutputSize specifies the maximum number of bytes to keep in the user output.
-func WithMaxUserOutputSize(maxUserOutputSize math.Uint) LimitsOption {
+func WithMaxUserOutputSize(maxUserOutputSize uint64) LimitsOption {
 	return func(i *Limits) {
-		i.MaxUserOutputSize = &maxUserOutputSize
+		i.MaxUserOutputSize = maxUserOutputSize
 	}
 }
 
 // WithMaxVariables sets the maximum number of variables that can be created by the interpreter.
-func WithMaxVariables(maxVariables math.Uint) LimitsOption {
+func WithMaxVariables(maxVariables uint64) LimitsOption {
 	return func(i *Limits) {
-		i.MaxVariables = &maxVariables
+		i.MaxVariables = maxVariables
 	}
 }
 
@@ -159,18 +154,6 @@ func NewLimits(opts ...LimitsOption) Limits {
 	l := Limits{}
 	for _, opt := range opts {
 		opt(&l)
-	}
-
-	if l.MaxSize == nil {
-		l.MaxSize = &DefaultMaxSize
-	}
-
-	if l.MaxResultCount == nil {
-		l.MaxResultCount = &DefaultMaxResultCount
-	}
-
-	if l.MaxVariables == nil {
-		l.MaxVariables = &DefaultMaxVariables
 	}
 
 	return l

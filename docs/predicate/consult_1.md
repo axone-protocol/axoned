@@ -65,7 +65,7 @@ hello(Who).
 
 ```  yaml
 height: 42
-gas_used: 4143
+gas_used: 3615
 answer:
   has_more: false
   variables: ["Who"]
@@ -129,7 +129,7 @@ response: |
 
 ```  yaml
 height: 42
-gas_used: 4142
+gas_used: 3614
 answer:
   has_more: false
   variables: ["X"]
@@ -194,7 +194,7 @@ source_file(File).
 
 ```  yaml
 height: 42
-gas_used: 4141
+gas_used: 3613
 answer:
   has_more: false
   variables: ["File"]

@@ -10,7 +10,6 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -40,10 +39,10 @@ func TestGRPCParams(t *testing.T) {
 						types.WithVirtualFilesWhitelist([]string{"file2"}),
 					),
 					types.NewLimits(
-						types.WithMaxSize(math.NewUint(2)),
-						types.WithMaxResultCount(math.NewUint(3)),
-						types.WithMaxUserOutputSize(math.NewUint(4)),
-						types.WithMaxVariables(math.NewUint(5)),
+						types.WithMaxSize(2),
+						types.WithMaxResultCount(3),
+						types.WithMaxUserOutputSize(4),
+						types.WithMaxVariables(5),
 					),
 				),
 			},

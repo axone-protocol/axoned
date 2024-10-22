@@ -827,7 +827,7 @@ func TestAccount(t *testing.T) {
 							So(err, ShouldBeNil)
 
 							Convey("When the predicate is called", func() {
-								answer, err := util.QueryInterpreter(ctx, interpreter, tc.query, math.NewUint(5))
+								answer, err := util.QueryInterpreter(ctx, interpreter, tc.query, 5)
 
 								Convey("Then the error should be nil", func() {
 									So(err, ShouldBeNil)
