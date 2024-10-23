@@ -44,6 +44,31 @@ func TestGRPCParams(t *testing.T) {
 						types.WithMaxUserOutputSize(4),
 						types.WithMaxVariables(5),
 					),
+					types.GasPolicy{},
+				),
+			},
+			{
+				params: types.NewParams(
+					types.NewInterpreter(
+						types.WithBootstrap("bootstrap"),
+						types.WithPredicatesBlacklist([]string{"halt/1"}),
+						types.WithPredicatesWhitelist([]string{"source_file/1"}),
+						types.WithVirtualFilesBlacklist([]string{"file1"}),
+						types.WithVirtualFilesWhitelist([]string{"file2"}),
+					),
+					types.NewLimits(
+						types.WithMaxSize(2),
+						types.WithMaxResultCount(3),
+						types.WithMaxUserOutputSize(4),
+						types.WithMaxVariables(5),
+					),
+					types.GasPolicy{
+						WeightingFactor:      2,
+						DefaultPredicateCost: 1,
+						PredicateCosts: []types.PredicateCost{
+							{Predicate: "foo", Cost: 1},
+						},
+					},
 				),
 			},
 		}
