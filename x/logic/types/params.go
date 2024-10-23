@@ -3,8 +3,6 @@ package types
 import (
 	"fmt"
 	"net/url"
-
-	"cosmossdk.io/math"
 )
 
 // Parameter store keys.
@@ -12,25 +10,27 @@ var (
 	ParamsKey = []byte("Params")
 )
 
-var (
-	DefaultPredicatesWhitelist = make([]string, 0)
-	DefaultPredicatesBlacklist = make([]string, 0)
-	DefaultMaxSize             = math.NewUint(uint64(5000))
-	DefaultMaxResultCount      = math.NewUint(uint64(1))
-	DefaultMaxVariables        = math.NewUint(uint64(100000))
-)
-
 // NewParams creates a new Params object.
-func NewParams(interpreter Interpreter, limits Limits) Params {
+func NewParams(interpreter Interpreter, limits Limits, gasPolicy GasPolicy) Params {
 	return Params{
 		Interpreter: interpreter,
 		Limits:      limits,
+		GasPolicy:   gasPolicy,
 	}
 }
 
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
-	return NewParams(NewInterpreter(), NewLimits())
+	return NewParams(
+		NewInterpreter(),
+		NewLimits(
+			WithMaxSize(5000),
+			WithMaxResultCount(3),
+			WithMaxVariables(100000)),
+		NewGasPolicy(
+			WithWeightingFactor(1),
+			WithDefaultPredicateCost(1)),
+	)
 }
 
 // Validate validates the set of params.
@@ -55,11 +55,11 @@ func NewInterpreter(opts ...InterpreterOption) Interpreter {
 	}
 
 	if i.PredicatesFilter.Whitelist == nil {
-		i.PredicatesFilter.Whitelist = DefaultPredicatesWhitelist
+		i.PredicatesFilter.Whitelist = []string{}
 	}
 
 	if i.PredicatesFilter.Blacklist == nil {
-		i.PredicatesFilter.Blacklist = DefaultPredicatesBlacklist
+		i.PredicatesFilter.Blacklist = []string{}
 	}
 
 	return i
@@ -127,30 +127,30 @@ func validateInterpreter(i interface{}) error {
 type LimitsOption func(*Limits)
 
 // WithMaxSize sets the max size limits accepted for a prolog program.
-func WithMaxSize(maxSize math.Uint) LimitsOption {
+func WithMaxSize(maxSize uint64) LimitsOption {
 	return func(i *Limits) {
-		i.MaxSize = &maxSize
+		i.MaxSize = maxSize
 	}
 }
 
 // WithMaxResultCount sets the maximum number of results that can be requested for a query.
-func WithMaxResultCount(maxResultCount math.Uint) LimitsOption {
+func WithMaxResultCount(maxResultCount uint64) LimitsOption {
 	return func(i *Limits) {
-		i.MaxResultCount = &maxResultCount
+		i.MaxResultCount = maxResultCount
 	}
 }
 
 // WithMaxUserOutputSize specifies the maximum number of bytes to keep in the user output.
-func WithMaxUserOutputSize(maxUserOutputSize math.Uint) LimitsOption {
+func WithMaxUserOutputSize(maxUserOutputSize uint64) LimitsOption {
 	return func(i *Limits) {
-		i.MaxUserOutputSize = &maxUserOutputSize
+		i.MaxUserOutputSize = maxUserOutputSize
 	}
 }
 
 // WithMaxVariables sets the maximum number of variables that can be created by the interpreter.
-func WithMaxVariables(maxVariables math.Uint) LimitsOption {
+func WithMaxVariables(maxVariables uint64) LimitsOption {
 	return func(i *Limits) {
-		i.MaxVariables = &maxVariables
+		i.MaxVariables = maxVariables
 	}
 }
 
@@ -159,18 +159,6 @@ func NewLimits(opts ...LimitsOption) Limits {
 	l := Limits{}
 	for _, opt := range opts {
 		opt(&l)
-	}
-
-	if l.MaxSize == nil {
-		l.MaxSize = &DefaultMaxSize
-	}
-
-	if l.MaxResultCount == nil {
-		l.MaxResultCount = &DefaultMaxResultCount
-	}
-
-	if l.MaxVariables == nil {
-		l.MaxVariables = &DefaultMaxVariables
 	}
 
 	return l
@@ -184,4 +172,38 @@ func validateLimits(i interface{}) error {
 
 	// TODO: Validate limits params.
 	return nil
+}
+
+// GasPolicyOption is a functional option for configuring the GasPolicy.
+type GasPolicyOption func(*GasPolicy)
+
+// WithWeightingFactor sets the weighting factor.
+func WithWeightingFactor(weightingFactor uint64) GasPolicyOption {
+	return func(i *GasPolicy) {
+		i.WeightingFactor = weightingFactor
+	}
+}
+
+// WithDefaultPredicateCost sets the default cost of a predicate.
+func WithDefaultPredicateCost(defaultPredicateCost uint64) GasPolicyOption {
+	return func(i *GasPolicy) {
+		i.DefaultPredicateCost = defaultPredicateCost
+	}
+}
+
+// WithPredicateCosts sets the cost of a predicate.
+func WithPredicateCosts(predicateCosts []PredicateCost) GasPolicyOption {
+	return func(i *GasPolicy) {
+		i.PredicateCosts = predicateCosts
+	}
+}
+
+// NewGasPolicy creates a new GasPolicy object.
+func NewGasPolicy(opts ...GasPolicyOption) GasPolicy {
+	g := GasPolicy{}
+	for _, opt := range opts {
+		opt(&g)
+	}
+
+	return g
 }

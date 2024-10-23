@@ -2,20 +2,15 @@ package keeper
 
 import (
 	goctx "context"
-	"math"
 
 	errorsmod "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/axone-protocol/axoned/v10/x/logic/meter"
 	"github.com/axone-protocol/axoned/v10/x/logic/types"
-	"github.com/axone-protocol/axoned/v10/x/logic/util"
 )
-
-var defaultSolutionsLimit = sdkmath.OneUint()
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {
 	if req == nil {
@@ -47,20 +42,14 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 		params,
 		req.Program,
 		req.Query,
-		util.DerefOrDefault(req.Limit, defaultSolutionsLimit))
+		req.Limit)
 }
 
 func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) error {
-	size := sdkmath.NewUint(uint64(len(request.GetQuery())))
-	maxSize := util.NonZeroOrDefaultUInt(limits.MaxSize, sdkmath.NewUint(math.MaxInt64))
-	if size.GT(maxSize) {
-		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size.Uint64(), maxSize.Uint64())
-	}
+	size := uint64(len(request.GetQuery()))
 
-	resultCount := util.DerefOrDefault(request.Limit, defaultSolutionsLimit)
-	maxResultCount := util.NonZeroOrDefaultUInt(limits.MaxResultCount, sdkmath.NewUint(math.MaxInt64))
-	if resultCount.GT(maxResultCount) {
-		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxResultCount: %d", resultCount.Uint64(), maxResultCount.Uint64())
+	if limits.MaxSize != 0 && size > limits.MaxSize {
+		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size, limits.MaxSize)
 	}
 
 	return nil

@@ -16,7 +16,7 @@ Feature: block_time/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4140
+      gas_used: 3975
       answer:
         has_more: false
         variables: ["Time"]
@@ -44,7 +44,7 @@ Feature: block_time/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4141
+      gas_used: 3976
       answer:
         has_more: false
         variables: ["Time"]

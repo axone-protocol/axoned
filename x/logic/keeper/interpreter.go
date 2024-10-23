@@ -12,7 +12,6 @@ import (
 	orderedmap "github.com/wk8/go-ordered-map/v2"
 
 	errorsmod "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -46,7 +45,7 @@ func (k Keeper) enhanceContext(ctx context.Context) context.Context {
 }
 
 func (k Keeper) execute(
-	ctx context.Context, params types.Params, program, query string, solutionsLimit sdkmath.Uint,
+	ctx context.Context, params types.Params, program, query string, solutionsLimit uint64,
 ) (*types.QueryServiceAskResponse, error) {
 	ctx = k.enhanceContext(ctx)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
@@ -59,7 +58,7 @@ func (k Keeper) execute(
 		return nil, errorsmod.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
 	}
 
-	answer, err := k.queryInterpreter(ctx, i, query, solutionsLimit)
+	answer, err := k.queryInterpreter(ctx, i, query, calculateSolutionLimit(solutionsLimit, params.GetLimits().MaxResultCount))
 	if err != nil {
 		return nil, err
 	}
@@ -74,7 +73,7 @@ func (k Keeper) execute(
 
 // queryInterpreter executes the given query on the given interpreter and returns the answer.
 func (k Keeper) queryInterpreter(
-	ctx context.Context, i *prolog.Interpreter, query string, solutionsLimit sdkmath.Uint,
+	ctx context.Context, i *prolog.Interpreter, query string, solutionsLimit uint64,
 ) (*types.Answer, error) {
 	return util.QueryInterpreter(ctx, i, query, solutionsLimit)
 }
@@ -96,8 +95,8 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 
 	var userOutputBuffer writerStringer
 	limits := params.GetLimits()
-	if limits.MaxUserOutputSize != nil && limits.MaxUserOutputSize.GT(sdkmath.ZeroUint()) {
-		userOutputBuffer = util.NewBoundedBufferMust(int(limits.MaxUserOutputSize.Uint64())) //nolint:gosec // disable G115
+	if limits.MaxUserOutputSize > 0 {
+		userOutputBuffer = util.NewBoundedBufferMust(int(limits.MaxUserOutputSize)) //nolint:gosec // disable G115
 	} else {
 		userOutputBuffer = new(strings.Builder)
 	}
@@ -160,7 +159,7 @@ func whitelistBlacklistHookFn(whitelist, blacklist []string) engine.HookFunc {
 // gasMeterHookFn returns a hook function that consumes gas based on the cost of the executed predicate.
 func gasMeterHookFn(ctx context.Context, gasPolicy types.GasPolicy) engine.HookFunc {
 	sdkctx := sdk.UnwrapSDKContext(ctx)
-	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), nonNilNorZeroOrDefaultUint64(gasPolicy.WeightingFactor, defaultWeightFactor))
+	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), lo.CoalesceOrEmpty(gasPolicy.WeightingFactor, defaultWeightFactor))
 
 	return func(opcode engine.Opcode, operand engine.Term, env *engine.Env) (err error) {
 		if opcode != engine.OpCall {
@@ -175,7 +174,7 @@ func gasMeterHookFn(ctx context.Context, gasPolicy types.GasPolicy) engine.HookF
 		predicate := operandStringer.String()
 
 		cost := lookupCost(predicate,
-			nonNilNorZeroOrDefaultUint64(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
+			lo.CoalesceOrEmpty(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
 			gasPolicy.PredicateCosts)
 
 		defer func() {
@@ -203,19 +202,20 @@ func lookupCost(predicate string, defaultCost uint64, costs []types.PredicateCos
 
 	for _, c := range costs {
 		if prolog2.PredicateMatches(predicate)(c.Predicate) {
-			return nonNilNorZeroOrDefaultUint64(c.Cost, defaultCost)
+			return lo.CoalesceOrEmpty(c.Cost, defaultCost)
 		}
 	}
 
 	return defaultCost
 }
 
-// nonNilNorZeroOrDefaultUint64 returns the value of the given sdkmath.Uint if it is not nil and not zero, otherwise it returns the
-// given default value.
-func nonNilNorZeroOrDefaultUint64(v *sdkmath.Uint, defaultValue uint64) uint64 {
-	if v == nil || v.IsZero() {
-		return defaultValue
+// calculateSolutionLimit returns the final number of solutions to be returned based on the given number of solutions and the
+// maximum result count.
+func calculateSolutionLimit(nbSolutions uint64, maxResultCount uint64) uint64 {
+	nbSolutions = max(nbSolutions, 1)
+	if maxResultCount == 0 {
+		return nbSolutions
 	}
 
-	return v.Uint64()
+	return min(nbSolutions, maxResultCount)
 }

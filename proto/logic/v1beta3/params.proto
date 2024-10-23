@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package logic.v1beta2;
+package logic.v1beta3;
 
 import "gogoproto/gogo.proto";
 
@@ -36,37 +36,21 @@ message Limits {
   option (gogoproto.goproto_stringer) = true;
 
   // max_size specifies the maximum size, in bytes, that is accepted for a program.
-  // nil value or 0 value remove size limitation.
-  string max_size = 3 [
-    (gogoproto.moretags) = "yaml:\"max_size\"",
-    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
-    (gogoproto.nullable) = true
-  ];
+  // A value of 0 means that there is no limit on the size of the program.
+  uint64 max_size = 3 [(gogoproto.moretags) = "yaml:\"max_size\""];
 
   // max_result_count specifies the maximum number of results that can be requested for a query.
-  // nil value or 0 value remove max result count limitation.
-  string max_result_count = 2 [
-    (gogoproto.moretags) = "yaml:\"max_result_count\"",
-    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
-    (gogoproto.nullable) = true
-  ];
+  // A value of 0 means that there is no limit on the number of results.
+  uint64 max_result_count = 2 [(gogoproto.moretags) = "yaml:\"max_result_count\""];
 
   // max_user_output_size specifies the maximum number of bytes to keep in the user output. If the user output exceeds
   // this size, the interpreter will overwrite the oldest bytes with the new ones to keep the size constant.
-  // nil value or 0 value means that no user output is used at all.
-  string max_user_output_size = 4 [
-    (gogoproto.moretags) = "yaml:\"max_user_output_size\"",
-    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
-    (gogoproto.nullable) = true
-  ];
+  // A value of 0 means the user output is disabled.
+  uint64 max_user_output_size = 4 [(gogoproto.moretags) = "yaml:\"max_user_output_size\""];
 
   // max_variables specifies the maximum number of variables that can be create by the interpreter.
-  // nil value or 0 value means that no limit is set.
-  string max_variables = 5 [
-    (gogoproto.moretags) = "yaml:\"max_variables\"",
-    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
-    (gogoproto.nullable) = true
-  ];
+  // A value of 0 means that there is no limit on the number of variables.
+  uint64 max_variables = 5 [(gogoproto.moretags) = "yaml:\"max_variables\""];
 }
 
 // Filter defines the parameters for filtering the set of strings which can designate anything.
@@ -132,20 +116,12 @@ message Interpreter {
 message GasPolicy {
   // WeightingFactor is the factor that is applied to the unit cost of each predicate
   // to yield the gas value.
-  // If not provided or set to 0, the value is set to 1.
-  string weighting_factor = 1 [
-    (gogoproto.moretags) = "yaml:\"weighting_factor\"",
-    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
-    (gogoproto.nullable) = true
-  ];
+  // If set to 0, the value considered is 1.
+  uint64 weighting_factor = 1 [ (gogoproto.moretags) = "yaml:\"weighting_factor\"" ];
 
   // DefaultPredicateCost is the default unit cost of a predicate when not specified in the PredicateCosts list.
-  // If not provided or set to 0, the value is set to 1.
-  string default_predicate_cost = 2 [
-    (gogoproto.moretags) = "yaml:\"default_predicate_cost\"",
-    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
-    (gogoproto.nullable) = true
-  ];
+  // If set to 0, the value considered is 1.
+  uint64 default_predicate_cost = 2 [ (gogoproto.moretags) = "yaml:\"default_predicate_cost\"" ];
 
   // PredicateCosts is the list of predicates and their associated unit costs.
   repeated PredicateCost predicate_costs = 3 [
@@ -164,9 +140,6 @@ message PredicateCost {
   ];
 
   // Cost is the unit cost of the predicate.
-  string cost = 2 [
-    (gogoproto.moretags) = "yaml:\"cost\",omitempty",
-    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
-    (gogoproto.nullable) = true
-  ];
+  // If set to 0, the value considered is 1.
+  uint64 cost = 2 [ (gogoproto.moretags) = "yaml:\"cost\"" ];
 }

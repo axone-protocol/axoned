@@ -6,8 +6,6 @@ import (
 
 	"github.com/spf13/cobra"
 
-	sdkmath "cosmossdk.io/math"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	"github.com/cosmos/cosmos-sdk/version"
@@ -38,11 +36,10 @@ func CmdQueryAsk() *cobra.Command {
 			query := args[0]
 			queryClient := types.NewQueryServiceClient(clientCtx)
 
-			limit := sdkmath.NewUint(limit)
 			res, err := queryClient.Ask(context.Background(), &types.QueryServiceAskRequest{
 				Program: program,
 				Query:   query,
-				Limit:   &limit,
+				Limit:   limit,
 			})
 			if err != nil {
 				return

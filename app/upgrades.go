@@ -1,17 +1,28 @@
 package app
 
 import (
+	"context"
 	"fmt"
 
-	v7 "github.com/axone-protocol/axoned/v10/app/upgrades/v7"
+	upgradetypes "cosmossdk.io/x/upgrade/types"
+
+	"github.com/cosmos/cosmos-sdk/types/module"
 )
 
-// RegisterUpgradeHandlers registers the chain upgrade handlers.
-func (app *App) RegisterUpgradeHandlers() {
-	app.UpgradeKeeper.SetUpgradeHandler(
-		v7.UpgradeName,
-		v7.CreateUpgradeHandler(app.ModuleManager, app.configurator),
-	)
+var upgrades = []string{
+	"v11.0.0",
+}
+
+// registerUpgradeHandlers registers the chain upgrade handlers.
+func (app *App) registerUpgradeHandlers() {
+	for _, upgrade := range upgrades {
+		app.UpgradeKeeper.SetUpgradeHandler(
+			upgrade,
+			func(ctx context.Context, _ upgradetypes.Plan, vm module.VersionMap) (module.VersionMap, error) {
+				return app.ModuleManager.RunMigrations(ctx, app.configurator, vm)
+			},
+		)
+	}
 
 	upgradeInfo, err := app.UpgradeKeeper.ReadUpgradeInfoFromDisk()
 	if err != nil {

@@ -10,7 +10,6 @@ import (
 	"github.com/samber/lo"
 
 	errorsmod "cosmossdk.io/errors"
-	sdkmath "cosmossdk.io/math"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -25,7 +24,7 @@ const (
 //
 //nolint:nestif,funlen
 func QueryInterpreter(
-	ctx context.Context, i *prolog.Interpreter, query string, solutionsLimit sdkmath.Uint,
+	ctx context.Context, i *prolog.Interpreter, query string, solutionsLimit uint64,
 ) (*types.Answer, error) {
 	p := engine.NewParser(&i.VM, strings.NewReader(query))
 	t, err := p.Term()
@@ -34,14 +33,14 @@ func QueryInterpreter(
 	}
 
 	var env *engine.Env
-	count := sdkmath.ZeroUint()
-	envs := make([]*engine.Env, 0, sdkmath.MinUint(solutionsLimit, sdkmath.NewUint(defaultEnvCap)).Uint64())
+	count := uint64(0)
+	envs := make([]*engine.Env, 0, min(solutionsLimit, defaultEnvCap))
 	_, callErr := engine.Call(&i.VM, t, func(env *engine.Env) *engine.Promise {
-		if count.LT(solutionsLimit) {
+		if count < solutionsLimit {
 			envs = append(envs, env)
 		}
-		count = count.Incr()
-		return engine.Bool(count.GT(solutionsLimit))
+		count++
+		return engine.Bool(count > solutionsLimit)
 	}, env).Force(ctx)
 
 	vars := parsedVarsToVars(p.Vars)
@@ -51,7 +50,7 @@ func QueryInterpreter(
 	}
 
 	if callErr != nil {
-		if sdkmath.NewUint(uint64(len(results))).LT(solutionsLimit) {
+		if uint64(len(results)) < solutionsLimit {
 			// error is not part of the look-ahead and should be included in the solutions
 			if errors.Is(callErr, types.LimitExceeded) {
 				return nil, callErr
@@ -80,12 +79,12 @@ func QueryInterpreter(
 			results = append(results, types.Result{Error: callErr.Error()})
 		} else {
 			// error is part of the look-ahead, so let's consider that there's one more solution
-			count = count.Incr()
+			count++
 		}
 	}
 
 	return &types.Answer{
-		HasMore:   count.GT(solutionsLimit),
+		HasMore:   count > solutionsLimit,
 		Variables: vars,
 		Results:   results,
 	}, nil

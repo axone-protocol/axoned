@@ -6,8 +6,6 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"cosmossdk.io/math"
-
 	"github.com/axone-protocol/axoned/v10/x/logic/types"
 )
 
@@ -36,11 +34,15 @@ func TestValidateParams(t *testing.T) {
 						types.WithVirtualFilesWhitelist([]string{"file2"}),
 					),
 					types.NewLimits(
-						types.WithMaxSize(math.NewUint(2)),
-						types.WithMaxResultCount(math.NewUint(3)),
-						types.WithMaxUserOutputSize(math.NewUint(4)),
-						types.WithMaxVariables(math.NewUint(5)),
+						types.WithMaxSize(2),
+						types.WithMaxResultCount(3),
+						types.WithMaxUserOutputSize(4),
+						types.WithMaxVariables(5),
 					),
+					types.GasPolicy{
+						WeightingFactor:      2,
+						DefaultPredicateCost: 1,
+					},
 				),
 				expectErr: false,
 				err:       nil,
@@ -52,6 +54,7 @@ func TestValidateParams(t *testing.T) {
 						types.WithVirtualFilesBlacklist([]string{"https://foo{bar/"}),
 					),
 					types.NewLimits(),
+					types.GasPolicy{},
 				),
 				expectErr: true,
 				err:       fmt.Errorf("invalid virtual file in blacklist: https://foo{bar/"),
@@ -63,6 +66,7 @@ func TestValidateParams(t *testing.T) {
 						types.WithVirtualFilesWhitelist([]string{"https://foo{bar/"}),
 					),
 					types.NewLimits(),
+					types.GasPolicy{},
 				),
 				expectErr: true,
 				err:       fmt.Errorf("invalid virtual file in whitelist: https://foo{bar/"),

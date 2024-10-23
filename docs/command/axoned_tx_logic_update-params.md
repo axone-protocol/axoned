@@ -30,7 +30,7 @@ axoned tx logic update-params [flags]
       --note string                          Note to add a description to the transaction (previously --memo)
       --offline                              Offline mode (does not allow any online functionality)
   -o, --output string                        Output format (text|json) (default "json")
-      --params logic.v1beta2.Params (json)   
+      --params logic.v1beta3.Params (json)   
   -s, --sequence uint                        The sequence number of the signing account (offline mode only)
       --sign-mode string                     Choose sign mode (direct|amino-json|direct-aux|textual), this is an advanced feature
       --timeout-height uint                  Set a block timeout height to prevent the tx from being committed past a certain height

@@ -37,7 +37,7 @@ Here are the steps of the scenario:
 ```  json
 {
   "limits": {
-    "max_user_output_size": "5"
+    "max_user_output_size": 5
   }
 }
 ```
@@ -61,7 +61,7 @@ write_char_to_user_output(x).
 
 ```  yaml
 height: 42
-gas_used: 4241
+gas_used: 4043
 answer:
   has_more: false
   variables:
@@ -83,7 +83,7 @@ Here are the steps of the scenario:
 ```  json
 {
   "limits": {
-    "max_user_output_size": "15"
+    "max_user_output_size": 15
   }
 }
 ```
@@ -108,7 +108,7 @@ log_message('Hello world!').
 
 ```  yaml
 height: 42
-gas_used: 4276
+gas_used: 4045
 answer:
   has_more: false
   variables:
@@ -131,7 +131,7 @@ Here are the steps of the scenario:
 ```  json
 {
   "limits": {
-    "max_user_output_size": "5"
+    "max_user_output_size": 5
   }
 }
 ```
@@ -155,7 +155,7 @@ log_message('Hello world!').
 
 ```  yaml
 height: 42
-gas_used: 4242
+gas_used: 4044
 answer:
   has_more: false
   variables:
@@ -179,7 +179,7 @@ Here are the steps of the scenario:
 ```  json
 {
   "limits": {
-    "max_user_output_size": "5"
+    "max_user_output_size": 5
   }
 }
 ```
@@ -205,7 +205,7 @@ log_message("Hello 🧙!").
 
 ```  yaml
 height: 42
-gas_used: 4263
+gas_used: 4065
 answer:
   has_more: false
   variables:
