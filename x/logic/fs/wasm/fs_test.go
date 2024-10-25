@@ -9,7 +9,7 @@ import (
 	"testing"
 
 	dbm "github.com/cosmos/cosmos-db"
-	"github.com/golang/mock/gomock"
+	"go.uber.org/mock/gomock"
 
 	. "github.com/smartystreets/goconvey/convey"
 

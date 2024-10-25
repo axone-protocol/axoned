@@ -14,9 +14,9 @@ import (
 
 	"dario.cat/mergo"
 	"github.com/cucumber/godog"
-	"github.com/golang/mock/gomock"
 	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/smartystreets/goconvey/convey/reporting"
+	"go.uber.org/mock/gomock"
 	"gopkg.in/yaml.v3"
 
 	. "github.com/smartystreets/goconvey/convey"

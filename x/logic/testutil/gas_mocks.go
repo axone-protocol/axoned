@@ -7,7 +7,7 @@ package testutil
 import (
 	reflect "reflect"
 
-	gomock "github.com/golang/mock/gomock"
+	gomock "go.uber.org/mock/gomock"
 )
 
 // MockGasMeter is a mock of GasMeter interface.

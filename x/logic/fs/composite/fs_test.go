@@ -8,9 +8,8 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang/mock/gomock"
-
 	. "github.com/smartystreets/goconvey/convey"
+	"go.uber.org/mock/gomock"
 
 	"github.com/axone-protocol/axoned/v10/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v10/x/logic/testutil"
