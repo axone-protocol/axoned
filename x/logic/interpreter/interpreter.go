@@ -8,8 +8,6 @@ import (
 
 	"github.com/axone-protocol/prolog"
 	"github.com/axone-protocol/prolog/engine"
-
-	"cosmossdk.io/math"
 )
 
 // Option is a function that configures an Interpreter.
@@ -69,13 +67,10 @@ func WithFS(fs fs.FS) Option {
 }
 
 // WithMaxVariables configures the interpreter to use the specified maximum number of variables.
-func WithMaxVariables(maxVariables *math.Uint) Option {
+func WithMaxVariables(maxVariables uint64) Option {
 	return func(i *prolog.Interpreter) error {
-		if maxVariables != nil {
-			i.SetMaxVariables(maxVariables.Uint64())
-		} else {
-			i.SetMaxVariables(0)
-		}
+		i.SetMaxVariables(maxVariables)
+
 		return nil
 	}
 }

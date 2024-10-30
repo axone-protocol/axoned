@@ -98,7 +98,7 @@ func TestFilteredVFS(t *testing.T) {
 							result, err := filteredFS.Open(tc.file)
 
 							Convey("then the result should be as expected", func() {
-								if util.IsNil(tc.wantError) {
+								if lo.IsNil(tc.wantError) {
 									So(err, ShouldBeNil)
 
 									stat, _ := result.Stat()
@@ -117,7 +117,7 @@ func TestFilteredVFS(t *testing.T) {
 							result, err := filteredFS.ReadFile(tc.file)
 
 							Convey("Then the result should be as expected", func() {
-								if util.IsNil(tc.wantError) {
+								if lo.IsNil(tc.wantError) {
 									So(err, ShouldBeNil)
 									So(result, ShouldResemble, content)
 								} else {

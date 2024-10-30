@@ -1,12 +1,12 @@
 syntax = "proto3";
 
-package logic.v1beta2;
+package logic.v1beta3;
 
 import "cosmos/query/v1/query.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
-import "logic/v1beta2/params.proto";
-import "logic/v1beta2/types.proto";
+import "logic/v1beta3/params.proto";
+import "logic/v1beta3/types.proto";
 
 option go_package = "github.com/axone-protocol/axoned/x/logic/types";
 
@@ -50,11 +50,7 @@ message QueryServiceAskRequest {
   // limit specifies the maximum number of solutions to be returned. This field is governed by
   // max_result_count, which defines the upper limit of results that may be requested per query.
   // If this field is not explicitly set, a default value of 1 is applied.
-  string limit = 3 [
-    (gogoproto.moretags) = "yaml:\"limit\",omitempty",
-    (gogoproto.customtype) = "cosmossdk.io/math.Uint",
-    (gogoproto.nullable) = true
-  ];
+  uint64 limit = 3 [(gogoproto.moretags) = "yaml:\"limit\",omitempty"];
 }
 
 // QueryServiceAskResponse is response type for the QueryService/Ask RPC method.

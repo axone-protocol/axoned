@@ -1,9 +1,9 @@
 syntax = "proto3";
 
-package logic.v1beta2;
+package logic.v1beta3;
 
 import "gogoproto/gogo.proto";
-import "logic/v1beta2/params.proto";
+import "logic/v1beta3/params.proto";
 
 option go_package = "github.com/axone-protocol/axoned/x/logic/types";
 
