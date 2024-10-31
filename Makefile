@@ -236,7 +236,7 @@ chain-stop: ## Stop the blockchain
 	@echo "${COLOR_CYAN} ✋️ Stopping chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
 	@killall axoned
 
-chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION. You can pass also the proposal json file on PROPOSAL var
+chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION.
 	@echo "${COLOR_CYAN} ⬆️ Upgrade the chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} from ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} to ${COLOR_YELLOW}${TO_VERSION}${COLOR_RESET}"
 	@killall cosmovisor || \
 	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
@@ -249,40 +249,31 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
 	echo $$BINARY_OLD; \
 	make chain-init CHAIN_BINARY=$$BINARY_OLD; \
 	\
-	echo "${COLOR_CYAN} 👩‍🚀 Prepare cosmovisor ${COLOR_RESET}"; \
+	echo "${COLOR_CYAN} 👩‍🚀 Preparing cosmovisor ${COLOR_RESET}"; \
 	export DAEMON_NAME=${DAEMON_NAME}; \
 	export DAEMON_HOME=${DAEMON_HOME}; \
 	\
-	PROPOSAL=${PROPOSAL}; \
-	if [[ ! -f "$$PROPOSAL" ]]; then \
-        echo "${COLOR_CYAN} 👩‍🚀 No proposal given  ${COLOR_RESET}"; \
-        echo '{"messages": [{"@type": "/cosmos.upgrade.v1beta1.MsgSoftwareUpgrade","authority": "axone10d07y265gmmuvt4z0w9aw880jnsr700jh7kd2g","plan": {"name": "","time": "0001-01-01T00:00:00Z","height": "10","info": "","upgraded_client_state": null}}],"title": "Software update", "summary": "Update the binary", "metadata": "ipfs://CID","deposit": "1uaxone"}' | \
-        jq --arg name "${TO_VERSION}" '.messages[].plan.name = $$name' > ${TARGET_FOLDER}/proposal.json; \
-      	PROPOSAL=${TARGET_FOLDER}/proposal.json; \
-    fi; \
-    cat <<< $$(jq '.app_state.gov.params.voting_period = "30s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
+    cat <<< $$(jq '.app_state.gov.params.voting_period = "20s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
 	\
  	cosmovisor init $$BINARY_OLD; \
  	cosmovisor run start --moniker ${CHAIN_MONIKER} \
  		--home ${CHAIN_HOME} \
  		--log_level debug & \
-	sleep 10;\
- 	$$BINARY_OLD tx gov submit-proposal $$PROPOSAL \
- 		--from validator \
- 		--yes \
- 		--home ${CHAIN_HOME} \
- 		--chain-id axone-${CHAIN} \
- 		--keyring-backend test \
- 		-b sync; \
- 	\
- 	sleep 5;\
- 	$$BINARY_OLD tx gov deposit 1 10000000uaxone \
-     		--from validator \
-     		--yes \
-     		--home ${CHAIN_HOME} \
-     		--chain-id axone-${CHAIN} \
-     		--keyring-backend test \
-     		-b sync; \
+	sleep 10; \
+	echo "${COLOR_CYAN} 🗳️ Submitting software-upgrade tx ${COLOR_RESET}"; \
+	$$BINARY_OLD tx upgrade software-upgrade ${TO_VERSION}\
+	    --title "Axoned upgrade" \
+	    --summary "⬆️ Upgrade the chain from ${FROM_VERSION} to ${TO_VERSION}" \
+	    --upgrade-height 20 \
+	    --upgrade-info "{}" \
+	    --deposit 10000000uaxone \
+	    --no-validate \
+	    --yes \
+	    --from validator \
+	    --keyring-backend test \
+	    --chain-id axone-${CHAIN} \
+	    --home ${CHAIN_HOME}; \
+	sleep 5;\
 	\
 	sleep 5;\
  	$$BINARY_OLD tx gov vote 1 yes \
@@ -290,8 +281,7 @@ chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to th
      		--yes \
      		--home ${CHAIN_HOME} \
      		--chain-id axone-${CHAIN} \
-     		--keyring-backend test \
-     		-b sync; \
+     		--keyring-backend test; \
 	mkdir -p ${DAEMON_HOME}/cosmovisor/upgrades/${TO_VERSION}/bin && cp ${CHAIN_BINARY} ${DAEMON_HOME}/cosmovisor/upgrades/${TO_VERSION}/bin; \
 	wait
 

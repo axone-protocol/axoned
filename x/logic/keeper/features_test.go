@@ -21,7 +21,6 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -205,9 +204,7 @@ func whenTheQueryIsRun(ctx context.Context) error {
 
 func whenTheQueryIsRunLimitedToNSolutions(ctx context.Context, n int) error {
 	request := testCaseFromContext(ctx).request
-
-	limit := sdkmath.NewUint(uint64(n)) //nolint:gosec // disable G115
-	request.Limit = &limit
+	request.Limit = uint64(n) //nolint:gosec // disable G115
 
 	testCaseFromContext(ctx).request = request
 
@@ -319,8 +316,7 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 func logicKeeperParams() types.Params {
 	params := types.DefaultParams()
 	limits := params.Limits
-	maxResultCount := sdkmath.NewUint(10)
-	limits.MaxResultCount = &maxResultCount
+	limits.MaxResultCount = 10
 	params.Limits = limits
 	return params
 }

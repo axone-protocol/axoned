@@ -10,7 +10,6 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -40,11 +39,36 @@ func TestGRPCParams(t *testing.T) {
 						types.WithVirtualFilesWhitelist([]string{"file2"}),
 					),
 					types.NewLimits(
-						types.WithMaxSize(math.NewUint(2)),
-						types.WithMaxResultCount(math.NewUint(3)),
-						types.WithMaxUserOutputSize(math.NewUint(4)),
-						types.WithMaxVariables(math.NewUint(5)),
+						types.WithMaxSize(2),
+						types.WithMaxResultCount(3),
+						types.WithMaxUserOutputSize(4),
+						types.WithMaxVariables(5),
 					),
+					types.GasPolicy{},
+				),
+			},
+			{
+				params: types.NewParams(
+					types.NewInterpreter(
+						types.WithBootstrap("bootstrap"),
+						types.WithPredicatesBlacklist([]string{"halt/1"}),
+						types.WithPredicatesWhitelist([]string{"source_file/1"}),
+						types.WithVirtualFilesBlacklist([]string{"file1"}),
+						types.WithVirtualFilesWhitelist([]string{"file2"}),
+					),
+					types.NewLimits(
+						types.WithMaxSize(2),
+						types.WithMaxResultCount(3),
+						types.WithMaxUserOutputSize(4),
+						types.WithMaxVariables(5),
+					),
+					types.GasPolicy{
+						WeightingFactor:      2,
+						DefaultPredicateCost: 1,
+						PredicateCosts: []types.PredicateCost{
+							{Predicate: "foo", Cost: 1},
+						},
+					},
 				),
 			},
 		}
@@ -96,5 +120,32 @@ func TestGRPCParams(t *testing.T) {
 					})
 				})
 		}
+	})
+
+	Convey("Given a keeper", t, func() {
+		encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
+		key := storetypes.NewKVStoreKey(types.StoreKey)
+		testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+
+		logicKeeper := keeper.NewKeeper(
+			encCfg.Codec,
+			encCfg.InterfaceRegistry,
+			key,
+			key,
+			authtypes.NewModuleAddress(govtypes.ModuleName),
+			nil,
+			nil,
+			nil,
+			nil)
+
+		Convey("When the query params is called with a nil query", func() {
+			params, err := logicKeeper.Params(testCtx.Ctx, nil)
+
+			Convey("Then it should return an error", func() {
+				So(err, ShouldNotBeNil)
+				So(err.Error(), ShouldEqual, "rpc error: code = InvalidArgument desc = invalid request")
+				So(params, ShouldBeNil)
+			})
+		})
 	})
 }

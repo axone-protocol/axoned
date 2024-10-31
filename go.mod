@@ -40,6 +40,7 @@ require (
 	github.com/huandu/xstrings v1.5.0
 	github.com/hyperledger/aries-framework-go v0.3.2
 	github.com/ignite/cli v0.27.2
+	github.com/jinzhu/copier v0.4.0
 	github.com/muesli/reflow v0.3.0
 	github.com/nuts-foundation/go-did v0.15.0
 	github.com/piprate/json-gold v0.5.1-0.20230111113000-6ddbe6e6f19f

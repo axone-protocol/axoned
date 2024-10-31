@@ -1,4 +1,3 @@
-//nolint:gocognit
 package keeper_test
 
 import (
@@ -11,7 +10,6 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	sdkmath "cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -33,7 +31,7 @@ func TestGRPCAsk(t *testing.T) {
 		cases := []struct {
 			program            string
 			query              string
-			limit              int
+			limit              uint64
 			maxResultCount     uint64
 			maxSize            uint64
 			predicateBlacklist []string
@@ -117,7 +115,13 @@ func TestGRPCAsk(t *testing.T) {
 				query:          "father(bob, X).",
 				limit:          2,
 				maxResultCount: 1,
-				expectedError:  "query: 2 > MaxResultCount: 1: limit exceeded",
+				expectedAnswer: &types.Answer{
+					HasMore:   true,
+					Variables: []string{"X"},
+					Results: []types.Result{{Substitutions: []types.Substitution{{
+						Variable: "X", Expression: "alice",
+					}}}},
+				},
 			},
 			{
 				program:       "father(bob, alice). father(bob, john).",
@@ -157,7 +161,7 @@ func TestGRPCAsk(t *testing.T) {
 				predicateCosts: map[string]uint64{
 					"block_height/1": 10000,
 				},
-				expectedError: "out of gas: logic <block_height/1> (11167/3000): limit exceeded",
+				expectedError: "out of gas: logic <block_height/1> (11140/3000): limit exceeded",
 			},
 			{
 				program:       "recursionOfDeath :- recursionOfDeath.",
@@ -287,11 +291,11 @@ func TestGRPCAsk(t *testing.T) {
 			},
 			{
 				program: `
-			foo(a1).
-			foo(a2).
-			foo(a3) :- throw(error(resource_error(foo))).
-			foo(a4).
-			`,
+				foo(a1).
+				foo(a2).
+				foo(a3) :- throw(error(resource_error(foo))).
+				foo(a4).
+				`,
 				query:          `foo(X).`,
 				maxResultCount: 1,
 				expectedAnswer: &types.Answer{
@@ -304,11 +308,11 @@ func TestGRPCAsk(t *testing.T) {
 			},
 			{
 				program: `
-			foo(a1).
-			foo(a2).
-			foo(a3) :- throw(error(resource_error(foo))).
-			foo(a4).
-			`,
+				foo(a1).
+				foo(a2).
+				foo(a3) :- throw(error(resource_error(foo))).
+				foo(a4).
+				`,
 				query:          `foo(X).`,
 				limit:          2,
 				maxResultCount: 3,
@@ -323,11 +327,11 @@ func TestGRPCAsk(t *testing.T) {
 			},
 			{
 				program: `
-			foo(a1).
-			foo(a2).
-			foo(a3) :- throw(error(resource_error(foo))).
-			foo(a4).
-			`,
+				foo(a1).
+				foo(a2).
+				foo(a3) :- throw(error(resource_error(foo))).
+				foo(a4).
+				`,
 				query:          `foo(X).`,
 				limit:          3,
 				maxResultCount: 5,
@@ -342,11 +346,11 @@ func TestGRPCAsk(t *testing.T) {
 			},
 			{
 				program: `
-			foo(a1).
-			foo(a2).
-			foo(a3) :- throw(error(resource_error(foo))).
-			foo(a4).
-			`,
+				foo(a1).
+				foo(a2).
+				foo(a3) :- throw(error(resource_error(foo))).
+				foo(a4).
+				`,
 				query:          `foo(X).`,
 				limit:          5,
 				maxResultCount: 5,
@@ -361,11 +365,11 @@ func TestGRPCAsk(t *testing.T) {
 			},
 			{
 				program: `
-			foo(a1).
-			foo(a2).
-			foo(a3) :- throw(error(resource_error(foo))).
-			foo(a4).
-			`,
+				foo(a1).
+				foo(a2).
+				foo(a3) :- throw(error(resource_error(foo))).
+				foo(a4).
+				`,
 				query:          `foo(X).`,
 				limit:          5,
 				maxResultCount: 0,
@@ -407,23 +411,21 @@ func TestGRPCAsk(t *testing.T) {
 						func(_ gocontext.Context) fs.FS {
 							return fsProvider
 						})
-					maxResultCount := sdkmath.NewUint(tc.maxResultCount)
-					maxSize := sdkmath.NewUint(tc.maxSize)
+
 					params := types.DefaultParams()
-					params.Limits.MaxResultCount = &maxResultCount
-					params.Limits.MaxSize = &maxSize
-					maxVariables := sdkmath.NewUint(tc.maxVariables)
-					params.Limits.MaxVariables = &maxVariables
+					params.Limits.MaxResultCount = tc.maxResultCount
+					params.Limits.MaxSize = tc.maxSize
+					params.Limits.MaxVariables = tc.maxVariables
+
 					if tc.predicateBlacklist != nil {
 						params.Interpreter.PredicatesFilter.Blacklist = tc.predicateBlacklist
 					}
 					if tc.predicateCosts != nil {
 						predicateCosts := make([]types.PredicateCost, 0, len(tc.predicateCosts))
 						for predicate, cost := range tc.predicateCosts {
-							cost := sdkmath.NewUint(cost)
 							predicateCosts = append(predicateCosts, types.PredicateCost{
 								Predicate: predicate,
-								Cost:      &cost,
+								Cost:      cost,
 							})
 						}
 						params.GasPolicy.PredicateCosts = predicateCosts
@@ -444,15 +446,10 @@ func TestGRPCAsk(t *testing.T) {
 
 						queryClient := types.NewQueryServiceClient(queryHelper)
 
-						var limit *sdkmath.Uint
-						if tc.limit != 0 {
-							v := sdkmath.NewUint(uint64(tc.limit)) //nolint:gosec // disable G115
-							limit = &v
-						}
 						query := types.QueryServiceAskRequest{
 							Program: tc.program,
 							Query:   tc.query,
-							Limit:   limit,
+							Limit:   tc.limit,
 						}
 
 						Convey("when the grpc query ask is called", func() {
@@ -473,5 +470,32 @@ func TestGRPCAsk(t *testing.T) {
 					})
 				})
 		}
+	})
+
+	Convey("Given a keeper", t, func() {
+		encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
+		key := storetypes.NewKVStoreKey(types.StoreKey)
+		testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+
+		logicKeeper := keeper.NewKeeper(
+			encCfg.Codec,
+			encCfg.InterfaceRegistry,
+			key,
+			key,
+			authtypes.NewModuleAddress(govtypes.ModuleName),
+			nil,
+			nil,
+			nil,
+			nil)
+
+		Convey("When the query ask is called with a nil query", func() {
+			response, err := logicKeeper.Ask(testCtx.Ctx, nil)
+
+			Convey("Then it should return an error", func() {
+				So(err, ShouldNotBeNil)
+				So(err.Error(), ShouldEqual, "request is nil: invalid argument")
+				So(response, ShouldBeNil)
+			})
+		})
 	})
 }
