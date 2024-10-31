@@ -6,8 +6,8 @@ import (
 	"io/fs"
 	"testing"
 
-	"github.com/golang/mock/gomock"
-
+	"go.uber.org/mock/gomock"
+	
 	. "github.com/smartystreets/goconvey/convey"
 
 	storetypes "cosmossdk.io/store/types"

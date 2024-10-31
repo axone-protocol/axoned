@@ -10,7 +10,7 @@ import (
 	signing "cosmossdk.io/x/tx/signing"
 	types "github.com/cosmos/cosmos-sdk/codec/types"
 	proto "github.com/cosmos/gogoproto/proto"
-	gomock "github.com/golang/mock/gomock"
+	gomock "go.uber.org/mock/gomock"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 )
 
