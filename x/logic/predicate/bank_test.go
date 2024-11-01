@@ -9,8 +9,8 @@ import (
 
 	"github.com/axone-protocol/prolog/engine"
 	dbm "github.com/cosmos/cosmos-db"
-	"github.com/golang/mock/gomock"
 	"github.com/samber/lo"
+	"go.uber.org/mock/gomock"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
