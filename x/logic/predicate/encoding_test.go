@@ -2,7 +2,6 @@ package predicate
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/axone-protocol/prolog"
@@ -23,6 +22,10 @@ import (
 )
 
 func TestHexBytesPredicate(t *testing.T) {
+	const (
+		hexEncodingErrorFmt = "e,n,c,o,d,i,n,g,/,h,e,x,:, ,i,n,v,a,l,i,d, ,b,y,t,e,:, ,U,+,0,0,6,9, ,',i,'"
+	)
+
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			program     string
@@ -58,8 +61,7 @@ func TestHexBytesPredicate(t *testing.T) {
 			{
 				query: `hex_bytes('fail',
 				[44,38,180,107,104,255,198,143,249,155,69,60,29,48,65,52,19,66,45,112,100,131,191,160,249,138,94,136,98,102,231,174]).`,
-				wantError: fmt.Errorf("error(domain_error(encoding(hex),fail),[%s],hex_bytes/2)",
-					strings.Join(strings.Split("encoding/hex: invalid byte: U+0069 'i'", ""), ",")),
+				wantError:   fmt.Errorf("error(domain_error(encoding(hex),fail),[%s],hex_bytes/2)", hexEncodingErrorFmt),
 				wantSuccess: false,
 			},
 			{

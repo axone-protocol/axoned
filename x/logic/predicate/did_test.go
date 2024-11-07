@@ -3,7 +3,6 @@ package predicate
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/axone-protocol/prolog/engine"
@@ -23,6 +22,9 @@ import (
 )
 
 func TestDID(t *testing.T) {
+	const (
+		invalidDID = "i,n,v,a,l,i,d, ,D,I,D"
+	)
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			program    string
@@ -79,8 +81,7 @@ func TestDID(t *testing.T) {
 			{
 				query:      `did_components('foo',X).`,
 				wantResult: []testutil.TermResults{},
-				wantError: fmt.Errorf("error(domain_error(encoding(did),foo),[%s],did_components/2)",
-					strings.Join(strings.Split("invalid DID", ""), ",")),
+				wantError:  fmt.Errorf("error(domain_error(encoding(did),foo),[%s],did_components/2)", invalidDID),
 			},
 			{
 				query:      `did_components(123,X).`,
