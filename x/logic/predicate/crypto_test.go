@@ -3,7 +3,6 @@ package predicate
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/axone-protocol/prolog/engine"
@@ -159,6 +158,11 @@ func TestCryptoOperations(t *testing.T) {
 }
 
 func TestXVerify(t *testing.T) {
+	const (
+		badPublicKeyLength     = "e,d,2,5,5,1,9,:, ,b,a,d, ,p,u,b,l,i,c, ,k,e,y, ,l,e,n,g,t,h,:, ,3,3"
+		failedToParsePublicKey = "f,a,i,l,e,d, ,t,o, ,p,a,r,s,e, ,c,o,m,p,r,e,s,s,e,d, ,p,u,b,l,i,c, ,k,e,y, ,(,f,i,r,s,t, ,1,0, ,b,y,t,e,s,),:, ,0,2,1,3,c,8,4,2,6,b,e,4,7,1,e,5,5,5,0,6"
+	)
+
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			program     string
@@ -204,8 +208,7 @@ func TestXVerify(t *testing.T) {
 				eddsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError: fmt.Errorf("error(syntax_error([%s]),eddsa_verify/4)",
-					strings.Join(strings.Split("ed25519: bad public key length: 33", ""), ",")),
+				wantError:   fmt.Errorf("error(syntax_error([%s]),eddsa_verify/4)", badPublicKeyLength),
 			},
 			{ // Wrong signature
 				program: `verify :-
@@ -256,8 +259,7 @@ func TestXVerify(t *testing.T) {
 				ecdsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError: fmt.Errorf("error(syntax_error([%s]),ecdsa_verify/4)",
-					strings.Join(strings.Split("failed to parse compressed public key (first 10 bytes): 0213c8426be471e55506", ""), ",")),
+				wantError:   fmt.Errorf("error(syntax_error([%s]),ecdsa_verify/4)", failedToParsePublicKey),
 			},
 			{ // Unsupported algo
 				program: `verify :-

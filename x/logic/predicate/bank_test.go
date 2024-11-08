@@ -4,7 +4,6 @@ package predicate
 import (
 	"context"
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/axone-protocol/prolog/engine"
@@ -36,6 +35,9 @@ import (
 )
 
 func TestBank(t *testing.T) {
+	const (
+		bench32DecodingFail = "d,e,c,o,d,i,n,g, ,b,e,c,h,3,2, ,f,a,i,l,e,d,:, ,i,n,v,a,l,i,d, ,b,e,c,h,3,2, ,s,t,r,i,n,g, ,l,e,n,g,t,h, ,3"
+	)
 	Convey("Under a mocked environment", t, func() {
 		ctrl := gomock.NewController(t)
 		defer ctrl.Finish()
@@ -173,8 +175,7 @@ func TestBank(t *testing.T) {
 				balances:   []bank.Balance{},
 				query:      `bank_balances('foo', X).`,
 				wantResult: []testutil.TermResults{{"X": "[uaxone-100]"}},
-				wantError: fmt.Errorf("error(domain_error(encoding(bech32),foo),[%s],bank_balances/2)",
-					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
+				wantError:  fmt.Errorf("error(domain_error(encoding(bech32),foo),[%s],bank_balances/2)", bench32DecodingFail),
 			},
 			{
 				ctx:        context.Background(),
@@ -308,8 +309,7 @@ func TestBank(t *testing.T) {
 				spendableCoins: []bank.Balance{},
 				query:          `bank_spendable_balances('foo', X).`,
 				wantResult:     []testutil.TermResults{{"X": "[uaxone-100]"}},
-				wantError: fmt.Errorf("error(domain_error(encoding(bech32),foo),[%s],bank_spendable_balances/2)",
-					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
+				wantError:      fmt.Errorf("error(domain_error(encoding(bech32),foo),[%s],bank_spendable_balances/2)", bench32DecodingFail),
 			},
 
 			{
@@ -453,8 +453,7 @@ func TestBank(t *testing.T) {
 				lockedCoins: []bank.Balance{},
 				query:       `bank_locked_balances('foo', X).`,
 				wantResult:  []testutil.TermResults{{"X": "[uaxone-100]"}},
-				wantError: fmt.Errorf("error(domain_error(encoding(bech32),foo),[%s],bank_locked_balances/2)",
-					strings.Join(strings.Split("decoding bech32 failed: invalid bech32 string length 3", ""), ",")),
+				wantError:   fmt.Errorf("error(domain_error(encoding(bech32),foo),[%s],bank_locked_balances/2)", bench32DecodingFail),
 			},
 		}
 		for nc, tc := range cases {

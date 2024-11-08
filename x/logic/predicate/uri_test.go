@@ -3,7 +3,6 @@ package predicate
 
 import (
 	"fmt"
-	"strings"
 	"testing"
 
 	"github.com/axone-protocol/prolog/engine"
@@ -23,6 +22,9 @@ import (
 )
 
 func TestURIEncoded(t *testing.T) {
+	const (
+		invalidURLEscape = "i,n,v,a,l,i,d, ,U,R,L, ,e,s,c,a,p,e, ,\",%,%,3,\""
+	)
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
 			program     string
@@ -167,8 +169,7 @@ func TestURIEncoded(t *testing.T) {
 			{
 				query:       "uri_encoded(path, Decoded, 'bar%%3foo').",
 				wantSuccess: false,
-				wantError: fmt.Errorf("error(domain_error(encoding(uri),bar%%%%3foo),[%s],uri_encoded/3)",
-					strings.Join(strings.Split("invalid URL escape \"%%3\"", ""), ",")),
+				wantError:   fmt.Errorf("error(domain_error(encoding(uri),bar%%%%3foo),[%s],uri_encoded/3)", invalidURLEscape),
 			},
 		}
 		for nc, tc := range cases {
