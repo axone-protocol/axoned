@@ -106,6 +106,7 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 			whitelistBlacklistHookFn(whitelistPredicates, blacklistPredicates),
 			gasMeterHookFn(sdkctx, params.GetGasPolicy()),
 			telemetryPredicateCallCounterHookFn(),
+			telemetryPredicateDurationHookFn(),
 		),
 		interpreter.WithPredicates(ctx, interpreter.RegistryNames),
 		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),

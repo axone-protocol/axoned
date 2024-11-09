@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"fmt"
+	"time"
 
 	"github.com/axone-protocol/prolog/engine"
 	"github.com/hashicorp/go-metrics"
@@ -40,6 +41,30 @@ func telemetryPredicateCallCounterHookFn() engine.HookFunc {
 				telemetry.NewLabel(labelPredicate, predicate),
 			},
 		)
+
+		return nil
+	}
+}
+
+func telemetryPredicateDurationHookFn() engine.HookFunc {
+	var predicate string
+	var start time.Time
+	return func(opcode engine.Opcode, operand engine.Term, _ *engine.Env) error {
+		if opcode != engine.OpCall {
+			if predicate != "" {
+				telemetry.MeasureSince(start, append(metricsKeys, predicate)...)
+				predicate = ""
+				start = time.Time{}
+			}
+			return nil
+		}
+
+		var ok bool
+		if predicate, ok = stringifyOperand(operand); !ok {
+			return nil
+		}
+
+		start = telemetry.Now()
 
 		return nil
 	}
