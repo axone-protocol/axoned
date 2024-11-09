@@ -1,0 +1,55 @@
+package keeper
+
+import (
+	"fmt"
+
+	"github.com/axone-protocol/prolog/engine"
+	"github.com/hashicorp/go-metrics"
+
+	"github.com/cosmos/cosmos-sdk/telemetry"
+
+	"github.com/axone-protocol/axoned/v10/x/logic/interpreter"
+	"github.com/axone-protocol/axoned/v10/x/logic/types"
+)
+
+var metricsKeys = []string{types.ModuleName, "vm", "predicate"}
+
+const (
+	labelPredicate = "predicate"
+)
+
+func telemetryPredicateCallCounterHookFn() engine.HookFunc {
+	return func(opcode engine.Opcode, operand engine.Term, _ *engine.Env) error {
+		if opcode != engine.OpCall {
+			return nil
+		}
+
+		predicate, ok := stringifyOperand(operand)
+		if !ok {
+			return nil
+		}
+
+		if !interpreter.IsRegistered(predicate) {
+			return nil
+		}
+
+		telemetry.IncrCounterWithLabels(
+			metricsKeys,
+			1,
+			[]metrics.Label{
+				telemetry.NewLabel(labelPredicate, predicate),
+			},
+		)
+
+		return nil
+	}
+}
+
+// stringifyOperand returns the string representation of the operand if it implements fmt.Stringer.
+// It returns an empty string and false if the operand does not have a string representation.
+func stringifyOperand(operand engine.Term) (string, bool) {
+	if stringer, ok := operand.(fmt.Stringer); ok {
+		return stringer.String(), true
+	}
+	return "", false
+}

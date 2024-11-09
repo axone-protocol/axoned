@@ -105,6 +105,7 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 		interpreter.WithHooks(
 			whitelistBlacklistHookFn(whitelistPredicates, blacklistPredicates),
 			gasMeterHookFn(sdkctx, params.GetGasPolicy()),
+			telemetryPredicateCallCounterHookFn(),
 		),
 		interpreter.WithPredicates(ctx, interpreter.RegistryNames),
 		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
@@ -135,23 +136,24 @@ func whitelistBlacklistHookFn(whitelist, blacklist []string) engine.HookFunc {
 			return nil
 		}
 
-		predicateStringer, ok := operand.(fmt.Stringer)
+		predicate, ok := stringifyOperand(operand)
 		if !ok {
 			return engine.SyntaxError(operand, env)
 		}
 
-		predicate := predicateStringer.String()
-
-		if interpreter.IsRegistered(predicate) {
-			if _, found := allowed.Get(predicate); !found {
-				return engine.PermissionError(
-					prolog2.AtomOperationExecute,
-					prolog2.AtomPermissionForbiddenPredicate,
-					engine.NewAtom(predicate),
-					env,
-				)
-			}
+		if !interpreter.IsRegistered(predicate) {
+			return nil
 		}
+
+		if _, found := allowed.Get(predicate); !found {
+			return engine.PermissionError(
+				prolog2.AtomOperationExecute,
+				prolog2.AtomPermissionForbiddenPredicate,
+				engine.NewAtom(predicate),
+				env,
+			)
+		}
+
 		return nil
 	}
 }
@@ -166,12 +168,10 @@ func gasMeterHookFn(ctx context.Context, gasPolicy types.GasPolicy) engine.HookF
 			return nil
 		}
 
-		operandStringer, ok := operand.(fmt.Stringer)
+		predicate, ok := stringifyOperand(operand)
 		if !ok {
 			return engine.SyntaxError(operand, env)
 		}
-
-		predicate := operandStringer.String()
 
 		cost := lookupCost(predicate,
 			lo.CoalesceOrEmpty(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
