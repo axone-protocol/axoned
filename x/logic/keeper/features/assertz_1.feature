@@ -91,3 +91,37 @@ Feature: assertz/1
           - variable: X
             expression: "john"
       """
+
+@great_for_documentation
+Scenario: Add and remove items in an inventory.
+  This scenario demonstrates how to maintain a dynamic list of items (like in an inventory system) by representing each item
+  as a fact in the Prolog knowledge base. By using dynamic predicates, we can add items to the inventory and remove them on demand.
+
+  Given the program:
+    """ prolog
+    :- dynamic(inventory/1).
+
+    add_item(Item) :- assertz(inventory(Item)).
+    remove_item(Item) :- retract(inventory(Item)).
+    """
+  And the query:
+    """ prolog
+    add_item('apple'),
+    add_item('banana'),
+    add_item('orange'),
+    remove_item('banana'),
+    findall(I, inventory(I), CurrentInventory).
+    """
+  When the query is run
+  Then the answer we get is:
+    """ yaml
+    height: 42
+    gas_used: 3984
+    answer:
+      has_more: false
+      variables: ["I","CurrentInventory"]
+      results:
+      - substitutions:
+        - variable: CurrentInventory
+          expression: "[apple,orange]"
+    """
