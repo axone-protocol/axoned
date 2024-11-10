@@ -1,5 +1,37 @@
+language: "en-US"
+early_access: true
+tone_instructions: >-
+  Maintain a formal tone, highlighting issues, and suggesting production-grade, elegant, and concise solutions.
 reviews:
+  profile: "chill"
+  request_changes_workflow: true
+  high_level_summary: true
+  poem: false
+  review_status: true
+  collapse_walkthrough: false
   path_filters:
     - "!docs/command/**/*.md"
     - "!docs/predicate/**/*.md"
     - "!docs/proto/**/*.md"
+  path_instructions:
+    - path: "**/*.go"
+      instructions: >-
+        Review the Go code, point out issues relative to principles of clean
+        code, expressiveness, and performance.
+    - path: "**/*_test.go"
+      instructions: >-
+        Review tests to ensure they follow GoConvey style, using a behavioral and data-driven approach.
+    - path: "**/*.proto"
+      instructions: >-
+        Review the Protobuf definitions, point out issues relative to
+        compatibility, and expressiveness.
+    - path: "**/*.sh"
+      instructions: >-
+        Review the shell scripts, point out issues relative to security,
+        performance, and maintainability.
+  auto_review:
+    enabled: true
+    drafts: false
+    auto_incremental_review: false # review on demand
+chat:
+  auto_reply: true
