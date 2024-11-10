@@ -91,3 +91,40 @@ Feature: asserta/1
           - variable: X
             expression: "jane"
       """
+
+  @great_for_documentation
+  Scenario: Shows a simple counter example.
+    This scenario demonstrates a simple counter example using the `asserta/1` and `retract/1` predicates.
+    In this example, we represent the value of the counter as a dynamic predicate `counter/1` that is asserted and retracted
+    to each time the value of the counter is incremented or decremented.
+
+    Given the program:
+      """ prolog
+      :- dynamic(counter/1).
+
+      counter(0).
+
+      increment_counter :- retract(counter(X)), Y is X + 1, asserta(counter(Y)).
+      decrement_counter :- retract(counter(X)), Y is X - 1, asserta(counter(Y)).
+      """
+    Given the query:
+      """ prolog
+      counter(InitialValue), increment_counter, increment_counter, counter(IncrementedValue), decrement_counter, counter(DecrementedValue).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 3989
+      answer:
+        has_more: false
+        variables: ["InitialValue", "IncrementedValue", "DecrementedValue"]
+        results:
+        - substitutions:
+          - variable: InitialValue
+            expression: 0
+          - variable: IncrementedValue
+            expression: 2
+          - variable: DecrementedValue
+            expression: 1
+      """
