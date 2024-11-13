@@ -15,6 +15,9 @@ jobs:
       tag: ${{ steps.set-env.outputs.tag }}
       repo_name: ${{ steps.set-env.outputs.repo_name }}
     steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
       - name: Expose tag and repo_name
         id: set-env
         run: |
@@ -29,6 +32,7 @@ jobs:
           echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
         env:
           INPUT_TAG: ${{ github.event.inputs.tag }}
+          GH_TOKEN: ${{ secrets.OPS_TOKEN }}
 
   notify-github-discussion:
     runs-on: ubuntu-22.04
