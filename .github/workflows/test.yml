@@ -45,6 +45,12 @@ jobs:
         with:
           go-version: "1.23"
 
+      - name: Restore Cache for Tools
+        uses: actions/cache@v3
+        with:
+          path: ./target/tools
+          key: tools-cache-${{ runner.os }}-${{ hashFiles('Makefile') }}
+
       - name: Test go project
         run: |
           make test-go
