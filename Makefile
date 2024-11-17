@@ -118,7 +118,6 @@ endif
 .PHONY: all
 all: help
 
-## Lint:
 .PHONY: lint
 lint: lint-go lint-proto ## Lint all available linters
 
@@ -418,7 +417,10 @@ ensure-buildx-builder:
 
 ## Dependencies:
 .PHONY: deps
-deps: $(TOOL_TPARSE_BIN) ## Install all the dependencies (tools, etc.)
+deps: deps-$(TOOL_TPARSE_NAME) ## Install all the dependencies (tools, etc.)
+
+.PHONY: deps-$(TOOL_TPARSE_NAME)
+deps-tparse: $(TOOL_TPARSE_BIN) ## Install $TOOL_TPARSE_NAME $TOOL_TPARSE_VERSION ($TOOL_TPARSE_PKG)
 
 $(TOOL_TPARSE_BIN):
 	@echo "${COLOR_CYAN} 📦 Installing ${COLOR_GREEN}$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)${COLOR_CYAN}...${COLOR_RESET}"
@@ -433,10 +435,14 @@ help: ## Show this help.
 	@echo '  ${COLOR_YELLOW}make${COLOR_RESET} ${COLOR_GREEN}<target>${COLOR_RESET}'
 	@echo ''
 	@echo 'Targets:'
-	@awk 'BEGIN {FS = ":.*?## "} { \
+	@$(foreach V,$(sort $(.VARIABLES)), \
+		$(if $(filter-out environment% default automatic,$(origin $V)), \
+			$(if $(filter TOOL_%,$V), \
+				export $V="$($V)";))) \
+	awk 'BEGIN {FS = ":.*?## "} { \
 		if (/^[a-zA-Z_-]+:.*?##.*$$/) {printf "    ${COLOR_YELLOW}%-20s${COLOR_GREEN}%s${COLOR_RESET}\n", $$1, $$2} \
 		else if (/^## .*$$/) {printf "  ${COLOR_CYAN}%s${COLOR_RESET}\n", substr($$1,4)} \
-		}' $(MAKEFILE_LIST)
+		}' $(MAKEFILE_LIST) | envsubst
 	@echo ''
 	@echo 'This Makefile depends on ${COLOR_CYAN}docker${COLOR_RESET}. To install it, please follow the instructions:'
 	@echo '- for ${COLOR_YELLOW}macOS${COLOR_RESET}: https://docs.docker.com/docker-for-mac/install/'
