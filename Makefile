@@ -5,6 +5,7 @@ BINARY_NAME             = axoned
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 RELEASE_FOLDER          = $(TARGET_FOLDER)/release
+TOOLS_FOLDER            = $(TARGET_FOLDER)/tools
 CMD_ROOT               :=./cmd/${BINARY_NAME}
 LEDGER_ENABLED         ?= true
 
@@ -18,6 +19,12 @@ DOCKER_BUF_RUN            := docker run --rm -v $(HOME)/.cache:/root/.cache -v $
 DOCKER_BUILDX_BUILDER     = axone-builder
 DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
 DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
+
+# Tools
+TOOL_TPARSE_NAME := tparse
+TOOL_TPARSE_VERSION := v0.16.0
+TOOL_TPARSE_PKG := github.com/mfridman/$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)
+TOOL_TPARSE_BIN := ${TOOLS_FOLDER}/$(TOOL_TPARSE_NAME)/$(TOOL_TPARSE_VERSION)/$(TOOL_TPARSE_NAME)
 
 # Some colors
 COLOR_GREEN  = $(shell tput -Txterm setaf 2)
@@ -111,7 +118,6 @@ endif
 .PHONY: all
 all: help
 
-## Lint:
 .PHONY: lint
 lint: lint-go lint-proto ## Lint all available linters
 
@@ -190,9 +196,9 @@ install: ## Install node executable
 test: test-go ## Pass all the tests
 
 .PHONY: test-go
-test-go: build ## Pass the test for the go source code
+test-go: $(TOOL_TPARSE_BIN) build ## Pass the test for the go source code
 	@echo "${COLOR_CYAN} 🧪 Passing go tests${COLOR_RESET}"
-	@go test -v -coverprofile ./target/coverage.txt ./...
+	@go test -v -coverprofile ./target/coverage.txt ./... -json | $(TOOL_TPARSE_BIN)
 
 ## Chain:
 chain-init: build ## Initialize the blockchain with default settings.
@@ -409,6 +415,18 @@ ensure-buildx-builder:
 	@docker buildx ls | sed '1 d' | cut -f 1 -d ' ' | grep -q ${DOCKER_BUILDX_BUILDER} || \
 	docker buildx create --name ${DOCKER_BUILDX_BUILDER}
 
+## Dependencies:
+.PHONY: deps
+deps: deps-$(TOOL_TPARSE_NAME) ## Install all the dependencies (tools, etc.)
+
+.PHONY: deps-$(TOOL_TPARSE_NAME)
+deps-tparse: $(TOOL_TPARSE_BIN) ## Install $TOOL_TPARSE_NAME $TOOL_TPARSE_VERSION ($TOOL_TPARSE_PKG)
+
+$(TOOL_TPARSE_BIN):
+	@echo "${COLOR_CYAN} 📦 Installing ${COLOR_GREEN}$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)${COLOR_CYAN}...${COLOR_RESET}"
+	@mkdir -p $(dir $(TOOL_TPARSE_BIN))
+	@GOBIN=$(dir $(abspath $(TOOL_TPARSE_BIN))) go install $(TOOL_TPARSE_PKG)
+
 ## Help:
 .PHONY: help
 help: ## Show this help.
@@ -417,10 +435,14 @@ help: ## Show this help.
 	@echo '  ${COLOR_YELLOW}make${COLOR_RESET} ${COLOR_GREEN}<target>${COLOR_RESET}'
 	@echo ''
 	@echo 'Targets:'
-	@awk 'BEGIN {FS = ":.*?## "} { \
+	@$(foreach V,$(sort $(.VARIABLES)), \
+		$(if $(filter-out environment% default automatic,$(origin $V)), \
+			$(if $(filter TOOL_%,$V), \
+				export $V="$($V)";))) \
+	awk 'BEGIN {FS = ":.*?## "} { \
 		if (/^[a-zA-Z_-]+:.*?##.*$$/) {printf "    ${COLOR_YELLOW}%-20s${COLOR_GREEN}%s${COLOR_RESET}\n", $$1, $$2} \
 		else if (/^## .*$$/) {printf "  ${COLOR_CYAN}%s${COLOR_RESET}\n", substr($$1,4)} \
-		}' $(MAKEFILE_LIST)
+		}' $(MAKEFILE_LIST) | envsubst
 	@echo ''
 	@echo 'This Makefile depends on ${COLOR_CYAN}docker${COLOR_RESET}. To install it, please follow the instructions:'
 	@echo '- for ${COLOR_YELLOW}macOS${COLOR_RESET}: https://docs.docker.com/docker-for-mac/install/'

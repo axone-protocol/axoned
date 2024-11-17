@@ -99,7 +99,6 @@ The project comes with a convenient `Makefile` that helps you to build, install,
 $ make <target>
 
 Targets:
-  Lint:
     lint                Lint all available linters
     lint-go             Lint go source code
     lint-proto          Lint proto files
@@ -120,7 +119,7 @@ Targets:
     chain-init          Initialize the blockchain with default settings.
     chain-start         Start the blockchain with existing configuration (see chain-init)
     chain-stop          Stop the blockchain
-    chain-upgrade       Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION. You can pass also the proposal json file on PROPOSAL var
+    chain-upgrade       Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION.
   Clean:
     clean               Remove all the files from the target folder
   Proto:
@@ -135,6 +134,9 @@ Targets:
     mock                Generate all the mocks (for tests)
   Release:
     release-assets      Generate release assets
+  Dependencies:
+    deps                Install all the dependencies (tools, etc.)
+    deps-tparse         Install tparse v0.16.0 (github.com/mfridman/tparse@v0.16.0)
   Help:
     help                Show this help.
 
