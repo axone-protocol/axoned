@@ -210,15 +210,16 @@ Please reach out to us and say hi 👋, we're happy to help there.
 So you want to contribute? Great! ❤️ We appreciate any help you're willing to give. Don't hesitate to open issues and/or
 submit pull requests.
 
-We believe that collaboration is key to the success of the AXONE project. Join our Community discussions on the [Community Repository](https://github.com/axone-protocol/community) to:
+We believe that collaboration is key to the success of the Axone project. Join our Community discussions on the [Community space](https://github.com/orgs/axone-protocol/discussions) to:
 
 - Engage in conversations with peers and experts.
-- Share your insights and experiences with AXONE.
+- Share your insights and experiences with Axone.
 - Learn from others and expand your knowledge of the protocol.
 
-The Community Repository serves as a hub for discussions, questions, and knowledge-sharing related to AXONE. We encourage you to actively participate and contribute to the growth of our community.
+The Community space serves as a hub for discussions, questions, and knowledge-sharing related to Axone.
+We encourage you to actively participate and contribute to the growth of our community.
 
-Please check out AXONE health files:
+Please check out Axone health files:
 
 - [Contributing](https://github.com/axone-protocol/.github/blob/main/CONTRIBUTING.md)
 - [Code of conduct](https://github.com/axone-protocol/.github/blob/main/CODE_OF_CONDUCT.md)
