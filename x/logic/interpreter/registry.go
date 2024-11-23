@@ -105,7 +105,7 @@ var registry = orderedmap.New[string, any](
 		{Key: "block_header/1", Value: predicate.BlockHeader},
 		{Key: "chain_id/1", Value: predicate.ChainID}, //nolint:staticcheck // Deprecated but still exposed for compatibility.
 		{Key: "block_height/1", Value: predicate.BlockHeight},
-		{Key: "block_time/1", Value: predicate.BlockTime},
+		{Key: "block_time/1", Value: predicate.BlockTime}, //nolint:staticcheck // Deprecated but still exposed for compatibility.
 		{Key: "bank_balances/2", Value: predicate.BankBalances},
 		{Key: "bank_spendable_balances/2", Value: predicate.BankSpendableBalances},
 		{Key: "bank_locked_balances/2", Value: predicate.BankLockedBalances},
