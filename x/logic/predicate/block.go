@@ -17,6 +17,8 @@ import (
 // where:
 //
 //   - Height represents the current chain height at the time of the query.
+//
+// Deprecated: Use the `block_header/1` predicate instead.
 func BlockHeight(vm *engine.VM, height engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		sdkContext, err := prolog.UnwrapSDKContext(ctx, env)
