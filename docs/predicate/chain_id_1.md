@@ -1,5 +1,5 @@
 ---
-sidebar_position: 12
+sidebar_position: 13
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -19,9 +19,4 @@ where:
 
 - ID represents the current chain ID at the time of the query.
 
-## Examples
-
-```text
-# Query the current chain ID.
-- chain_id(ID).
-```
+Deprecated: Use the \`block\_header/1\` predicate instead.
