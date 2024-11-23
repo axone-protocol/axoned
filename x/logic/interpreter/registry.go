@@ -101,6 +101,8 @@ var registry = orderedmap.New[string, any](
 		{Key: "nth0/3", Value: engine.Nth0},
 		{Key: "nth1/3", Value: engine.Nth1},
 		{Key: "call_nth/2", Value: engine.CallNth},
+		{Key: "./3", Value: engine.Op3},
+		{Key: "block_header/1", Value: predicate.BlockHeader},
 		{Key: "chain_id/1", Value: predicate.ChainID},
 		{Key: "block_height/1", Value: predicate.BlockHeight},
 		{Key: "block_time/1", Value: predicate.BlockTime},
