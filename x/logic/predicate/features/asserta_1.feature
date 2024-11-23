@@ -27,9 +27,9 @@ Feature: asserta/1
         results:
         - substitutions:
           - variable: X
-            expression: "john"
-          - variable: Y
-            expression: "pete"
+            expression: john
+          - variable: 'Y'
+            expression: pete
       """
 
   @great_for_documentation
@@ -86,10 +86,10 @@ Feature: asserta/1
         results:
         - substitutions:
           - variable: X
-            expression: "john"
+            expression: john
         - substitutions:
           - variable: X
-            expression: "jane"
+            expression: jane
       """
 
   @great_for_documentation

@@ -27,9 +27,9 @@ Feature: assertz/1
         results:
         - substitutions:
           - variable: X
-            expression: "john"
-          - variable: Y
-            expression: "pete"
+            expression: john
+          - variable: 'Y'
+            expression: pete
       """
 
   @great_for_documentation
@@ -86,10 +86,10 @@ Feature: assertz/1
         results:
         - substitutions:
           - variable: X
-            expression: "jane"
+            expression: jane
         - substitutions:
           - variable: X
-            expression: "john"
+            expression: john
       """
 
 @great_for_documentation

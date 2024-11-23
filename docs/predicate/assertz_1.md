@@ -54,9 +54,9 @@ answer:
   results:
   - substitutions:
     - variable: X
-      expression: "john"
-    - variable: Y
-      expression: "pete"
+      expression: john
+    - variable: 'Y'
+      expression: pete
 ```
 
 ### Only dynamic predicates can be asserted
@@ -127,10 +127,10 @@ answer:
   results:
   - substitutions:
     - variable: X
-      expression: "jane"
+      expression: jane
   - substitutions:
     - variable: X
-      expression: "john"
+      expression: john
 ```
 
 ### Add and remove items in an inventory

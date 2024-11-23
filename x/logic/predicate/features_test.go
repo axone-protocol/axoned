@@ -1,4 +1,4 @@
-package keeper_test
+package predicate_test
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 	"fmt"
 	"io/fs"
 	"reflect"
-	"strconv"
 	"strings"
 	"testing"
 	"time"
@@ -17,7 +16,7 @@ import (
 	"github.com/sergi/go-diff/diffmatchpatch"
 	"github.com/smartystreets/goconvey/convey/reporting"
 	"go.uber.org/mock/gomock"
-	"gopkg.in/yaml.v3"
+	"sigs.k8s.io/yaml"
 
 	. "github.com/smartystreets/goconvey/convey"
 
@@ -83,28 +82,15 @@ func testCaseFromContext(ctx context.Context) *testCase {
 	return tc
 }
 
-func givenABlockWithTheFollowingHeader(ctx context.Context, table *godog.Table) error {
+func givenABlockWithTheFollowingHeader(ctx context.Context, headerConfig *godog.DocString) error {
 	tc := testCaseFromContext(ctx)
 
 	header := tc.ctx.Ctx.BlockHeader()
-	for _, row := range table.Rows {
-		switch row.Cells[0].Value {
-		case "Height":
-			height, err := atoi64(row.Cells[1].Value)
-			if err != nil {
-				return err
-			}
-			header.Height = height
-		case "Time":
-			sec, err := atoi64(row.Cells[1].Value)
-			if err != nil {
-				return err
-			}
-			header.Time = time.Unix(sec, 0)
-		default:
-			return fmt.Errorf("unknown field: %s", row.Cells[0].Value)
-		}
+
+	if err := parseDocStringYaml(headerConfig, &header); err != nil {
+		return err
 	}
+
 	tc.ctx.Ctx = tc.ctx.Ctx.WithBlockHeader(header)
 
 	return nil
@@ -135,10 +121,7 @@ func givenTheProgram(ctx context.Context, program *godog.DocString) error {
 
 func givenASmartContractWithAddress(ctx context.Context, address string, configuration *godog.DocString) error {
 	smartContractConfiguration := &SmartContractConfiguration{}
-	if strings.TrimSpace(configuration.MediaType) != "yaml" {
-		return fmt.Errorf("unsupported media type: %s. Want %s", configuration.MediaType, "yaml")
-	}
-	if err := yaml.Unmarshal([]byte(configuration.Content), &smartContractConfiguration); err != nil {
+	if err := parseDocStringYaml(configuration, smartContractConfiguration); err != nil {
 		return err
 	}
 
@@ -214,7 +197,7 @@ func whenTheQueryIsRunLimitedToNSolutions(ctx context.Context, n int) error {
 func theAnswerWeGetIs(ctx context.Context, want *godog.DocString) error {
 	got := testCaseFromContext(ctx).got
 	wantAnswer := &types.QueryServiceAskResponse{}
-	if err := yaml.Unmarshal([]byte(want.Content), &wantAnswer); err != nil {
+	if err := parseDocStringYaml(want, wantAnswer); err != nil {
 		return err
 	}
 
@@ -321,10 +304,15 @@ func logicKeeperParams() types.Params {
 	return params
 }
 
-func atoi64(s string) (int64, error) {
-	i, err := strconv.ParseInt(s, 10, 64)
-	if err != nil {
-		return 0, err
+func parseDocStringYaml(docString *godog.DocString, v interface{}) error {
+	const yamlMediaType = "yaml"
+	if strings.TrimSpace(docString.MediaType) != yamlMediaType {
+		return fmt.Errorf("unsupported media type: %s. Want %s", docString.MediaType, yamlMediaType)
 	}
-	return i, nil
+
+	if err := yaml.UnmarshalStrict([]byte(docString.Content), v); err != nil {
+		return err
+	}
+
+	return nil
 }
