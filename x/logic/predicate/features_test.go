@@ -1,4 +1,4 @@
-package keeper_test
+package predicate_test
 
 import (
 	"context"
