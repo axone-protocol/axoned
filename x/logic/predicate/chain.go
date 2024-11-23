@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/axone-protocol/prolog/engine"
+
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cometbft/cometbft/proto/tendermint/version"
 
@@ -106,6 +107,8 @@ func blockIDToTerm(blockID cmtproto.BlockID) (engine.Dict, error) {
 //
 // where:
 //   - ID represents the current chain ID at the time of the query.
+//
+// Deprecated: Use the `block_header/1` predicate instead.
 func ChainID(vm *engine.VM, chainID engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
 		sdkContext, err := prolog.UnwrapSDKContext(ctx, env)
