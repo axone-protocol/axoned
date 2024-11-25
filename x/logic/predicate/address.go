@@ -1,7 +1,7 @@
 package predicate
 
 import (
-	"github.com/axone-protocol/prolog/engine"
+	"github.com/axone-protocol/prolog/v2/engine"
 
 	bech322 "github.com/cosmos/cosmos-sdk/types/bech32"
 

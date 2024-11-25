@@ -3,7 +3,7 @@ package predicate
 import (
 	"context"
 
-	"github.com/axone-protocol/prolog/engine"
+	"github.com/axone-protocol/prolog/v2/engine"
 
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cometbft/cometbft/proto/tendermint/version"

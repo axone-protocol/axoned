@@ -1,7 +1,7 @@
 package prolog
 
 import (
-	"github.com/axone-protocol/prolog/engine"
+	"github.com/axone-protocol/prolog/v2/engine"
 )
 
 // ByteListTermToBytes try to convert a given list of bytes into native golang []byte.

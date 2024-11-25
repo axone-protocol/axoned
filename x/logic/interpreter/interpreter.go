@@ -6,8 +6,8 @@ import (
 	"io"
 	"io/fs"
 
-	"github.com/axone-protocol/prolog"
-	"github.com/axone-protocol/prolog/engine"
+	"github.com/axone-protocol/prolog/v2"
+	"github.com/axone-protocol/prolog/v2/engine"
 )
 
 // Option is a function that configures an Interpreter.
