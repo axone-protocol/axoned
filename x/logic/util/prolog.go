@@ -3,6 +3,7 @@ package util
 import (
 	"context"
 	"errors"
+	"fmt"
 	"strings"
 
 	"github.com/axone-protocol/prolog/v2"
@@ -18,6 +19,11 @@ import (
 
 const (
 	defaultEnvCap = uint64(50)
+)
+
+var (
+	errMessageVar = engine.NewVariable()
+	errPanicError = engine.Atom("error").Apply(engine.AtomPanicError.Apply(errMessageVar))
 )
 
 // QueryInterpreter interprets a query and returns the solutions up to the given limit.
@@ -56,12 +62,14 @@ func QueryInterpreter(
 				return nil, callErr
 			}
 
-			var panicErr engine.PanicError
-			if errors.As(callErr, &panicErr) && errors.Is(panicErr.OriginErr, engine.ErrMaxVariables) {
-				return nil, errorsmod.Wrapf(types.LimitExceeded, panicErr.OriginErr.Error()) //nolint:govet
+			var err engine.Exception
+			if errors.As(callErr, &err) {
+				if err, ok := isPanicError(err.Term(), env); ok {
+					return nil, errorsmod.Wrapf(types.LimitExceeded, "%s", err)
+				}
 			}
 
-			if err = func() error {
+			if err := func() error {
 				defer func() {
 					_ = recover()
 				}()
@@ -136,4 +144,13 @@ func isBound(v engine.ParsedVariable, env *engine.Env) bool {
 	_, ok := env.Resolve(v.Variable).(engine.Variable)
 
 	return !ok
+}
+
+// isPanicError returns the panic error message if the given term is a panic_error.
+func isPanicError(term engine.Term, env *engine.Env) (string, bool) {
+	if env, ok := env.Unify(term, errPanicError); ok {
+		return fmt.Sprintf("%s", env.Resolve(errMessageVar)), true
+	}
+
+	return "", false
 }
