@@ -3,7 +3,7 @@ package predicate
 import (
 	"strings"
 
-	"github.com/axone-protocol/prolog/engine"
+	"github.com/axone-protocol/prolog/v2/engine"
 	godid "github.com/nuts-foundation/go-did/did"
 	"github.com/samber/lo"
 

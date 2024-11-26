@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/axone-protocol/prolog/engine"
+	"github.com/axone-protocol/prolog/v2/engine"
 	dbm "github.com/cosmos/cosmos-db"
 	"github.com/samber/lo"
 	"go.uber.org/mock/gomock"

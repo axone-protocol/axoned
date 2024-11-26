@@ -1,6 +1,6 @@
 package predicate
 
-import "github.com/axone-protocol/prolog/engine"
+import "github.com/axone-protocol/prolog/v2/engine"
 
 // Asserta is a predicate that asserts a clause into the database as the first clause of the predicate.
 //

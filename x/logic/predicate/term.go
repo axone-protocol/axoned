@@ -1,6 +1,6 @@
 package predicate
 
-import "github.com/axone-protocol/prolog/engine"
+import "github.com/axone-protocol/prolog/v2/engine"
 
 // WriteTerm3 is a predicate that writes a term to a stream or alias.
 //

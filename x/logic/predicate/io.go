@@ -1,6 +1,6 @@
 package predicate
 
-import "github.com/axone-protocol/prolog/engine"
+import "github.com/axone-protocol/prolog/v2/engine"
 
 // CurrentOutput is a predicate that unifies the given term with the current output stream.
 //
