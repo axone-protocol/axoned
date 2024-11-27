@@ -64,7 +64,7 @@ func QueryInterpreter(
 
 			var err engine.Exception
 			if errors.As(callErr, &err) {
-				if err, ok := isPanicError(err.Term(), env); ok {
+				if err, ok := isPanicError(err.Term()); ok {
 					return nil, errorsmod.Wrapf(types.LimitExceeded, "%s", err)
 				}
 			}
@@ -147,7 +147,8 @@ func isBound(v engine.ParsedVariable, env *engine.Env) bool {
 }
 
 // isPanicError returns the panic error message if the given term is a panic_error.
-func isPanicError(term engine.Term, env *engine.Env) (string, bool) {
+func isPanicError(term engine.Term) (string, bool) {
+	var env *engine.Env
 	if env, ok := env.Unify(term, errPanicError); ok {
 		return fmt.Sprintf("%s", env.Resolve(errMessageVar)), true
 	}

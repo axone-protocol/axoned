@@ -181,6 +181,13 @@ func TestGRPCAsk(t *testing.T) {
 				expectedError: "maximum number of variables reached: limit exceeded",
 			},
 			{
+				program:       "l(L) :- length(L, 1). l(L) :- length(L, 1000).",
+				query:         "l(L).",
+				limit:         2,
+				maxVariables:  1000,
+				expectedError: "maximum number of variables reached: limit exceeded",
+			},
+			{
 				program: "father(bob, 'élodie').",
 				query:   "father(bob, X).",
 				expectedAnswer: &types.Answer{
