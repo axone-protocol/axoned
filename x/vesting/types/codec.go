@@ -27,7 +27,7 @@ func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	legacy.RegisterAminoMsg(cdc, &MsgCreateCliffVestingAccount{}, "cosmos-sdk/MsgCreateCliffVestingAccount")
 }
 
-// RegisterInterface associates protoName with AccountI and VestingAccount
+// RegisterInterfaces associates protoName with AccountI and VestingAccount
 // Interfaces and creates a registry of it's concrete implementations.
 func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterInterface(
