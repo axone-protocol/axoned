@@ -26,13 +26,17 @@ TOOL_TPARSE_VERSION := v0.16.0
 TOOL_TPARSE_PKG := github.com/mfridman/$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)
 TOOL_TPARSE_BIN := ${TOOLS_FOLDER}/$(TOOL_TPARSE_NAME)/$(TOOL_TPARSE_VERSION)/$(TOOL_TPARSE_NAME)
 
-# Some colors
-COLOR_GREEN  = $(shell tput -Txterm setaf 2)
-COLOR_YELLOW = $(shell tput -Txterm setaf 3)
-COLOR_WHITE  = $(shell tput -Txterm setaf 7)
-COLOR_CYAN   = $(shell tput -Txterm setaf 6)
-COLOR_RED    = $(shell tput -Txterm setaf 1)
-COLOR_RESET  = $(shell tput -Txterm sgr0)
+# Some colors (if supported)
+define get_color
+$(shell tput -Txterm $(1) $(2) 2>/dev/null || echo "")
+endef
+
+COLOR_GREEN  = $(call get_color,setaf,2)
+COLOR_YELLOW = $(call get_color,setaf,3)
+COLOR_WHITE  = $(call get_color,setaf,7)
+COLOR_CYAN   = $(call get_color,setaf,6)
+COLOR_RED    = $(call get_color,setaf,1)
+COLOR_RESET  = $(call get_color,sgr0,)
 
 # Blockchain constants
 CHAIN     		:= localnet
