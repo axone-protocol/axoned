@@ -8,8 +8,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v10/x/logic/meter"
-	"github.com/axone-protocol/axoned/v10/x/logic/types"
+	"github.com/axone-protocol/axoned/v11/x/logic/meter"
+	"github.com/axone-protocol/axoned/v11/x/logic/types"
 )
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {

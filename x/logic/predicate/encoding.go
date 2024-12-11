@@ -5,7 +5,7 @@ import (
 
 	"github.com/axone-protocol/prolog/v2/engine"
 
-	"github.com/axone-protocol/axoned/v10/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v11/x/logic/prolog"
 )
 
 // HexBytes is a predicate that unifies hexadecimal encoded bytes to a list of bytes.

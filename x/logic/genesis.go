@@ -5,8 +5,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v10/x/logic/keeper"
-	"github.com/axone-protocol/axoned/v10/x/logic/types"
+	"github.com/axone-protocol/axoned/v11/x/logic/keeper"
+	"github.com/axone-protocol/axoned/v11/x/logic/types"
 )
 
 // InitGenesis initializes the module's state from a provided genesis state.

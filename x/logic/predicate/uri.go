@@ -3,7 +3,7 @@ package predicate
 import (
 	"github.com/axone-protocol/prolog/v2/engine"
 
-	"github.com/axone-protocol/axoned/v10/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v11/x/logic/prolog"
 )
 
 // URIEncoded is a predicate that unifies the given URI component with the given encoded or decoded string.

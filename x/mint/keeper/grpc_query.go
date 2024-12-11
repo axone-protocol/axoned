@@ -3,7 +3,7 @@ package keeper
 import (
 	"context"
 
-	"github.com/axone-protocol/axoned/v10/x/mint/types"
+	"github.com/axone-protocol/axoned/v11/x/mint/types"
 )
 
 var _ types.QueryServer = queryServer{}

@@ -18,7 +18,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v10/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v11/x/logic/testutil"
 )
 
 func TestURIEncoded(t *testing.T) {

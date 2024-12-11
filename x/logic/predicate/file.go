@@ -8,7 +8,7 @@ import (
 
 	"github.com/axone-protocol/prolog/v2/engine"
 
-	"github.com/axone-protocol/axoned/v10/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v11/x/logic/prolog"
 )
 
 var atomOpen = engine.NewAtom("open")

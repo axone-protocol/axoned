@@ -14,7 +14,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v10/x/logic/types"
+	"github.com/axone-protocol/axoned/v11/x/logic/types"
 )
 
 const (

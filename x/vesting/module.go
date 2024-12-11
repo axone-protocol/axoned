@@ -21,8 +21,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/module"
 	"github.com/cosmos/cosmos-sdk/x/auth/keeper"
 
-	"github.com/axone-protocol/axoned/v10/x/vesting/client/cli"
-	"github.com/axone-protocol/axoned/v10/x/vesting/types"
+	"github.com/axone-protocol/axoned/v11/x/vesting/client/cli"
+	"github.com/axone-protocol/axoned/v11/x/vesting/types"
 )
 
 var (

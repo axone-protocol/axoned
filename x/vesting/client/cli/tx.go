@@ -16,7 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/tx"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v10/x/vesting/types"
+	"github.com/axone-protocol/axoned/v11/x/vesting/types"
 )
 
 // Transaction command flags.

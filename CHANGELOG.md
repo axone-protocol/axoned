@@ -1,5 +1,49 @@
 # AXONE protocol changelog
 
+## [11.0.0](https://github.com/axone-protocol/axoned/compare/v10.0.0...v11.0.0) (2024-12-11)
+
+
+### ⚠ BREAKING CHANGES
+
+* **logic:** change Limits and GasPolicy properties to use uint64
+* **logic:** use '=' functor for encoding key-value pairs in json_prolog/2
+* **logic:** remove @([]) empty list encoding in json_prolog/2
+* **logic:** preserve object key order in json_prolog/2
+* **logic:** add decimal number support for json_prolog/2
+
+### Features
+
+* **logic:** accept JSON as text for json_prolog/2 ([83aa22c](https://github.com/axone-protocol/axoned/commit/83aa22c11fbdae76121697175da3dfccd5dfe04d))
+* **logic:** add atomic_list_concat/2 predicate ([44daf95](https://github.com/axone-protocol/axoned/commit/44daf95f7c082d5a941fc919e63f761343f78bf6))
+* **logic:** add atomic_list_concat/3 predicate ([f394074](https://github.com/axone-protocol/axoned/commit/f394074d8ec4802381445a825541688a59b7e575))
+* **logic:** add block_header/1 predicate ([94a94a3](https://github.com/axone-protocol/axoned/commit/94a94a374cb186d7ad2312b9ffc72bcbbc82b8e0))
+* **logic:** add json_read/2 predicate ([a9902a3](https://github.com/axone-protocol/axoned/commit/a9902a32a7e4c180e55609cd445fc6fe24823047))
+* **logic:** add json_write/2 predicate ([1675c34](https://github.com/axone-protocol/axoned/commit/1675c34b3b10b3a3898a1fc2b59765e00b8bb7eb))
+* **logic:** add term_to_atom/2 predicate ([96043c2](https://github.com/axone-protocol/axoned/commit/96043c23fb4943825c1f86d57feb188904a4a9b6))
+* **logic:** deprecate the block_height/1 predicate ([0467fb5](https://github.com/axone-protocol/axoned/commit/0467fb5237abc705d023b4d3d3ec789c37351899))
+* **logic:** deprecate the block_time/1 predicate ([404fdc2](https://github.com/axone-protocol/axoned/commit/404fdc2691d1fc5732ede10d84fd1ec2a5ea0884))
+* **logic:** deprecate the chain_id/1 predicate ([8a6144e](https://github.com/axone-protocol/axoned/commit/8a6144e66cf7d3ca96e1c019ffbdd041470e5f0c))
+* **logic:** generate default values for the interpreter in genesis file ([6146f20](https://github.com/axone-protocol/axoned/commit/6146f2007528092db5f4c89b9e9702ebb9e980b2))
+* **logic:** implement chain migration to v11 ([da93e81](https://github.com/axone-protocol/axoned/commit/da93e8146a2fe127d43a5f1f886e78b1b077b890))
+* **logic:** implement telemetry for predicate execution duration metrics ([f550a53](https://github.com/axone-protocol/axoned/commit/f550a535dbb0327876c64b6d0e93eb579df70af2))
+* **logic:** introduce resource_context/1 composite for missing context value retrieval ([1132405](https://github.com/axone-protocol/axoned/commit/1132405069638be018c7792900862efd2e10f9f0))
+* **logic:** introduce telemetry to track predicate call counts ([d0fd0c7](https://github.com/axone-protocol/axoned/commit/d0fd0c7bed42205c70b613b7de0838c4787e232b))
+* **logic:** use the default cost params when lookup gas cost ([350b78a](https://github.com/axone-protocol/axoned/commit/350b78a087c2ce0dbd20e7efa1e293506ff0fd8f))
+
+
+### Bug Fixes
+
+* **logic:** add decimal number support for json_prolog/2 ([4e7375b](https://github.com/axone-protocol/axoned/commit/4e7375b4bb3714ef0ed706f7628fe030847a0d2d))
+* **prolog:** implement fine-grained gas metering for predicates ([239a4e0](https://github.com/axone-protocol/axoned/commit/239a4e04074b518d764644b0649e85827a0365dc))
+
+
+### Code Refactoring
+
+* **logic:** change Limits and GasPolicy properties to use uint64 ([db18c9a](https://github.com/axone-protocol/axoned/commit/db18c9a38d80c4e882f410fafca876679a8cffaa))
+* **logic:** preserve object key order in json_prolog/2 ([6ea2633](https://github.com/axone-protocol/axoned/commit/6ea26335aadb9cd62bda9ea1653c43bde05c9a9c))
+* **logic:** remove @([]) empty list encoding in json_prolog/2 ([c3e5781](https://github.com/axone-protocol/axoned/commit/c3e57816bab683bb29b3f160f16d566b355ec84f))
+* **logic:** use '=' functor for encoding key-value pairs in json_prolog/2 ([37d4518](https://github.com/axone-protocol/axoned/commit/37d4518c9d6ec6693ef4632af67c0c1b74c00d3a))
+
 ## [10.0.0](https://github.com/axone-protocol/axoned/compare/v9.0.0...v10.0.0) (2024-08-29)
 
 

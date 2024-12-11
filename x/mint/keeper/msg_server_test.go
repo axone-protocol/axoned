@@ -5,7 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v10/x/mint/types"
+	"github.com/axone-protocol/axoned/v11/x/mint/types"
 )
 
 func (s *IntegrationTestSuite) TestUpdateParams() {

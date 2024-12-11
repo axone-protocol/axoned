@@ -16,10 +16,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/axone-protocol/axoned/v10/x/logic/client/cli"
-	"github.com/axone-protocol/axoned/v10/x/logic/exported"
-	"github.com/axone-protocol/axoned/v10/x/logic/keeper"
-	"github.com/axone-protocol/axoned/v10/x/logic/types"
+	"github.com/axone-protocol/axoned/v11/x/logic/client/cli"
+	"github.com/axone-protocol/axoned/v11/x/logic/exported"
+	"github.com/axone-protocol/axoned/v11/x/logic/keeper"
+	"github.com/axone-protocol/axoned/v11/x/logic/types"
 )
 
 var (

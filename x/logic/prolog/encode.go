@@ -5,7 +5,7 @@ import (
 
 	"github.com/axone-protocol/prolog/v2/engine"
 
-	"github.com/axone-protocol/axoned/v10/x/logic/util"
+	"github.com/axone-protocol/axoned/v11/x/logic/util"
 )
 
 // Encode encodes the given string with the given encoding.

@@ -6,8 +6,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	v1beta2types "github.com/axone-protocol/axoned/v10/x/logic/legacy/v1beta2/types"
-	"github.com/axone-protocol/axoned/v10/x/logic/types"
+	v1beta2types "github.com/axone-protocol/axoned/v11/x/logic/legacy/v1beta2/types"
+	"github.com/axone-protocol/axoned/v11/x/logic/types"
 )
 
 func MigrateStoreV3ToV4(k Keeper) module.MigrationHandler {

@@ -11,7 +11,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/keys"
 	cryptokeyring "github.com/cosmos/cosmos-sdk/crypto/keyring"
 
-	"github.com/axone-protocol/axoned/v10/x/logic/util"
+	"github.com/axone-protocol/axoned/v11/x/logic/util"
 )
 
 // KeyOutput is the output format for keys when listing them.

@@ -14,8 +14,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/address"
 	simtypes "github.com/cosmos/cosmos-sdk/types/simulation"
 
-	"github.com/axone-protocol/axoned/v10/x/mint/simulation"
-	"github.com/axone-protocol/axoned/v10/x/mint/types"
+	"github.com/axone-protocol/axoned/v11/x/mint/simulation"
+	"github.com/axone-protocol/axoned/v11/x/mint/types"
 )
 
 func TestProposalMsgs(t *testing.T) {
