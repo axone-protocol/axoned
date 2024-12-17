@@ -59,7 +59,7 @@ metadata example:
   -b, --broadcast-mode string    Transaction broadcasting mode (sync|async) (default "sync")
       --chain-id string          The network chain ID
       --dry-run                  ignore the --gas flag and perform a simulation of a transaction, but don't broadcast it (when enabled, the local Keybase is not accessible)
-      --exec string              Set to 1 to try to execute proposal immediately after creation (proposers signatures are considered as Yes votes)
+      --exec string              Set to 1 or 'try' to try to execute proposal immediately after creation (proposers signatures are considered as Yes votes)
       --fee-granter string       Fee granter grants fees for the transaction
       --fee-payer string         Fee payer pays fees for the transaction instead of deducting from the signer
       --fees string              Fees to pay along with transaction; eg: 10uatom

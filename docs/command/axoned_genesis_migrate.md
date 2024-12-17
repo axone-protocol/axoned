@@ -13,7 +13,7 @@ axoned genesis migrate [target-version] [genesis-file] [flags]
 ### Examples
 
 ```
-axoned migrate v0.47 /path/to/genesis.json --chain-id=cosmoshub-3 --genesis-time=2019-04-22T17:00:00Z
+axoned genesis migrate v0.47 /path/to/genesis.json --chain-id=cosmoshub-3 --genesis-time=2019-04-22T17:00:00Z
 ```
 
 ### Options

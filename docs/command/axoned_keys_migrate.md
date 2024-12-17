@@ -12,8 +12,6 @@ LegacyInfo to Protobuf serialization format and overwrite the keyring entry. If 
 outputted in CLI and migration will be continued until all keys in the keyring DB are exhausted.
 See [https://github.com/cosmos/cosmos-sdk/pull/9695](https://github.com/cosmos/cosmos-sdk/pull/9695)  for more details.
 
-It is recommended to run in 'dry-run' mode first to verify all key migration material.
-
 ```
 axoned keys migrate [flags]
 ```
