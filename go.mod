@@ -16,7 +16,7 @@ require (
 	cosmossdk.io/x/circuit v0.1.1
 	cosmossdk.io/x/evidence v0.1.1
 	cosmossdk.io/x/feegrant v0.1.1
-	cosmossdk.io/x/tx v0.13.6
+	cosmossdk.io/x/tx v0.13.7
 	cosmossdk.io/x/upgrade v0.1.4
 	dario.cat/mergo v1.0.1
 	github.com/CosmWasm/wasmd v0.53.0
@@ -25,7 +25,7 @@ require (
 	github.com/cometbft/cometbft v0.38.15
 	github.com/cosmos/cosmos-db v1.1.0
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
-	github.com/cosmos/cosmos-sdk v0.50.10
+	github.com/cosmos/cosmos-sdk v0.50.11
 	github.com/cosmos/gogoproto v1.7.0
 	github.com/cosmos/ibc-go/modules/apps/callbacks v0.2.1-0.20231113120333-342c00b0f8bd
 	github.com/cosmos/ibc-go/modules/capability v1.0.1
@@ -126,7 +126,7 @@ require (
 	github.com/cosmos/btcutil v1.0.5 // indirect
 	github.com/cosmos/go-bip39 v1.0.0 // indirect
 	github.com/cosmos/gogogateway v1.2.0 // indirect
-	github.com/cosmos/iavl v1.2.0 // indirect
+	github.com/cosmos/iavl v1.2.2 // indirect
 	github.com/cosmos/ics23/go v0.11.0 // indirect
 	github.com/cosmos/ledger-cosmos-go v0.13.3 // indirect
 	github.com/cpuguy83/go-md2man/v2 v2.0.4 // indirect
@@ -142,7 +142,7 @@ require (
 	github.com/distribution/reference v0.5.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/dvsekhvalnov/jose2go v1.6.0 // indirect
-	github.com/emicklei/dot v1.6.1 // indirect
+	github.com/emicklei/dot v1.6.2 // indirect
 	github.com/emirpasic/gods v1.18.1 // indirect
 	github.com/fatih/color v1.15.0 // indirect
 	github.com/felixge/httpsnoop v1.0.4 // indirect
