@@ -6,7 +6,7 @@ TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 RELEASE_FOLDER          = $(TARGET_FOLDER)/release
 TOOLS_FOLDER            = $(TARGET_FOLDER)/tools
-CMD_ROOT               :=./cmd/${BINARY_NAME}
+CMD_ROOT               := ./cmd/${BINARY_NAME}
 LEDGER_ENABLED         ?= true
 
 # Docker images
@@ -14,17 +14,17 @@ DOCKER_IMAGE_GOLANG		  = golang:1.23-alpine3.20
 DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v1.61
 DOCKER_IMAGE_PROTO        = ghcr.io/cosmos/proto-builder:0.14.0
 DOCKER_IMAGE_BUF          = bufbuild/buf:1.4.0
-DOCKER_PROTO_RUN          := docker run --rm --user $(id -u):$(id -g) -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_PROTO)
-DOCKER_BUF_RUN            := docker run --rm -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_BUF)
+DOCKER_PROTO_RUN         := docker run --rm --user $(id -u):$(id -g) -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_PROTO)
+DOCKER_BUF_RUN           := docker run --rm -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_BUF)
 DOCKER_BUILDX_BUILDER     = axone-builder
 DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
 DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
 
 # Tools
-TOOL_TPARSE_NAME := tparse
+TOOL_TPARSE_NAME    := tparse
 TOOL_TPARSE_VERSION := v0.16.0
-TOOL_TPARSE_PKG := github.com/mfridman/$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)
-TOOL_TPARSE_BIN := ${TOOLS_FOLDER}/$(TOOL_TPARSE_NAME)/$(TOOL_TPARSE_VERSION)/$(TOOL_TPARSE_NAME)
+TOOL_TPARSE_PKG     := github.com/mfridman/$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)
+TOOL_TPARSE_BIN     := ${TOOLS_FOLDER}/$(TOOL_TPARSE_NAME)/$(TOOL_TPARSE_VERSION)/$(TOOL_TPARSE_NAME)
 
 # Some colors (if supported)
 define get_color
@@ -47,15 +47,19 @@ CHAIN_BINARY 	:= ./${DIST_FOLDER}/${BINARY_NAME}
 DAEMON_NAME 	:= axoned
 DAEMON_HOME 	:= `pwd`/${CHAIN_HOME}
 
-BUILD_TAGS += netgo
-BUILD_TAGS := $(strip $(BUILD_TAGS))
+# Binary information
+VERSION  := $(shell cat version)
+COMMIT   := $(shell git log -1 --format='%H')
+
+build_tags += netgo
+build_tags := $(strip $(build_tags))
 ifeq ($(LEDGER_ENABLED),true)
   ifeq ($(OS),Windows_NT)
     GCCEXE = $(shell where gcc.exe 2> NUL)
     ifeq ($(GCCEXE),)
       $(error gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
     else
-      BUILD_TAGS += ledger
+      build_tags += ledger
     endif
   else
     UNAME_S = $(shell uname -s)
@@ -66,37 +70,41 @@ ifeq ($(LEDGER_ENABLED),true)
       ifeq ($(GCC),)
         $(error gcc not installed for ledger support, please install or set LEDGER_ENABLED=false)
       else
-        BUILD_TAGS += ledger
+        build_tags += ledger
       endif
     endif
   endif
 endif
 
+build_tags += $(BUILD_TAGS)
+build_tags := $(strip $(build_tags))
+whitespace := $(subst ,, )
+comma := ,
+build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
+
 # Flags
-WHITESPACE := $(subst ,, )
-COMMA := ,
-BUILD_TAGS_COMMA_SEP := $(subst $(WHITESPACE),$(COMMA),$(BUILD_TAGS))
-VERSION  := $(shell cat version)
-COMMIT   := $(shell git log -1 --format='%H')
-LD_FLAGS  = \
+ldflags  = \
     -X github.com/cosmos/cosmos-sdk/version.AppName=axoned      \
 	-X github.com/cosmos/cosmos-sdk/version.Name=axoned         \
 	-X github.com/cosmos/cosmos-sdk/version.ServerName=axoned   \
 	-X github.com/cosmos/cosmos-sdk/version.ClientName=axoned   \
 	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
 	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)   \
-    -X github.com/cosmos/cosmos-sdk/version.BuildTags=$(BUILD_TAGS_COMMA_SEP)
+    -X github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)
 
-ifeq ($(LINK_STATICALLY),true)
-	LD_FLAGS += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
+ifeq (,$(findstring nostrip,$(BUILD_OPTIONS)))
+	ldflags += -w -s
 endif
+ifeq ($(LINK_STATICALLY),true)
+	ldflags += -linkmode=external -extldflags "-Wl,-z,muldefs -static"
+endif
+ldflags += $(LDFLAGS)
+ldflags := $(strip $(ldflags))
 
-LD_FLAGS := $(strip $(LD_FLAGS))
-
-BUILD_FLAGS := -tags "$(BUILD_TAGS)" -ldflags '$(LD_FLAGS)' -trimpath
+BUILD_FLAGS := -tags "$(build_tags_comma_sep)" -ldflags '$(ldflags)' -trimpath
 
 # Commands
-GO_BUiLD := go build $(BUILD_FLAGS)
+GO_BUILD := go build $(BUILD_FLAGS)
 
 # Environments
 ENVIRONMENTS = \
@@ -458,5 +466,5 @@ help: ## Show this help.
 # $2: architecture (GOARCH)
 # $3: filename of the executable generated
 define build-go
-	GOOS=$1 GOARCH=$2 $(GO_BUiLD) -o $3 ${CMD_ROOT}
+	GOOS=$1 GOARCH=$2 $(GO_BUILD) -o $3 ${CMD_ROOT}
 endef
