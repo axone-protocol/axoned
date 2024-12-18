@@ -2,6 +2,14 @@
 
 ## [11.0.1](https://github.com/axone-protocol/axoned/compare/v11.0.0...v11.0.1) (2024-12-18)
 
+### Build
+
+* **project:** update -tags format to use comma-separated values ([f4dad40](https://github.com/axone-protocol/axoned/commit/f4dad40660c391b5ec9b1aa524e4270f84547648))
+
+### Docs
+
+* **cli:** update CLI docs following Cosmos SDK v0.50.11 upgrade ([0ddeec2](https://github.com/axone-protocol/axoned/commit/0ddeec2d149084173dd5355338a6323573fd8409))
+
 ## [11.0.0](https://github.com/axone-protocol/axoned/compare/v10.0.0...v11.0.0) (2024-12-11)
 
 
