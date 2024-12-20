@@ -23,7 +23,7 @@ require (
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/axone-protocol/prolog/v2 v2.0.1
 	github.com/cometbft/cometbft v0.38.15
-	github.com/cosmos/cosmos-db v1.1.0
+	github.com/cosmos/cosmos-db v1.1.1
 	github.com/cosmos/cosmos-proto v1.0.0-beta.5
 	github.com/cosmos/cosmos-sdk v0.50.11
 	github.com/cosmos/gogoproto v1.7.0
