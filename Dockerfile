@@ -15,7 +15,7 @@ RUN set -eux \
 
 COPY . /src/
 
-RUN BUILD_TAGS=muslc LINK_STATICALLY=true make build
+RUN BUILD_TAGS=muslc LINK_STATICALLY=true make build-go
 
 #--- Image stage
 FROM alpine:3.20.3

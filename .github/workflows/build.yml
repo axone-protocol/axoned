@@ -27,7 +27,7 @@ jobs:
 
       - name: Build go project
         run: |
-          make build
+          make build-go
 
   build-docker:
     runs-on: ubuntu-22.04
