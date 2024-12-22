@@ -21,10 +21,15 @@ DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
 DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
 
 # Tools
-TOOL_TPARSE_NAME    := tparse
-TOOL_TPARSE_VERSION := v0.16.0
-TOOL_TPARSE_PKG     := github.com/mfridman/$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)
-TOOL_TPARSE_BIN     := ${TOOLS_FOLDER}/$(TOOL_TPARSE_NAME)/$(TOOL_TPARSE_VERSION)/$(TOOL_TPARSE_NAME)
+TOOL_TPARSE_NAME         := tparse
+TOOL_TPARSE_VERSION      := v0.16.0
+TOOL_TPARSE_PKG          := github.com/mfridman/$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)
+TOOL_TPARSE_BIN          := ${TOOLS_FOLDER}/$(TOOL_TPARSE_NAME)/$(TOOL_TPARSE_VERSION)/$(TOOL_TPARSE_NAME)
+
+TOOL_HEIGHLINER_NAME     := heighliner
+TOOL_HEIGHLINER_VERSION  := v1.7.1
+TOOL_HEIGHLINER_PKG      := github.com/strangelove-ventures/$(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION)
+TOOL_HEIGHLINER_BIN      := ${TOOLS_FOLDER}/$(TOOL_HEIGHLINER_NAME)/$(TOOL_HEIGHLINER_VERSION)/$(TOOL_HEIGHLINER_NAME)
 
 # Some colors (if supported)
 define get_color
@@ -429,15 +434,32 @@ ensure-buildx-builder:
 
 ## Dependencies:
 .PHONY: deps
-deps: deps-$(TOOL_TPARSE_NAME) ## Install all the dependencies (tools, etc.)
+deps: deps-$(TOOL_TPARSE_NAME) deps-$(TOOL_HEIGHLINER_NAME) ## Install all the dependencies (tools, etc.)
 
 .PHONY: deps-$(TOOL_TPARSE_NAME)
 deps-tparse: $(TOOL_TPARSE_BIN) ## Install $TOOL_TPARSE_NAME $TOOL_TPARSE_VERSION ($TOOL_TPARSE_PKG)
+
+.PHONY: deps-$(TOOL_HEIGHLINER_NAME)
+deps-heighliner: $(TOOL_HEIGHLINER_BIN) ## Install $TOOL_HEIGHLINER_NAME $TOOL_HEIGHLINER_VERSION ($TOOL_HEIGHLINER_PKG)
 
 $(TOOL_TPARSE_BIN):
 	@echo "${COLOR_CYAN} 📦 Installing ${COLOR_GREEN}$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)${COLOR_CYAN}...${COLOR_RESET}"
 	@mkdir -p $(dir $(TOOL_TPARSE_BIN))
 	@GOBIN=$(dir $(abspath $(TOOL_TPARSE_BIN))) go install $(TOOL_TPARSE_PKG)
+
+$(TOOL_HEIGHLINER_BIN):
+	@echo "${COLOR_CYAN} 📦 Installing ${COLOR_GREEN}$(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION)${COLOR_CYAN}...${COLOR_RESET}"
+	@mkdir -p $(dir $(TOOL_HEIGHLINER_BIN))
+	CUR_DIR=$(shell pwd) && \
+	TEMP_DIR=$(shell mktemp -d) && \
+	GIT_URL=https://$(firstword $(subst @, ,$(TOOL_HEIGHLINER_PKG))).git && \
+	GIT_TAG=$(word 2,$(subst @, ,$(TOOL_HEIGHLINER_PKG))) && \
+	git clone --branch $$GIT_TAG --depth 1 $$GIT_URL $$TEMP_DIR && \
+	cd $$TEMP_DIR && \
+	make build && \
+	cd $$CUR_DIR && \
+	mv $$TEMP_DIR/heighliner $(TOOL_HEIGHLINER_BIN) && \
+	rm -rf $$TEMP_DIR
 
 ## Help:
 .PHONY: help
