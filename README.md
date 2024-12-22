@@ -110,6 +110,7 @@ Targets:
     build               Build all available artefacts (executable, docker image, etc.)
     build-go            Build node executable for the current environment (default build)
     build-go-all        Build node executables for all available environments
+    build-docker        Build docker image
   Install:
     install             Install node executable
   Test:
@@ -137,6 +138,7 @@ Targets:
   Dependencies:
     deps                Install all the dependencies (tools, etc.)
     deps-tparse         Install tparse v0.16.0 (github.com/mfridman/tparse@v0.16.0)
+    deps-heighliner     Install heighliner v1.7.1 (github.com/strangelove-ventures/heighliner@v1.7.1)
   Help:
     help                Show this help.
 
@@ -148,13 +150,22 @@ This Makefile depends on docker. To install it, please follow the instructions:
 
 ### Build
 
-To build the `axoned` node, invoke the goal `build` of the `Makefile`:
+To build the `axoned` node, invoke the goal `build-go` of the `Makefile`:
 
 ```sh
-make build
+make build-go
 ```
 
 The binary will be generated under the folder `target/dist`.
+
+### Build a docker image
+
+This project leverages [heighliner](https://github.com/strangelove-ventures/heighliner) to simplify the management and
+creation of production-grade container images. To build a Docker image, use the `build-docker` target in the `Makefile`:
+
+```sh
+make build-docker
+```
 
 ### Run a local network
 
