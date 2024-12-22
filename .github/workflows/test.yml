@@ -84,7 +84,7 @@ jobs:
 
       - name: Install AXONE blockchain
         run: |
-          make build && make install
+          make build-go && make install
 
       - name: Initialize blockchain
         run: |
