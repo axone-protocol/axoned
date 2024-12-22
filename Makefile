@@ -173,7 +173,7 @@ format-proto: ## Format proto files
 
 ## Build:
 .PHONY: build
-build: build-go ## Build all available artefacts (executable, docker image, etc.)
+build: build-go build-docker ## Build all available artefacts (executable, docker image, etc.)
 
 .PHONY: build-go
 build-go: ## Build node executable for the current environment (default build)
@@ -181,6 +181,11 @@ build-go: ## Build node executable for the current environment (default build)
 	@$(call build-go,"","",${DIST_FOLDER}/${BINARY_NAME})
 
 build-go-all: $(ENVIRONMENTS_TARGETS) ## Build node executables for all available environments
+
+.PHONY: build-docker
+build-docker: $(TOOL_HEIGHLINER_BIN) ## Build docker image
+	@echo "${COLOR_CYAN} 🐳 Building local ${COLOR_RESET}docker${COLOR_CYAN} image${COLOR_RESET}"
+	@$(TOOL_HEIGHLINER_BIN) build -c axone --local
 
 $(ENVIRONMENTS_TARGETS):
 	@GOOS=$(word 3, $(subst -, ,$@)); \
@@ -218,7 +223,7 @@ test-go: $(TOOL_TPARSE_BIN) build ## Pass the test for the go source code
 	@go test -v -coverprofile ./target/coverage.txt ./... -json | $(TOOL_TPARSE_BIN)
 
 ## Chain:
-chain-init: build ## Initialize the blockchain with default settings.
+chain-init: build-go ## Initialize the blockchain with default settings.
 	@echo "${COLOR_CYAN} 🛠️ Initializing chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} under ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
 
 	@rm -rf "${CHAIN_HOME}"; \
@@ -250,7 +255,7 @@ chain-init: build ## Initialize the blockchain with default settings.
 	${CHAIN_BINARY} genesis collect-gentxs \
 	  --home "${CHAIN_HOME}"
 
-chain-start: build ## Start the blockchain with existing configuration (see chain-init)
+chain-start: build-go ## Start the blockchain with existing configuration (see chain-init)
 	@echo "${COLOR_CYAN} 🛠️ Starting chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"; \
 	${CHAIN_BINARY} start --moniker ${CHAIN_MONIKER} \
 	  --home ${CHAIN_HOME}
@@ -259,14 +264,14 @@ chain-stop: ## Stop the blockchain
 	@echo "${COLOR_CYAN} ✋️ Stopping chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
 	@killall axoned
 
-chain-upgrade: build ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION.
+chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION.
 	@echo "${COLOR_CYAN} ⬆️ Upgrade the chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} from ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} to ${COLOR_YELLOW}${TO_VERSION}${COLOR_RESET}"
 	@killall cosmovisor || \
 	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
 	git clone -b ${FROM_VERSION} https://github.com/axone-protocol/axoned.git ${TARGET_FOLDER}/${FROM_VERSION}; \
 	echo "${COLOR_CYAN} 🏗 Build the ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} binary...${COLOR_RESET}"; \
 	cd ${TARGET_FOLDER}/${FROM_VERSION}; \
-	make build; \
+	make build-go; \
 	BINARY_OLD=${TARGET_FOLDER}/${FROM_VERSION}/${DIST_FOLDER}/${DAEMON_NAME}; \
 	cd ../../; \
 	echo $$BINARY_OLD; \
