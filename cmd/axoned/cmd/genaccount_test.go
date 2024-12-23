@@ -64,7 +64,7 @@ func TestAddGenesisAccountCmd(t *testing.T) {
 		},
 		{
 			name:        "with keyring",
-			addr:        "ser",
+			addr:        "ser", // codespell:ignore
 			denom:       "1000atom",
 			withKeyring: true,
 			expectErr:   false,

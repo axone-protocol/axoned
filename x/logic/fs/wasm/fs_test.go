@@ -99,7 +99,7 @@ func TestWasmVFS(t *testing.T) {
 				data:            []byte("\"hey\""),
 				uri:             `cosmwasm:?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
 				wantResult:      []byte("\"\""),
-				wantError:       fmt.Sprintf("cosmwasm:?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: emtpy path given, should be 'cosmwasm:{contractName}:{contractAddr}?query={query}'"),
+				wantError:       fmt.Sprintf("cosmwasm:?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: empty path given, should be 'cosmwasm:{contractName}:{contractAddr}?query={query}'"),
 			},
 			{
 				contractAddress: contractAddress,

@@ -1,0 +1,4 @@
+[codespell]
+skip = *.pulsar.go,*.pb.go,*.pb.gw.go,*.json,*.git,*.bin,*.sum,*.mod,CHANGELOG.md,./docs
+count = true
+quiet-level = 3

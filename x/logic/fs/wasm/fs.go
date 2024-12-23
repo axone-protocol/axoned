@@ -112,7 +112,7 @@ func (f *vfs) parsePath(op string, path string) (sdk.AccAddress, string, bool, e
 	pathsLen := len(paths)
 	if pathsLen < 1 || paths[pathsLen-1] == "" {
 		return nil, "", false,
-			&fs.PathError{Op: op, Path: path, Err: fmt.Errorf("emtpy path given, should be '%s:{contractName}:{contractAddr}?query={query}'",
+			&fs.PathError{Op: op, Path: path, Err: fmt.Errorf("empty path given, should be '%s:{contractName}:{contractAddr}?query={query}'",
 				Scheme)}
 	}
 
