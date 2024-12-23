@@ -17,7 +17,7 @@ func TestE2ETestSuite(t *testing.T) {
 }
 
 func (s *TestSuite) TestChainsStatus() {
-	s.T().Log("runing test for /status endpoint for each chain")
+	s.T().Log("running test for /status endpoint for each chain")
 
 	for _, chainClient := range s.chainClients {
 		status, err := chainClient.GetStatus()
@@ -40,7 +40,7 @@ func (s *TestSuite) TestChainTokenTransfer() {
 
 	s.TransferTokens(chain1, address, 2345000, denom)
 
-	// Verify the address recived the token
+	// Verify the address received the token
 	balance, err := chain1.Client.QueryBalanceWithDenomTraces(context.Background(), sdk.MustAccAddressFromBech32(address), nil)
 	s.Require().NoError(err)
 
@@ -60,10 +60,10 @@ func (s *TestSuite) TestChainIBCTransfer() {
 	address, err := chain1.CreateRandWallet(keyName)
 	s.Require().NoError(err)
 
-	// Tranfer atom to axone chain
+	// Transfer atom to axone chain
 	s.IBCTransferTokens(chain2, chain1, address, 12345000)
 
-	// Verify the address recived the token
+	// Verify the address received the token
 	balances, err := banktypes.NewQueryClient(chain1.Client).AllBalances(context.Background(), &banktypes.QueryAllBalancesRequest{
 		Address: address,
 	})

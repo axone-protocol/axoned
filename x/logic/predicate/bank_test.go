@@ -679,13 +679,13 @@ func TestAccount(t *testing.T) {
 				addresses: []string{
 					"axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 				},
-				query: `account(unparseable).`,
+				query: `account(unparsable).`,
 				wantAnswer: &types.Answer{
 					HasMore:   false,
 					Variables: []string{},
 					Results: []types.Result{
 						{
-							Error:         "error(domain_error(encoding(bech32),unparseable),[d,e,c,o,d,i,n,g, ,b,e,c,h,3,2, ,f,a,i,l,e,d,:, ,i,n,v,a,l,i,d, ,s,e,p,a,r,a,t,o,r, ,i,n,d,e,x, ,-,1],account/1)",
+							Error:         "error(domain_error(encoding(bech32),unparsable),[d,e,c,o,d,i,n,g, ,b,e,c,h,3,2, ,f,a,i,l,e,d,:, ,i,n,v,a,l,i,d, ,s,e,p,a,r,a,t,o,r, ,i,n,d,e,x, ,-,1],account/1)",
 							Substitutions: nil,
 						},
 					},
@@ -695,13 +695,13 @@ func TestAccount(t *testing.T) {
 				addresses: []string{
 					"axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa",
 				},
-				query: `account("wrong agument type").`,
+				query: `account("wrong argument type").`,
 				wantAnswer: &types.Answer{
 					HasMore:   false,
 					Variables: []string{},
 					Results: []types.Result{
 						{
-							Error:         "error(type_error(atom,[w,r,o,n,g, ,a,g,u,m,e,n,t, ,t,y,p,e]),account/1)",
+							Error:         "error(type_error(atom,[w,r,o,n,g, ,a,r,g,u,m,e,n,t, ,t,y,p,e]),account/1)",
 							Substitutions: nil,
 						},
 					},

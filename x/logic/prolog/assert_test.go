@@ -169,7 +169,7 @@ func TestWhitelistBlacklistMatches(t *testing.T) {
 
 		for nc, tc := range cases {
 			Convey(
-				fmt.Sprintf("Given test case #%d with values: %v cheked against whitelist: %v and blacklist: %v",
+				fmt.Sprintf("Given test case #%d with values: %v checked against whitelist: %v and blacklist: %v",
 					nc, tc.values, tc.whitelist, tc.blacklist), func() {
 					Convey("When the function WhitelistBlacklistMatches() is called", func() {
 						result := lo.Filter(tc.values, util.Indexed(util.WhitelistBlacklistMatches(tc.whitelist, tc.blacklist, tc.predicate)))
