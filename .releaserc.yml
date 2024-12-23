@@ -55,6 +55,7 @@ plugins:
         - path: "./target/release/sha256sum.txt"
   - - "@semantic-release/git"
     - assets:
+        - README.md
         - CHANGELOG.md
         - version
         - go.mod

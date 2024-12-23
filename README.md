@@ -1,7 +1,7 @@
 [![axone github banner](https://raw.githubusercontent.com/axone-protocol/.github/main/profile/static/axone-banner.png)](https://axone.xyz)
 
 <p align="center">
-  <a href="https://discord.gg/axone"><img src="https://img.shields.io/badge/Discord-7289DA?style=for-the-badge&logo=discord&logoColor=white" /></a> &nbsp;
+  <a href="https://discord.gg/axone"><img src="https://img.shields.io/discord/946759919678406696.svg?label=discord&labelColor=7289DA&logo=discord&logoColor=white&color=gray&style=for-the-badge" /></a> &nbsp;
   <a href="https://www.linkedin.com/company/axone-protocol/"><img src="https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white" /></a> &nbsp;
   <a href="https://twitter.com/axonexyz"><img src="https://img.shields.io/badge/Twitter-1DA1F2?style=for-the-badge&logo=twitter&logoColor=white" /></a> &nbsp;
   <a href="https://blog.axone.xyz"><img src="https://img.shields.io/badge/Medium-12100E?style=for-the-badge&logo=medium&logoColor=white" /></a> &nbsp;
@@ -14,8 +14,10 @@
 [![build](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/build.yml?label=build&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/build.yml)
 [![test](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/test.yml?label=test&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/test.yml)
 [![codecov](https://img.shields.io/codecov/c/github/axone-protocol/axoned?style=for-the-badge&token=O3FJO5QDCA&logo=codecov)](https://codecov.io/gh/axone-protocol/axoned)
+[![Go Report Card](https://goreportcard.com/badge/github.com/axone-protocol/axoned/v11?style=for-the-badge)](https://goreportcard.com/report/github.com/axone-protocol/axoned/v11)
 [![docker-pull](https://img.shields.io/docker/pulls/axoneprotocol/axoned?label=downloads&style=for-the-badge&logo=docker)](https://hub.docker.com/r/axoneprotocol/axoned)
-[![discord](https://img.shields.io/discord/946759919678406696.svg?label=discord&logo=discord&logoColor=white&style=for-the-badge)](https://discord.gg/axone)
+[![Godoc Reference](https://img.shields.io/badge/godoc-reference-blue.svg?logo=go&logoColor=white&labelColor=gray&label=&style=for-the-badge)](https://pkg.go.dev/github.com/axone-protocol/axoned/v11)
+
 [![conventional commits](https://img.shields.io/badge/Conventional%20Commits-1.0.0-yellow.svg?style=for-the-badge&logo=conventionalcommits)](https://conventionalcommits.org)
 [![semantic-release](https://img.shields.io/badge/%20%20%F0%9F%93%A6%F0%9F%9A%80-semantic--release-e10079.svg?style=for-the-badge)](https://github.com/semantic-release/semantic-release)
 [![Contributor Covenant](https://img.shields.io/badge/Contributor%20Covenant-2.1-4baaaa.svg?style=for-the-badge)](https://github.com/axone-protocol/.github/blob/main/CODE_OF_CONDUCT.md)
