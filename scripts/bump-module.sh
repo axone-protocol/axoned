@@ -13,15 +13,22 @@ if [ "${major_version}" -gt 1 ]; then
   go mod edit -module "${module_name_versioned}"
   echo "✅ module name updated to ${module_name_versioned} in go.mod"
 
+  sed_i_flag=""
   if [ "$(uname)" = "Darwin" ]; then
-    find . -type f -name "*.go" -exec \
-    sed -i '' "s|\"${module_name}|\"${module_name_versioned}|g" {} \;
+    sed_i_flag=(-i '')
   else
-    find . -type f -name "*.go" -exec \
-    sed -i "s|\"${module_name}|\"${module_name_versioned}|g" {} \;
+    sed_i_flag=(-i)
   fi
-  echo "✅ packages updated to ${module_name_versioned} in source files"
+  echo "⬆️ updating ${module_name} to ${module_name_versioned}..."
+  find . -type f \( -name "*.go" \) \
+      -exec echo "  - processing {}" \; \
+      -exec sed "${sed_i_flag[@]}" "s|\"${module_name}|\"${module_name_versioned}|g" {} \;
 
+  find . -type f \( -name "README.md" \) \
+      -exec echo "  - processing {}" \; \
+      -exec sed "${sed_i_flag[@]}" "s|${module_name}|${module_name_versioned}|g" {} \;
+
+  echo "✅ packages updated to ${module_name_versioned} in source files"
   echo "🧹 cleaning up go.sum"
   go mod tidy
 else
