@@ -233,3 +233,18 @@ jobs:
           version: "v0.9.0"
         env:
           SHELLCHECK_OPTS: -e SC2034
+
+  lint-typos:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Install codespell
+        run: |
+          pip install codespell==2.3.0
+
+      - name: Check for spelling errors
+        run: |
+          codespell --config .codespellrc
+          exit $?
