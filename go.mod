@@ -3,7 +3,7 @@ module github.com/axone-protocol/axoned/v11
 go 1.23.3
 
 require (
-	cosmossdk.io/api v0.7.6
+	cosmossdk.io/api v0.8.0
 	cosmossdk.io/client/v2 v2.0.0-beta.1
 	cosmossdk.io/collections v0.4.0
 	cosmossdk.io/core v0.11.1
@@ -80,6 +80,8 @@ replace (
 )
 
 require (
+	buf.build/gen/go/cometbft/cometbft/protocolbuffers/go v1.36.1-20241120201313-68e42a58b301.1 // indirect
+	buf.build/gen/go/cosmos/gogo-proto/protocolbuffers/go v1.36.1-20240130113600-88ef6483f90f.1 // indirect
 	cloud.google.com/go v0.112.1 // indirect
 	cloud.google.com/go/compute/metadata v0.5.2 // indirect
 	cloud.google.com/go/iam v1.1.6 // indirect
@@ -306,7 +308,7 @@ require (
 	golang.org/x/tools v0.22.0 // indirect
 	google.golang.org/api v0.171.0 // indirect
 	google.golang.org/genproto v0.0.0-20240227224415-6ceb2ff114de // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20241015192408-796eee8c2d53 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20241202173237-19429a94021a // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
