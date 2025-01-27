@@ -28,7 +28,7 @@ jobs:
 
       - name: Setup Test infra
         id: starship-action
-        uses: cosmology-tech/starship-action@0.5.7
+        uses: cosmology-tech/starship-action@0.5.8
         with:
           values: starship/configs/ci.yaml
           port-forward: true
