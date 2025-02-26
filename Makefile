@@ -210,7 +210,7 @@ $(ENVIRONMENTS_TARGETS):
 ## Install:
 .PHONY: install
 install: ## Install node executable
-	@echo "${COLOR_CYAN} 🚚 Installing project ${BINARY_NAME}${COLOR_RESET}"
+	@echo "${COLOR_CYAN} 🚚 Installing ${COLOR_YELLOW}${BINARY_NAME}${COLOR_RESET} (v${VERSION})"
 	@go install -mod=readonly ${BUILD_FLAGS} ${CMD_ROOT}
 
 ## Test:
