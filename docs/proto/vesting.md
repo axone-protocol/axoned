@@ -178,7 +178,7 @@ Since: cosmos-sdk 0.46
 
 ### MsgCreatePeriodicVestingAccountResponse
 
-MsgCreateVestingAccountResponse defines the Msg/CreatePeriodicVestingAccount
+MsgCreatePeriodicVestingAccountResponse defines the Msg/CreatePeriodicVestingAccount
 response type.
 
 Since: cosmos-sdk 0.46
