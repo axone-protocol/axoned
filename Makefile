@@ -53,8 +53,16 @@ DAEMON_NAME 	:= axoned
 DAEMON_HOME 	:= `pwd`/${CHAIN_HOME}
 
 # Binary information
-VERSION  := $(shell cat version)
-COMMIT   := $(shell git log -1 --format='%H')
+VERSION       := $(shell cat version)
+MAJOR_VERSION := $(shell cat version | cut -d. -f1)
+COMMIT        := $(shell git log -1 --format='%H')
+
+# Modules
+MODULE_COSMOS_SDK := github.com/cosmos/cosmos-sdk
+MODULE_AXONED     := github.com/axone-protocol/axoned/v$(MAJOR_VERSION)
+
+# Build options
+MAX_WASM_SIZE := $(shell echo "$$((1 * 1024 * 1024))")
 
 build_tags += netgo
 build_tags := $(strip $(build_tags))
@@ -69,7 +77,7 @@ ifeq ($(LEDGER_ENABLED),true)
   else
     UNAME_S = $(shell uname -s)
     ifeq ($(UNAME_S),OpenBSD)
-      $(warning OpenBSD detected, disabling ledger support (https://github.com/cosmos/cosmos-sdk/issues/1988))
+      $(warning OpenBSD detected, disabling ledger support (https://$(MODULE_COSMOS_SDK)/issues/1988))
     else
       GCC = $(shell command -v gcc 2> /dev/null)
       ifeq ($(GCC),)
@@ -89,13 +97,14 @@ build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 # Flags
 ldflags  = \
-    -X github.com/cosmos/cosmos-sdk/version.AppName=axoned      \
-	-X github.com/cosmos/cosmos-sdk/version.Name=axoned         \
-	-X github.com/cosmos/cosmos-sdk/version.ServerName=axoned   \
-	-X github.com/cosmos/cosmos-sdk/version.ClientName=axoned   \
-	-X github.com/cosmos/cosmos-sdk/version.Version=$(VERSION) \
-	-X github.com/cosmos/cosmos-sdk/version.Commit=$(COMMIT)   \
-    -X github.com/cosmos/cosmos-sdk/version.BuildTags=$(build_tags_comma_sep)
+    -X $(MODULE_COSMOS_SDK)/version.AppName=axoned                    \
+	-X $(MODULE_COSMOS_SDK)/version.Name=axoned                       \
+	-X $(MODULE_COSMOS_SDK)/version.ServerName=axoned                 \
+	-X $(MODULE_COSMOS_SDK)/version.ClientName=axoned                 \
+	-X $(MODULE_COSMOS_SDK)/version.Version=$(VERSION)                \
+	-X $(MODULE_COSMOS_SDK)/version.Commit=$(COMMIT)                  \
+    -X $(MODULE_COSMOS_SDK)/version.BuildTags=$(build_tags_comma_sep) \
+    -X $(MODULE_AXONED)/app.MaxWasmSize=$(MAX_WASM_SIZE)              \
 
 ifeq (,$(findstring nostrip,$(BUILD_OPTIONS)))
 	ldflags += -w -s
@@ -177,7 +186,7 @@ build: build-go build-docker ## Build all available artefacts (executable, docke
 
 .PHONY: build-go
 build-go: ## Build node executable for the current environment (default build)
-	@echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN}${COLOR_RESET} into ${COLOR_YELLOW}${DIST_FOLDER}${COLOR_RESET}"
+	@echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN} ${COLOR_GREEN}(v${VERSION})${COLOR_RESET} into ${COLOR_YELLOW}${DIST_FOLDER}${COLOR_RESET}"
 	@$(call build-go,"","",${DIST_FOLDER}/${BINARY_NAME})
 
 build-go-all: $(ENVIRONMENTS_TARGETS) ## Build node executables for all available environments
@@ -268,7 +277,7 @@ chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to
 	@echo "${COLOR_CYAN} ⬆️ Upgrade the chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} from ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} to ${COLOR_YELLOW}${TO_VERSION}${COLOR_RESET}"
 	@killall cosmovisor || \
 	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
-	git clone -b ${FROM_VERSION} https://github.com/axone-protocol/axoned.git ${TARGET_FOLDER}/${FROM_VERSION}; \
+	git clone -b ${FROM_VERSION} https://$(MODULE_AXONED).git ${TARGET_FOLDER}/${FROM_VERSION}; \
 	echo "${COLOR_CYAN} 🏗 Build the ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} binary...${COLOR_RESET}"; \
 	cd ${TARGET_FOLDER}/${FROM_VERSION}; \
 	make build-go; \
@@ -397,7 +406,7 @@ mock: ## Generate all the mocks (for tests)
 	@mockgen -destination x/logic/testutil/gas_mocks.go -package testutil cosmossdk.io/store/types GasMeter
 	@mockgen -destination x/logic/testutil/fs_mocks.go -package testutil io/fs FS
 	@mockgen -destination x/logic/testutil/read_file_fs_mocks.go -package testutil io/fs ReadFileFS
-	@mockgen -source "$$(go list -f '{{.Dir}}' github.com/cosmos/cosmos-sdk/codec/types)/interface_registry.go" \
+	@mockgen -source "$$(go list -f '{{.Dir}}' $(MODULE_COSMOS_SDK)/codec/types)/interface_registry.go" \
     	-package testutil \
     	-destination x/logic/testutil/interface_registry_mocks.go
 

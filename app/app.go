@@ -590,11 +590,7 @@ func New(
 		panic(fmt.Sprintf("error while reading wasm config: %s", err))
 	}
 
-	if MaxWasmSize != "" {
-		if wasmtypes.MaxWasmSize, err = strconv.Atoi(MaxWasmSize); err != nil {
-			panic(fmt.Sprintf("error while parsing MaxWasmSize: %s", err))
-		}
-	}
+	mustConfigureWasmExtensionPoints()
 
 	var wasmOpts []wasmkeeper.Option
 	if cast.ToBool(appOpts.Get("telemetry.enabled")) {
@@ -917,6 +913,15 @@ func New(
 	}
 
 	return app
+}
+
+func mustConfigureWasmExtensionPoints() {
+	var err error
+	if MaxWasmSize != "" {
+		if wasmtypes.MaxWasmSize, err = strconv.Atoi(MaxWasmSize); err != nil {
+			panic(fmt.Sprintf("error while parsing MaxWasmSize: %s", err))
+		}
+	}
 }
 
 func (app *App) setAnteHandler(txConfig client.TxConfig, wasmConfig wasmtypes.WasmConfig, txCounterStoreKey *storetypes.KVStoreKey) {
