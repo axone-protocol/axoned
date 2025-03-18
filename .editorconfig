@@ -31,3 +31,7 @@ indent_style = tab
 
 [*.feature]
 indent_size = 2
+
+[Makefile]
+indent_style = tab
+tab_width = 2
