@@ -10,6 +10,7 @@ import (
 	"os"
 	"path/filepath"
 	"sort"
+	"strconv"
 
 	"github.com/CosmWasm/wasmd/x/wasm"
 	wasmkeeper "github.com/CosmWasm/wasmd/x/wasm/keeper"
@@ -170,6 +171,11 @@ var (
 		ibcfeetypes.ModuleName:         nil,
 		wasmtypes.ModuleName:           {authtypes.Burner},
 	}
+
+	// MaxWasmSize defines the maximum allowed size (in bytes) for uploaded Wasm code.
+	// This parameter can be set at compile time.
+	// More details: https://github.com/CosmWasm/wasmd/blob/main/README.md#compile-time-parameters
+	MaxWasmSize string
 )
 
 var _ servertypes.Application = (*App)(nil)
@@ -582,6 +588,12 @@ func New(
 	wasmConfig, err := wasm.ReadWasmConfig(appOpts)
 	if err != nil {
 		panic(fmt.Sprintf("error while reading wasm config: %s", err))
+	}
+
+	if MaxWasmSize != "" {
+		if wasmtypes.MaxWasmSize, err = strconv.Atoi(MaxWasmSize); err != nil {
+			panic(fmt.Sprintf("error while parsing MaxWasmSize: %s", err))
+		}
 	}
 
 	var wasmOpts []wasmkeeper.Option
