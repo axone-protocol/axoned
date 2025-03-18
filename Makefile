@@ -10,7 +10,7 @@ CMD_ROOT               := ./cmd/${BINARY_NAME}
 LEDGER_ENABLED         ?= true
 
 # Docker images
-DOCKER_IMAGE_GOLANG		  = golang:1.23-alpine3.20
+DOCKER_IMAGE_GOLANG	      = golang:1.23-alpine3.20
 DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v1.61
 DOCKER_IMAGE_PROTO        = ghcr.io/cosmos/proto-builder:0.14.0
 DOCKER_IMAGE_BUF          = bufbuild/buf:1.4.0
@@ -44,13 +44,13 @@ COLOR_RED    = $(call get_color,setaf,1)
 COLOR_RESET  = $(call get_color,sgr0,)
 
 # Blockchain constants
-CHAIN     		:= localnet
-CHAIN_HOME    	:= ./target/deployment/${CHAIN}
-CHAIN_MONIKER 	:= local-node
-CHAIN_BINARY 	:= ./${DIST_FOLDER}/${BINARY_NAME}
+CHAIN           := localnet
+CHAIN_HOME      := ./target/deployment/${CHAIN}
+CHAIN_MONIKER   := local-node
+CHAIN_BINARY    := ./${DIST_FOLDER}/${BINARY_NAME}
 
-DAEMON_NAME 	:= axoned
-DAEMON_HOME 	:= `pwd`/${CHAIN_HOME}
+DAEMON_NAME     := axoned
+DAEMON_HOME     := `pwd`/${CHAIN_HOME}
 
 # Binary information
 VERSION       := $(shell cat version)
@@ -67,26 +67,26 @@ MAX_WASM_SIZE := $(shell echo "$$((1 * 1024 * 1024))")
 build_tags += netgo
 build_tags := $(strip $(build_tags))
 ifeq ($(LEDGER_ENABLED),true)
-  ifeq ($(OS),Windows_NT)
-    GCCEXE = $(shell where gcc.exe 2> NUL)
-    ifeq ($(GCCEXE),)
-      $(error gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
-    else
-      build_tags += ledger
-    endif
-  else
-    UNAME_S = $(shell uname -s)
-    ifeq ($(UNAME_S),OpenBSD)
-      $(warning OpenBSD detected, disabling ledger support (https://$(MODULE_COSMOS_SDK)/issues/1988))
-    else
-      GCC = $(shell command -v gcc 2> /dev/null)
-      ifeq ($(GCC),)
-        $(error gcc not installed for ledger support, please install or set LEDGER_ENABLED=false)
-      else
-        build_tags += ledger
-      endif
-    endif
-  endif
+	ifeq ($(OS),Windows_NT)
+		GCCEXE = $(shell where gcc.exe 2> NUL)
+		ifeq ($(GCCEXE),)
+			$(error gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
+		else
+			build_tags += ledger
+		endif
+	else
+		UNAME_S = $(shell uname -s)
+		ifeq ($(UNAME_S),OpenBSD)
+			$(warning OpenBSD detected, disabling ledger support (https://$(MODULE_COSMOS_SDK)/issues/1988))
+		else
+			GCC = $(shell command -v gcc 2> /dev/null)
+			ifeq ($(GCC),)
+				$(error gcc not installed for ledger support, please install or set LEDGER_ENABLED=false)
+			else
+				build_tags += ledger
+			endif
+		endif
+	endif
 endif
 
 build_tags += $(BUILD_TAGS)
@@ -96,15 +96,15 @@ comma := ,
 build_tags_comma_sep := $(subst $(whitespace),$(comma),$(build_tags))
 
 # Flags
-ldflags  = \
-    -X $(MODULE_COSMOS_SDK)/version.AppName=axoned                    \
-	-X $(MODULE_COSMOS_SDK)/version.Name=axoned                       \
-	-X $(MODULE_COSMOS_SDK)/version.ServerName=axoned                 \
-	-X $(MODULE_COSMOS_SDK)/version.ClientName=axoned                 \
-	-X $(MODULE_COSMOS_SDK)/version.Version=$(VERSION)                \
-	-X $(MODULE_COSMOS_SDK)/version.Commit=$(COMMIT)                  \
-    -X $(MODULE_COSMOS_SDK)/version.BuildTags=$(build_tags_comma_sep) \
-    -X $(MODULE_AXONED)/app.MaxWasmSize=$(MAX_WASM_SIZE)              \
+ldflags = \
+	-X $(MODULE_COSMOS_SDK)/version.AppName=axoned     \
+	-X $(MODULE_COSMOS_SDK)/version.Name=axoned        \
+	-X $(MODULE_COSMOS_SDK)/version.ServerName=axoned  \
+	-X $(MODULE_COSMOS_SDK)/version.ClientName=axoned  \
+	-X $(MODULE_COSMOS_SDK)/version.Version=$(VERSION) \
+	-X $(MODULE_COSMOS_SDK)/version.Commit=$(COMMIT)   \
+	-X $(MODULE_COSMOS_SDK)/version.BuildTags=$(build_tags_comma_sep) \
+	-X $(MODULE_AXONED)/app.MaxWasmSize=$(MAX_WASM_SIZE)              \
 
 ifeq (,$(findstring nostrip,$(BUILD_OPTIONS)))
 	ldflags += -w -s
@@ -124,7 +124,7 @@ GO_BUILD := go build $(BUILD_FLAGS)
 ENVIRONMENTS = \
 	darwin-amd64 \
 	darwin-arm64 \
-	linux-amd64 \
+	linux-amd64  \
 	linux-arm64
 ENVIRONMENTS_TARGETS = $(addprefix build-go-, $(ENVIRONMENTS))
 
@@ -151,10 +151,10 @@ lint: lint-go lint-proto ## Lint all available linters
 lint-go: ## Lint go source code
 	@echo "${COLOR_CYAN}🔍 Inspecting go source code${COLOR_RESET}"
 	@docker run --rm \
-  		-v `pwd`:/app:ro \
-  		-w /app \
-  		${DOCKER_IMAGE_GOLANG_CI} \
-  		golangci-lint run -v
+		-v `pwd`:/app:ro \
+		-w /app \
+		${DOCKER_IMAGE_GOLANG_CI} \
+		golangci-lint run -v
 
 .PHONY: lint-proto
 lint-proto: ## Lint proto files
@@ -169,10 +169,10 @@ format: format-go ## Run all available formatters
 format-go: ## Format go files
 	@echo "${COLOR_CYAN}📐 Formatting go source code${COLOR_RESET}"
 	@docker run --rm \
-  		-v `pwd`:/app:rw \
-  		-w /app \
-  		${DOCKER_IMAGE_GOLANG} \
-  		sh -c \
+		-v `pwd`:/app:rw \
+		-w /app \
+		${DOCKER_IMAGE_GOLANG} \
+		sh -c \
 		"go install mvdan.cc/gofumpt@v0.7.0; gofumpt -w -l ."
 
 .PHONY: format-proto
@@ -200,18 +200,18 @@ $(ENVIRONMENTS_TARGETS):
 	@GOOS=$(word 3, $(subst -, ,$@)); \
     GOARCH=$(word 4, $(subst -, ,$@)); \
     if [ $$GOARCH = "amd64" ]; then \
-    	TARGET_ARCH="x86_64"; \
-    elif [ $$GOARCH = "arm64" ]; then \
-    	TARGET_ARCH="aarch64"; \
-    fi; \
-    HOST_OS=`uname -s | tr A-Z a-z`; \
-    HOST_ARCH=`uname -m`; \
-    if [ $$GOOS != $$HOST_OS ] || [ $$TARGET_ARCH != $$HOST_ARCH ]; then \
-      echo "${COLOR_RED} ❌ Cross compilation impossible${COLOR_RESET}" >&2; \
-      exit 1; \
-    fi; \
-    FOLDER=${DIST_FOLDER}/$$GOOS/$$GOARCH; \
-    FILENAME=$$FOLDER/${BINARY_NAME}; \
+		TARGET_ARCH="x86_64"; \
+	elif [ $$GOARCH = "arm64" ]; then \
+		TARGET_ARCH="aarch64"; \
+	fi; \
+	HOST_OS=`uname -s | tr A-Z a-z`; \
+	HOST_ARCH=`uname -m`; \
+	if [ $$GOOS != $$HOST_OS ] || [ $$TARGET_ARCH != $$HOST_ARCH ]; then \
+		echo "${COLOR_RED} ❌ Cross compilation impossible${COLOR_RESET}" >&2; \
+		exit 1; \
+	fi; \
+	FOLDER=${DIST_FOLDER}/$$GOOS/$$GOARCH; \
+	FILENAME=$$FOLDER/${BINARY_NAME}; \
 	echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN} for environment ${COLOR_YELLOW}$$GOOS ($$GOARCH)${COLOR_RESET} into ${COLOR_YELLOW}$$FOLDER${COLOR_RESET}" && \
 	$(call build-go,$$GOOS,$$GOARCH,$$FILENAME)
 
@@ -237,37 +237,37 @@ chain-init: build-go ## Initialize the blockchain with default settings.
 
 	@rm -rf "${CHAIN_HOME}"; \
 	${CHAIN_BINARY} init axone-node \
-	  --chain-id=axone-${CHAIN} \
-	  --home "${CHAIN_HOME}"; \
+		--chain-id=axone-${CHAIN} \
+		--home "${CHAIN_HOME}"; \
 	\
 	sed -i $(SED_FLAG) "s/\"stake\"/\"uaxone\"/g" "${CHAIN_HOME}/config/genesis.json"; \
 	\
 	MNEMONIC_VALIDATOR="island position immense mom cross enemy grab little deputy tray hungry detect state helmet \
-	  tomorrow trap expect admit inhale present vault reveal scene atom"; \
+		tomorrow trap expect admit inhale present vault reveal scene atom"; \
 	echo $$MNEMONIC_VALIDATOR \
-	  | ${CHAIN_BINARY} keys add validator \
-	      --recover \
-	      --keyring-backend test \
-	      --home "${CHAIN_HOME}"; \
+	| ${CHAIN_BINARY} keys add validator \
+		--recover \
+		--keyring-backend test \
+		--home "${CHAIN_HOME}"; \
 	\
 	${CHAIN_BINARY} genesis add-genesis-account validator 1000000000uaxone \
-	  --keyring-backend test \
-	  --home "${CHAIN_HOME}"; \
+		--keyring-backend test \
+		--home "${CHAIN_HOME}"; \
 	\
 	NODE_ID=`${CHAIN_BINARY} tendermint show-node-id --home ${CHAIN_HOME}`; \
 	${CHAIN_BINARY} genesis gentx validator 1000000uaxone \
-	  --node-id $$NODE_ID \
-	  --chain-id=axone-${CHAIN} \
-	  --keyring-backend test \
-      --home "${CHAIN_HOME}"; \
+		--node-id $$NODE_ID \
+		--chain-id=axone-${CHAIN} \
+		--keyring-backend test \
+		--home "${CHAIN_HOME}"; \
 	\
 	${CHAIN_BINARY} genesis collect-gentxs \
-	  --home "${CHAIN_HOME}"
+		--home "${CHAIN_HOME}"
 
 chain-start: build-go ## Start the blockchain with existing configuration (see chain-init)
 	@echo "${COLOR_CYAN} 🛠️ Starting chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"; \
 	${CHAIN_BINARY} start --moniker ${CHAIN_MONIKER} \
-	  --home ${CHAIN_HOME}
+		--home ${CHAIN_HOME}
 
 chain-stop: ## Stop the blockchain
 	@echo "${COLOR_CYAN} ✋️ Stopping chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
@@ -290,35 +290,35 @@ chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to
 	export DAEMON_NAME=${DAEMON_NAME}; \
 	export DAEMON_HOME=${DAEMON_HOME}; \
 	\
-    cat <<< $$(jq '.app_state.gov.params.voting_period = "20s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
+	cat <<< $$(jq '.app_state.gov.params.voting_period = "20s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
 	\
- 	cosmovisor init $$BINARY_OLD; \
- 	cosmovisor run start --moniker ${CHAIN_MONIKER} \
- 		--home ${CHAIN_HOME} \
- 		--log_level debug & \
+	cosmovisor init $$BINARY_OLD; \
+	cosmovisor run start --moniker ${CHAIN_MONIKER} \
+		--home ${CHAIN_HOME} \
+		--log_level debug & \
 	sleep 10; \
 	echo "${COLOR_CYAN} 🗳️ Submitting software-upgrade tx ${COLOR_RESET}"; \
 	$$BINARY_OLD tx upgrade software-upgrade ${TO_VERSION}\
-	    --title "Axoned upgrade" \
-	    --summary "⬆️ Upgrade the chain from ${FROM_VERSION} to ${TO_VERSION}" \
-	    --upgrade-height 20 \
-	    --upgrade-info "{}" \
-	    --deposit 10000000uaxone \
-	    --no-validate \
-	    --yes \
-	    --from validator \
-	    --keyring-backend test \
-	    --chain-id axone-${CHAIN} \
-	    --home ${CHAIN_HOME}; \
+		--title "Axoned upgrade" \
+		--summary "⬆️ Upgrade the chain from ${FROM_VERSION} to ${TO_VERSION}" \
+		--upgrade-height 20 \
+		--upgrade-info "{}" \
+		--deposit 10000000uaxone \
+		--no-validate \
+		--yes \
+		--from validator \
+		--keyring-backend test \
+		--chain-id axone-${CHAIN} \
+		--home ${CHAIN_HOME}; \
 	sleep 5;\
 	\
 	sleep 5;\
- 	$$BINARY_OLD tx gov vote 1 yes \
-     		--from validator \
-     		--yes \
-     		--home ${CHAIN_HOME} \
-     		--chain-id axone-${CHAIN} \
-     		--keyring-backend test; \
+	$$BINARY_OLD tx gov vote 1 yes \
+		--from validator \
+		--yes \
+		--home ${CHAIN_HOME} \
+		--chain-id axone-${CHAIN} \
+		--keyring-backend test; \
 	mkdir -p ${DAEMON_HOME}/cosmovisor/upgrades/${TO_VERSION}/bin && cp ${CHAIN_BINARY} ${DAEMON_HOME}/cosmovisor/upgrades/${TO_VERSION}/bin; \
 	wait
 
@@ -348,9 +348,9 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 	@$(DOCKER_PROTO_RUN) sh ./scripts/protocgen-doc.sh
 	@for MODULE in $(shell find proto -name '*.proto' -maxdepth 3 -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
 		echo "${COLOR_CYAN} 📖 Generate documentation for $${MODULE} module${COLOR_RESET}" ; \
-        DEFAULT_DATASOURCE="./docs/proto/templates/default.yaml" ; \
-        MODULE_DATASOURCE="merge:./$${MODULE}/docs.yaml|$${DEFAULT_DATASOURCE}" ; \
-        DATASOURCE="docs=`[ -f $${MODULE}/docs.yaml ] && echo $$MODULE_DATASOURCE || echo $${DEFAULT_DATASOURCE}`" ; \
+		DEFAULT_DATASOURCE="./docs/proto/templates/default.yaml" ; \
+		MODULE_DATASOURCE="merge:./$${MODULE}/docs.yaml|$${DEFAULT_DATASOURCE}" ; \
+		DATASOURCE="docs=`[ -f $${MODULE}/docs.yaml ] && echo $$MODULE_DATASOURCE || echo $${DEFAULT_DATASOURCE}`" ; \
 		docker run --rm \
 				-v ${HOME}/.cache:/root/.cache \
 				-v `pwd`:/usr/src/axoned \
@@ -390,9 +390,9 @@ doc-predicate: ## Generate markdown documentation for all the predicates (module
 	go get ./scripts; \
 	go run ./scripts/. predicate; \
 	docker run --rm \
-	  -v `pwd`:/usr/src/docs \
-	  -w /usr/src/docs \
-	  ${DOCKER_IMAGE_MARKDOWNLINT} -f $$OUT_FOLDER -c docs/.markdownlint.yaml
+		-v `pwd`:/usr/src/docs \
+		-w /usr/src/docs \
+		${DOCKER_IMAGE_MARKDOWNLINT} -f $$OUT_FOLDER -c docs/.markdownlint.yaml
 
 
 ## Mock:
@@ -407,8 +407,8 @@ mock: ## Generate all the mocks (for tests)
 	@mockgen -destination x/logic/testutil/fs_mocks.go -package testutil io/fs FS
 	@mockgen -destination x/logic/testutil/read_file_fs_mocks.go -package testutil io/fs ReadFileFS
 	@mockgen -source "$$(go list -f '{{.Dir}}' $(MODULE_COSMOS_SDK)/codec/types)/interface_registry.go" \
-    	-package testutil \
-    	-destination x/logic/testutil/interface_registry_mocks.go
+		-package testutil \
+		-destination x/logic/testutil/interface_registry_mocks.go
 
 ## Release:
 .PHONY: release-assets
@@ -418,8 +418,8 @@ release-binary-all: $(RELEASE_TARGETS)
 
 $(RELEASE_TARGETS): ensure-buildx-builder
 	@GOOS=$(word 3, $(subst -, ,$@)); \
-    GOARCH=$(word 4, $(subst -, ,$@)); \
-    BINARY_NAME="axoned-${VERSION}-$$GOOS-$$GOARCH"; \
+	GOARCH=$(word 4, $(subst -, ,$@)); \
+	BINARY_NAME="axoned-${VERSION}-$$GOOS-$$GOARCH"; \
 	echo "${COLOR_CYAN} 🎁 Building ${COLOR_GREEN}$$GOOS $$GOARCH ${COLOR_CYAN}release binary${COLOR_RESET} into ${COLOR_YELLOW}${RELEASE_FOLDER}${COLOR_RESET}"; \
 	docker buildx use ${DOCKER_BUILDX_BUILDER}; \
 	docker buildx build \
