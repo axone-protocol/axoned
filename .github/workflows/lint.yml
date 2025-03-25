@@ -103,7 +103,7 @@ jobs:
           cache: false
 
       - name: Lint go code (golangci-lint)
-        uses: golangci/golangci-lint-action@v6
+        uses: golangci/golangci-lint-action@v7
         if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
           version: v1.61
