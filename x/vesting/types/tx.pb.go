@@ -254,7 +254,7 @@ func (m *MsgCreatePermanentLockedAccountResponse) XXX_DiscardUnknown() {
 
 var xxx_messageInfo_MsgCreatePermanentLockedAccountResponse proto.InternalMessageInfo
 
-// MsgCreateVestingAccount defines a message that enables creating a vesting
+// MsgCreatePeriodicVestingAccount defines a message that enables creating a vesting
 // account.
 //
 // Since: cosmos-sdk 0.46
@@ -327,7 +327,7 @@ func (m *MsgCreatePeriodicVestingAccount) GetVestingPeriods() []Period {
 	return nil
 }
 
-// MsgCreateVestingAccountResponse defines the Msg/CreatePeriodicVestingAccount
+// MsgCreatePeriodicVestingAccountResponse defines the Msg/CreatePeriodicVestingAccount
 // response type.
 //
 // Since: cosmos-sdk 0.46
