@@ -33,6 +33,8 @@ var (
 	AtomOctet = engine.NewAtom("octet")
 	// AtomPadding is the term used to indicate the padding encoding type option.
 	AtomPadding = engine.NewAtom("padding")
+	// AtomCharset is the term used to indicate the charset encoding type option.
+	AtomCharset = engine.NewAtom("charset")
 	// AtomPair are terms with principal functor (-)/2.
 	// For example, the term -(A, B) denotes the pair of elements A and B.
 	AtomPair = engine.NewAtom("-")
@@ -47,6 +49,8 @@ var (
 	AtomSegment = engine.NewAtom("segment")
 	// AtomText is the term used to indicate the atom text.
 	AtomText = engine.NewAtom("text")
+	// AtomBoolean is the term used to indicate the atom boolean.
+	AtomBoolean = engine.NewAtom("boolean")
 	// AtomTrue is the term true.
 	AtomTrue = engine.NewAtom("true")
 	// AtomUtf8 is the term used to indicate the UTF-8 encoding type option.
