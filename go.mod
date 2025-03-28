@@ -58,7 +58,7 @@ require (
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	go.uber.org/mock v0.5.0
 	golang.org/x/exp v0.0.0-20240404231335-c0f41cb1a7a0
-	golang.org/x/net v0.37.0
+	golang.org/x/net v0.38.0
 	google.golang.org/genproto/googleapis/api v0.0.0-20250106144421-5f5ef82da422
 	google.golang.org/grpc v1.71.0
 	google.golang.org/protobuf v1.36.6
