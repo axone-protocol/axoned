@@ -1,6 +1,7 @@
 module github.com/axone-protocol/axoned/v11
 
 go 1.23.3
+toolchain go1.24.1
 
 require (
 	cosmossdk.io/api v0.7.6
@@ -52,7 +53,7 @@ require (
 	github.com/spf13/cast v1.7.1
 	github.com/spf13/cobra v1.9.1
 	github.com/spf13/pflag v1.0.6
-	github.com/spf13/viper v1.20.0
+	github.com/spf13/viper v1.20.1
 	github.com/stretchr/testify v1.10.0
 	github.com/wk8/go-ordered-map/v2 v2.1.8
 	go.uber.org/mock v0.5.0
