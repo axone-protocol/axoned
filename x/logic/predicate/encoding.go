@@ -16,7 +16,7 @@ var (
 	atomAtom    = engine.NewAtom("atom")
 )
 
-// Base64Encoded is a predicate that unifies a string to a base64 encoded string as specified by [RFC 4648].
+// Base64Encoded is a predicate that unifies a string to a Base64 encoded string as specified by [RFC 4648].
 //
 // The signature is as follows:
 //
@@ -26,7 +26,7 @@ var (
 //
 // Where:
 //   - Plain is an atom, a list of character codes, or list of characters containing the unencoded (plain) text.
-//   - Encoded is an atom or string containing the base64 encoded text.
+//   - Encoded is an atom or string containing the Base64 encoded text.
 //   - Options is a list of options that can be used to control the encoding process.
 //
 // # Options
@@ -144,6 +144,29 @@ func getBase64Encoding(options engine.Term, env *engine.Env) (*base64.Encoding, 
 		return nil, engine.DomainError(prolog.AtomPadding, paddingOpt, env)
 	}
 	return encoding, nil
+}
+
+// Base64URL is a predicate that unifies a string to a Base64 URL-safe encoded string.
+//
+// Encoded values are safe for use in URLs and filenames: "+" is replaced by "-", "/" by "_", and padding is omitted.
+//
+// The signature is as follows:
+//
+//	base64url(+Plain, -Encoded) is det
+//	base64url(-Plain, +Encoded) is det
+//
+// Where:
+//   - Plain is an atom, a list of characters, or character codes representing the unencoded text.
+//   - Encoded  is an atom, a list of characters, or character codes representing the Base64 URL-safe encoded form.
+//
+// The predicate is equivalent to base64_encoded/3 with options: [as(atom), encoding(utf8), charset(url), padding(false)].
+func Base64URL(vm *engine.VM, plain, encoded engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return Base64Encoded(vm, plain, encoded, engine.List(
+		prolog.AtomAs.Apply(atomAtom),
+		prolog.AtomEncoding.Apply(prolog.AtomUtf8),
+		prolog.AtomCharset.Apply(atomURL),
+		prolog.AtomPadding.Apply(prolog.AtomFalse),
+	), cont, env)
 }
 
 // HexBytes is a predicate that unifies hexadecimal encoded bytes to a list of bytes.
