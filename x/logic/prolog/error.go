@@ -51,6 +51,8 @@ var (
 	AtomTypeJSON = engine.NewAtom("json")
 	// AtomTypeURIComponent is the term used to represent the URI component type.
 	AtomTypeURIComponent = engine.NewAtom("uri_component")
+	// AtomTypeBoolean is the term used to represent the boolean type.
+	AtomTypeBoolean = engine.NewAtom("boolean")
 )
 
 var (
