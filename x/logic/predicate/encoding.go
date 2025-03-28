@@ -169,6 +169,29 @@ func Base64URL(vm *engine.VM, plain, encoded engine.Term, cont engine.Cont, env 
 	), cont, env)
 }
 
+// Base64 is a predicate that unifies a string to a Base64 encoded string.
+//
+// The output is returned as an atom with padding included.
+//
+// The signature is as follows:
+//
+//	base64(+Plain, -Encoded) is det
+//	base64(-Plain, +Encoded) is det
+//
+// Where:
+//   - Plain is an atom, a list of characters, or character codes representing the unencoded text.
+//   - Encoded  is an atom, a list of characters, or character codes representing the Base64 encoded form.
+//
+// The predicate is equivalent to base64_encoded/3 with options: [as(atom), encoding(utf8), charset(classic), padding(true)].
+func Base64(vm *engine.VM, plain, encoded engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
+	return Base64Encoded(vm, plain, encoded, engine.List(
+		prolog.AtomAs.Apply(atomAtom),
+		prolog.AtomEncoding.Apply(prolog.AtomUtf8),
+		prolog.AtomCharset.Apply(atomClassic),
+		prolog.AtomPadding.Apply(prolog.AtomTrue),
+	), cont, env)
+}
+
 // HexBytes is a predicate that unifies hexadecimal encoded bytes to a list of bytes.
 //
 // The signature is as follows:

@@ -127,6 +127,7 @@ var registry = orderedmap.New[string, any](
 		{Key: "json_write/2", Value: predicate.JSONWrite},
 		{Key: "base64_encoded/3", Value: predicate.Base64Encoded},
 		{Key: "base64url/2", Value: predicate.Base64URL},
+		{Key: "base64/2", Value: predicate.Base64},
 	}...),
 )
 
