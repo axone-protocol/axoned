@@ -1,5 +1,5 @@
 ---
-sidebar_position: 9
+sidebar_position: 10
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -7,7 +7,7 @@ sidebar_position: 9
 
 ## Description
 
-`base64_encoded/3` is a predicate that unifies a string to a base64 encoded string as specified by [RFC 4648](<https://rfc-editor.org/rfc/rfc4648.html>).
+`base64_encoded/3` is a predicate that unifies a string to a Base64 encoded string as specified by [RFC 4648](<https://rfc-editor.org/rfc/rfc4648.html>).
 
 The signature is as follows:
 
@@ -20,7 +20,7 @@ base64_encoded(+Plain, +Encoded, +Options) is det
 Where:
 
 - Plain is an atom, a list of character codes, or list of characters containing the unencoded \(plain\) text.
-- Encoded is an atom or string containing the base64 encoded text.
+- Encoded is an atom or string containing the Base64 encoded text.
 - Options is a list of options that can be used to control the encoding process.
 
 ## Options
