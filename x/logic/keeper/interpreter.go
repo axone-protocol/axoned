@@ -52,10 +52,10 @@ func (k Keeper) execute(
 
 	i, userOutput, err := k.newInterpreter(ctx, params)
 	if err != nil {
-		return nil, errorsmod.Wrapf(types.Internal, "error creating interpreter: %v", err.Error())
+		return nil, errorsmod.Wrapf(types.ErrInternal, "error creating interpreter: %v", err.Error())
 	}
 	if err := i.ExecContext(ctx, program); err != nil {
-		return nil, errorsmod.Wrapf(types.InvalidArgument, "error compiling query: %v", err.Error())
+		return nil, errorsmod.Wrapf(types.ErrInvalidArgument, "error compiling query: %v", err.Error())
 	}
 
 	answer, err := k.queryInterpreter(ctx, i, query, calculateSolutionLimit(solutionsLimit, params.GetLimits().MaxResultCount))
@@ -183,7 +183,7 @@ func gasMeterHookFn(ctx context.Context, gasPolicy types.GasPolicy) engine.HookF
 				switch rType := r.(type) {
 				case storetypes.ErrorOutOfGas:
 					err = errorsmod.Wrapf(
-						types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
+						types.ErrLimitExceeded, "out of gas: %s <%s> (%d/%d)",
 						types.ModuleName, rType.Descriptor, sdkctx.GasMeter().GasConsumed(), sdkctx.GasMeter().Limit())
 				default:
 					panic(r)
