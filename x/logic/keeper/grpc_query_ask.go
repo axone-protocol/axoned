@@ -14,7 +14,7 @@ import (
 
 func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {
 	if req == nil {
-		return nil, errorsmod.Wrap(types.InvalidArgument, "request is nil")
+		return nil, errorsmod.Wrap(types.ErrInvalidArgument, "request is nil")
 	}
 
 	sdkCtx := withSafeGasMeter(sdk.UnwrapSDKContext(ctx))
@@ -22,7 +22,7 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 		if r := recover(); r != nil {
 			if gasError, ok := r.(storetypes.ErrorOutOfGas); ok {
 				response, err = nil, errorsmod.Wrapf(
-					types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
+					types.ErrLimitExceeded, "out of gas: %s <%s> (%d/%d)",
 					types.ModuleName, gasError.Descriptor, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
 
 				return
@@ -49,7 +49,7 @@ func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) err
 	size := uint64(len(request.GetQuery()))
 
 	if limits.MaxSize != 0 && size > limits.MaxSize {
-		return errorsmod.Wrapf(types.LimitExceeded, "query: %d > MaxSize: %d", size, limits.MaxSize)
+		return errorsmod.Wrapf(types.ErrLimitExceeded, "query: %d > MaxSize: %d", size, limits.MaxSize)
 	}
 
 	return nil

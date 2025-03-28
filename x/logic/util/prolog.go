@@ -35,7 +35,7 @@ func QueryInterpreter(
 	p := engine.NewParser(&i.VM, strings.NewReader(query))
 	t, err := p.Term()
 	if err != nil {
-		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
+		return nil, errorsmod.Wrapf(types.ErrInvalidArgument, "error executing query: %v", err.Error())
 	}
 
 	var env *engine.Env
@@ -52,20 +52,20 @@ func QueryInterpreter(
 	vars := parsedVarsToVars(p.Vars)
 	results, err := envsToResults(envs, p.Vars, i)
 	if err != nil {
-		return nil, errorsmod.Wrapf(types.InvalidArgument, "error executing query: %v", err.Error())
+		return nil, errorsmod.Wrapf(types.ErrInvalidArgument, "error executing query: %v", err.Error())
 	}
 
 	if callErr != nil {
 		if uint64(len(results)) < solutionsLimit {
 			// error is not part of the look-ahead and should be included in the solutions
-			if errors.Is(callErr, types.LimitExceeded) {
+			if errors.Is(callErr, types.ErrLimitExceeded) {
 				return nil, callErr
 			}
 
 			var err engine.Exception
 			if errors.As(callErr, &err) {
 				if err, ok := isPanicError(err.Term()); ok {
-					return nil, errorsmod.Wrapf(types.LimitExceeded, "%s", err)
+					return nil, errorsmod.Wrapf(types.ErrLimitExceeded, "%s", err)
 				}
 			}
 
@@ -76,7 +76,7 @@ func QueryInterpreter(
 				sdkCtx := sdk.UnwrapSDKContext(ctx)
 				if sdkCtx.GasMeter().IsOutOfGas() {
 					return errorsmod.Wrapf(
-						types.LimitExceeded, "out of gas: %s <%s> (%d/%d)",
+						types.ErrLimitExceeded, "out of gas: %s <%s> (%d/%d)",
 						types.ModuleName, callErr.Error(), sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
 				}
 				return nil

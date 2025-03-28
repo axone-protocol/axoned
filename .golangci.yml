@@ -1,8 +1,6 @@
-run:
-  timeout: 10m
-
+version: "2"
 linters:
-  disable-all: true
+  default: none
   enable:
     - asciicheck
     - bidichk
@@ -17,17 +15,14 @@ linters:
     - exhaustive
     - forbidigo
     - funlen
-    - gci
     - gocognit
     - goconst
     - gocritic
     - gocyclo
     - godot
-    - goimports
     - gomodguard
     - goprintffuncname
     - gosec
-    - gosimple
     - govet
     - ineffassign
     - lll
@@ -43,71 +38,88 @@ linters:
     - promlinter
     - revive
     - staticcheck
-    - stylecheck
     - tagliatelle
-    - tenv
     - tparallel
-    - typecheck
     - unconvert
     - unparam
     - unused
     - wastedassign
     - whitespace
-
-linters-settings:
-  gci:
-    sections:
-      - standard # Standard section: captures all standard packages.
-      - default # Default section: contains all imports that could not be matched to another section type.
-      - blank # blank imports
-      - dot # dot imports
-      - prefix(github.com/cometbft/cometbft) # comet
-      - prefix(cosmossdk.io) # cosmossdk.io
-      - prefix(github.com/cosmos/cosmos-sdk) # cosmos-sdk & cosmos org libs
-      - prefix(github.com/cosmos/interchain-security) # interchain-security
-      - prefix(github.com/cosmos/ibc-go) # ibc
-      - prefix(github.com/axone-protocol/axoned) # axone
-    custom-order: true
-
-  cyclop:
-    max-complexity: 20
-    skip-tests: true
-  funlen:
-    statements: 65
-  godot:
-    scope: declarations # comments to be checked: `declarations` (default), `toplevel`, or `all`
-  lll:
-    line-length: 135
-  tagliatelle:
-    case:
-      use-field-name: true
-      rules:
-        json: snake
-        yaml: snake
-output:
-  uniq-by-line: false
-
+  settings:
+    cyclop:
+      max-complexity: 20
+    funlen:
+      statements: 65
+    godot:
+      scope: declarations
+    lll:
+      line-length: 135
+    tagliatelle:
+      case:
+        rules:
+          json: snake
+          yaml: snake
+        use-field-name: true
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    rules:
+      - linters:
+          - lll
+        source: ^//\s*go:generate\s
+      - linters:
+          - godot
+        source: (noinspection|TODO)
+      - linters:
+          - gocritic
+        source: //noinspection
+      - linters:
+          - errorlint
+        source: ^\s+if _, ok := err\.\([^.]+\.InternalError\); ok {
+      - linters:
+          - dupl
+          - funlen
+        path: _test\.go
+      - linters:
+          - revive
+        path: _test\.go
+        text: "dot-imports:"
+      - linters:
+          - cyclop
+        path: (.+)_test\.go
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
 issues:
   max-issues-per-linter: 0
   max-same-issues: 0
-  exclude-rules:
-    - source: "^//\\s*go:generate\\s"
-      linters:
-        - lll
-    - source: "(noinspection|TODO)"
-      linters:
-        - godot
-    - source: "//noinspection"
-      linters:
-        - gocritic
-    - source: "^\\s+if _, ok := err\\.\\([^.]+\\.InternalError\\); ok {"
-      linters:
-        - errorlint
-    - path: "_test\\.go"
-      linters:
-        - dupl
-        - funlen
-    - path: "_test\\.go"
-      linters:
-        - revive
-      text: "dot-imports:"
+  uniq-by-line: false
+formatters:
+  enable:
+    - gci
+    - goimports
+  settings:
+    gci:
+      sections:
+        - standard
+        - default
+        - blank
+        - dot
+        - prefix(github.com/cometbft/cometbft)
+        - prefix(cosmossdk.io)
+        - prefix(github.com/cosmos/cosmos-sdk)
+        - prefix(github.com/cosmos/interchain-security)
+        - prefix(github.com/cosmos/ibc-go)
+        - prefix(github.com/axone-protocol/axoned)
+      custom-order: true
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
