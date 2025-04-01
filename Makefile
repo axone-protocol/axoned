@@ -70,18 +70,18 @@ ifeq ($(LEDGER_ENABLED),true)
 	ifeq ($(OS),Windows_NT)
 		GCCEXE = $(shell where gcc.exe 2> NUL)
 		ifeq ($(GCCEXE),)
-			$(error gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
+			$(error ❌ gcc.exe not installed for ledger support, please install or set LEDGER_ENABLED=false)
 		else
 			build_tags += ledger
 		endif
 	else
 		UNAME_S = $(shell uname -s)
 		ifeq ($(UNAME_S),OpenBSD)
-			$(warning OpenBSD detected, disabling ledger support (https://$(MODULE_COSMOS_SDK)/issues/1988))
+			$(warning ⚠️ OpenBSD detected, disabling ledger support (https://$(MODULE_COSMOS_SDK)/issues/1988))
 		else
 			GCC = $(shell command -v gcc 2> /dev/null)
 			ifeq ($(GCC),)
-				$(error gcc not installed for ledger support, please install or set LEDGER_ENABLED=false)
+				$(error ❌ gcc not installed for ledger support, please install or set LEDGER_ENABLED=false)
 			else
 				build_tags += ledger
 			endif
@@ -149,7 +149,7 @@ lint: lint-go lint-proto ## Lint all available linters
 
 .PHONY: lint-go
 lint-go: ## Lint go source code
-	@echo "${COLOR_CYAN}🔍 Inspecting go source code${COLOR_RESET}"
+	@$(call echo_msg, 🔍, Inspecting, go source code, [golangci-lint]...)
 	@docker run --rm \
 		-v `pwd`:/app:ro \
 		-w /app \
@@ -158,7 +158,7 @@ lint-go: ## Lint go source code
 
 .PHONY: lint-proto
 lint-proto: ## Lint proto files
-	@echo "${COLOR_CYAN}🔍️ lint proto${COLOR_RESET}"
+	@$(call echo_msg, 🔍, Inspecting, proto files, [buf]...)
 	@$(DOCKER_BUF_RUN) lint proto -v
 
 ## Format:
@@ -167,7 +167,7 @@ format: format-go ## Run all available formatters
 
 .PHONY: format-go
 format-go: ## Format go files
-	@echo "${COLOR_CYAN}📐 Formatting go source code${COLOR_RESET}"
+	@${call echo_msg, 📐, Formatting, go source code, [gofumpt]...}
 	@docker run --rm \
 		-v `pwd`:/app:rw \
 		-w /app \
@@ -177,7 +177,7 @@ format-go: ## Format go files
 
 .PHONY: format-proto
 format-proto: ## Format proto files
-	@echo "${COLOR_CYAN}📐 Formatting proto files${COLOR_RESET}"
+	@${call echo_msg, 📐, Formatting, proto files, [buf]...}
 	@$(DOCKER_BUF_RUN) format -w
 
 ## Build:
@@ -186,14 +186,14 @@ build: build-go build-docker ## Build all available artefacts (executable, docke
 
 .PHONY: build-go
 build-go: ## Build node executable for the current environment (default build)
-	@echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN} ${COLOR_GREEN}(v${VERSION})${COLOR_RESET} into ${COLOR_YELLOW}${DIST_FOLDER}${COLOR_RESET}"
+	@${call echo_msg, 🏗, Building, project, ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN} ${COLOR_GREEN}(v${VERSION})${COLOR_RESET} into ${COLOR_YELLOW}${DIST_FOLDER}}
 	@$(call build-go,"","",${DIST_FOLDER}/${BINARY_NAME})
 
 build-go-all: $(ENVIRONMENTS_TARGETS) ## Build node executables for all available environments
 
 .PHONY: build-docker
 build-docker: $(TOOL_HEIGHLINER_BIN) ## Build docker image
-	@echo "${COLOR_CYAN} 🐳 Building local ${COLOR_RESET}docker${COLOR_CYAN} image${COLOR_RESET}"
+	@${call echo_msg, 🐳, Building, docker image,...}
 	@$(TOOL_HEIGHLINER_BIN) build -c axone --local
 
 $(ENVIRONMENTS_TARGETS):
@@ -212,14 +212,14 @@ $(ENVIRONMENTS_TARGETS):
 	fi; \
 	FOLDER=${DIST_FOLDER}/$$GOOS/$$GOARCH; \
 	FILENAME=$$FOLDER/${BINARY_NAME}; \
-	echo "${COLOR_CYAN} 🏗️ Building project ${COLOR_RESET}${CMD_ROOT}${COLOR_CYAN} for environment ${COLOR_YELLOW}$$GOOS ($$GOARCH)${COLOR_RESET} into ${COLOR_YELLOW}$$FOLDER${COLOR_RESET}" && \
+	$(call echo_msg, 🏗️, Building, project, ${CMD_ROOT}${COLOR_CYAN} ${COLOR_GREEN}(v${VERSION})${COLOR_RESET} into ${COLOR_YELLOW}$$FOLDER); \
 	$(call build-go,$$GOOS,$$GOARCH,$$FILENAME)
 
 
 ## Install:
 .PHONY: install
 install: ## Install node executable
-	@echo "${COLOR_CYAN} 🚚 Installing ${COLOR_YELLOW}${BINARY_NAME}${COLOR_RESET} (v${VERSION})"
+	@${call echo_msg, 🚚, Installing, ${BINARY_NAME}, (v${VERSION})}
 	@go install -mod=readonly ${BUILD_FLAGS} ${CMD_ROOT}
 
 ## Test:
@@ -228,12 +228,13 @@ test: test-go ## Pass all the tests
 
 .PHONY: test-go
 test-go: $(TOOL_TPARSE_BIN) build ## Pass the test for the go source code
-	@echo "${COLOR_CYAN} 🧪 Passing go tests${COLOR_RESET}"
+	@${call echo_msg, 🧪, Passing, go tests, ...}
 	@go test -v -coverprofile ./target/coverage.txt ./... -json | $(TOOL_TPARSE_BIN)
 
 ## Chain:
+.PHONY: chain-init
 chain-init: build-go ## Initialize the blockchain with default settings.
-	@echo "${COLOR_CYAN} 🛠️ Initializing chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} under ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
+	@${call echo_msg, 🛠️, Initializing, chain ${CHAIN}, under ${COLOR_YELLOW}${CHAIN_HOME}}
 
 	@rm -rf "${CHAIN_HOME}"; \
 	${CHAIN_BINARY} init axone-node \
@@ -264,21 +265,24 @@ chain-init: build-go ## Initialize the blockchain with default settings.
 	${CHAIN_BINARY} genesis collect-gentxs \
 		--home "${CHAIN_HOME}"
 
+.PHONY: chain-start
 chain-start: build-go ## Start the blockchain with existing configuration (see chain-init)
-	@echo "${COLOR_CYAN} 🛠️ Starting chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"; \
-	${CHAIN_BINARY} start --moniker ${CHAIN_MONIKER} \
+	@${call echo_msg, 🟢, Starting, chain ${CHAIN}, with configuration ${COLOR_YELLOW}${CHAIN_HOME}}
+	@${CHAIN_BINARY} start --moniker ${CHAIN_MONIKER} \
 		--home ${CHAIN_HOME}
 
+.PHONY: chain-stop
 chain-stop: ## Stop the blockchain
-	@echo "${COLOR_CYAN} ✋️ Stopping chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} with configuration ${COLOR_YELLOW}${CHAIN_HOME}${COLOR_RESET}"
+	@${call echo_msg, 🛑️, Stopping, chain ${CHAIN}, with configuration ${COLOR_YELLOW}${CHAIN_HOME}}
 	@killall axoned
 
+.PHONY: chain-upgrade
 chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION.
-	@echo "${COLOR_CYAN} ⬆️ Upgrade the chain ${COLOR_RESET}${CHAIN}${COLOR_CYAN} from ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} to ${COLOR_YELLOW}${TO_VERSION}${COLOR_RESET}"
+	@${call echo_msg, 🔄, Upgrading, chain ${CHAIN}, from ${COLOR_YELLOW}${FROM_VERSION} to ${COLOR_YELLOW}${TO_VERSION}}
 	@killall cosmovisor || \
 	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
 	git clone -b ${FROM_VERSION} https://$(MODULE_AXONED).git ${TARGET_FOLDER}/${FROM_VERSION}; \
-	echo "${COLOR_CYAN} 🏗 Build the ${COLOR_YELLOW}${FROM_VERSION}${COLOR_RESET}${COLOR_CYAN} binary...${COLOR_RESET}"; \
+	${call echo_msg, 🏗️, Building, binary,  ${COLOR_YELLOW}${FROM_VERSION}}; \
 	cd ${TARGET_FOLDER}/${FROM_VERSION}; \
 	make build-go; \
 	BINARY_OLD=${TARGET_FOLDER}/${FROM_VERSION}/${DIST_FOLDER}/${DAEMON_NAME}; \
@@ -286,7 +290,7 @@ chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to
 	echo $$BINARY_OLD; \
 	make chain-init CHAIN_BINARY=$$BINARY_OLD; \
 	\
-	echo "${COLOR_CYAN} 👩‍🚀 Preparing cosmovisor ${COLOR_RESET}"; \
+	${call echo_msg, 👩‍🚀, Preparing, cosmovisor}; \
 	export DAEMON_NAME=${DAEMON_NAME}; \
 	export DAEMON_HOME=${DAEMON_HOME}; \
 	\
@@ -297,7 +301,7 @@ chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to
 		--home ${CHAIN_HOME} \
 		--log_level debug & \
 	sleep 10; \
-	echo "${COLOR_CYAN} 🗳️ Submitting software-upgrade tx ${COLOR_RESET}"; \
+	${call echo_msg, 🗳️, Submitting, software-upgrade tx}; \
 	$$BINARY_OLD tx upgrade software-upgrade ${TO_VERSION}\
 		--title "Axoned upgrade" \
 		--summary "⬆️ Upgrade the chain from ${FROM_VERSION} to ${TO_VERSION}" \
@@ -325,7 +329,7 @@ chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to
 ## Clean:
 .PHONY: clean
 clean: ## Remove all the files from the target folder
-	@echo "${COLOR_CYAN} 🗑 Cleaning folder $(TARGET_FOLDER)${COLOR_RESET}"
+	@${call echo_msg, 🗑️, Cleaning, ${TARGET_FOLDER},}
 	@rm -rf $(TARGET_FOLDER)/
 
 ## Proto:
@@ -334,7 +338,7 @@ proto: format-proto lint-proto proto-gen doc-proto ## Generate all resources for
 
 .PHONY: proto-gen
 proto-gen: ## Generate all the code from the Protobuf files
-	@echo "${COLOR_CYAN} 📝 Generating code from Protobuf files${COLOR_RESET}"
+	@${call echo_msg, 🖨️, Generating, code, from ${COLOR_YELLOW}proto files}
 	@$(DOCKER_PROTO_RUN) sh ./scripts/protocgen-code.sh
 
 
@@ -344,10 +348,10 @@ doc: doc-proto doc-command doc-predicate ## Generate all the documentation
 
 .PHONY: doc-proto
 doc-proto: proto-gen ## Generate the documentation from the Protobuf files
-	@echo "${COLOR_CYAN} 📝 Generating doc from Protobuf files${COLOR_RESET}"
+	@${call echo_msg, 📖, Generating, documentation, from ${COLOR_YELLOW}proto files}
 	@$(DOCKER_PROTO_RUN) sh ./scripts/protocgen-doc.sh
 	@for MODULE in $(shell find proto -name '*.proto' -maxdepth 3 -print0 | xargs -0 -n1 dirname | sort | uniq | xargs dirname) ; do \
-		echo "${COLOR_CYAN} 📖 Generate documentation for $${MODULE} module${COLOR_RESET}" ; \
+		${call echo_msg, 📖, Generating, documentation, for ${COLOR_YELLOW}$$MODULE${COLOR_RESET} module}; \
 		DEFAULT_DATASOURCE="./docs/proto/templates/default.yaml" ; \
 		MODULE_DATASOURCE="merge:./$${MODULE}/docs.yaml|$${DEFAULT_DATASOURCE}" ; \
 		DATASOURCE="docs=`[ -f $${MODULE}/docs.yaml ] && echo $$MODULE_DATASOURCE || echo $${DEFAULT_DATASOURCE}`" ; \
@@ -365,7 +369,7 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 
 .PHONY: doc-command
 doc-command: ## Generate markdown documentation for the command
-	@echo "${COLOR_CYAN} 📖 Generate markdown documentation for the command${COLOR_RESET}"
+	@${call echo_msg, 📖, Generating, documentation, for the CLI}
 	@OUT_FOLDER="docs/command"; \
 	rm -rf $$OUT_FOLDER; \
 	go get ./scripts; \
@@ -383,7 +387,7 @@ doc-command: ## Generate markdown documentation for the command
 
 .PHONY: doc-predicate
 doc-predicate: ## Generate markdown documentation for all the predicates (module logic)
-	@echo "${COLOR_CYAN} 📖 Generate markdown documentation for the predicates${COLOR_RESET}"
+	${call echo_msg, 📖, Generating, documentation, for Predicates}
 	@OUT_FOLDER="docs/predicate"; \
 	rm -rf $$OUT_FOLDER; \
 	mkdir -p $$OUT_FOLDER; \
@@ -398,7 +402,7 @@ doc-predicate: ## Generate markdown documentation for all the predicates (module
 ## Mock:
 .PHONY: mock
 mock: ## Generate all the mocks (for tests)
-	@echo "${COLOR_CYAN} 🧱 Generating all the mocks${COLOR_RESET}"
+	@${call echo_msg, 🧱, Generating, mocks}
 	@go install go.uber.org/mock/mockgen@v0.5.0
 	@mockgen -source=x/mint/types/expected_keepers.go -package testutil -destination x/mint/testutil/expected_keepers_mocks.go
 	@mockgen -source=x/vesting/types/expected_keepers.go -package testutil -destination x/vesting/testutil/expected_keepers_mocks.go
@@ -420,7 +424,7 @@ $(RELEASE_TARGETS): ensure-buildx-builder
 	@GOOS=$(word 3, $(subst -, ,$@)); \
 	GOARCH=$(word 4, $(subst -, ,$@)); \
 	BINARY_NAME="axoned-${VERSION}-$$GOOS-$$GOARCH"; \
-	echo "${COLOR_CYAN} 🎁 Building ${COLOR_GREEN}$$GOOS $$GOARCH ${COLOR_CYAN}release binary${COLOR_RESET} into ${COLOR_YELLOW}${RELEASE_FOLDER}${COLOR_RESET}"; \
+	${call echo_msg, 🎁️, Building, project, ${COLOR_CYAN}$$BINARY_NAME${COLOR_RESET} into ${COLOR_YELLOW}${RELEASE_FOLDER}}; \
 	docker buildx use ${DOCKER_BUILDX_BUILDER}; \
 	docker buildx build \
 		--platform $$GOOS/$$GOARCH \
@@ -435,14 +439,14 @@ $(RELEASE_TARGETS): ensure-buildx-builder
 	tar -zcvf ${RELEASE_FOLDER}/$$BINARY_NAME.tar.gz ${RELEASE_FOLDER}/$$BINARY_NAME;
 
 release-checksums:
-	@echo "${COLOR_CYAN} 🐾 Generating release binary checksums${COLOR_RESET} into ${COLOR_YELLOW}${RELEASE_FOLDER}${COLOR_RESET}"
+	@${call echo_msg, 🔑, Generating, release binary ${COLOR_YELLOW}checksums}
 	@rm ${RELEASE_FOLDER}/sha256sum.txt; \
 	for asset in `ls ${RELEASE_FOLDER}`; do \
 		shasum -a 256 ${RELEASE_FOLDER}/$$asset >> ${RELEASE_FOLDER}/sha256sum.txt; \
 	done;
 
 ensure-buildx-builder:
-	@echo "${COLOR_CYAN} 👷 Ensuring docker buildx builder${COLOR_RESET}"
+	@${call echo_msg, 👷, Ensuring, docker ${COLOR_YELLOW}buildx${COLOR_RESET} builder}
 	@docker buildx ls | sed '1 d' | cut -f 1 -d ' ' | grep -q ${DOCKER_BUILDX_BUILDER} || \
 	docker buildx create --name ${DOCKER_BUILDX_BUILDER}
 
@@ -457,12 +461,12 @@ deps-tparse: $(TOOL_TPARSE_BIN) ## Install $TOOL_TPARSE_NAME $TOOL_TPARSE_VERSIO
 deps-heighliner: $(TOOL_HEIGHLINER_BIN) ## Install $TOOL_HEIGHLINER_NAME $TOOL_HEIGHLINER_VERSION ($TOOL_HEIGHLINER_PKG)
 
 $(TOOL_TPARSE_BIN):
-	@echo "${COLOR_CYAN} 📦 Installing ${COLOR_GREEN}$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)${COLOR_CYAN}...${COLOR_RESET}"
+	@${call echo_msg, 📦, Installing, $(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION),...}
 	@mkdir -p $(dir $(TOOL_TPARSE_BIN))
 	@GOBIN=$(dir $(abspath $(TOOL_TPARSE_BIN))) go install $(TOOL_TPARSE_PKG)
 
 $(TOOL_HEIGHLINER_BIN):
-	@echo "${COLOR_CYAN} 📦 Installing ${COLOR_GREEN}$(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION)${COLOR_CYAN}...${COLOR_RESET}"
+	@${call echo_msg, 📦, Installing, $(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION),...}
 	@mkdir -p $(dir $(TOOL_HEIGHLINER_BIN))
 	CUR_DIR=$(shell pwd) && \
 	TEMP_DIR=$(shell mktemp -d) && \
@@ -496,6 +500,11 @@ help: ## Show this help.
 	@echo '- for ${COLOR_YELLOW}macOS${COLOR_RESET}: https://docs.docker.com/docker-for-mac/install/'
 	@echo '- for ${COLOR_YELLOW}Windows${COLOR_RESET}: https://docs.docker.com/docker-for-windows/install/'
 	@echo '- for ${COLOR_YELLOW}Linux${COLOR_RESET}: https://docs.docker.com/engine/install/'
+
+# $(call echo_msg, <emoji>, <action>, <object>, <context>)
+define echo_msg
+	echo "$(strip $(1)) ${COLOR_GREEN}$(strip $(2))${COLOR_RESET} ${COLOR_CYAN}$(strip $(3))${COLOR_RESET} $(strip $(4))${COLOR_RESET}"
+endef
 
 # Build go executable
 # $1: operating system (GOOS)
