@@ -1,6 +1,7 @@
 module github.com/axone-protocol/axoned/v11
 
 go 1.23.3
+
 toolchain go1.24.1
 
 require (
@@ -8,7 +9,7 @@ require (
 	cosmossdk.io/client/v2 v2.0.0-beta.1
 	cosmossdk.io/collections v0.4.0
 	cosmossdk.io/core v0.11.1
-	cosmossdk.io/depinject v1.1.0
+	cosmossdk.io/depinject v1.2.0
 	cosmossdk.io/errors v1.0.2
 	cosmossdk.io/log v1.5.1
 	cosmossdk.io/math v1.5.2
@@ -179,7 +180,7 @@ require (
 	github.com/golang/snappy v0.0.4 // indirect
 	github.com/google/btree v1.1.3 // indirect
 	github.com/google/flatbuffers v1.12.1 // indirect
-	github.com/google/go-cmp v0.6.0 // indirect
+	github.com/google/go-cmp v0.7.0 // indirect
 	github.com/google/gofuzz v1.2.0 // indirect
 	github.com/google/orderedcode v0.0.1 // indirect
 	github.com/google/s2a-go v0.1.8 // indirect
@@ -319,7 +320,7 @@ require (
 	golang.org/x/tools v0.31.0 // indirect
 	google.golang.org/api v0.215.0 // indirect
 	google.golang.org/genproto v0.0.0-20241118233622-e639e219e697 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20250303144028-a0af3efb3deb // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250324211829-b45e905df463 // indirect
 	gopkg.in/warnings.v0 v0.1.2 // indirect
 	gopkg.in/yaml.v2 v2.4.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect
