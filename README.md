@@ -29,7 +29,14 @@
 
 `axoned` is the node of the [AXONE](https://axone.xyz) network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, which allows companies & individuals to define on-chain rules, share any off-chain resources & create a new generation of applications on top of them.
 
-Read more in the [introduction blog post](https://blog.axone.xyz/). For a high-level overview of the AXONE protocol and network economics, check out the [white paper](https://docs.axone.xyz/docs/whitepaper/abstract).
+- 📖 Read the [introduction blog post](https://blog.axone.xyz/) to understand the project’s vision.
+- 🧠 Explore the [white paper](https://docs.axone.xyz/docs/whitepaper/abstract) for a deeper look at the protocol architecture and network economics.
+
+Looking for more?
+
+- If you’re searching for Axone' smart contracts → [github.com/axone-protocol/contracts](https://github.com/axone-protocol/contracts)
+- For the Axone SDK → [github.com/axone-protocol/axone-sdk](https://github.com/axone-protocol/axone-sdk)
+- For the MCP server implementation → [github.com/axone-protocol/axone-mcp](https://github.com/axone-protocol/axone-mcp)
 
 ## Want to become a validator?
 
@@ -44,11 +51,11 @@ Looking for a network to join ? 👉 [Checkout the networks!](https://github.com
 The `axoned` blockchain currently supports the following builds:
 
 | **Platform** | **Arch** |       **Status**       |
-|--------------|----------|:----------------------:|
-| Darwin       | amd64    |           ✅            |
-| Darwin       | arm64    |           ✅            |
-| Linux        | amd64    |           ✅            |
-| Linux        | arm64    |           ✅            |
+| ------------ | -------- | :--------------------: |
+| Darwin       | amd64    |           ✅           |
+| Darwin       | arm64    |           ✅           |
+| Linux        | amd64    |           ✅           |
+| Linux        | arm64    |           ✅           |
 | Windows      | amd64    | ️🚫<br/> Not supported |
 
 > Note: as the blockchain depends on [CosmWasm/wasmvm](https://github.com/CosmWasm/wasmvm), we only support the targets
@@ -202,9 +209,9 @@ you're willing to give!
 
 ## Audit
 
-| Date | Auditor | Version | Report |
-|---|---|---|---|
-| 2024/08/22 | [BlockApex](https://blockapex.io/) | [2f0f84d (v10.0.0)](https://github.com/axone-protocol/axoned/tree/2f0f84d369852bdb178e299a88c1b8eeb0654b8e) | [Axone Blockchain - Final Audit Report.pdf](https://github.com/BlockApex/Audit-Reports/blob/15d8765ac45b4a83bb2f1446fc9bf869c123f8d2/Axone%20Blockchain%20-%20Final%20Audit%20Report.pdf)|
+| Date       | Auditor                            | Version                                                                                                     | Report                                                                                                                                                                                    |
+| ---------- | ---------------------------------- | ----------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2024/08/22 | [BlockApex](https://blockapex.io/) | [2f0f84d (v10.0.0)](https://github.com/axone-protocol/axoned/tree/2f0f84d369852bdb178e299a88c1b8eeb0654b8e) | [Axone Blockchain - Final Audit Report.pdf](https://github.com/BlockApex/Audit-Reports/blob/15d8765ac45b4a83bb2f1446fc9bf869c123f8d2/Axone%20Blockchain%20-%20Final%20Audit%20Report.pdf) |
 
 ## Community
 
