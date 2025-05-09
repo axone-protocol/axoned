@@ -106,7 +106,7 @@ jobs:
         uses: golangci/golangci-lint-action@v8
         if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
-          version: v2.0
+          version: v2.1.6
 
       - name: Lint go code (gofumpt)
         if: steps.changed-go-files.outputs.any_changed == 'true'
