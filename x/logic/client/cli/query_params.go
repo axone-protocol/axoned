@@ -8,7 +8,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 
-	"github.com/axone-protocol/axoned/v11/x/logic/types"
+	"github.com/axone-protocol/axoned/v12/x/logic/types"
 )
 
 func CmdQueryParams() *cobra.Command {

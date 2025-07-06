@@ -21,8 +21,8 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 
-	"github.com/axone-protocol/axoned/v11/x/logic/testutil"
-	"github.com/axone-protocol/axoned/v11/x/logic/types"
+	"github.com/axone-protocol/axoned/v12/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v12/x/logic/types"
 )
 
 //nolint:gocognit

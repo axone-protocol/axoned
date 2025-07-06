@@ -1,7 +1,7 @@
 package wasm
 
 import (
-	"github.com/axone-protocol/axoned/v11/x/logic/types"
+	"github.com/axone-protocol/axoned/v12/x/logic/types"
 )
 
 // AskQuery implements the wasm custom Ask query JSON schema, it basically redefined the Ask gRPC request parameters

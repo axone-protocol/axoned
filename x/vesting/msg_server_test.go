@@ -21,9 +21,9 @@ import (
 	authkeeper "github.com/cosmos/cosmos-sdk/x/auth/keeper"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/axone-protocol/axoned/v11/x/vesting"
-	vestingtestutil "github.com/axone-protocol/axoned/v11/x/vesting/testutil"
-	vestingtypes "github.com/axone-protocol/axoned/v11/x/vesting/types"
+	"github.com/axone-protocol/axoned/v12/x/vesting"
+	vestingtestutil "github.com/axone-protocol/axoned/v12/x/vesting/testutil"
+	vestingtypes "github.com/axone-protocol/axoned/v12/x/vesting/types"
 )
 
 var (

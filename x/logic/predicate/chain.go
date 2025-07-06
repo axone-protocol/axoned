@@ -8,7 +8,7 @@ import (
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 	"github.com/cometbft/cometbft/proto/tendermint/version"
 
-	"github.com/axone-protocol/axoned/v11/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v12/x/logic/prolog"
 )
 
 // BlockHeader is a predicate which unifies the given term with the current block header.

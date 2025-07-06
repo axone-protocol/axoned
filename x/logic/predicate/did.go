@@ -7,7 +7,7 @@ import (
 	godid "github.com/nuts-foundation/go-did/did"
 	"github.com/samber/lo"
 
-	"github.com/axone-protocol/axoned/v11/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v12/x/logic/prolog"
 )
 
 // DIDPrefix is the prefix for a DID.

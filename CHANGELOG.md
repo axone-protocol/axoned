@@ -1,5 +1,24 @@
 # AXONE protocol changelog
 
+## [12.0.0](https://github.com/axone-protocol/axoned/compare/v11.0.1...v12.0.0) (2025-07-06)
+
+
+### ⚠ BREAKING CHANGES
+
+* **ibc:** unplug IBC for now 🔌
+
+### Features
+
+* **app:** add MaxWasmSize parameter for configurable Wasm code limits ([caa0403](https://github.com/axone-protocol/axoned/commit/caa0403b192d7ed3e2742440e6985c335776c5c3))
+* **logic:** add base64_encoded/3 precicate ([d1a75ee](https://github.com/axone-protocol/axoned/commit/d1a75eea1197a40cb7ae55d73799d1ba8f4b4419))
+* **logic:** add base64/2 predicate ([7e55d19](https://github.com/axone-protocol/axoned/commit/7e55d1942bb5db1da8152dde6515166f8adc8e4b))
+* **logic:** add base64url/2 predicate ([3176ff7](https://github.com/axone-protocol/axoned/commit/3176ff7b2100e7007ddb31b9ce11c70f988075f0))
+
+
+### Code Refactoring
+
+* **ibc:** unplug IBC for now 🔌 ([324685f](https://github.com/axone-protocol/axoned/commit/324685f9c6962d5f66799f4df751b29e99360675))
+
 ## [11.0.1](https://github.com/axone-protocol/axoned/compare/v11.0.0...v11.0.1) (2024-12-18)
 
 ### Build

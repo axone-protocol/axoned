@@ -9,8 +9,8 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v11/x/logic/prolog"
-	"github.com/axone-protocol/axoned/v11/x/logic/types"
+	"github.com/axone-protocol/axoned/v12/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v12/x/logic/types"
 )
 
 // BankBalances is a predicate which unifies the given terms with the list of balances (coins) of the given account.

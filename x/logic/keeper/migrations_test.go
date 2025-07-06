@@ -19,11 +19,11 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/axone-protocol/axoned/v11/x/logic"
-	"github.com/axone-protocol/axoned/v11/x/logic/keeper"
-	v1beta2types "github.com/axone-protocol/axoned/v11/x/logic/legacy/v1beta2/types"
-	logictestutil "github.com/axone-protocol/axoned/v11/x/logic/testutil"
-	"github.com/axone-protocol/axoned/v11/x/logic/types"
+	"github.com/axone-protocol/axoned/v12/x/logic"
+	"github.com/axone-protocol/axoned/v12/x/logic/keeper"
+	v1beta2types "github.com/axone-protocol/axoned/v12/x/logic/legacy/v1beta2/types"
+	logictestutil "github.com/axone-protocol/axoned/v12/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v12/x/logic/types"
 )
 
 func TestMigrateStoreV10ToV11(t *testing.T) {

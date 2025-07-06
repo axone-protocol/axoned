@@ -12,8 +12,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/types/query"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/axone-protocol/axoned/v11/x/logic/prolog"
-	"github.com/axone-protocol/axoned/v11/x/logic/types"
+	"github.com/axone-protocol/axoned/v12/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v12/x/logic/types"
 )
 
 // SortBalances by coin denomination.

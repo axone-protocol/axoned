@@ -10,8 +10,8 @@ import (
 	cdctypes "github.com/cosmos/cosmos-sdk/codec/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v11/x/logic/fs"
-	"github.com/axone-protocol/axoned/v11/x/logic/types"
+	"github.com/axone-protocol/axoned/v12/x/logic/fs"
+	"github.com/axone-protocol/axoned/v12/x/logic/types"
 )
 
 type (
