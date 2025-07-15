@@ -154,13 +154,6 @@ const (
 	Name                 = "axoned"
 )
 
-const (
-	// IBCEnabled is a flag used to enable IBC-related features.
-	// It is set to false for now.
-	// https://blog.axone.xyz/axone-mainnet-launches-july-8-but-why-the-axone-token-wont-be-tradable-at-launch-066ef652882d
-	IBCEnabled = false
-)
-
 var (
 	// DefaultNodeHome default home directories for the application daemon.
 	DefaultNodeHome string
@@ -714,15 +707,13 @@ func New(
 		circuit.NewAppModule(appCodec, app.CircuitKeeper),
 	}
 
-	if IBCEnabled {
-		appModules = append(appModules,
-			capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
-			ibc.NewAppModule(app.IBCKeeper),
-			transfer.NewAppModule(app.TransferKeeper),
-			ibcfee.NewAppModule(app.IBCFeeKeeper),
-			ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
-			ibctm.AppModule{})
-	}
+	appModules = append(appModules,
+		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),
+		ibc.NewAppModule(app.IBCKeeper),
+		transfer.NewAppModule(app.TransferKeeper),
+		ibcfee.NewAppModule(app.IBCFeeKeeper),
+		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
+		ibctm.AppModule{})
 
 	appModules = append(appModules,
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper,

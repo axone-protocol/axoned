@@ -29,6 +29,10 @@ axoned tx [flags]
 * [axoned tx feegrant](axoned_tx_feegrant.md)	 - Feegrant transactions sub-commands
 * [axoned tx gov](axoned_tx_gov.md)	 - Governance transactions subcommands
 * [axoned tx group](axoned_tx_group.md)	 - Group transaction subcommands
+* [axoned tx ibc](axoned_tx_ibc.md)	 - IBC transaction subcommands
+* [axoned tx ibc-fee](axoned_tx_ibc-fee.md)	 - IBC relayer incentivization transaction subcommands
+* [axoned tx ibc-transfer](axoned_tx_ibc-transfer.md)	 - IBC fungible token transfer transaction subcommands
+* [axoned tx interchain-accounts](axoned_tx_interchain-accounts.md)	 - IBC interchain accounts transaction subcommands
 * [axoned tx logic](axoned_tx_logic.md)	 - Transactions commands for the logic module
 * [axoned tx mint](axoned_tx_mint.md)	 - Transactions commands for the mint module
 * [axoned tx multi-sign](axoned_tx_multi-sign.md)	 - Generate multisig signatures for transactions generated offline
