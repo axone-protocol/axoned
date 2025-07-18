@@ -58,8 +58,9 @@ MAJOR_VERSION := $(shell cat version | cut -d. -f1)
 COMMIT        := $(shell git log -1 --format='%H')
 
 # Modules
-MODULE_COSMOS_SDK := github.com/cosmos/cosmos-sdk
-MODULE_AXONED     := github.com/axone-protocol/axoned/v$(MAJOR_VERSION)
+MODULE_COSMOS_SDK       := github.com/cosmos/cosmos-sdk
+MODULE_AXONED						:= github.com/axone-protocol/axoned
+MODULE_AXONED_VERSIONED := $(MODULE_AXONED)/v$(MAJOR_VERSION)
 
 # Build options
 MAX_WASM_SIZE := $(shell echo "$$((1 * 1024 * 1024))")
@@ -104,7 +105,7 @@ ldflags = \
 	-X $(MODULE_COSMOS_SDK)/version.Version=$(VERSION) \
 	-X $(MODULE_COSMOS_SDK)/version.Commit=$(COMMIT)   \
 	-X $(MODULE_COSMOS_SDK)/version.BuildTags=$(build_tags_comma_sep) \
-	-X $(MODULE_AXONED)/app.MaxWasmSize=$(MAX_WASM_SIZE)              \
+	-X $(MODULE_AXONED_VERSIONED)/app.MaxWasmSize=$(MAX_WASM_SIZE)              \
 
 ifeq (,$(findstring nostrip,$(BUILD_OPTIONS)))
 	ldflags += -w -s
@@ -287,7 +288,6 @@ chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to
 	make build-go; \
 	BINARY_OLD=${TARGET_FOLDER}/${FROM_VERSION}/${DIST_FOLDER}/${DAEMON_NAME}; \
 	cd ../../; \
-	echo $$BINARY_OLD; \
 	make chain-init CHAIN_BINARY=$$BINARY_OLD; \
 	\
 	${call echo_msg, 👩‍🚀, Preparing, cosmovisor}; \
