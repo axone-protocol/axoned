@@ -200,14 +200,6 @@ func initRootCmd(
 func genesisCommand(txConfig client.TxConfig, basicManager module.BasicManager, cmds ...*cobra.Command) *cobra.Command {
 	cmd := genutilcli.Commands(txConfig, basicManager, app.DefaultNodeHome)
 
-	// Remove default `add-genesis-account` command and add our custom (integrating the cliff),
-	for _, command := range cmd.Commands() {
-		if command.Name() == "add-genesis-account" {
-			cmd.RemoveCommand(command)
-		}
-	}
-	cmd.AddCommand(AddGenesisAccountCmd(app.DefaultNodeHome, txConfig.SigningContext().AddressCodec()))
-
 	for _, subCmd := range cmds {
 		cmd.AddCommand(subCmd)
 	}

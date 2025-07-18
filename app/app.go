@@ -145,8 +145,8 @@ import (
 	"github.com/axone-protocol/axoned/v12/x/mint"
 	mintkeeper "github.com/axone-protocol/axoned/v12/x/mint/keeper"
 	minttypes "github.com/axone-protocol/axoned/v12/x/mint/types"
-	"github.com/axone-protocol/axoned/v12/x/vesting"
-	vestingtypes "github.com/axone-protocol/axoned/v12/x/vesting/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 )
 
 const (
