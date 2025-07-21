@@ -31,6 +31,11 @@ TOOL_HEIGHLINER_VERSION  := v1.7.1
 TOOL_HEIGHLINER_PKG      := github.com/strangelove-ventures/$(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION)
 TOOL_HEIGHLINER_BIN      := ${TOOLS_FOLDER}/$(TOOL_HEIGHLINER_NAME)/$(TOOL_HEIGHLINER_VERSION)/$(TOOL_HEIGHLINER_NAME)
 
+TOOL_COSMOVISOR_NAME    := cosmovisor
+TOOL_COSMOVISOR_VERSION := v1.7.1
+TOOL_COSMOVISOR_PKG     := cosmossdk.io/tools/$(TOOL_COSMOVISOR_NAME)/cmd/$(TOOL_COSMOVISOR_NAME)@$(TOOL_COSMOVISOR_VERSION)
+TOOL_COSMOVISOR_BIN     := ${TOOLS_FOLDER}/$(TOOL_COSMOVISOR_NAME)/$(TOOL_COSMOVISOR_VERSION)/$(TOOL_COSMOVISOR_NAME)
+
 # Some colors (if supported)
 define get_color
 $(shell tput -Txterm $(1) $(2) 2>/dev/null || echo "")
@@ -58,8 +63,9 @@ MAJOR_VERSION := $(shell cat version | cut -d. -f1)
 COMMIT        := $(shell git log -1 --format='%H')
 
 # Modules
-MODULE_COSMOS_SDK := github.com/cosmos/cosmos-sdk
-MODULE_AXONED     := github.com/axone-protocol/axoned/v$(MAJOR_VERSION)
+MODULE_COSMOS_SDK       := github.com/cosmos/cosmos-sdk
+MODULE_AXONED						:= github.com/axone-protocol/axoned
+MODULE_AXONED_VERSIONED := $(MODULE_AXONED)/v$(MAJOR_VERSION)
 
 # Build options
 MAX_WASM_SIZE := $(shell echo "$$((1 * 1024 * 1024))")
@@ -104,7 +110,7 @@ ldflags = \
 	-X $(MODULE_COSMOS_SDK)/version.Version=$(VERSION) \
 	-X $(MODULE_COSMOS_SDK)/version.Commit=$(COMMIT)   \
 	-X $(MODULE_COSMOS_SDK)/version.BuildTags=$(build_tags_comma_sep) \
-	-X $(MODULE_AXONED)/app.MaxWasmSize=$(MAX_WASM_SIZE)              \
+	-X $(MODULE_AXONED_VERSIONED)/app.MaxWasmSize=$(MAX_WASM_SIZE)              \
 
 ifeq (,$(findstring nostrip,$(BUILD_OPTIONS)))
 	ldflags += -w -s
@@ -277,9 +283,9 @@ chain-stop: ## Stop the blockchain
 	@killall axoned
 
 .PHONY: chain-upgrade
-chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION.
+chain-upgrade: build-go deps-$(TOOL_COSMOVISOR_NAME) ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION.
 	@${call echo_msg, 🔄, Upgrading, chain ${CHAIN}, from ${COLOR_YELLOW}${FROM_VERSION} to ${COLOR_YELLOW}${TO_VERSION}}
-	@killall cosmovisor || \
+	@killall $(TOOL_COSMOVISOR_BIN) || \
 	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
 	git clone -b ${FROM_VERSION} https://$(MODULE_AXONED).git ${TARGET_FOLDER}/${FROM_VERSION}; \
 	${call echo_msg, 🏗️, Building, binary,  ${COLOR_YELLOW}${FROM_VERSION}}; \
@@ -287,18 +293,17 @@ chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to
 	make build-go; \
 	BINARY_OLD=${TARGET_FOLDER}/${FROM_VERSION}/${DIST_FOLDER}/${DAEMON_NAME}; \
 	cd ../../; \
-	echo $$BINARY_OLD; \
 	make chain-init CHAIN_BINARY=$$BINARY_OLD; \
 	\
-	${call echo_msg, 👩‍🚀, Preparing, cosmovisor}; \
+	${call echo_msg, 👩‍🚀, Preparing, $(TOOL_COSMOVISOR_BIN)}; \
 	export DAEMON_NAME=${DAEMON_NAME}; \
 	export DAEMON_HOME=${DAEMON_HOME}; \
 	\
 	cat <<< $$(jq '.app_state.gov.params.voting_period = "20s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
 	\
-	cosmovisor init $$BINARY_OLD; \
-	cosmovisor run start --moniker ${CHAIN_MONIKER} \
-		--home ${CHAIN_HOME} \
+	$(TOOL_COSMOVISOR_BIN) init $$BINARY_OLD; \
+	$(TOOL_COSMOVISOR_BIN) run start --moniker ${CHAIN_MONIKER} \
+		--home ${DAEMON_HOME} \
 		--log_level debug & \
 	sleep 10; \
 	${call echo_msg, 🗳️, Submitting, software-upgrade tx}; \
@@ -452,13 +457,16 @@ ensure-buildx-builder:
 
 ## Dependencies:
 .PHONY: deps
-deps: deps-$(TOOL_TPARSE_NAME) deps-$(TOOL_HEIGHLINER_NAME) ## Install all the dependencies (tools, etc.)
+deps: deps-$(TOOL_TPARSE_NAME) deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) ## Install all the dependencies (tools, etc.)
 
 .PHONY: deps-$(TOOL_TPARSE_NAME)
 deps-tparse: $(TOOL_TPARSE_BIN) ## Install $TOOL_TPARSE_NAME $TOOL_TPARSE_VERSION ($TOOL_TPARSE_PKG)
 
 .PHONY: deps-$(TOOL_HEIGHLINER_NAME)
 deps-heighliner: $(TOOL_HEIGHLINER_BIN) ## Install $TOOL_HEIGHLINER_NAME $TOOL_HEIGHLINER_VERSION ($TOOL_HEIGHLINER_PKG)
+
+.PHONY: deps-$(TOOL_COSMOVISOR_NAME)
+deps-cosmovisor: $(TOOL_COSMOVISOR_BIN) ## Install $TOOL_COSMOVISOR_NAME $TOOL_COSMOVISOR_VERSION ($TOOL_COSMOVISOR_PKG)
 
 $(TOOL_TPARSE_BIN):
 	@${call echo_msg, 📦, Installing, $(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION),...}
@@ -478,6 +486,11 @@ $(TOOL_HEIGHLINER_BIN):
 	cd $$CUR_DIR && \
 	mv $$TEMP_DIR/heighliner $(TOOL_HEIGHLINER_BIN) && \
 	rm -rf $$TEMP_DIR
+
+$(TOOL_COSMOVISOR_BIN):
+	@${call echo_msg, 📦, Installing, $(TOOL_COSMOVISOR_NAME)@$(TOOL_COSMOVISOR_VERSION),...}
+	@mkdir -p $(dir $(TOOL_COSMOVISOR_BIN))
+	@GOBIN=$(dir $(abspath $(TOOL_COSMOVISOR_BIN))) go install $(TOOL_COSMOVISOR_PKG)
 
 ## Help:
 .PHONY: help

@@ -72,6 +72,8 @@ import (
 	authsims "github.com/cosmos/cosmos-sdk/x/auth/simulation"
 	authtx "github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
+	"github.com/cosmos/cosmos-sdk/x/auth/vesting"
+	vestingtypes "github.com/cosmos/cosmos-sdk/x/auth/vesting/types"
 	"github.com/cosmos/cosmos-sdk/x/authz"
 	authzkeeper "github.com/cosmos/cosmos-sdk/x/authz/keeper"
 	authzmodule "github.com/cosmos/cosmos-sdk/x/authz/module"
@@ -145,8 +147,6 @@ import (
 	"github.com/axone-protocol/axoned/v12/x/mint"
 	mintkeeper "github.com/axone-protocol/axoned/v12/x/mint/keeper"
 	minttypes "github.com/axone-protocol/axoned/v12/x/mint/types"
-	"github.com/axone-protocol/axoned/v12/x/vesting"
-	vestingtypes "github.com/axone-protocol/axoned/v12/x/vesting/types"
 )
 
 const (

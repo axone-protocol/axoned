@@ -117,11 +117,11 @@ message GasPolicy {
   // WeightingFactor is the factor that is applied to the unit cost of each predicate
   // to yield the gas value.
   // If set to 0, the value considered is 1.
-  uint64 weighting_factor = 1 [ (gogoproto.moretags) = "yaml:\"weighting_factor\"" ];
+  uint64 weighting_factor = 1 [(gogoproto.moretags) = "yaml:\"weighting_factor\""];
 
   // DefaultPredicateCost is the default unit cost of a predicate when not specified in the PredicateCosts list.
   // If set to 0, the value considered is 1.
-  uint64 default_predicate_cost = 2 [ (gogoproto.moretags) = "yaml:\"default_predicate_cost\"" ];
+  uint64 default_predicate_cost = 2 [(gogoproto.moretags) = "yaml:\"default_predicate_cost\""];
 
   // PredicateCosts is the list of predicates and their associated unit costs.
   repeated PredicateCost predicate_costs = 3 [
@@ -141,5 +141,5 @@ message PredicateCost {
 
   // Cost is the unit cost of the predicate.
   // If set to 0, the value considered is 1.
-  uint64 cost = 2 [ (gogoproto.moretags) = "yaml:\"cost\"" ];
+  uint64 cost = 2 [(gogoproto.moretags) = "yaml:\"cost\""];
 }
