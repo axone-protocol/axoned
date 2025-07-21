@@ -5,7 +5,7 @@ Create a new permanently locked account funded with an allocation of tokens.
 ### Synopsis
 
 Create a new account funded with an allocation of permanently locked tokens. These
-tokens may be used for staking but are non-transferable. Staking rewards will accrue as liquid and transferable
+tokens may be used for staking but are non-transferable. Staking rewards will acrue as liquid and transferable
 tokens.
 
 ```

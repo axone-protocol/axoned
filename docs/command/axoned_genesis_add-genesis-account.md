@@ -27,7 +27,6 @@ axoned genesis add-genesis-account [address_or_key_name] [coin][,[coin]] [flags]
       --node string              <host>:<port> to CometBFT RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string            Output format (text|json) (default "text")
       --vesting-amount string    amount of coins for vesting accounts
-      --vesting-cliff-time int   schedule cliff time (unix epoch) for vesting accounts
       --vesting-end-time int     schedule end time (unix epoch) for vesting accounts
       --vesting-start-time int   schedule start time (unix epoch) for vesting accounts
 ```
