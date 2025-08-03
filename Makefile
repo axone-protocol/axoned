@@ -144,7 +144,7 @@ RELEASE_TARGETS = $(addprefix release-binary-, $(RELEASE_BINARIES))
 SED_FLAG=
 SHELL_NAME := $(shell uname -s)
 ifeq ($(SHELL_NAME),Darwin)
-    SED_FLAG := ""
+	SED_FLAG := ""
 endif
 
 .PHONY: all
@@ -204,8 +204,8 @@ build-docker: $(TOOL_HEIGHLINER_BIN) ## Build docker image
 
 $(ENVIRONMENTS_TARGETS):
 	@GOOS=$(word 3, $(subst -, ,$@)); \
-    GOARCH=$(word 4, $(subst -, ,$@)); \
-    if [ $$GOARCH = "amd64" ]; then \
+	GOARCH=$(word 4, $(subst -, ,$@)); \
+	if [ $$GOARCH = "amd64" ]; then \
 		TARGET_ARCH="x86_64"; \
 	elif [ $$GOARCH = "arm64" ]; then \
 		TARGET_ARCH="aarch64"; \
@@ -248,6 +248,7 @@ chain-init: build-go ## Initialize the blockchain with default settings.
 		--home "${CHAIN_HOME}"; \
 	\
 	sed -i $(SED_FLAG) "s/\"stake\"/\"uaxone\"/g" "${CHAIN_HOME}/config/genesis.json"; \
+  sed -i $(SED_FLAG) 's/^query-gas-limit = ".*"/query-gas-limit = "1000000"/g' "${CHAIN_HOME}/config/app.toml"; \
 	\
 	MNEMONIC_VALIDATOR="island position immense mom cross enemy grab little deputy tray hungry detect state helmet \
 		tomorrow trap expect admit inhale present vault reveal scene atom"; \
