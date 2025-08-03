@@ -22,6 +22,9 @@ import (
 	"github.com/axone-protocol/axoned/v12/x/logic/types"
 )
 
+// ConsensusVersion defines the current x/logic module consensus version.
+const ConsensusVersion = 4
+
 var (
 	_ module.HasGenesis  = AppModule{}
 	_ module.HasServices = AppModule{}
@@ -124,10 +127,6 @@ func (am AppModule) IsAppModule() {}
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServiceServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServiceServer(cfg.QueryServer(), am.keeper)
-
-	if err := cfg.RegisterMigration(types.ModuleName, 3, keeper.MigrateStoreV3ToV4(am.keeper)); err != nil {
-		panic(err)
-	}
 }
 
 // InitGenesis performs the module's genesis initialization. It returns no validator updates.
@@ -147,7 +146,7 @@ func (am AppModule) ExportGenesis(ctx sdk.Context, cdc codec.JSONCodec) json.Raw
 
 // ConsensusVersion is a sequence number for state-breaking change of the module. It should be incremented on each
 // consensus-breaking change introduced by the module. To avoid wrong/empty versions, the initial version should be set to 1.
-func (AppModule) ConsensusVersion() uint64 { return 4 }
+func (AppModule) ConsensusVersion() uint64 { return ConsensusVersion }
 
 // BeginBlock contains the logic that is automatically triggered at the beginning of each block.
 func (am AppModule) BeginBlock(_ context.Context) error {
