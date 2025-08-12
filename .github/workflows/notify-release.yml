@@ -16,7 +16,7 @@ jobs:
       repo_name: ${{ steps.set-env.outputs.repo_name }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Expose tag and repo_name
         id: set-env
@@ -39,7 +39,7 @@ jobs:
     needs: set-env
     steps:
       - name: Check out repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: Extract changelog for tag
         run: |
