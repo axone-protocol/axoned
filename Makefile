@@ -11,7 +11,7 @@ LEDGER_ENABLED         ?= true
 
 # Docker images
 DOCKER_IMAGE_GOLANG	      = golang:1.23-alpine3.20
-DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v2.1.6
+DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v2.4.0
 DOCKER_IMAGE_PROTO        = ghcr.io/cosmos/proto-builder:0.14.0
 DOCKER_IMAGE_BUF          = bufbuild/buf:1.4.0
 DOCKER_PROTO_RUN         := docker run --rm --user $(id -u):$(id -g) -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_PROTO)
