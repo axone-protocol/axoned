@@ -10,7 +10,7 @@ CMD_ROOT               := ./cmd/${BINARY_NAME}
 LEDGER_ENABLED         ?= true
 
 # Docker images
-DOCKER_IMAGE_GOLANG	      = golang:1.23-alpine3.20
+DOCKER_IMAGE_GOLANG	      = golang:1.24-alpine3.22
 DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v2.4.0
 DOCKER_IMAGE_PROTO        = ghcr.io/cosmos/proto-builder:0.14.0
 DOCKER_IMAGE_BUF          = bufbuild/buf:1.4.0
@@ -22,12 +22,12 @@ DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
 
 # Tools
 TOOL_TPARSE_NAME         := tparse
-TOOL_TPARSE_VERSION      := v0.16.0
+TOOL_TPARSE_VERSION      := v0.17.0
 TOOL_TPARSE_PKG          := github.com/mfridman/$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)
 TOOL_TPARSE_BIN          := ${TOOLS_FOLDER}/$(TOOL_TPARSE_NAME)/$(TOOL_TPARSE_VERSION)/$(TOOL_TPARSE_NAME)
 
 TOOL_HEIGHLINER_NAME     := heighliner
-TOOL_HEIGHLINER_VERSION  := v1.7.1
+TOOL_HEIGHLINER_VERSION  := v1.7.4
 TOOL_HEIGHLINER_PKG      := github.com/strangelove-ventures/$(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION)
 TOOL_HEIGHLINER_BIN      := ${TOOLS_FOLDER}/$(TOOL_HEIGHLINER_NAME)/$(TOOL_HEIGHLINER_VERSION)/$(TOOL_HEIGHLINER_NAME)
 
@@ -233,7 +233,7 @@ install: ## Install node executable
 test: test-go ## Pass all the tests
 
 .PHONY: test-go
-test-go: $(TOOL_TPARSE_BIN) build ## Pass the test for the go source code
+test-go: $(TOOL_TPARSE_BIN) build-go ## Pass the test for the go source code
 	@${call echo_msg, 🧪, Passing, go tests, ...}
 	@go test -v -coverprofile ./target/coverage.txt ./... -json | $(TOOL_TPARSE_BIN)
 
