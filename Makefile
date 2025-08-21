@@ -233,7 +233,7 @@ install: ## Install node executable
 test: test-go ## Pass all the tests
 
 .PHONY: test-go
-test-go: $(TOOL_TPARSE_BIN) build ## Pass the test for the go source code
+test-go: $(TOOL_TPARSE_BIN) build-go ## Pass the test for the go source code
 	@${call echo_msg, 🧪, Passing, go tests, ...}
 	@go test -v -coverprofile ./target/coverage.txt ./... -json | $(TOOL_TPARSE_BIN)
 
