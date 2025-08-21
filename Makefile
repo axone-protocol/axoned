@@ -22,7 +22,7 @@ DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
 
 # Tools
 TOOL_TPARSE_NAME         := tparse
-TOOL_TPARSE_VERSION      := v0.16.0
+TOOL_TPARSE_VERSION      := v0.17.0
 TOOL_TPARSE_PKG          := github.com/mfridman/$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)
 TOOL_TPARSE_BIN          := ${TOOLS_FOLDER}/$(TOOL_TPARSE_NAME)/$(TOOL_TPARSE_VERSION)/$(TOOL_TPARSE_NAME)
 
