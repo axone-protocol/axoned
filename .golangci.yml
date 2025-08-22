@@ -89,6 +89,14 @@ linters:
         path: _test\.go
         text: "dot-imports:"
       - linters:
+          - revive
+        path: "util/*"
+        text: "var-naming: avoid meaningless package names"
+      - linters:
+          - revive
+        path: "types/*"
+        text: "var-naming: avoid meaningless package names"
+      - linters:
           - cyclop
         path: (.+)_test\.go
     paths:
