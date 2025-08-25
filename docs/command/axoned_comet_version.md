@@ -4,7 +4,7 @@ Print CometBFT libraries' version
 
 ### Synopsis
 
-Print protocols' and libraries' version numbers against which this app has been compiled.
+Print protocols and libraries' version numbers against which this app has been compiled.
 
 ```
 axoned comet version [flags]
