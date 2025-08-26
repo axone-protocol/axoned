@@ -11,7 +11,6 @@ LEDGER_ENABLED         ?= true
 
 # Docker images
 DOCKER_IMAGE_GOLANG	      = golang:1.24-alpine3.22
-DOCKER_IMAGE_GOLANG_CI    = golangci/golangci-lint:v2.4.0
 DOCKER_IMAGE_PROTO        = ghcr.io/cosmos/proto-builder:0.14.0
 DOCKER_IMAGE_BUF          = bufbuild/buf:1.4.0
 DOCKER_PROTO_RUN         := docker run --rm --user $(id -u):$(id -g) -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_PROTO)
@@ -31,10 +30,14 @@ TOOL_HEIGHLINER_VERSION  := v1.7.4
 TOOL_HEIGHLINER_PKG      := github.com/strangelove-ventures/$(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION)
 TOOL_HEIGHLINER_BIN      := ${TOOLS_FOLDER}/$(TOOL_HEIGHLINER_NAME)/$(TOOL_HEIGHLINER_VERSION)/$(TOOL_HEIGHLINER_NAME)
 
-TOOL_COSMOVISOR_NAME    := cosmovisor
-TOOL_COSMOVISOR_VERSION := v1.7.1
-TOOL_COSMOVISOR_PKG     := cosmossdk.io/tools/$(TOOL_COSMOVISOR_NAME)/cmd/$(TOOL_COSMOVISOR_NAME)@$(TOOL_COSMOVISOR_VERSION)
-TOOL_COSMOVISOR_BIN     := ${TOOLS_FOLDER}/$(TOOL_COSMOVISOR_NAME)/$(TOOL_COSMOVISOR_VERSION)/$(TOOL_COSMOVISOR_NAME)
+TOOL_COSMOVISOR_NAME     := cosmovisor
+TOOL_COSMOVISOR_VERSION  := v1.7.1
+TOOL_COSMOVISOR_PKG      := cosmossdk.io/tools/$(TOOL_COSMOVISOR_NAME)/cmd/$(TOOL_COSMOVISOR_NAME)@$(TOOL_COSMOVISOR_VERSION)
+TOOL_COSMOVISOR_BIN      := ${TOOLS_FOLDER}/$(TOOL_COSMOVISOR_NAME)/$(TOOL_COSMOVISOR_VERSION)/$(TOOL_COSMOVISOR_NAME)
+
+TOOL_GOLANGCI_NAME       := golangci-lint
+TOOL_GOLANGCI_VERSION    := v2.4.0
+TOOL_GOLANGCI_BIN        := ${TOOLS_FOLDER}/$(TOOL_GOLANGCI_NAME)/$(TOOL_GOLANGCI_VERSION)/$(TOOL_GOLANGCI_NAME)
 
 # Some colors (if supported)
 define get_color
@@ -154,13 +157,9 @@ all: help
 lint: lint-go lint-proto ## Lint all available linters
 
 .PHONY: lint-go
-lint-go: ## Lint go source code
+lint-go: $(TOOL_GOLANGCI_BIN) ## Lint go source code
 	@$(call echo_msg, 🔍, Inspecting, go source code, [golangci-lint]...)
-	@docker run --rm \
-		-v `pwd`:/app:ro \
-		-w /app \
-		${DOCKER_IMAGE_GOLANG_CI} \
-		golangci-lint run -v
+	@$(TOOL_GOLANGCI_BIN) run -v
 
 .PHONY: lint-proto
 lint-proto: ## Lint proto files
@@ -458,16 +457,19 @@ ensure-buildx-builder:
 
 ## Dependencies:
 .PHONY: deps
-deps: deps-$(TOOL_TPARSE_NAME) deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) ## Install all the dependencies (tools, etc.)
+deps: deps-$(TOOL_GOLANGCI_NAME) deps-$(TOOL_TPARSE_NAME) deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) ## Install all the dependencies (tools, etc.)
 
 .PHONY: deps-$(TOOL_TPARSE_NAME)
-deps-tparse: $(TOOL_TPARSE_BIN) ## Install $TOOL_TPARSE_NAME $TOOL_TPARSE_VERSION ($TOOL_TPARSE_PKG)
+deps-tparse: $(TOOL_TPARSE_BIN) ## Install $TOOL_TPARSE_NAME ($TOOL_TPARSE_VERSION)
 
 .PHONY: deps-$(TOOL_HEIGHLINER_NAME)
-deps-heighliner: $(TOOL_HEIGHLINER_BIN) ## Install $TOOL_HEIGHLINER_NAME $TOOL_HEIGHLINER_VERSION ($TOOL_HEIGHLINER_PKG)
+deps-heighliner: $(TOOL_HEIGHLINER_BIN) ## Install $TOOL_HEIGHLINER_NAME ($TOOL_HEIGHLINER_VERSION)
 
 .PHONY: deps-$(TOOL_COSMOVISOR_NAME)
-deps-cosmovisor: $(TOOL_COSMOVISOR_BIN) ## Install $TOOL_COSMOVISOR_NAME $TOOL_COSMOVISOR_VERSION ($TOOL_COSMOVISOR_PKG)
+deps-cosmovisor: $(TOOL_COSMOVISOR_BIN) ## Install $TOOL_COSMOVISOR_NAME ($TOOL_COSMOVISOR_VERSION)
+
+.PHONY: deps-$(TOOL_GOLANGCI_NAME)
+deps-golangci-lint: $(TOOL_GOLANGCI_BIN) ## Install $TOOL_GOLANGCI_NAME ($TOOL_GOLANGCI_VERSION)
 
 $(TOOL_TPARSE_BIN):
 	@${call echo_msg, 📦, Installing, $(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION),...}
@@ -492,6 +494,13 @@ $(TOOL_COSMOVISOR_BIN):
 	@${call echo_msg, 📦, Installing, $(TOOL_COSMOVISOR_NAME)@$(TOOL_COSMOVISOR_VERSION),...}
 	@mkdir -p $(dir $(TOOL_COSMOVISOR_BIN))
 	@GOBIN=$(dir $(abspath $(TOOL_COSMOVISOR_BIN))) go install $(TOOL_COSMOVISOR_PKG)
+
+$(TOOL_GOLANGCI_BIN):
+	@$(call echo_msg, 📦, Installing, $(TOOL_GOLANGCI_NAME)@$(TOOL_GOLANGCI_VERSION),...)
+	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/$(TOOL_GOLANGCI_VERSION)/install.sh | \
+		sh -s -- -b $(shell go env GOPATH)/bin $(TOOL_GOLANGCI_VERSION)
+	@mkdir -p $(dir $(TOOL_GOLANGCI_BIN))
+	@cp $(shell go env GOPATH)/bin/golangci-lint $(dir $(TOOL_GOLANGCI_BIN))
 
 ## Help:
 .PHONY: help
