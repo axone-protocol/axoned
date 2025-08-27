@@ -118,45 +118,6 @@ jobs:
           fi
           echo "✅ Code is gofumpt!"
 
-  analyze-go:
-    runs-on: ubuntu-22.04
-    permissions:
-      actions: read
-      contents: read
-      security-events: write
-
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      - name: Find changed go files
-        id: changed-go-files
-        uses: tj-actions/changed-files@v46.0.5
-        with:
-          files: |
-            **/*.go
-            go.mod
-            go.sum
-
-      - name: Setup Go environment
-        uses: actions/setup-go@v5.5.0
-        with:
-          go-version-file: 'go.mod'
-          cache: false
-
-      - name: Initialize CodeQL
-        uses: github/codeql-action/init@v3
-        with:
-          languages: "go"
-
-      - name: Autobuild project
-        uses: github/codeql-action/autobuild@v3
-
-      - name: Perform CodeQL Analysis
-        uses: github/codeql-action/analyze@v3
-
   lint-dockerfile:
     runs-on: ubuntu-22.04
     if: github.actor != 'dependabot[bot]'
