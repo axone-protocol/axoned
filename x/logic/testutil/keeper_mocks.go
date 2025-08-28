@@ -23,7 +23,7 @@ func MockAuthQueryServiceWithAddresses(mock *MockAuthQueryService, addresses []s
 		DoAndReturn(func(_ context.Context, req *authtypes.QueryAccountsRequest) (*authtypes.QueryAccountsResponse, error) {
 			start := 0
 			limit := 5
-			toCursor := func(idx int) []byte { return []byte(fmt.Sprintf("%d", idx)) }
+			toCursor := func(idx int) []byte { return fmt.Appendf(nil, "%d", idx) }
 			fromCursor := func(k []byte) int {
 				idx, err := strconv.Atoi(string(k))
 				if err != nil {
