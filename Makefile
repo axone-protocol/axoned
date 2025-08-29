@@ -39,6 +39,11 @@ TOOL_GOLANGCI_NAME       := golangci-lint
 TOOL_GOLANGCI_VERSION    := v2.4.0
 TOOL_GOLANGCI_BIN        := ${TOOLS_FOLDER}/$(TOOL_GOLANGCI_NAME)/$(TOOL_GOLANGCI_VERSION)/$(TOOL_GOLANGCI_NAME)
 
+TOOL_MODERNIZE_NAME      := modernize
+TOOL_MODERNIZE_VERSION   := v0.20.0
+TOOL_MODERNIZE_PKG       := golang.org/x/tools/gopls/internal/analysis/modernize/cmd/$(TOOL_MODERNIZE_NAME)@$(TOOL_MODERNIZE_VERSION)
+TOOL_MODERNIZE_BIN 		   := ${TOOLS_FOLDER}/$(TOOL_MODERNIZE_NAME)/$(TOOL_MODERNIZE_VERSION)/$(TOOL_MODERNIZE_NAME)
+
 # Some colors (if supported)
 define get_color
 $(shell tput -Txterm $(1) $(2) 2>/dev/null || echo "")
@@ -153,13 +158,22 @@ endif
 .PHONY: all
 all: help
 
+## Lint:
 .PHONY: lint
 lint: lint-go lint-proto ## Lint all available linters
 
 .PHONY: lint-go
-lint-go: $(TOOL_GOLANGCI_BIN) ## Lint go source code
+lint-go: lint-go-golangci lint-go-modernize ## Lint go source code
+
+.PHONY: lint-go-golangci
+lint-go-golangci: $(TOOL_GOLANGCI_BIN) ## Lint go source code with golangci-lint
 	@$(call echo_msg, 🔍, Inspecting, go source code, [golangci-lint]...)
 	@$(TOOL_GOLANGCI_BIN) run -v
+
+.PHONY: lint-go-modernize
+lint-go-modernize: $(TOOL_MODERNIZE_BIN) ## Lint go source code with modernize
+	@$(call echo_msg, 🔍, Inspecting, go source code, [modernize]...)
+	@$(TOOL_MODERNIZE_BIN) -test ./...
 
 .PHONY: lint-proto
 lint-proto: ## Lint proto files
@@ -457,7 +471,7 @@ ensure-buildx-builder:
 
 ## Dependencies:
 .PHONY: deps
-deps: deps-$(TOOL_GOLANGCI_NAME) deps-$(TOOL_TPARSE_NAME) deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) ## Install all the dependencies (tools, etc.)
+deps: deps-$(TOOL_GOLANGCI_NAME) deps-$(TOOL_TPARSE_NAME) deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) deps-$(TOOL_MODERNIZE_NAME) ## Install all the dependencies (tools, etc.)
 
 .PHONY: deps-$(TOOL_TPARSE_NAME)
 deps-tparse: $(TOOL_TPARSE_BIN) ## Install $TOOL_TPARSE_NAME ($TOOL_TPARSE_VERSION)
@@ -470,6 +484,9 @@ deps-cosmovisor: $(TOOL_COSMOVISOR_BIN) ## Install $TOOL_COSMOVISOR_NAME ($TOOL_
 
 .PHONY: deps-$(TOOL_GOLANGCI_NAME)
 deps-golangci-lint: $(TOOL_GOLANGCI_BIN) ## Install $TOOL_GOLANGCI_NAME ($TOOL_GOLANGCI_VERSION)
+
+.PHONY: deps-$(TOOL_MODERNIZE_NAME)
+deps-modernize: $(TOOL_MODERNIZE_BIN) ## Install $TOOL_MODERNIZE_NAME ($TOOL_MODERNIZE_VERSION)
 
 $(TOOL_TPARSE_BIN):
 	@${call echo_msg, 📦, Installing, $(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION),...}
@@ -501,6 +518,11 @@ $(TOOL_GOLANGCI_BIN):
 		sh -s -- -b $(shell go env GOPATH)/bin $(TOOL_GOLANGCI_VERSION)
 	@mkdir -p $(dir $(TOOL_GOLANGCI_BIN))
 	@cp $(shell go env GOPATH)/bin/golangci-lint $(dir $(TOOL_GOLANGCI_BIN))
+
+$(TOOL_MODERNIZE_BIN):
+	@${call echo_msg, 📦, Installing, $(TOOL_MODERNIZE_NAME)@$(TOOL_MODERNIZE_VERSION),...}
+	@mkdir -p $(dir $(TOOL_MODERNIZE_BIN))
+	@GOBIN=$(dir $(abspath $(TOOL_MODERNIZE_BIN))) go install $(TOOL_MODERNIZE_PKG)
 
 ## Help:
 .PHONY: help
