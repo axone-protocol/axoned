@@ -64,7 +64,7 @@ func NewComprehensiveInterpreterMust(ctx context.Context) (i *prolog.Interpreter
 
 // CompileMust compiles the given source code and panics if it fails.
 // This is a convenience function for testing.
-func CompileMust(ctx context.Context, i *prolog.Interpreter, s string, args ...interface{}) {
+func CompileMust(ctx context.Context, i *prolog.Interpreter, s string, args ...any) {
 	err := i.Compile(ctx, s, args...)
 	if err != nil {
 		panic(err)

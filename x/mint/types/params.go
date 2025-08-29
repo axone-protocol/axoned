@@ -56,7 +56,7 @@ func (p Params) String() string {
 	return string(out)
 }
 
-func validateMintDenom(i interface{}) error {
+func validateMintDenom(i any) error {
 	v, ok := i.(string)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
@@ -69,7 +69,7 @@ func validateMintDenom(i interface{}) error {
 	return sdk.ValidateDenom(v)
 }
 
-func validateInflationCoef(i interface{}) error {
+func validateInflationCoef(i any) error {
 	v, ok := i.(math.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
@@ -87,7 +87,7 @@ func validateInflationCoef(i interface{}) error {
 	return nil
 }
 
-func validateBounds(minBound, maxBound interface{}) error {
+func validateBounds(minBound, maxBound any) error {
 	vmin, ok := minBound.(*math.LegacyDec)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", minBound)
@@ -110,7 +110,7 @@ func validateBounds(minBound, maxBound interface{}) error {
 	return nil
 }
 
-func validateBlocksPerYear(i interface{}) error {
+func validateBlocksPerYear(i any) error {
 	v, ok := i.(uint64)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)

@@ -126,7 +126,7 @@ func BenchmarkBlockProvision(b *testing.B) {
 	minter.AnnualProvisions = math.LegacyNewDec(r1.Int63n(1000000))
 
 	// run the BlockProvision function b.N times
-	for n := 0; n < b.N; n++ {
+	for b.Loop() {
 		minter.BlockProvision(params)
 	}
 }
@@ -141,7 +141,7 @@ func BenchmarkNextInflation(b *testing.B) {
 	totalSupply := math.NewInt(100000000000000)
 
 	// run the NextInflationRate function b.N times
-	for n := 0; n < b.N; n++ {
+	for b.Loop() {
 		_, err := NewMinterWithInflationCoef(params.InflationCoef, bondedRatio, nil, nil, totalSupply)
 		if err != nil {
 			panic(err)
