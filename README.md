@@ -108,8 +108,11 @@ The project comes with a convenient `Makefile` that helps you to build, install,
 $ make <target>
 
 Targets:
+  Lint:
     lint                Lint all available linters
     lint-go             Lint go source code
+    lint-go-golangci    Lint go source code with golangci-lint
+    lint-go-modernize   Lint go source code with modernize
     lint-proto          Lint proto files
   Format:
     format              Run all available formatters
@@ -150,6 +153,7 @@ Targets:
     deps-heighliner     Install heighliner (v1.7.4)
     deps-cosmovisor     Install cosmovisor (v1.7.1)
     deps-golangci-lint  Install golangci-lint (v2.4.0)
+    deps-modernize      Install modernize (v0.20.0)
   Help:
     help                Show this help.
 
