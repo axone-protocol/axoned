@@ -80,7 +80,7 @@ func TestAccounts(t *testing.T) {
 							EXPECT().
 							UnpackAny(gomock.Any(), gomock.Any()).
 							AnyTimes().
-							DoAndReturn(func(v *cdctypes.Any, iface interface{}) error {
+							DoAndReturn(func(v *cdctypes.Any, iface any) error {
 								if tc.interfaceRegistryError != "" {
 									return errors.New(tc.interfaceRegistryError)
 								}
@@ -118,7 +118,7 @@ func TestAccounts(t *testing.T) {
 									}
 								}
 
-								for i := 0; i < 5; i++ {
+								for range 5 {
 									result, ok := next()
 									So(ok, ShouldBeFalse)
 									So(result.A, ShouldBeNil)

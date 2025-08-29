@@ -153,7 +153,7 @@ func TestWasmVFS(t *testing.T) {
 					wasmKeeper.EXPECT().
 						QuerySmart(ctx, sdk.MustAccAddressFromBech32(tc.contractAddress), tc.query).
 						AnyTimes().
-						DoAndReturn(func(_, _, _ interface{}) ([]byte, error) {
+						DoAndReturn(func(_, _, _ any) ([]byte, error) {
 							if tc.fail {
 								return nil, errors.New("failed to query smart contract")
 							}

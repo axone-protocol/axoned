@@ -18,7 +18,7 @@ func Test_validateBounds(t *testing.T) {
 	Convey("Given test cases", t, func() {
 		cases := []struct {
 			name               string
-			minBound, maxBound interface{}
+			minBound, maxBound any
 			expectErr          bool
 			err                error
 		}{

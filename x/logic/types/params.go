@@ -103,7 +103,7 @@ func WithBootstrap(bootstrap string) InterpreterOption {
 	}
 }
 
-func validateInterpreter(i interface{}) error {
+func validateInterpreter(i any) error {
 	interpreter, ok := i.(Interpreter)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)
@@ -164,7 +164,7 @@ func NewLimits(opts ...LimitsOption) Limits {
 	return l
 }
 
-func validateLimits(i interface{}) error {
+func validateLimits(i any) error {
 	_, ok := i.(Limits)
 	if !ok {
 		return fmt.Errorf("invalid parameter type: %T", i)

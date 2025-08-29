@@ -50,7 +50,7 @@ func (b *BoundedBuffer) Write(p []byte) (n int, err error) {
 		return size, nil
 	}
 
-	for i := 0; i < size; i++ {
+	for i := range size {
 		b.buf[b.offset] = p[i]
 		b.offset = (b.offset + 1) % b.size
 		b.overflown = b.overflown || b.offset == 0

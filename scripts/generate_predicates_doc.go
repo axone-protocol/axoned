@@ -65,8 +65,8 @@ func generatePredicateDocumentation() error {
 
 		// globalCtx used to keep track of contexts between templates.
 		// (yes it's a hack).
-		globalCtx := make(map[string]interface{})
-		globalCtx["frontmatter"] = map[string]interface{}{
+		globalCtx := make(map[string]any)
+		globalCtx["frontmatter"] = map[string]any{
 			"sidebar_position": idx + 1,
 		}
 		globalCtx["feature"] = features[name]
@@ -88,7 +88,7 @@ func generatePredicateDocumentation() error {
 	return nil
 }
 
-func createRenderer(ctx map[string]interface{}) (*gomarkdoc.Renderer, error) {
+func createRenderer(ctx map[string]any) (*gomarkdoc.Renderer, error) {
 	templateFunctionOpts := make([]gomarkdoc.RendererOption, 0)
 
 	templateFunctionOpts = append(
@@ -114,7 +114,7 @@ func createRenderer(ctx map[string]interface{}) (*gomarkdoc.Renderer, error) {
 		gomarkdoc.WithTemplateFunc("countSubstr", func(substr string, s string) int {
 			return strings.Count(s, substr)
 		}),
-		gomarkdoc.WithTemplateFunc("globalCtx", func() map[string]interface{} {
+		gomarkdoc.WithTemplateFunc("globalCtx", func() map[string]any {
 			return ctx
 		}),
 		gomarkdoc.WithTemplateFunc("functorName", functorName),
@@ -152,7 +152,7 @@ func functorName(f *lang.Func) string {
 	return fmt.Sprintf("%s/%d", name, arity)
 }
 
-func bquote(str ...interface{}) string {
+func bquote(str ...any) string {
 	out := make([]string, 0, len(str))
 	for _, s := range str {
 		if s != nil {

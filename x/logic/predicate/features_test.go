@@ -129,7 +129,7 @@ func givenASmartContractWithAddress(ctx context.Context, address string, configu
 	if err != nil {
 		return err
 	}
-	messageWant := map[string]interface{}{}
+	messageWant := map[string]any{}
 	if err := json.Unmarshal([]byte(smartContractConfiguration.Message), &messageWant); err != nil {
 		return err
 	}
@@ -138,7 +138,7 @@ func givenASmartContractWithAddress(ctx context.Context, address string, configu
 	wasmKeeper.EXPECT().
 		QuerySmart(gomock.Any(), contractAddr, gomock.Any()).
 		DoAndReturn(func(_ context.Context, _ []byte, messageBytes []byte) ([]byte, error) {
-			message := map[string]interface{}{}
+			message := map[string]any{}
 			if err := json.Unmarshal(messageBytes, &message); err != nil {
 				return nil, err
 			}
@@ -304,7 +304,7 @@ func logicKeeperParams() types.Params {
 	return params
 }
 
-func parseDocStringYaml(docString *godog.DocString, v interface{}) error {
+func parseDocStringYaml(docString *godog.DocString, v any) error {
 	const yamlMediaType = "yaml"
 	if strings.TrimSpace(docString.MediaType) != yamlMediaType {
 		return fmt.Errorf("unsupported media type: %s. Want %s", docString.MediaType, yamlMediaType)
