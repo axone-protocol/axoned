@@ -84,7 +84,7 @@ Axone is a public dPoS layer 1 specifically designed for connecting, sharing, an
 It is an open network dedicated to collaborative AI workflow management that is universally compatible with any data, model,
 or infrastructure. Data, algorithms, storage, compute, APIs... Anything on-chain and off-chain can be shared.
 
-Want to lean more about AXONE network? Complete documentation is available at: https://docs.axone.xyz 👀
+Want to learn more about AXONE network? Complete documentation is available at: https://docs.axone.xyz 👀
 `,
 		PersistentPreRunE: func(cmd *cobra.Command, _ []string) error {
 			// set the default command outputs
@@ -406,7 +406,7 @@ var tempDir = func() string {
 }
 
 // sanitizeProtoRegistry removes all the unused proto definitions from the global registry to avoid surprises as the
-// cosmos sdk rely on it.
+// cosmos sdk relies on it.
 func sanitizeProtoRegistry() {
 	safeRegistry := new(protoregistry.Files)
 	protoregistry.GlobalFiles.RangeFiles(func(d protoreflect.FileDescriptor) bool {
