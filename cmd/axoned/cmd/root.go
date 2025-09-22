@@ -42,8 +42,6 @@ import (
 
 	"github.com/axone-protocol/axoned/v12/app"
 	appparams "github.com/axone-protocol/axoned/v12/app/params"
-	"github.com/axone-protocol/axoned/v12/client/credential"
-	axonekeys "github.com/axone-protocol/axoned/v12/client/keys"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application.
@@ -184,8 +182,7 @@ func initRootCmd(
 		genesisCommand(encodingConfig.TxConfig, basicManager),
 		queryCommand(),
 		txCommand(),
-		axonekeys.Enhance(keys.Commands()),
-		credential.Commands(),
+		keys.Commands(),
 	)
 }
 
