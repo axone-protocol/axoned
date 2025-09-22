@@ -22,7 +22,6 @@ import (
 	"github.com/spf13/cast"
 
 	abci "github.com/cometbft/cometbft/abci/types"
-	tmos "github.com/cometbft/cometbft/libs/os"
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	autocliv1 "cosmossdk.io/api/cosmos/autocli/v1"
@@ -750,6 +749,31 @@ func New(
 	// NOTE: upgrade module is required to be prioritized
 	app.ModuleManager.SetOrderPreBlockers(
 		upgradetypes.ModuleName,
+		// All other modules must be listed even if they don't have PreBlock logic
+		authtypes.ModuleName,
+		authz.ModuleName,
+		banktypes.ModuleName,
+		capabilitytypes.ModuleName,
+		circuittypes.ModuleName,
+		consensusparamtypes.ModuleName,
+		crisistypes.ModuleName,
+		distrtypes.ModuleName,
+		evidencetypes.ModuleName,
+		feegrant.ModuleName,
+		genutiltypes.ModuleName,
+		govtypes.ModuleName,
+		group.ModuleName,
+		ibcexported.ModuleName,
+		ibcfeetypes.ModuleName,
+		ibctransfertypes.ModuleName,
+		icatypes.ModuleName,
+		logicmoduletypes.ModuleName,
+		minttypes.ModuleName,
+		paramstypes.ModuleName,
+		slashingtypes.ModuleName,
+		stakingtypes.ModuleName,
+		vestingtypes.ModuleName,
+		wasmtypes.ModuleName,
 	)
 
 	// During begin block slashing happens after distr.BeginBlocker so that
@@ -767,8 +791,9 @@ func New(
 		authz.ModuleName,
 		// additional non simd modules
 		capabilitytypes.ModuleName,
-		ibctransfertypes.ModuleName,
+
 		ibcexported.ModuleName,
+		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		wasmtypes.ModuleName,
@@ -784,8 +809,9 @@ func New(
 		group.ModuleName,
 		// additional non simd modules
 		capabilitytypes.ModuleName,
-		ibctransfertypes.ModuleName,
+
 		ibcexported.ModuleName,
+		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
 		wasmtypes.ModuleName,
@@ -808,11 +834,10 @@ func New(
 		feegrant.ModuleName, group.ModuleName, paramstypes.ModuleName, upgradetypes.ModuleName,
 		vestingtypes.ModuleName, consensusparamtypes.ModuleName, circuittypes.ModuleName,
 		// additional non simd modules
-		ibctransfertypes.ModuleName,
 		ibcexported.ModuleName,
+		ibctransfertypes.ModuleName,
 		icatypes.ModuleName,
 		ibcfeetypes.ModuleName,
-		// wasm after ibc transfer
 		wasmtypes.ModuleName,
 		// logic
 		logicmoduletypes.ModuleName,
@@ -910,13 +935,13 @@ func New(
 
 	if loadLatest {
 		if err := app.LoadLatestVersion(); err != nil {
-			tmos.Exit(err.Error())
+			panic(err.Error())
 		}
 		ctx := app.NewUncachedContext(true, tmproto.Header{})
 
 		// Initialize pinned codes in wasmvm as they are not persisted there
 		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {
-			tmos.Exit(fmt.Errorf("failed initialize pinned codes %w", err).Error())
+			panic(fmt.Errorf("failed initialize pinned codes %w", err).Error())
 		}
 	}
 
