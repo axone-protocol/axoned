@@ -28,7 +28,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/pruning"
 	"github.com/cosmos/cosmos-sdk/client/rpc"
 	"github.com/cosmos/cosmos-sdk/client/snapshot"
-	"github.com/cosmos/cosmos-sdk/crypto/keyring"
 	"github.com/cosmos/cosmos-sdk/server"
 	serverconfig "github.com/cosmos/cosmos-sdk/server/config"
 	servertypes "github.com/cosmos/cosmos-sdk/server/types"
@@ -39,13 +38,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/x/auth/tx"
 	authtxconfig "github.com/cosmos/cosmos-sdk/x/auth/tx/config"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
-	"github.com/cosmos/cosmos-sdk/x/crisis"
 	genutilcli "github.com/cosmos/cosmos-sdk/x/genutil/client/cli"
 
 	"github.com/axone-protocol/axoned/v12/app"
 	appparams "github.com/axone-protocol/axoned/v12/app/params"
-	"github.com/axone-protocol/axoned/v12/client/credential"
-	axonekeys "github.com/axone-protocol/axoned/v12/client/keys"
 )
 
 // NewRootCmd creates a new root command for a Cosmos SDK application.
@@ -141,12 +137,7 @@ Want to learn more about AXONE network? Complete documentation is available at: 
 	// add keyring to autocli opts
 	autoCliOpts := tempApp.AutoCliOpts()
 	initClientCtx, _ = config.ReadFromClientConfig(initClientCtx)
-	autoCliOpts.Keyring, _ = keyring.NewAutoCLIKeyring(initClientCtx.Keyring)
 	autoCliOpts.ClientCtx = initClientCtx
-	autoCliOpts.TxConfigOpts = tx.ConfigOptions{
-		EnabledSignModes:           tx.DefaultSignModes,
-		TextualCoinMetadataQueryFn: authtxconfig.NewGRPCCoinMetadataQueryFn(initClientCtx),
-	}
 
 	if err := autoCliOpts.EnhanceRootCommand(rootCmd); err != nil {
 		panic(err)
@@ -191,8 +182,7 @@ func initRootCmd(
 		genesisCommand(encodingConfig.TxConfig, basicManager),
 		queryCommand(),
 		txCommand(),
-		axonekeys.Enhance(keys.Commands()),
-		credential.Commands(),
+		keys.Commands(),
 	)
 }
 
@@ -256,7 +246,6 @@ func txCommand() *cobra.Command {
 }
 
 func addModuleInitFlags(startCmd *cobra.Command) {
-	crisis.AddModuleInitFlags(startCmd)
 	wasm.AddModuleInitFlags(startCmd)
 }
 
