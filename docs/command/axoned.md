@@ -20,7 +20,6 @@ Want to learn more about AXONE network? Complete documentation is available at: 
 
 * [axoned comet](axoned_comet.md)	 - CometBFT subcommands
 * [axoned config](axoned_config.md)	 - Utilities for managing application configuration
-* [axoned credential](axoned_credential.md)	 - W3C Verifiable Credential
 * [axoned debug](axoned_debug.md)	 - Tool for helping with debugging your application
 * [axoned export](axoned_export.md)	 - Export state to JSON
 * [axoned genesis](axoned_genesis.md)	 - Application's genesis-related subcommands

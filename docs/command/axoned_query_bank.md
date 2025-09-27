@@ -20,6 +20,7 @@ axoned query bank [flags]
 * [axoned query bank denom-metadata](axoned_query_bank_denom-metadata.md)	 - Query the client metadata of a given coin denomination
 * [axoned query bank denom-metadata-by-query-string](axoned_query_bank_denom-metadata-by-query-string.md)	 - Execute the DenomMetadataByQueryString RPC method
 * [axoned query bank denom-owners](axoned_query_bank_denom-owners.md)	 - Query for all account addresses that own a particular token denomination.
+* [axoned query bank denom-owners-by-query](axoned_query_bank_denom-owners-by-query.md)	 - Execute the DenomOwnersByQuery RPC method
 * [axoned query bank denoms-metadata](axoned_query_bank_denoms-metadata.md)	 - Query the client metadata for all registered coin denominations
 * [axoned query bank params](axoned_query_bank_params.md)	 - Query the current bank parameters
 * [axoned query bank send-enabled](axoned_query_bank_send-enabled.md)	 - Query for send enabled entries

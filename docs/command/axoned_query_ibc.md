@@ -16,5 +16,6 @@ axoned query ibc [flags]
 
 * [axoned query](axoned_query.md)	 - Querying subcommands
 * [axoned query ibc channel](axoned_query_ibc_channel.md)	 - IBC channel query subcommands
+* [axoned query ibc channelv2](axoned_query_ibc_channelv2.md)	 - IBC channel/v2 query subcommands
 * [axoned query ibc client](axoned_query_ibc_client.md)	 - IBC client query subcommands
 * [axoned query ibc connection](axoned_query_ibc_connection.md)	 - IBC connection query subcommands

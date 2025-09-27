@@ -15,4 +15,4 @@ axoned tx ibc-transfer [flags]
 ### SEE ALSO
 
 * [axoned tx](axoned_tx.md)	 - Transactions subcommands
-* [axoned tx ibc-transfer transfer](axoned_tx_ibc-transfer_transfer.md)	 - Transfer a fungible token through IBC
+* [axoned tx ibc-transfer transfer](axoned_tx_ibc-transfer_transfer.md)	 - Transfer a fungible tokens through IBC

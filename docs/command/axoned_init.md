@@ -13,13 +13,14 @@ axoned init [moniker] [flags]
 ### Options
 
 ```
-      --chain-id string        genesis file chain-id, if left blank will be randomly created (default "axoned")
-      --default-denom string   genesis file default denomination, if left blank default value is 'stake'
-  -h, --help                   help for init
-      --home string            node's home directory (default "/home/john/.axoned")
-      --initial-height int     specify the initial block height at genesis (default 1)
-  -o, --overwrite              overwrite the genesis.json file
-      --recover                provide seed phrase to recover existing key instead of creating
+      --chain-id string             genesis file chain-id, if left blank will be randomly created (default "axoned")
+      --consensus-key-algo string   algorithm to use for the consensus key (default "ed25519")
+      --default-denom string        genesis file default denomination, if left blank default value is 'stake'
+  -h, --help                        help for init
+      --home string                 node's home directory (default "/home/john/.axoned")
+      --initial-height int          specify the initial block height at genesis (default 1)
+  -o, --overwrite                   overwrite the genesis.json file
+      --recover                     provide seed phrase to recover existing key instead of creating
 ```
 
 ### SEE ALSO
