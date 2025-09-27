@@ -44,6 +44,9 @@ jobs:
         uses: actions/setup-go@v6.0.0
         with:
           go-version-file: 'go.mod'
+          cache: true
+          cache-dependency-path: |
+            go.sum
 
       - name: Restore Cache for Tools
         uses: actions/cache@v4
@@ -81,6 +84,9 @@ jobs:
         uses: actions/setup-go@v6.0.0
         with:
           go-version-file: 'go.mod'
+          cache: true
+          cache-dependency-path: |
+            go.sum
 
       - name: Install AXONE blockchain
         run: |
