@@ -7,7 +7,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v12/x/logic/types"
+	"github.com/axone-protocol/axoned/v13/x/logic/types"
 )
 
 // UnwrapSDKContext retrieves a Context from a context.Context instance

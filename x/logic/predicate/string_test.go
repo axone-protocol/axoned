@@ -19,7 +19,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v12/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v13/x/logic/testutil"
 )
 
 func TestReadString(t *testing.T) {

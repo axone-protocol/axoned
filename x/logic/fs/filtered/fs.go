@@ -4,7 +4,7 @@ import (
 	"io/fs"
 	"net/url"
 
-	"github.com/axone-protocol/axoned/v12/x/logic/util"
+	"github.com/axone-protocol/axoned/v13/x/logic/util"
 )
 
 type vfs struct {

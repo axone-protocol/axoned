@@ -1,4 +1,4 @@
-module github.com/axone-protocol/axoned/v12
+module github.com/axone-protocol/axoned/v13
 
 go 1.24
 

@@ -16,13 +16,13 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v12/x/logic/fs/filtered"
-	"github.com/axone-protocol/axoned/v12/x/logic/interpreter"
-	"github.com/axone-protocol/axoned/v12/x/logic/interpreter/bootstrap"
-	"github.com/axone-protocol/axoned/v12/x/logic/meter"
-	prolog2 "github.com/axone-protocol/axoned/v12/x/logic/prolog"
-	"github.com/axone-protocol/axoned/v12/x/logic/types"
-	"github.com/axone-protocol/axoned/v12/x/logic/util"
+	"github.com/axone-protocol/axoned/v13/x/logic/fs/filtered"
+	"github.com/axone-protocol/axoned/v13/x/logic/interpreter"
+	"github.com/axone-protocol/axoned/v13/x/logic/interpreter/bootstrap"
+	"github.com/axone-protocol/axoned/v13/x/logic/meter"
+	prolog2 "github.com/axone-protocol/axoned/v13/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v13/x/logic/types"
+	"github.com/axone-protocol/axoned/v13/x/logic/util"
 )
 
 const (

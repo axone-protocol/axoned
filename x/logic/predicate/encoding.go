@@ -6,7 +6,7 @@ import (
 
 	"github.com/axone-protocol/prolog/v2/engine"
 
-	"github.com/axone-protocol/axoned/v12/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v13/x/logic/prolog"
 )
 
 var (

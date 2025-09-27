@@ -9,7 +9,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/axone-protocol/axoned/v12/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v13/x/logic/testutil"
 )
 
 func TestMultiplyUint64Overflow(t *testing.T) {

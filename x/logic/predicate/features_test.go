@@ -29,12 +29,12 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/axone-protocol/axoned/v12/x/logic"
-	"github.com/axone-protocol/axoned/v12/x/logic/fs/composite"
-	"github.com/axone-protocol/axoned/v12/x/logic/fs/wasm"
-	"github.com/axone-protocol/axoned/v12/x/logic/keeper"
-	logictestutil "github.com/axone-protocol/axoned/v12/x/logic/testutil"
-	"github.com/axone-protocol/axoned/v12/x/logic/types"
+	"github.com/axone-protocol/axoned/v13/x/logic"
+	"github.com/axone-protocol/axoned/v13/x/logic/fs/composite"
+	"github.com/axone-protocol/axoned/v13/x/logic/fs/wasm"
+	"github.com/axone-protocol/axoned/v13/x/logic/keeper"
+	logictestutil "github.com/axone-protocol/axoned/v13/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v13/x/logic/types"
 )
 
 var key = storetypes.NewKVStoreKey(types.StoreKey)

@@ -6,7 +6,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/axone-protocol/axoned/v12/x/logic/types"
+	"github.com/axone-protocol/axoned/v13/x/logic/types"
 )
 
 func TestValidateParams(t *testing.T) {

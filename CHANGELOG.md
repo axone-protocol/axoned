@@ -1,5 +1,30 @@
 # AXONE protocol changelog
 
+## [13.0.0](https://github.com/axone-protocol/axoned/compare/v12.0.0...v13.0.0) (2025-09-27)
+
+
+### ⚠ BREAKING CHANGES
+
+* **deps:** bump wasmd to v0.61.2 and wasmvm to v3.0.2
+* **cli:** remove custom credential and did key commands
+* **app:** drop x/crisis module and keeper
+* **deps:** bump cosmos-sdk to v0.53.4 and ibc-go to v8.7.0
+* **vesting:** back to canonical cosmos vesting
+* **ibc:** replug IBC modules right now 🔌
+
+### Code Refactoring
+
+* **app:** drop x/crisis module and keeper ([78e57f2](https://github.com/axone-protocol/axoned/commit/78e57f2043e8243cfda9050d164739ba838f8df3))
+* **cli:** remove custom credential and did key commands ([9906178](https://github.com/axone-protocol/axoned/commit/9906178e659e9d003fadfc9e265081d605acacab))
+* **ibc:** replug IBC modules right now 🔌 ([569348b](https://github.com/axone-protocol/axoned/commit/569348be8dcc87333bde26fa381eae6e49b75255))
+* **vesting:** back to canonical cosmos vesting ([32e117c](https://github.com/axone-protocol/axoned/commit/32e117c7a20b57c1d2a12e2328dda1732ac0552f))
+
+
+### Build System
+
+* **deps:** bump cosmos-sdk to v0.53.4 and ibc-go to v8.7.0 ([efd9426](https://github.com/axone-protocol/axoned/commit/efd942680dcaf0bc2fb0ba3b3ffbefb467b697fa))
+* **deps:** bump wasmd to v0.61.2 and wasmvm to v3.0.2 ([1a6f327](https://github.com/axone-protocol/axoned/commit/1a6f32791a6d31968b4f0ac53660772457ce40b7))
+
 ## [12.0.0](https://github.com/axone-protocol/axoned/compare/v11.0.1...v12.0.0) (2025-07-06)
 
 
