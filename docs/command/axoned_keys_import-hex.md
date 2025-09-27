@@ -9,7 +9,7 @@ Supported key-types can be obtained with:
 axoned list-key-types
 
 ```
-axoned keys import-hex <name> <hex> [flags]
+axoned keys import-hex <name> [hex] [flags]
 ```
 
 ### Options

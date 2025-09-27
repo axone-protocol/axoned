@@ -1,19 +1,19 @@
-## axoned query ibc-fee packet
+## axoned query ibc client config
 
-Query for an unrelayed incentivized packet by port-id, channel-id and packet sequence.
+Query a client's config
 
 ### Synopsis
 
-Query for an unrelayed incentivized packet by port-id, channel-id and packet sequence.
+Query a client's config
 
 ```
-axoned query ibc-fee packet [port-id] [channel-id] [sequence] [flags]
+axoned query ibc client config [client-id] [flags]
 ```
 
 ### Examples
 
 ```
-axoned query ibc-fee packet
+axoned query ibc client params 08-wasm-0
 ```
 
 ### Options
@@ -22,11 +22,11 @@ axoned query ibc-fee packet
       --grpc-addr string   the gRPC endpoint to use for this chain
       --grpc-insecure      allow gRPC over insecure channels, if not the server must use TLS
       --height int         Use a specific height to query state at (this can error if the node is pruning state)
-  -h, --help               help for packet
+  -h, --help               help for config
       --node string        <host>:<port> to CometBFT RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string      Output format (text|json) (default "text")
 ```
 
 ### SEE ALSO
 
-* [axoned query ibc-fee](axoned_query_ibc-fee.md)	 - IBC relayer incentivization query subcommands
+* [axoned query ibc client](axoned_query_ibc_client.md)	 - IBC client query subcommands

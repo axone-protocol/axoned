@@ -1,19 +1,19 @@
-## axoned query ibc-fee payee
+## axoned query ibc channelv2 packet-commitment
 
-Query the relayer payee address on a given channel
+Query a channel/v2 packet commitment
 
 ### Synopsis
 
-Query the relayer payee address on a given channel
+Query a channel/v2 packet commitment by client-id and sequence
 
 ```
-axoned query ibc-fee payee [channel-id] [relayer] [flags]
+axoned query ibc channelv2 packet-commitment [client-id] [sequence] [flags]
 ```
 
 ### Examples
 
 ```
-axoned query ibc-fee payee channel-5 cosmos1layxcsmyye0dc0har9sdfzwckaz8sjwlfsj8zs
+axoned query ibc channelv2 packet-commitment [client-id] [sequence]
 ```
 
 ### Options
@@ -22,11 +22,12 @@ axoned query ibc-fee payee channel-5 cosmos1layxcsmyye0dc0har9sdfzwckaz8sjwlfsj8
       --grpc-addr string   the gRPC endpoint to use for this chain
       --grpc-insecure      allow gRPC over insecure channels, if not the server must use TLS
       --height int         Use a specific height to query state at (this can error if the node is pruning state)
-  -h, --help               help for payee
+  -h, --help               help for packet-commitment
       --node string        <host>:<port> to CometBFT RPC interface for this chain (default "tcp://localhost:26657")
   -o, --output string      Output format (text|json) (default "text")
+      --prove              show proofs for the query results (default true)
 ```
 
 ### SEE ALSO
 
-* [axoned query ibc-fee](axoned_query_ibc-fee.md)	 - IBC relayer incentivization query subcommands
+* [axoned query ibc channelv2](axoned_query_ibc_channelv2.md)	 - IBC channel/v2 query subcommands

@@ -21,7 +21,6 @@ axoned tx [flags]
 * [axoned tx broadcast](axoned_tx_broadcast.md)	 - Broadcast transactions generated offline
 * [axoned tx circuit](axoned_tx_circuit.md)	 - Transactions commands for the circuit module
 * [axoned tx consensus](axoned_tx_consensus.md)	 - Transactions commands for the consensus module
-* [axoned tx crisis](axoned_tx_crisis.md)	 - Transactions commands for the crisis module
 * [axoned tx decode](axoned_tx_decode.md)	 - Decode a binary encoded transaction string
 * [axoned tx distribution](axoned_tx_distribution.md)	 - Distribution transactions subcommands
 * [axoned tx encode](axoned_tx_encode.md)	 - Encode transactions generated offline
@@ -30,7 +29,6 @@ axoned tx [flags]
 * [axoned tx gov](axoned_tx_gov.md)	 - Governance transactions subcommands
 * [axoned tx group](axoned_tx_group.md)	 - Group transaction subcommands
 * [axoned tx ibc](axoned_tx_ibc.md)	 - IBC transaction subcommands
-* [axoned tx ibc-fee](axoned_tx_ibc-fee.md)	 - IBC relayer incentivization transaction subcommands
 * [axoned tx ibc-transfer](axoned_tx_ibc-transfer.md)	 - IBC fungible token transfer transaction subcommands
 * [axoned tx interchain-accounts](axoned_tx_interchain-accounts.md)	 - IBC interchain accounts transaction subcommands
 * [axoned tx logic](axoned_tx_logic.md)	 - Transactions commands for the logic module

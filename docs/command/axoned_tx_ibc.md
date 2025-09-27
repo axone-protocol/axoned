@@ -15,5 +15,5 @@ axoned tx ibc [flags]
 ### SEE ALSO
 
 * [axoned tx](axoned_tx.md)	 - Transactions subcommands
-* [axoned tx ibc channel](axoned_tx_ibc_channel.md)	 - IBC channel transaction subcommands
+* [axoned tx ibc channelv2](axoned_tx_ibc_channelv2.md)	 - IBC channel/v2 transaction subcommands
 * [axoned tx ibc client](axoned_tx_ibc_client.md)	 - IBC client transaction subcommands
