@@ -2,12 +2,19 @@
 
 # Constants
 BINARY_NAME             = axoned
+CMD_ROOT               := ./cmd/${BINARY_NAME}
+LEDGER_ENABLED         ?= true
+
+# Folders & files
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 RELEASE_FOLDER          = $(TARGET_FOLDER)/release
 TOOLS_FOLDER            = $(TARGET_FOLDER)/tools
-CMD_ROOT               := ./cmd/${BINARY_NAME}
-LEDGER_ENABLED         ?= true
+E2E_PKG_FOLDER         ?= ./x/logic/tests/...
+COVER_UNIT_FILE        := $(TARGET_FOLDER)/coverage.unit.txt
+COVER_E2E_FILE         := $(TARGET_FOLDER)/coverage.e2e.txt
+COVER_ALL_FILE         := $(TARGET_FOLDER)/coverage.txt
+COVER_HTML_FILE        := $(TARGET_FOLDER)/coverage.html
 
 # Docker images
 DOCKER_IMAGE_GOLANG	      = golang:1.24-alpine3.22
@@ -20,11 +27,6 @@ DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
 DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
 
 # Tools
-TOOL_TPARSE_NAME         := tparse
-TOOL_TPARSE_VERSION      := v0.17.0
-TOOL_TPARSE_PKG          := github.com/mfridman/$(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION)
-TOOL_TPARSE_BIN          := ${TOOLS_FOLDER}/$(TOOL_TPARSE_NAME)/$(TOOL_TPARSE_VERSION)/$(TOOL_TPARSE_NAME)
-
 TOOL_HEIGHLINER_NAME     := heighliner
 TOOL_HEIGHLINER_VERSION  := v1.7.4
 TOOL_HEIGHLINER_PKG      := github.com/strangelove-ventures/$(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION)
@@ -43,6 +45,10 @@ TOOL_MODERNIZE_NAME      := modernize
 TOOL_MODERNIZE_VERSION   := v0.20.0
 TOOL_MODERNIZE_PKG       := golang.org/x/tools/gopls/internal/analysis/modernize/cmd/$(TOOL_MODERNIZE_NAME)@$(TOOL_MODERNIZE_VERSION)
 TOOL_MODERNIZE_BIN 		   := ${TOOLS_FOLDER}/$(TOOL_MODERNIZE_NAME)/$(TOOL_MODERNIZE_VERSION)/$(TOOL_MODERNIZE_NAME)
+
+# Coverage settings
+COVERPKG := $(shell go list ./x/logic/... | grep -v '/tests/' | tr '\n' ',' | sed 's/,$$//')
+ALL_PKGS := $(shell go list ./... | grep -v '/vendor/')
 
 # Some colors (if supported)
 define get_color
@@ -246,9 +252,43 @@ install: ## Install node executable
 test: test-go ## Pass all the tests
 
 .PHONY: test-go
-test-go: $(TOOL_TPARSE_BIN) build-go ## Pass the test for the go source code
+test-go: build-go ## Pass the test for the go source code
 	@${call echo_msg, 🧪, Passing, go tests, ...}
-	@go test -v -coverprofile ./target/coverage.txt ./... -json | $(TOOL_TPARSE_BIN)
+	@mkdir -p $(TARGET_FOLDER)
+
+	@${call echo_msg, ╰──, ▶, unit, tests...}
+	@touch $(COVER_UNIT_FILE)
+	@go test -v -count=1 -json -cover -covermode=atomic \
+	  -coverprofile=$(COVER_UNIT_FILE) \
+	  $(ALL_PKGS)
+
+	@${call echo_msg, ╰──, ▶, e2E, tests...}
+	@touch $(COVER_E2E_FILE)
+	@go test -v -count=1 -json -tags=e2e -cover -covermode=atomic \
+	  -coverpkg=$(COVERPKG) \
+	  -coverprofile=$(COVER_E2E_FILE) \
+	  $(E2E_PKG_FOLDER)
+
+	@${call echo_msg, ╰──, ▶, merging, coverage...}
+	@{ echo "mode: atomic"; \
+	   tail -n +2 $(COVER_UNIT_FILE); \
+	   tail -n +2 $(COVER_E2E_FILE); \
+	 } > $(COVER_ALL_FILE)
+
+	@${call echo_msg, ╰──, ▶, coverage, reports..}
+	@go tool cover -func $(COVER_ALL_FILE) | tail -n 1
+	@go tool cover -html $(COVER_ALL_FILE) -o $(COVER_HTML_FILE)
+
+	@echo "╭────────────────────────────────────────────────────────────────────────┬────────╮"
+	@echo "│ Package                                                                │ Cover %│"
+	@echo "├────────────────────────────────────────────────────────────────────────┼────────┤"
+	@go tool cover -func=$(COVER_ALL_FILE) | \
+	  awk 'BEGIN{FS="[: \t]+"} \
+	       /\.go:/ {pkg=$$1; sub(/\/[^\/]+\.go$$/,"",pkg); pct=$$NF; gsub("%","",pct); c[pkg]+=pct; n[pkg]++} \
+	       END{for(p in c){printf "│ %-70s │ %6.1f │\n", p, c[p]/n[p]}}' | sort
+	@echo "├────────────────────────────────────────────────────────────────────────┼────────┤"
+	@printf "│ %-70s │ " "TOTAL"; go tool cover -func $(COVER_ALL_FILE) | tail -n 1 | awk '{printf "%6s │\n", $$3}'
+	@echo "╰────────────────────────────────────────────────────────────────────────┴────────╯"
 
 ## Chain:
 .PHONY: chain-init
@@ -406,7 +446,7 @@ doc-command: ## Generate markdown documentation for the command
 
 .PHONY: doc-predicate
 doc-predicate: ## Generate markdown documentation for all the predicates (module logic)
-	${call echo_msg, 📖, Generating, documentation, for Predicates}
+	@${call echo_msg, 📖, Generating, documentation, for Predicates}
 	@OUT_FOLDER="docs/predicate"; \
 	rm -rf $$OUT_FOLDER; \
 	mkdir -p $$OUT_FOLDER; \
@@ -471,10 +511,7 @@ ensure-buildx-builder:
 
 ## Dependencies:
 .PHONY: deps
-deps: deps-$(TOOL_GOLANGCI_NAME) deps-$(TOOL_TPARSE_NAME) deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) deps-$(TOOL_MODERNIZE_NAME) ## Install all the dependencies (tools, etc.)
-
-.PHONY: deps-$(TOOL_TPARSE_NAME)
-deps-tparse: $(TOOL_TPARSE_BIN) ## Install $TOOL_TPARSE_NAME ($TOOL_TPARSE_VERSION)
+deps: deps-$(TOOL_GOLANGCI_NAME) deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) deps-$(TOOL_MODERNIZE_NAME) ## Install all the dependencies (tools, etc.)
 
 .PHONY: deps-$(TOOL_HEIGHLINER_NAME)
 deps-heighliner: $(TOOL_HEIGHLINER_BIN) ## Install $TOOL_HEIGHLINER_NAME ($TOOL_HEIGHLINER_VERSION)
@@ -487,11 +524,6 @@ deps-golangci-lint: $(TOOL_GOLANGCI_BIN) ## Install $TOOL_GOLANGCI_NAME ($TOOL_G
 
 .PHONY: deps-$(TOOL_MODERNIZE_NAME)
 deps-modernize: $(TOOL_MODERNIZE_BIN) ## Install $TOOL_MODERNIZE_NAME ($TOOL_MODERNIZE_VERSION)
-
-$(TOOL_TPARSE_BIN):
-	@${call echo_msg, 📦, Installing, $(TOOL_TPARSE_NAME)@$(TOOL_TPARSE_VERSION),...}
-	@mkdir -p $(dir $(TOOL_TPARSE_BIN))
-	@GOBIN=$(dir $(abspath $(TOOL_TPARSE_BIN))) go install $(TOOL_TPARSE_PKG)
 
 $(TOOL_HEIGHLINER_BIN):
 	@${call echo_msg, 📦, Installing, $(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION),...}
