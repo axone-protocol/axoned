@@ -45,7 +45,7 @@ require (
 	github.com/princjef/gomarkdoc v1.1.0
 	github.com/prometheus/client_golang v1.23.2
 	github.com/samber/lo v1.50.0
-	github.com/sergi/go-diff v1.3.2-0.20230802210424-5b0b94c5c0d3
+	github.com/sergi/go-diff v1.4.0
 	github.com/smartystreets/goconvey v1.8.1
 	github.com/spf13/cast v1.9.2
 	github.com/spf13/cobra v1.10.1
