@@ -20,7 +20,7 @@ require (
 	cosmossdk.io/x/feegrant v0.1.1
 	cosmossdk.io/x/tx v0.14.0
 	cosmossdk.io/x/upgrade v0.2.0
-	dario.cat/mergo v1.0.1
+	dario.cat/mergo v1.0.2
 	github.com/CosmWasm/wasmd v0.61.2
 	github.com/Masterminds/sprig/v3 v3.3.0
 	github.com/axone-protocol/prolog/v2 v2.0.1
