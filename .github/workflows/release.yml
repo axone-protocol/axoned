@@ -39,7 +39,7 @@ jobs:
           git_commit_gpgsign: true
 
       - name: Setup node
-        uses: actions/setup-node@v5
+        uses: actions/setup-node@v6
         with:
           node-version: 20
 
