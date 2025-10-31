@@ -1,6 +1,6 @@
 module github.com/axone-protocol/axoned/v13
 
-go 1.24
+go 1.24.0
 
 toolchain go1.24.1
 
@@ -56,8 +56,8 @@ require (
 	go.uber.org/mock v0.6.0
 	golang.org/x/exp v0.0.0-20250305212735-054e65f0b394
 	golang.org/x/net v0.43.0
-	google.golang.org/genproto/googleapis/api v0.0.0-20250707201910-8d1bb00bc6a7
-	google.golang.org/grpc v1.75.1
+	google.golang.org/genproto/googleapis/api v0.0.0-20250804133106-a7a43d27e69b
+	google.golang.org/grpc v1.76.0
 	google.golang.org/protobuf v1.36.10
 	gotest.tools/v3 v3.5.2
 	sigs.k8s.io/yaml v1.6.0
@@ -175,7 +175,7 @@ require (
 	github.com/go-git/gcfg v1.5.1-0.20230307220236-3a3c6141e376 // indirect
 	github.com/go-git/go-billy/v5 v5.6.2 // indirect
 	github.com/go-git/go-git/v5 v5.13.2 // indirect
-	github.com/go-jose/go-jose/v4 v4.1.1 // indirect
+	github.com/go-jose/go-jose/v4 v4.1.2 // indirect
 	github.com/go-kit/kit v0.13.0 // indirect
 	github.com/go-kit/log v0.2.1 // indirect
 	github.com/go-logfmt/logfmt v0.6.0 // indirect
