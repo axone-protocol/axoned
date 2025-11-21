@@ -20,7 +20,7 @@ jobs:
       status: ${{ steps.changed-files.outputs.any_changed == 'true' }}
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Search for all modified files that involve the execution of tests
         id: changed-files
@@ -38,7 +38,7 @@ jobs:
     if: needs.check-tests.outputs.status
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Setup Go environment
         uses: actions/setup-go@v6.1.0
@@ -75,7 +75,7 @@ jobs:
     if: needs.check-tests.outputs.status
     steps:
       - name: Check out repository
-        uses: actions/checkout@v5
+        uses: actions/checkout@v6
 
       - name: Install jq
         run: sudo apt-get install jq
