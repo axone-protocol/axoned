@@ -27,7 +27,7 @@
 
 ## The protocol
 
-`axoned` is the node of the [AXONE](https://axone.xyz) network built on the [Cosmos SDK] 💫 & [Tendermint] consensus, which allows companies & individuals to define on-chain rules, share any off-chain resources & create a new generation of applications on top of them.
+`axoned` is the node of the [AXONE](https://axone.xyz) network built on the [Cosmos SDK] 💫 & [CometBFT] consensus, which allows companies & individuals to define on-chain rules, share any off-chain resources & create a new generation of applications on top of them.
 
 - 📖 Read the [introduction blog post](https://blog.axone.xyz/) to understand the project’s vision.
 - 🧠 Explore the [white paper](https://docs.axone.xyz/docs/whitepaper/abstract) for a deeper look at the protocol architecture and network economics.
@@ -227,9 +227,9 @@ software developers and node operators.
 Please reach out to us and say hi 👋, we're happy to help there.
 
 [Cosmos SDK]: https://v1.cosmos.network/sdk
+[CometBFT]: https://cometbft.com/
 [Docker]: https://www.docker.com/
 [Go]: https://go.dev
-[Tendermint]: https://tendermint.com/
 
 ## You want to get involved? 😍
 
