@@ -226,7 +226,7 @@ software developers and node operators.
 
 Please reach out to us and say hi 👋, we're happy to help there.
 
-[Cosmos SDK]: https://v1.cosmos.network/sdk
+[Cosmos SDK]: https://cosmos.network/
 [CometBFT]: https://cometbft.com/
 [Docker]: https://www.docker.com/
 [Go]: https://go.dev
