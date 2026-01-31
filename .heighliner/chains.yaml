@@ -1,0 +1,18 @@
+- name: axone
+  build:
+    - name: axone
+      binaries:
+        - /go/bin/axoned
+      build-target: |
+        make install
+      build-env:
+        - LEDGER_ENABLED=false
+      build-tags:
+        - BUILD_TAGS=muslc
+      build-dir: .
+      pre-build: ""
+      platforms:
+        - linux/amd64
+        - linux/arm64
+      go-version: "1.24"
+      alpine-version: "3.22"

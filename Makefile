@@ -219,7 +219,7 @@ build-go-all: $(ENVIRONMENTS_TARGETS) ## Build node executables for all availabl
 .PHONY: build-docker
 build-docker: $(TOOL_HEIGHLINER_BIN) ## Build docker image
 	@${call echo_msg, 🐳, Building, docker image,...}
-	@$(TOOL_HEIGHLINER_BIN) build -c axone --local
+	@$(TOOL_HEIGHLINER_BIN) build -c axone --local -f .heighliner/chains.yaml
 
 $(ENVIRONMENTS_TARGETS):
 	@GOOS=$(word 3, $(subst -, ,$@)); \
