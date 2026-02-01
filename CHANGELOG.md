@@ -1,5 +1,7 @@
 # AXONE protocol changelog
 
+## [13.0.1](https://github.com/axone-protocol/axoned/compare/v13.0.0...v13.0.1) (2026-02-01)
+
 ## [13.0.0](https://github.com/axone-protocol/axoned/compare/v12.0.0...v13.0.0) (2025-09-27)
 
 
