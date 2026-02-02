@@ -28,7 +28,7 @@ require (
 	github.com/cosmos/cosmos-sdk v0.53.4
 	github.com/cosmos/gogoproto v1.7.2
 	github.com/cosmos/ibc-go/modules/capability v1.0.1
-	github.com/cosmos/ibc-go/v10 v10.4.0
+	github.com/cosmos/ibc-go/v10 v10.5.0
 	github.com/cucumber/gherkin/go/v26 v26.2.0
 	github.com/cucumber/godog v0.15.1
 	github.com/cucumber/messages/go/v21 v21.0.1
