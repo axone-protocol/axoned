@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Update modules docs repository
-        uses: fjogeleit/http-request-action@v1
+        uses: fjogeleit/http-request-action@v2
         with:
           url: 'https://api.github.com/repos/okp4/docs/actions/workflows/39152549/dispatches'
           method: 'POST'
@@ -27,7 +27,7 @@ jobs:
             }
 
       - name: Update commands docs repository
-        uses: fjogeleit/http-request-action@v1
+        uses: fjogeleit/http-request-action@v2
         with:
           url: 'https://api.github.com/repos/okp4/docs/actions/workflows/39152549/dispatches'
           method: 'POST'
@@ -45,7 +45,7 @@ jobs:
             }
 
       - name: Update predicates docs repository
-        uses: fjogeleit/http-request-action@v1
+        uses: fjogeleit/http-request-action@v2
         with:
           url: 'https://api.github.com/repos/okp4/docs/actions/workflows/39152549/dispatches'
           method: 'POST'
