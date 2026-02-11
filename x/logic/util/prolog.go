@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"strings"
 
-	"github.com/axone-protocol/prolog/v2"
-	"github.com/axone-protocol/prolog/v2/engine"
+	"github.com/axone-protocol/prolog/v3"
+	"github.com/axone-protocol/prolog/v3/engine"
 	"github.com/samber/lo"
 
 	errorsmod "cosmossdk.io/errors"

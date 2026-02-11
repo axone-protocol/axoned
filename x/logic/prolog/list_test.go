@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/axone-protocol/prolog/v2/engine"
+	"github.com/axone-protocol/prolog/v3/engine"
 
 	. "github.com/smartystreets/goconvey/convey"
 )

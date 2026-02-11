@@ -4,7 +4,7 @@ import (
 	"strings"
 	"unicode/utf8"
 
-	"github.com/axone-protocol/prolog/v2/engine"
+	"github.com/axone-protocol/prolog/v3/engine"
 )
 
 // AtomToString try to convert a given atom to a string.
