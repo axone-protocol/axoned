@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/axone-protocol/prolog/v2/engine"
+	"github.com/axone-protocol/prolog/v3/engine"
 	"github.com/hashicorp/go-metrics"
 
 	"github.com/cosmos/cosmos-sdk/telemetry"

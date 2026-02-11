@@ -1,7 +1,7 @@
 package prolog
 
 import (
-	"github.com/axone-protocol/prolog/v2/engine"
+	"github.com/axone-protocol/prolog/v3/engine"
 )
 
 // ListHead returns the first element of the given list.
