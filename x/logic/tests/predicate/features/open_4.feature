@@ -185,7 +185,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', write, Stream, []).
+      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', append, Stream, []).
       """
     When the query is run
     Then the answer we get is:
