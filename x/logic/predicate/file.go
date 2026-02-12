@@ -33,6 +33,8 @@ func Consult(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.Env)
 //
 // where:
 //   - File represents the loaded source file.
+//
+// When File is a variable, solutions are produced in source loading order.
 func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	loaded := vm.LoadedSources()
 
