@@ -18,3 +18,5 @@ source_file(?File) is det
 where:
 
 - File represents the loaded source file.
+
+When File is a variable, solutions are produced in source loading order.
