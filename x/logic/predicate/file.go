@@ -2,8 +2,6 @@ package predicate
 
 import (
 	"context"
-	"reflect"
-	"sort"
 
 	"github.com/axone-protocol/prolog/v3/engine"
 
@@ -36,14 +34,13 @@ func Consult(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.Env)
 // where:
 //   - File represents the loaded source file.
 func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	loaded := getLoadedSources(vm)
+	loaded := vm.LoadedSources()
 
 	switch file := env.Resolve(file).(type) {
 	case engine.Variable:
 		promises := make([]func(ctx context.Context) *engine.Promise, 0, len(loaded))
-		sortedSource := sortLoadedSources(loaded)
-		for i := range sortedSource {
-			term := engine.NewAtom(sortedSource[i])
+		for i := range loaded {
+			term := engine.NewAtom(loaded[i])
 			promises = append(
 				promises,
 				func(_ context.Context) *engine.Promise {
@@ -60,10 +57,12 @@ func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.E
 		return engine.Delay(promises...)
 	case engine.Atom:
 		inputFile := file.String()
-		if _, ok := loaded[inputFile]; !ok {
-			return engine.Bool(false)
+		for i := range loaded {
+			if loaded[i] == inputFile {
+				return cont(env)
+			}
 		}
-		return cont(env)
+		return engine.Bool(false)
 	default:
 		return engine.Error(engine.TypeError(prolog.AtomTypeAtom, file, env))
 	}
@@ -130,26 +129,4 @@ func Open3(vm *engine.VM, sourceSink, mode, stream engine.Term, k engine.Cont, e
 		vm,
 		atomOpen.Apply(sourceSink, mode, stream, prolog.AtomEmptyList),
 		k, env)
-}
-
-func getLoadedSources(vm *engine.VM) map[string]struct{} {
-	loadedField := reflect.ValueOf(vm).Elem().FieldByName("loaded").MapKeys()
-	loaded := make(map[string]struct{}, len(loadedField))
-	for _, value := range loadedField {
-		loaded[value.String()] = struct{}{}
-	}
-
-	return loaded
-}
-
-func sortLoadedSources(sources map[string]struct{}) []string {
-	result := make([]string, 0, len(sources))
-	for filename := range sources {
-		result = append(result, filename)
-	}
-	sort.SliceStable(result, func(i, j int) bool {
-		return result[i] < result[j]
-	})
-
-	return result
 }
