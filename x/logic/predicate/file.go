@@ -2,7 +2,6 @@ package predicate
 
 import (
 	"context"
-	"os"
 	"reflect"
 	"sort"
 
@@ -70,32 +69,6 @@ func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.E
 	}
 }
 
-// ioMode describes what operations you can perform on the stream.
-type ioMode int
-
-const (
-	// ioModeRead means you can read from the stream.
-	ioModeRead = ioMode(os.O_RDONLY)
-	// ioModeWrite means you can write to the stream.
-	ioModeWrite = ioMode(os.O_CREATE | os.O_WRONLY)
-	// ioModeAppend means you can append to the stream.
-	ioModeAppend = ioMode(os.O_APPEND) | ioModeWrite
-)
-
-var (
-	atomRead   = engine.NewAtom("read")
-	atomWrite  = engine.NewAtom("write")
-	atomAppend = engine.NewAtom("append")
-)
-
-func (m ioMode) Term() engine.Term {
-	return [...]engine.Term{
-		ioModeRead:   atomRead,
-		ioModeWrite:  atomWrite,
-		ioModeAppend: atomAppend,
-	}[m]
-}
-
 // Open is a predicate which opens a stream to a source or sink.
 //
 // # Signature
@@ -136,60 +109,7 @@ func (m ioMode) Term() engine.Term {
 //   - {contract_query}: The query to be executed on the smart contract. It is a JSON object that specifies the query payload.
 //   - base64Decode: (Optional) If true, the response is base64-decoded. Otherwise, the response is returned as is.
 func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
-	var name string
-	switch s := env.Resolve(sourceSink).(type) {
-	case engine.Variable:
-		return engine.Error(engine.InstantiationError(env))
-	case engine.Atom:
-		name = s.String()
-	default:
-		return engine.Error(engine.TypeError(prolog.AtomTypeAtom, sourceSink, env))
-	}
-
-	if prolog.IsGround(options, env) {
-		_, err := prolog.AssertList(options, env)
-		switch {
-		case err != nil:
-			return engine.Error(err)
-		case !prolog.IsEmptyList(options, env):
-			return engine.Error(engine.DomainError(prolog.ValidEmptyList(), options, env))
-		}
-	}
-
-	var streamMode ioMode
-	switch m := env.Resolve(mode).(type) {
-	case engine.Variable:
-		return engine.Error(engine.InstantiationError(env))
-	case engine.Atom:
-		var ok bool
-		streamMode, ok = map[engine.Atom]ioMode{
-			atomRead:   ioModeRead,
-			atomWrite:  ioModeWrite,
-			atomAppend: ioModeAppend,
-		}[m]
-		if !ok {
-			return engine.Error(engine.TypeError(prolog.AtomTypeIOMode, mode, env))
-		}
-	default:
-		return engine.Error(engine.TypeError(prolog.AtomTypeIOMode, mode, env))
-	}
-
-	if _, ok := env.Resolve(stream).(engine.Variable); !ok {
-		// TODO: replace InstantiationError with uninstantiation_error(+Culprit) once it's implemented by ichiban/prolog.
-		return engine.Error(engine.InstantiationError(env))
-	}
-
-	if streamMode != ioModeRead {
-		return engine.Error(engine.PermissionError(prolog.AtomOperationInput, prolog.AtomPermissionTypeStream, sourceSink, env))
-	}
-
-	f, err := vm.FS.Open(name)
-	if err != nil {
-		return engine.Error(engine.ExistenceError(prolog.AtomObjectTypeSourceSink, sourceSink, env))
-	}
-	s := engine.NewInputTextStream(f)
-
-	return engine.Unify(vm, stream, s, k, env)
+	return engine.Open(vm, sourceSink, mode, stream, options, k, env)
 }
 
 // Open3 is a predicate which opens a stream to a source or sink.

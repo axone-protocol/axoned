@@ -143,7 +143,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', read, Stream, []).
+      open('foo:bar', read, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -154,7 +154,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(existence_error(source_sink,cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo),open/4)"
+        - error: "error(existence_error(source_sink,foo:bar),open/4)"
       """
 
   @great_for_documentation
@@ -175,7 +175,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(permission_error(input,stream,cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo),open/4)"
+        - error: "error(permission_error(open,source_sink,cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo),open/4)"
       """
 
   @great_for_documentation
@@ -185,7 +185,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', write, Stream, []).
+      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', append, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -196,7 +196,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(permission_error(input,stream,cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo),open/4)"
+        - error: "error(permission_error(open,source_sink,cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo),open/4)"
       """
 
 
@@ -204,9 +204,18 @@ Feature: open/4
   Scenario: Pass incorrect options to open/4
   This scenario demonstrates the system's response to opening a resource with incorrect options.
 
+    Given the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
+      """ yaml
+      message: |
+        {
+          "foo": "bar"
+        }
+      response: |
+        Hello, World!
+      """
     Given the query:
       """ prolog
-      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=foo', read, Stream, [non_existing_option]).
+      open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22foo%22%3A%22bar%22%7D&base64Decode=false', read, Stream, [non_existing_option]).
       """
     When the query is run
     Then the answer we get is:
@@ -217,7 +226,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(domain_error(empty_list,[non_existing_option]),open/4)"
+        - error: "error(domain_error(stream_option,non_existing_option),open/4)"
       """
 
 
@@ -237,7 +246,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(type_error(io_mode,incorrect_mode),open/4)"
+        - error: "error(domain_error(io_mode,incorrect_mode),open/4)"
       """
 
   Scenario: Open a resource with incorrect mode (2)
@@ -256,7 +265,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(type_error(io_mode,666),open/4)"
+        - error: "error(type_error(atom,666),open/4)"
       """
 
   Scenario: Insufficient instantiation error (1)
