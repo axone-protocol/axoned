@@ -164,8 +164,8 @@ github.com/aws/aws-sdk-go-v2/service/sts v1.33.20 h1:oIaQ1e17CSKaWmUTu62MtraRWVI
 github.com/aws/aws-sdk-go-v2/service/sts v1.33.20/go.mod h1:cQnB8CUnxbMU82JvlqjKR2HBOm3fe9pWorWBza6MBJ4=
 github.com/aws/smithy-go v1.22.3 h1:Z//5NuZCSW6R4PhQ93hShNbyBbn8BWCmCVCt+Q8Io5k=
 github.com/aws/smithy-go v1.22.3/go.mod h1:t1ufH5HMublsJYulve2RKmHDC15xu1f26kHCp/HgceI=
-github.com/axone-protocol/prolog/v3 v3.0.0 h1:kn7BxV8vE0kVH64saxdXWC96ZVMsQYPXKKoSOLRSG4U=
-github.com/axone-protocol/prolog/v3 v3.0.0/go.mod h1:ZYKbPK6G8DN30BEgGqwFgaGX/CZllxiU7cqzJghI42o=
+github.com/axone-protocol/prolog/v3 v3.1.0 h1:ZaPNUpN4mi598sLEmId9qCmWemJYt17GRi+/BbBmH2g=
+github.com/axone-protocol/prolog/v3 v3.1.0/go.mod h1:ZYKbPK6G8DN30BEgGqwFgaGX/CZllxiU7cqzJghI42o=
 github.com/bahlo/generic-list-go v0.2.0 h1:5sz/EEAK+ls5wF+NeqDpk5+iNdMDXrh3z3nPnH1Wvgk=
 github.com/bahlo/generic-list-go v0.2.0/go.mod h1:2KvAjgMlE5NNynlg/5iLrrCCZ2+5xWbdbCW3pNTGyYg=
 github.com/benbjohnson/clock v1.1.0/go.mod h1:J11/hYXuz8f4ySSvYwY0FKfm+ezbsZBKZxNJlLklBHA=
