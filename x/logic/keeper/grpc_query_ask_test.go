@@ -293,6 +293,15 @@ func TestGRPCAsk(t *testing.T) {
 				},
 			},
 			{
+				program:               `test :- open('https://example.com/data.pl', read, _, []).`,
+				query:                 "test.",
+				virtualFilesWhitelist: []string{"cosmwasm:"},
+				expectedAnswer: &types.Answer{
+					HasMore: false,
+					Results: []types.Result{{Error: "error(permission_error(open,source_sink,https://example.com/data.pl),open/4)"}},
+				},
+			},
+			{
 				program:       "father°(bob, alice).",
 				query:         "father(bob, X).",
 				expectedError: "error compiling query: unexpected token: invalid(°): invalid argument",
