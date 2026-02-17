@@ -31,6 +31,8 @@ import (
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
+	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
 	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
@@ -280,10 +282,12 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		tc.authQueryService,
 		tc.bankKeeper,
 		func(ctx context.Context) fs.FS {
-			vfs := composite.NewFS()
-			vfs.Mount(wasm.Scheme, wasm.NewFS(ctx, tc.wasmKeeper))
+			legacyFS := composite.NewFS()
+			legacyFS.Mount(wasm.Scheme, wasm.NewFS(ctx, tc.wasmKeeper))
 
-			return vfs
+			pathFS := logicvfs.New()
+
+			return dual.NewFS(pathFS, legacyFS)
 		})
 
 	if err := logicKeeper.SetParams(tc.ctx.Ctx, tc.params); err != nil {
