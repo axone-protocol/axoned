@@ -24,7 +24,7 @@ import (
 	"github.com/axone-protocol/axoned/v13/x/logic/types"
 )
 
-//nolint:lll
+//nolint:lll,gocognit
 func TestGRPCAsk(t *testing.T) {
 	emptySolution := types.Result{}
 	Convey("Given a test cases", t, func() {

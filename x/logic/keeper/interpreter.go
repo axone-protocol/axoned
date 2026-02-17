@@ -90,7 +90,7 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
 		util.Indexed(util.ParseURLMust))
 	blacklistUrls := lo.Map(
-		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
+		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Blacklist, []string{}),
 		util.Indexed(util.ParseURLMust))
 
 	var userOutputBuffer writerStringer
