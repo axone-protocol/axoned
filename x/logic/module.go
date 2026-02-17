@@ -16,10 +16,10 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/axone-protocol/axoned/v13/x/logic/client/cli"
-	"github.com/axone-protocol/axoned/v13/x/logic/exported"
-	"github.com/axone-protocol/axoned/v13/x/logic/keeper"
-	"github.com/axone-protocol/axoned/v13/x/logic/types"
+	"github.com/axone-protocol/axoned/v14/x/logic/client/cli"
+	"github.com/axone-protocol/axoned/v14/x/logic/exported"
+	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
+	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
 // ConsensusVersion defines the current x/logic module consensus version.

@@ -18,7 +18,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v13/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
 )
 
 func TestTermToAtom(t *testing.T) {

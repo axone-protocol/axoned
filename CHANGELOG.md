@@ -1,5 +1,27 @@
 # AXONE protocol changelog
 
+## [14.0.0](https://github.com/axone-protocol/axoned/compare/v13.0.1...v14.0.0) (2026-02-17)
+
+
+### ⚠ BREAKING CHANGES
+
+* **logic:** return source_file/1 results in source loading order
+* **logic:** standardize open/3 and open/4 behavior
+
+### Features
+
+* **logic:** return source_file/1 results in source loading order ([5021da3](https://github.com/axone-protocol/axoned/commit/5021da34d835a1649411e023ddbe92bee435f771))
+
+
+### Bug Fixes
+
+* **logic:** correct blacklistUrls using Blacklist instead of Whitelist ([35904f1](https://github.com/axone-protocol/axoned/commit/35904f1e7abd66317837b772e6e7562ebc8e6e6b))
+
+
+### Code Refactoring
+
+* **logic:** standardize open/3 and open/4 behavior ([1d54e84](https://github.com/axone-protocol/axoned/commit/1d54e841b4862b78c8c8fb5343b642af4a1e5551))
+
 ## [13.0.1](https://github.com/axone-protocol/axoned/compare/v13.0.0...v13.0.1) (2026-02-01)
 
 ## [13.0.0](https://github.com/axone-protocol/axoned/compare/v12.0.0...v13.0.0) (2025-09-27)

@@ -7,8 +7,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/telemetry"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v13/x/mint/keeper"
-	"github.com/axone-protocol/axoned/v13/x/mint/types"
+	"github.com/axone-protocol/axoned/v14/x/mint/keeper"
+	"github.com/axone-protocol/axoned/v14/x/mint/types"
 )
 
 // BeginBlocker mints new tokens for the previous block.

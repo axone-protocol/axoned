@@ -12,7 +12,7 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/types/module"
 
-	"github.com/axone-protocol/axoned/v13/x/mint/types"
+	"github.com/axone-protocol/axoned/v14/x/mint/types"
 )
 
 // Simulation parameter constants.

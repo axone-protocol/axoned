@@ -12,8 +12,8 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/axone-protocol/axoned/v13/x/logic/fs/wasm"
-	"github.com/axone-protocol/axoned/v13/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
+	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
 )
 
 type fileSpec struct {

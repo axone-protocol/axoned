@@ -29,9 +29,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	bank "github.com/cosmos/cosmos-sdk/x/bank/types"
 
-	"github.com/axone-protocol/axoned/v13/x/logic/testutil"
-	"github.com/axone-protocol/axoned/v13/x/logic/types"
-	"github.com/axone-protocol/axoned/v13/x/logic/util"
+	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v14/x/logic/types"
+	"github.com/axone-protocol/axoned/v14/x/logic/util"
 )
 
 func TestBank(t *testing.T) {

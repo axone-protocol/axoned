@@ -7,7 +7,7 @@ import (
 	"github.com/axone-protocol/prolog/v3/engine"
 	"github.com/samber/lo"
 
-	"github.com/axone-protocol/axoned/v13/x/logic/util"
+	"github.com/axone-protocol/axoned/v14/x/logic/util"
 )
 
 // PredicateMatches returns a function that matches the given predicate against the given other predicate.

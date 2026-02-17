@@ -9,8 +9,8 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/telemetry"
 
-	"github.com/axone-protocol/axoned/v13/x/logic/interpreter"
-	"github.com/axone-protocol/axoned/v13/x/logic/types"
+	"github.com/axone-protocol/axoned/v14/x/logic/interpreter"
+	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
 var metricsKeys = []string{types.ModuleName, "vm", "predicate"}
