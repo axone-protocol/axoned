@@ -12,6 +12,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
@@ -48,7 +49,7 @@ func (f *vfs) Open(name string) (fs.File, error) {
 	}
 
 	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
-	return NewVirtualFile(name, data, sdkCtx.BlockTime()), nil
+	return NewVirtualFile(name, data, prolog.ResolveHeaderInfo(sdkCtx).Time), nil
 }
 
 func (f *vfs) ReadFile(name string) ([]byte, error) {

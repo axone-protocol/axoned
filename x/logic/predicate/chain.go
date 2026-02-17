@@ -27,7 +27,14 @@ func BlockHeader(vm *engine.VM, header engine.Term, cont engine.Cont, env *engin
 			return engine.Error(err)
 		}
 
-		headerDict, err := blockHeaderToTerm(sdkContext.BlockHeader())
+		blockHeader := sdkContext.BlockHeader()
+		headerInfo := prolog.ResolveHeaderInfo(sdkContext)
+		blockHeader.Height = headerInfo.Height
+		blockHeader.Time = headerInfo.Time
+		blockHeader.ChainID = headerInfo.ChainID
+		blockHeader.AppHash = headerInfo.AppHash
+
+		headerDict, err := blockHeaderToTerm(blockHeader)
 		if err != nil {
 			return engine.Error(err)
 		}
@@ -111,11 +118,11 @@ func blockIDToTerm(blockID cmtproto.BlockID) (engine.Dict, error) {
 // Deprecated: Use the `block_header/1` predicate instead.
 func ChainID(vm *engine.VM, chainID engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		sdkContext, err := prolog.UnwrapSDKContext(ctx, env)
+		headerInfo, err := prolog.HeaderInfo(ctx, env)
 		if err != nil {
 			return engine.Error(err)
 		}
 
-		return engine.Unify(vm, chainID, engine.NewAtom(sdkContext.ChainID()), cont, env)
+		return engine.Unify(vm, chainID, engine.NewAtom(headerInfo.ChainID), cont, env)
 	})
 }

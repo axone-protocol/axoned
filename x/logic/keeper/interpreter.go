@@ -64,7 +64,7 @@ func (k Keeper) execute(
 	}
 
 	return &types.QueryServiceAskResponse{
-		Height:     uint64(sdkCtx.BlockHeight()), //nolint:gosec // disable G115
+		Height:     uint64(prolog2.ResolveHeaderInfo(sdkCtx).Height), //nolint:gosec // disable G115
 		GasUsed:    sdkCtx.GasMeter().GasConsumed(),
 		Answer:     answer,
 		UserOutput: userOutput.String(),
