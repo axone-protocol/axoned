@@ -24,22 +24,24 @@ import (
 	"github.com/axone-protocol/axoned/v13/x/logic/types"
 )
 
-//nolint:lll
+//nolint:lll,gocognit
 func TestGRPCAsk(t *testing.T) {
 	emptySolution := types.Result{}
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
-			program            string
-			query              string
-			limit              uint64
-			maxResultCount     uint64
-			maxSize            uint64
-			predicateBlacklist []string
-			maxGas             uint64
-			maxVariables       uint64
-			predicateCosts     map[string]uint64
-			expectedAnswer     *types.Answer
-			expectedError      string
+			program               string
+			query                 string
+			limit                 uint64
+			maxResultCount        uint64
+			maxSize               uint64
+			predicateBlacklist    []string
+			virtualFilesWhitelist []string
+			virtualFilesBlacklist []string
+			maxGas                uint64
+			maxVariables          uint64
+			predicateCosts        map[string]uint64
+			expectedAnswer        *types.Answer
+			expectedError         string
 		}{
 			{
 				program: "foo.",
@@ -282,6 +284,24 @@ func TestGRPCAsk(t *testing.T) {
 				},
 			},
 			{
+				program:               `test :- open('cosmwasm:okp4-objectarium:okp41ffzp0xmjhwkltuxcvccl0z9tyfuu7txp5ke0tpkcjpzuq9fcj3pqrteqt3?query=%7B%22object_data%22%3A%7B%22id%22%3A%22content1%22%7D%7D', read, _, []).`,
+				query:                 "test.",
+				virtualFilesBlacklist: []string{"cosmwasm:"},
+				expectedAnswer: &types.Answer{
+					HasMore: false,
+					Results: []types.Result{{Error: "error(permission_error(open,source_sink,cosmwasm:okp4-objectarium:okp41ffzp0xmjhwkltuxcvccl0z9tyfuu7txp5ke0tpkcjpzuq9fcj3pqrteqt3?query=%7B%22object_data%22%3A%7B%22id%22%3A%22content1%22%7D%7D),open/4)"}},
+				},
+			},
+			{
+				program:               `test :- open('https://example.com/data.pl', read, _, []).`,
+				query:                 "test.",
+				virtualFilesWhitelist: []string{"cosmwasm:"},
+				expectedAnswer: &types.Answer{
+					HasMore: false,
+					Results: []types.Result{{Error: "error(permission_error(open,source_sink,https://example.com/data.pl),open/4)"}},
+				},
+			},
+			{
 				program:       "father°(bob, alice).",
 				query:         "father(bob, X).",
 				expectedError: "error compiling query: unexpected token: invalid(°): invalid argument",
@@ -426,6 +446,12 @@ func TestGRPCAsk(t *testing.T) {
 
 					if tc.predicateBlacklist != nil {
 						params.Interpreter.PredicatesFilter.Blacklist = tc.predicateBlacklist
+					}
+					if tc.virtualFilesWhitelist != nil {
+						params.Interpreter.VirtualFilesFilter.Whitelist = tc.virtualFilesWhitelist
+					}
+					if tc.virtualFilesBlacklist != nil {
+						params.Interpreter.VirtualFilesFilter.Blacklist = tc.virtualFilesBlacklist
 					}
 					if tc.predicateCosts != nil {
 						predicateCosts := make([]types.PredicateCost, 0, len(tc.predicateCosts))
