@@ -7,6 +7,11 @@ import (
 	"github.com/axone-protocol/axoned/v14/x/logic/util"
 )
 
+type openFileFS interface {
+	fs.FS
+	OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error)
+}
+
 type vfs struct {
 	fs        fs.FS
 	whitelist []*url.URL
@@ -16,6 +21,7 @@ type vfs struct {
 var (
 	_ fs.FS         = (*vfs)(nil)
 	_ fs.ReadFileFS = (*vfs)(nil)
+	_ openFileFS    = (*vfs)(nil)
 )
 
 // NewFS creates a new filtered filesystem that wraps the provided filesystem.
@@ -29,6 +35,18 @@ func (f *vfs) Open(name string) (fs.File, error) {
 		return nil, err
 	}
 	return f.fs.Open(name)
+}
+
+func (f *vfs) OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error) {
+	if err := f.accept("open", name); err != nil {
+		return nil, err
+	}
+
+	if ofs, ok := f.fs.(openFileFS); ok {
+		return ofs.OpenFile(name, flag, perm)
+	}
+
+	return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
 }
 
 func (f *vfs) ReadFile(name string) ([]byte, error) {
