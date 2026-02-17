@@ -190,7 +190,7 @@ func TestFilteredVFSOpenFile(t *testing.T) {
 				open: func(name string) (fs.File, error) {
 					return wasm.NewVirtualFile(name, content, time.Unix(1681389446, 0)), nil
 				},
-				readFile: func(name string) ([]byte, error) {
+				readFile: func(_ string) ([]byte, error) {
 					return content, nil
 				},
 				openFile: func(name string, flag int, perm fs.FileMode) (fs.File, error) {
@@ -250,10 +250,10 @@ func TestFilteredVFSOpenFile(t *testing.T) {
 				open: func(name string) (fs.File, error) {
 					return wasm.NewVirtualFile(name, content, time.Unix(1681389446, 0)), nil
 				},
-				readFile: func(name string) ([]byte, error) {
+				readFile: func(_ string) ([]byte, error) {
 					return content, nil
 				},
-				openFile: func(name string, flag int, perm fs.FileMode) (fs.File, error) {
+				openFile: func(name string, _ int, _ fs.FileMode) (fs.File, error) {
 					return wasm.NewVirtualFile(name, content, time.Unix(1681389446, 0)), nil
 				},
 			},
