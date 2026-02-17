@@ -20,6 +20,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	coreheader "cosmossdk.io/core/header"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -94,6 +95,12 @@ func givenABlockWithTheFollowingHeader(ctx context.Context, headerConfig *godog.
 	}
 
 	tc.ctx.Ctx = tc.ctx.Ctx.WithBlockHeader(header)
+	tc.ctx.Ctx = tc.ctx.Ctx.WithHeaderInfo(coreheader.Info{
+		Height:  header.Height,
+		Time:    header.Time,
+		ChainID: header.ChainID,
+		AppHash: header.AppHash,
+	})
 
 	return nil
 }
@@ -245,6 +252,12 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 			header.Height = 42
 			header.Time = time.Date(2024, 4, 10, 10, 44, 27, 0, time.UTC)
 			testCtx.Ctx = testCtx.Ctx.WithBlockHeader(header)
+			testCtx.Ctx = testCtx.Ctx.WithHeaderInfo(coreheader.Info{
+				Height:  header.Height,
+				Time:    header.Time,
+				ChainID: header.ChainID,
+				AppHash: header.AppHash,
+			})
 
 			tc := testCase{
 				ctx:           testCtx,

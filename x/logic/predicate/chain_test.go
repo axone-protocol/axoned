@@ -11,6 +11,7 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
+	coreheader "cosmossdk.io/core/header"
 	"cosmossdk.io/log"
 	"cosmossdk.io/store"
 	"cosmossdk.io/store/metrics"
@@ -37,7 +38,12 @@ func TestChainID(t *testing.T) {
 			Convey("Given a context", func() {
 				db := dbm.NewMemDB()
 				stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
-				ctx := sdk.NewContext(stateStore, tc.header, false, log.NewNopLogger())
+				ctx := sdk.NewContext(stateStore, tc.header, false, log.NewNopLogger()).WithHeaderInfo(coreheader.Info{
+					Height:  tc.header.Height,
+					Time:    tc.header.Time,
+					ChainID: tc.header.ChainID,
+					AppHash: tc.header.AppHash,
+				})
 
 				Convey("and an interpreter", func() {
 					interpreter := testutil.NewLightInterpreterMust(ctx)

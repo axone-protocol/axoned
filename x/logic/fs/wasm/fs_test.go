@@ -7,6 +7,7 @@ import (
 	"io"
 	"io/fs"
 	"testing"
+	"time"
 
 	dbm "github.com/cosmos/cosmos-db"
 	"go.uber.org/mock/gomock"
@@ -15,6 +16,7 @@ import (
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
+	coreheader "cosmossdk.io/core/header"
 	"cosmossdk.io/log"
 	"cosmossdk.io/store"
 	"cosmossdk.io/store/metrics"
@@ -146,8 +148,10 @@ func TestWasmVFS(t *testing.T) {
 					db := dbm.NewMemDB()
 					stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
 					wasmKeeper := testutil.NewMockWasmKeeper(ctrl)
+					headerTime := time.Date(2026, 2, 20, 11, 22, 33, 0, time.UTC)
 					ctx := sdk.
-						NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
+						NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger()).
+						WithHeaderInfo(coreheader.Info{Time: headerTime})
 					sdk.GetConfig().SetBech32PrefixForAccount("axone", "axonepub")
 
 					wasmKeeper.EXPECT().
@@ -180,7 +184,7 @@ func TestWasmVFS(t *testing.T) {
 
 									So(info.Name(), ShouldEqual, tc.uri)
 									So(info.Size(), ShouldEqual, int64(len(tc.wantResult)))
-									So(info.ModTime(), ShouldEqual, ctx.BlockTime())
+									So(info.ModTime(), ShouldEqual, ctx.HeaderInfo().Time)
 									So(info.IsDir(), ShouldBeFalse)
 									So(info.Mode(), ShouldEqual, fs.ModeIrregular)
 									So(info.Sys(), ShouldBeNil)
