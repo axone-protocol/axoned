@@ -105,24 +105,3 @@ func blockIDToTerm(blockID cmtproto.BlockID) (engine.Dict, error) {
 			engine.NewAtom("part_set_header"), partSetHeader,
 		})
 }
-
-// ChainID is a predicate which unifies the given term with the current chain ID. The signature is:
-//
-// The signature is as follows:
-//
-//	chain_id(?ID)
-//
-// where:
-//   - ID represents the current chain ID at the time of the query.
-//
-// Deprecated: Use the `block_header/1` predicate instead.
-func ChainID(vm *engine.VM, chainID engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Delay(func(ctx context.Context) *engine.Promise {
-		headerInfo, err := prolog.HeaderInfo(ctx, env)
-		if err != nil {
-			return engine.Error(err)
-		}
-
-		return engine.Unify(vm, chainID, engine.NewAtom(headerInfo.ChainID), cont, env)
-	})
-}
