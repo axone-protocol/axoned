@@ -435,8 +435,8 @@ func TestGRPCAsk(t *testing.T) {
 						accountKeeper,
 						authQueryService,
 						bankKeeper,
-						func(_ gocontext.Context) fs.FS {
-							return fsProvider
+						func(_ gocontext.Context) (fs.FS, error) {
+							return fsProvider, nil
 						})
 
 					params := types.DefaultParams()
