@@ -101,6 +101,11 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 		userOutputBuffer = new(strings.Builder)
 	}
 
+	fsProvider, err := k.fsProvider(ctx)
+	if err != nil {
+		return nil, nil, errorsmod.Wrapf(types.ErrInternal, "error getting filesystem: %v", err.Error())
+	}
+
 	options := []interpreter.Option{
 		interpreter.WithHooks(
 			whitelistBlacklistHookFn(whitelistPredicates, blacklistPredicates),
@@ -110,7 +115,7 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 		),
 		interpreter.WithPredicates(ctx, interpreter.RegistryNames),
 		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
-		interpreter.WithFS(filtered.NewFS(k.fsProvider(ctx), whitelistUrls, blacklistUrls)),
+		interpreter.WithFS(filtered.NewFS(fsProvider, whitelistUrls, blacklistUrls)),
 		interpreter.WithUserOutputWriter(userOutputBuffer),
 		interpreter.WithMaxVariables(limits.MaxVariables),
 	}
