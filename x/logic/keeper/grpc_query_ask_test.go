@@ -144,7 +144,8 @@ func TestGRPCAsk(t *testing.T) {
 				},
 			},
 			{
-				query: "block_height(X).",
+				program: "block_height(X) :- block_header(Header), X = Header.height.",
+				query:   "block_height(X).",
 				expectedAnswer: &types.Answer{
 					Variables: []string{"X"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
@@ -153,17 +154,19 @@ func TestGRPCAsk(t *testing.T) {
 				},
 			},
 			{
+				program:       "block_height(X) :- block_header(Header), X = Header.height.",
 				query:         "block_height(X).",
 				maxGas:        1000,
 				expectedError: "out of gas: logic <ReadPerByte> (1018/1000): limit exceeded",
 			},
 			{
-				query:  "block_height(X).",
-				maxGas: 3000,
+				program: "block_height(X) :- block_header(Header), X = Header.height.",
+				query:   "block_height(X).",
+				maxGas:  3000,
 				predicateCosts: map[string]uint64{
-					"block_height/1": 10000,
+					"block_header/1": 10000,
 				},
-				expectedError: "out of gas: logic <block_height/1> (11140/3000): limit exceeded",
+				expectedError: "out of gas: logic <block_header/1> (11141/3000): limit exceeded",
 			},
 			{
 				program:       "recursionOfDeath :- recursionOfDeath.",
@@ -253,22 +256,22 @@ func TestGRPCAsk(t *testing.T) {
 			},
 			{
 				program:            "",
-				query:              "block_height(X).",
-				predicateBlacklist: []string{"block_height/1"},
+				query:              "block_header(X).",
+				predicateBlacklist: []string{"block_header/1"},
 				expectedAnswer: &types.Answer{
 					HasMore:   false,
 					Variables: []string{"X"},
-					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_height/1),root)"}},
+					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_header/1),root)"}},
 				},
 			},
 			{
-				program:            "contains_forbidden_predicate(X) :- block_height(X).",
+				program:            "contains_forbidden_predicate(X) :- block_header(X).",
 				query:              "contains_forbidden_predicate(X).",
-				predicateBlacklist: []string{"block_height/1"},
+				predicateBlacklist: []string{"block_header/1"},
 				expectedAnswer: &types.Answer{
 					HasMore:   false,
 					Variables: []string{"X"},
-					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_height/1),contains_forbidden_predicate/1)"}},
+					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_header/1),contains_forbidden_predicate/1)"}},
 				},
 			},
 			{
