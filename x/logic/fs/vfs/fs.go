@@ -118,7 +118,7 @@ func (v *FileSystem) OpenFile(path string, flag int, perm fs.FileMode) (fs.File,
 
 	ofs, ok := mounted.(OpenFileFS)
 	if !ok {
-		return nil, wrapPathError("open", path, fs.ErrPermission)
+		return nil, wrapPathError("open", path, errors.Join(errors.ErrUnsupported, fs.ErrPermission))
 	}
 
 	f, err := ofs.OpenFile(subpath, flag, perm)

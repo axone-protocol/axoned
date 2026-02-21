@@ -249,7 +249,7 @@ func TestFileSystemOpenFileDispatch(t *testing.T) {
 			_, err := v.OpenFile("/v1/sys/block", 42, 0o640)
 
 			So(err, ShouldNotBeNil)
-			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+			So(errors.Is(err, errors.ErrUnsupported), ShouldBeTrue)
 		})
 	})
 }

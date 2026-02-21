@@ -1,6 +1,7 @@
 package filtered
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"testing"
@@ -237,8 +238,9 @@ func TestFilteredVFSOpenFile(t *testing.T) {
 
 			_, err := ofs.OpenFile("file1", 123, 0o640)
 
-			Convey("then it should return a permission error", func() {
-				So(err, ShouldResemble, &fs.PathError{Op: "open", Path: "file1", Err: fs.ErrPermission})
+			Convey("then it should return an unsupported operation error", func() {
+				So(err, ShouldNotBeNil)
+				So(errors.Is(err, errors.ErrUnsupported), ShouldBeTrue)
 			})
 		})
 	})

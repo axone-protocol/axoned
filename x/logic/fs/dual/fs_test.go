@@ -139,7 +139,7 @@ func TestDualFSOpenFileDispatch(t *testing.T) {
 			So(errors.As(err, &pathErr), ShouldBeTrue)
 			So(pathErr.Op, ShouldEqual, "open")
 			So(pathErr.Path, ShouldEqual, "/v1/codec/bech32")
-			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+			So(errors.Is(err, errors.ErrUnsupported), ShouldBeTrue)
 		})
 	})
 
@@ -159,7 +159,7 @@ func TestDualFSOpenFileDispatch(t *testing.T) {
 			So(errors.As(err, &pathErr), ShouldBeTrue)
 			So(pathErr.Op, ShouldEqual, "open")
 			So(pathErr.Path, ShouldEqual, "cosmwasm:storage:addr?query=foo")
-			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+			So(errors.Is(err, errors.ErrUnsupported), ShouldBeTrue)
 		})
 	})
 }

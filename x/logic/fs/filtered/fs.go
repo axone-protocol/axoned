@@ -1,6 +1,7 @@
 package filtered
 
 import (
+	"errors"
 	"io/fs"
 	"net/url"
 
@@ -46,7 +47,11 @@ func (f *vfs) OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error)
 		return ofs.OpenFile(name, flag, perm)
 	}
 
-	return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
+	return nil, &fs.PathError{
+		Op:   "open",
+		Path: name,
+		Err:  errors.Join(errors.ErrUnsupported, fs.ErrPermission),
+	}
 }
 
 func (f *vfs) ReadFile(name string) ([]byte, error) {

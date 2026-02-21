@@ -1,6 +1,7 @@
 package dual
 
 import (
+	"errors"
 	"io"
 	"io/fs"
 	"net/url"
@@ -58,7 +59,7 @@ func (f *vfs) OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error)
 	return nil, &fs.PathError{
 		Op:   "open",
 		Path: name,
-		Err:  fs.ErrPermission,
+		Err:  errors.Join(errors.ErrUnsupported, fs.ErrPermission),
 	}
 }
 
