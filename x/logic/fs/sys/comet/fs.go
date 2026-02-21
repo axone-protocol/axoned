@@ -269,6 +269,8 @@ func evidenceToTerm(evidence corecomet.Evidence) (engine.Term, error) {
 		if !t.IsZero() {
 			timeTerm = engine.Integer(t.Unix())
 		}
+		// Keep `time` numeric in the ABI. Zero-value timestamps are encoded as 0
+		// (explicit sentinel for "unset/unknown" evidence time).
 	}
 
 	validatorTerm, err := validatorToTerm(validator)
