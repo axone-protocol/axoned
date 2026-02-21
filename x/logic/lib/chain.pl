@@ -32,9 +32,11 @@
 % - Time is a Unix timestamp in seconds (0 when unset).
 % - Empty lists are returned when data is unavailable.
 comet_info(CometInfo) :-
-  open('/v1/sys/comet/@', read, Stream, [type(text)]),
-  read_term(Stream, CometInfo, []),
-  close(Stream).
+  setup_call_cleanup(
+    open('/v1/sys/comet/@', read, Stream, [type(text)]),
+    read_term(Stream, CometInfo, []),
+    close(Stream)
+  ).
 
 % header_info(?HeaderInfo) is det.
 %
@@ -57,6 +59,8 @@ comet_info(CometInfo) :-
 % - ChainID is an atom (quoted if needed).
 % - Byte is an integer in [0,255].
 header_info(HeaderInfo) :-
-  open('/v1/sys/header/@', read, Stream, [type(text)]),
-  read_term(Stream, HeaderInfo, []),
-  close(Stream).
+  setup_call_cleanup(
+    open('/v1/sys/header/@', read, Stream, [type(text)]),
+    read_term(Stream, HeaderInfo, []),
+    close(Stream)
+  ).
