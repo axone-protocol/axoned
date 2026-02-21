@@ -43,6 +43,8 @@ var (
 	AtomKeyValue = engine.NewAtom("=")
 	// AtomPath is the term used to indicate the path component.
 	AtomPath = engine.NewAtom("path")
+	// AtomQuoted is the term used to indicate the quoted write_term/3 option.
+	AtomQuoted = engine.NewAtom("quoted")
 	// AtomQueryValue is the term used to indicate the query value component.
 	AtomQueryValue = engine.NewAtom("query_value")
 	// AtomSegment is the term used to indicate the segment component.
