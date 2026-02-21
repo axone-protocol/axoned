@@ -3,6 +3,7 @@ package virtualfile
 import (
 	"errors"
 	"io"
+	"io/fs"
 	"testing"
 	"time"
 
@@ -20,6 +21,8 @@ func TestVirtualFile(t *testing.T) {
 			So(err, ShouldBeNil)
 			So(info.Name(), ShouldEqual, "foo.pl")
 			So(info.Size(), ShouldEqual, 4)
+			So(info.Mode(), ShouldEqual, fs.FileMode(0o444))
+			So(info.Mode().IsRegular(), ShouldBeTrue)
 			So(info.ModTime(), ShouldEqual, modTime)
 			So(info.IsDir(), ShouldBeFalse)
 			So(info.Sys(), ShouldBeNil)

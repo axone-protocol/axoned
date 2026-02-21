@@ -44,7 +44,7 @@ func (i fileInfo) Size() int64 {
 }
 
 func (i fileInfo) Mode() fs.FileMode {
-	return fs.ModeIrregular
+	return 0o444
 }
 
 func (i fileInfo) ModTime() time.Time {

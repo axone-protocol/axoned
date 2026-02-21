@@ -186,7 +186,7 @@ func TestWasmVFS(t *testing.T) {
 									So(info.Size(), ShouldEqual, int64(len(tc.wantResult)))
 									So(info.ModTime(), ShouldEqual, ctx.HeaderInfo().Time)
 									So(info.IsDir(), ShouldBeFalse)
-									So(info.Mode(), ShouldEqual, fs.ModeIrregular)
+									So(info.Mode(), ShouldEqual, fs.FileMode(0o444))
 									So(info.Sys(), ShouldBeNil)
 
 									data := make([]byte, info.Size())
