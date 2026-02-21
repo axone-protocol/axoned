@@ -33,10 +33,12 @@ import (
 	"github.com/axone-protocol/axoned/v14/x/logic"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
+	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
 	logicsys "github.com/axone-protocol/axoned/v14/x/logic/fs/sys"
 	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
+	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
 	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
@@ -300,6 +302,9 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 			legacyFS.Mount(wasm.Scheme, wasm.NewFS(ctx, tc.wasmKeeper))
 
 			pathFS := logicvfs.New()
+			if err := pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)); err != nil {
+				panic(fmt.Errorf("failed to mount /v1/lib: %w", err))
+			}
 			if err := pathFS.Mount("/v1/sys", logicsys.NewFS(ctx)); err != nil {
 				panic(fmt.Errorf("failed to mount /v1/sys: %w", err))
 			}
