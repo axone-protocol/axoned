@@ -19,6 +19,35 @@ Load this module before using the predicate:
 
 Unifies CometInfo with the current Comet block info dict exposed by the VFS.
 
+Returned term shape:
+
+```prolog
+comet{
+  validators_hash: [Byte],
+  proposer_address: [Byte],
+  evidence: [evidence{
+    type: Type,
+    validator: validator{address:[Byte], power:Power},
+    height: Height,
+    time: Time,
+    total_voting_power: TotalVotingPower
+  }],
+  last_commit: commit_info{
+    round: Round,
+    votes: [vote_info{
+      block_id_flag: BlockIDFlag,
+      validator: validator{address:[Byte], power:Power}
+    }]
+  }
+}.
+```
+
+where:
+
+- Byte is an integer in [0,255].
+- Time is a Unix timestamp in seconds (0 when unset).
+- Empty lists are returned when data is unavailable.
+
 ## Signature
 
 ```text

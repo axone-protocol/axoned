@@ -19,6 +19,25 @@ Load this module before using the predicate:
 
 Unifies HeaderInfo with the current SDK header info dict exposed by the VFS.
 
+Returned term shape:
+
+```prolog
+header{
+  height: Height,
+  hash: [Byte],
+  time: Time,
+  chain_id: ChainID,
+  app_hash: [Byte]
+}.
+```
+
+where:
+
+- Height is the current block height.
+- Time is a Unix timestamp in seconds.
+- ChainID is an atom (quoted if needed).
+- Byte is an integer in [0,255].
+
 ## Signature
 
 ```text
