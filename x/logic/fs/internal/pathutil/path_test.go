@@ -2,6 +2,7 @@ package pathutil
 
 import (
 	"errors"
+	"fmt"
 	"io/fs"
 	"testing"
 
@@ -26,16 +27,18 @@ func TestNormalizeSubpath(t *testing.T) {
 			{in: "nested/../secret", wantErr: fs.ErrPermission},
 		}
 
-		for _, tc := range cases {
-			got, err := NormalizeSubpath(tc.in)
-			if tc.wantErr != nil {
-				So(err, ShouldNotBeNil)
-				So(errors.Is(err, tc.wantErr), ShouldBeTrue)
-				continue
-			}
+		for i, tc := range cases {
+			Convey(fmt.Sprintf("when normalizing case #%d (%q)", i, tc.in), func() {
+				got, err := NormalizeSubpath(tc.in)
+				if tc.wantErr != nil {
+					So(err, ShouldNotBeNil)
+					So(errors.Is(err, tc.wantErr), ShouldBeTrue)
+					return
+				}
 
-			So(err, ShouldBeNil)
-			So(got, ShouldEqual, tc.want)
+				So(err, ShouldBeNil)
+				So(got, ShouldEqual, tc.want)
+			})
 		}
 	})
 }
