@@ -65,7 +65,7 @@ header_info(HeaderInfo).
 
 ```  yaml
 height: 42
-gas_used: 3980
+gas_used: 3991
 answer:
   has_more: false
   variables: ["HeaderInfo"]
@@ -109,7 +109,7 @@ height(Height).
 
 ```  yaml
 height: 100
-gas_used: 3983
+gas_used: 3994
 answer:
   has_more: false
   variables: ["Height"]
@@ -152,7 +152,7 @@ time(Time).
 
 ```  yaml
 height: 42
-gas_used: 3983
+gas_used: 3994
 answer:
   has_more: false
   variables: ["Time"]
@@ -198,7 +198,7 @@ evaluate.
 
 ```  yaml
 height: 42
-gas_used: 3986
+gas_used: 3991
 answer:
   has_more: false
   results:
