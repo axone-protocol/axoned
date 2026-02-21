@@ -1,6 +1,7 @@
 package comet
 
 import (
+	"bytes"
 	"context"
 	"io/fs"
 
@@ -138,8 +139,8 @@ func newCometTerms(info corecomet.BlockInfo) (cometTerms, error) {
 	}
 
 	if info != nil {
-		terms.validatorsHash = prolog.BytesToByteListTerm(copyBytes(info.GetValidatorsHash()))
-		terms.proposerAddress = prolog.BytesToByteListTerm(copyBytes(info.GetProposerAddress()))
+		terms.validatorsHash = prolog.BytesToByteListTerm(bytes.Clone(info.GetValidatorsHash()))
+		terms.proposerAddress = prolog.BytesToByteListTerm(bytes.Clone(info.GetProposerAddress()))
 
 		evidenceTerm, err := evidenceListToTerm(info.GetEvidence())
 		if err != nil {
@@ -292,7 +293,7 @@ func validatorToTerm(validator corecomet.Validator) (engine.Term, error) {
 	address := []byte(nil)
 	power := int64(0)
 	if validator != nil {
-		address = copyBytes(validator.Address())
+		address = bytes.Clone(validator.Address())
 		power = validator.Power()
 	}
 
@@ -301,15 +302,4 @@ func validatorToTerm(validator corecomet.Validator) (engine.Term, error) {
 		atomAddress, prolog.BytesToByteListTerm(address),
 		atomPower, engine.Integer(power),
 	})
-}
-
-func copyBytes(b []byte) []byte {
-	if len(b) == 0 {
-		return nil
-	}
-
-	cpy := make([]byte, len(b))
-	copy(cpy, b)
-
-	return cpy
 }

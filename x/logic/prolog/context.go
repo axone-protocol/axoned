@@ -1,6 +1,7 @@
 package prolog
 
 import (
+	"bytes"
 	"context"
 
 	"github.com/axone-protocol/prolog/v3/engine"
@@ -51,19 +52,8 @@ func HeaderInfo(ctx context.Context, env *engine.Env) (coreheader.Info, error) {
 // It exists to centralize access to sdk.Context.HeaderInfo() across the logic module.
 func ResolveHeaderInfo(sdkCtx sdk.Context) coreheader.Info {
 	info := sdkCtx.HeaderInfo()
-	info.Hash = cloneBytes(info.Hash)
-	info.AppHash = cloneBytes(info.AppHash)
+	info.Hash = bytes.Clone(info.Hash)
+	info.AppHash = bytes.Clone(info.AppHash)
 
 	return info
-}
-
-func cloneBytes(b []byte) []byte {
-	if len(b) == 0 {
-		return nil
-	}
-
-	cpy := make([]byte, len(b))
-	copy(cpy, b)
-
-	return cpy
 }
