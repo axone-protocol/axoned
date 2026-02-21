@@ -4,13 +4,13 @@ import (
 	"context"
 	"fmt"
 	"io/fs"
-	"path"
 	"strconv"
 	"strings"
 
 	coreheader "cosmossdk.io/core/header"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/pathutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
 )
 
@@ -52,7 +52,7 @@ func (f *vfs) ReadFile(name string) ([]byte, error) {
 }
 
 func (f *vfs) readFile(op, name string) ([]byte, error) {
-	subpath, err := normalizeSubpath(name)
+	subpath, err := pathutil.NormalizeSubpath(name)
 	if err != nil {
 		return nil, &fs.PathError{Op: op, Path: name, Err: err}
 	}
@@ -66,30 +66,6 @@ func (f *vfs) readFile(op, name string) ([]byte, error) {
 	}
 
 	return content, nil
-}
-
-func normalizeSubpath(name string) (string, error) {
-	trimmed := strings.TrimPrefix(name, "/")
-	if trimmed == "" || trimmed == "." {
-		return ".", nil
-	}
-
-	for _, segment := range strings.Split(trimmed, "/") {
-		if segment == ".." {
-			return "", fs.ErrPermission
-		}
-	}
-
-	cleaned := path.Clean(trimmed)
-	if cleaned == "." {
-		return ".", nil
-	}
-
-	if !fs.ValidPath(cleaned) {
-		return "", fs.ErrInvalid
-	}
-
-	return cleaned, nil
 }
 
 func renderFile(header coreheader.Info, subpath string) ([]byte, error) {
