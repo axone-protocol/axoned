@@ -50,18 +50,18 @@ func (f *vfs) Open(name string) (fs.File, error) {
 func (f *vfs) ReadFile(name string) ([]byte, error) {
 	uri, err := f.validatePath(name)
 	if err != nil {
-		return nil, &fs.PathError{Op: "readfile", Path: name, Err: fs.ErrInvalid}
+		return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrInvalid}
 	}
 
 	vfs, err := f.resolve(uri)
 	if err != nil {
-		return nil, &fs.PathError{Op: "readfile", Path: name, Err: fs.ErrNotExist}
+		return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrNotExist}
 	}
 
 	if vfs, ok := vfs.(fs.ReadFileFS); ok {
 		content, err := vfs.ReadFile(name)
 		if err != nil {
-			return nil, &fs.PathError{Op: "readfile", Path: name, Err: getUnderlyingError(err)}
+			return nil, &fs.PathError{Op: "open", Path: name, Err: getUnderlyingError(err)}
 		}
 
 		return content, nil
@@ -69,13 +69,13 @@ func (f *vfs) ReadFile(name string) ([]byte, error) {
 
 	file, err := vfs.Open(name)
 	if err != nil {
-		return nil, &fs.PathError{Op: "readfile", Path: name, Err: getUnderlyingError(err)}
+		return nil, &fs.PathError{Op: "open", Path: name, Err: getUnderlyingError(err)}
 	}
 	defer file.Close()
 
 	content, err := io.ReadAll(file)
 	if err != nil {
-		return nil, &fs.PathError{Op: "readfile", Path: name, Err: getUnderlyingError(err)}
+		return nil, &fs.PathError{Op: "open", Path: name, Err: getUnderlyingError(err)}
 	}
 
 	return content, nil

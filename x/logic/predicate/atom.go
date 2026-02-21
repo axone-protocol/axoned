@@ -31,7 +31,7 @@ func TermToAtom(vm *engine.VM, term, atom engine.Term, k engine.Cont, env *engin
 	case prolog.IsGround(term, env):
 		var strBuilder strings.Builder
 		os := engine.NewOutputTextStream(&strBuilder)
-		return engine.WriteTerm(vm, os, term, engine.List(engine.NewAtom("quoted").Apply(prolog.AtomTrue)),
+		return engine.WriteTerm(vm, os, term, engine.List(prolog.AtomQuoted.Apply(prolog.AtomTrue)),
 			func(env *engine.Env) *engine.Promise {
 				return engine.Unify(vm, prolog.StringToAtom(strBuilder.String()), atom, k, env)
 			}, env)

@@ -134,8 +134,14 @@ import (
 	"github.com/axone-protocol/axoned/v14/docs"
 	logicmodule "github.com/axone-protocol/axoned/v14/x/logic"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
+	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
+	logicsyscomet "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/comet"
+	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
+	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	wasm2 "github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	logicmodulekeeper "github.com/axone-protocol/axoned/v14/x/logic/keeper"
+	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
 	logicmoduletypes "github.com/axone-protocol/axoned/v14/x/logic/types"
 	"github.com/axone-protocol/axoned/v14/x/mint"
 	mintkeeper "github.com/axone-protocol/axoned/v14/x/mint/keeper"
@@ -1164,11 +1170,21 @@ func (app *App) SimulationManager() *module.SimulationManager {
 }
 
 // provideFS is used to provide the virtual file system used for the logic module
-// to load external file.
-func (app *App) provideFS(ctx context.Context) fs.FS {
-	vfs := composite.NewFS()
+// to load devices and other files. It is passed to the logic module keeper, which passes it to the logic module when executing logic.
+func (app *App) provideFS(ctx context.Context) (fs.FS, error) {
+	legacyFS := composite.NewFS()
+	legacyFS.Mount(wasm2.Scheme, wasm2.NewFS(ctx, app.WasmKeeper))
 
-	vfs.Mount(wasm2.Scheme, wasm2.NewFS(ctx, app.WasmKeeper))
+	pathFS := logicvfs.New()
+	if err := pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)); err != nil {
+		return nil, fmt.Errorf("failed to mount /v1/lib: %w", err)
+	}
+	if err := pathFS.Mount("/v1/sys/header", logicsysheader.NewFS(ctx)); err != nil {
+		return nil, fmt.Errorf("failed to mount /v1/sys/header: %w", err)
+	}
+	if err := pathFS.Mount("/v1/sys/comet", logicsyscomet.NewFS(ctx)); err != nil {
+		return nil, fmt.Errorf("failed to mount /v1/sys/comet: %w", err)
+	}
 
-	return vfs
+	return dual.NewFS(pathFS, legacyFS), nil
 }

@@ -186,7 +186,7 @@ func TestFilteredVFS(t *testing.T) {
 									So(result, ShouldResemble, tc.want.content)
 								} else {
 									So(err, ShouldNotBeNil)
-									So(err.Error(), ShouldEqual, fmt.Sprintf("readfile %s", tc.wantError))
+									So(err.Error(), ShouldEqual, fmt.Sprintf("open %s", tc.wantError))
 								}
 							})
 						})

@@ -70,8 +70,8 @@ func TestUpdateParams(t *testing.T) {
 						accountKeeper,
 						authQueryService,
 						bankKeeper,
-						func(_ gocontext.Context) fs.FS {
-							return fsProvider
+						func(_ gocontext.Context) (fs.FS, error) {
+							return fsProvider, nil
 						})
 
 					msgServer := keeper.NewMsgServerImpl(*logicKeeper)

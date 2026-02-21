@@ -20,6 +20,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	coreheader "cosmossdk.io/core/header"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -31,8 +32,14 @@ import (
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
+	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
+	logicsyscomet "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/comet"
+	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
+	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
+	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
 	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
@@ -92,6 +99,12 @@ func givenABlockWithTheFollowingHeader(ctx context.Context, headerConfig *godog.
 	}
 
 	tc.ctx.Ctx = tc.ctx.Ctx.WithBlockHeader(header)
+	tc.ctx.Ctx = tc.ctx.Ctx.WithHeaderInfo(coreheader.Info{
+		Height:  header.Height,
+		Time:    header.Time,
+		ChainID: header.ChainID,
+		AppHash: header.AppHash,
+	})
 
 	return nil
 }
@@ -243,6 +256,12 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 			header.Height = 42
 			header.Time = time.Date(2024, 4, 10, 10, 44, 27, 0, time.UTC)
 			testCtx.Ctx = testCtx.Ctx.WithBlockHeader(header)
+			testCtx.Ctx = testCtx.Ctx.WithHeaderInfo(coreheader.Info{
+				Height:  header.Height,
+				Time:    header.Time,
+				ChainID: header.ChainID,
+				AppHash: header.AppHash,
+			})
 
 			tc := testCase{
 				ctx:           testCtx,
@@ -279,11 +298,22 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		tc.accountKeeper,
 		tc.authQueryService,
 		tc.bankKeeper,
-		func(ctx context.Context) fs.FS {
-			vfs := composite.NewFS()
-			vfs.Mount(wasm.Scheme, wasm.NewFS(ctx, tc.wasmKeeper))
+		func(ctx context.Context) (fs.FS, error) {
+			legacyFS := composite.NewFS()
+			legacyFS.Mount(wasm.Scheme, wasm.NewFS(ctx, tc.wasmKeeper))
 
-			return vfs
+			pathFS := logicvfs.New()
+			if err := pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)); err != nil {
+				panic(fmt.Errorf("failed to mount /v1/lib: %w", err))
+			}
+			if err := pathFS.Mount("/v1/sys/header", logicsysheader.NewFS(ctx)); err != nil {
+				panic(fmt.Errorf("failed to mount /v1/sys/header: %w", err))
+			}
+			if err := pathFS.Mount("/v1/sys/comet", logicsyscomet.NewFS(ctx)); err != nil {
+				panic(fmt.Errorf("failed to mount /v1/sys/comet: %w", err))
+			}
+
+			return dual.NewFS(pathFS, legacyFS), nil
 		})
 
 	if err := logicKeeper.SetParams(tc.ctx.Ctx, tc.params); err != nil {

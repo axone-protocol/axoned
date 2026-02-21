@@ -96,8 +96,8 @@ func TestGRPCParams(t *testing.T) {
 						accountKeeper,
 						authQueryService,
 						bankKeeper,
-						func(_ gocontext.Context) fs.FS {
-							return fsProvider
+						func(_ gocontext.Context) (fs.FS, error) {
+							return fsProvider, nil
 						})
 
 					Convey("and given params to the keeper", func() {

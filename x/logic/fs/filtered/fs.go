@@ -1,9 +1,11 @@
 package filtered
 
 import (
+	"errors"
 	"io/fs"
 	"net/url"
 
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
 	"github.com/axone-protocol/axoned/v14/x/logic/util"
 )
 
@@ -14,8 +16,9 @@ type vfs struct {
 }
 
 var (
-	_ fs.FS         = (*vfs)(nil)
-	_ fs.ReadFileFS = (*vfs)(nil)
+	_ fs.FS            = (*vfs)(nil)
+	_ fs.ReadFileFS    = (*vfs)(nil)
+	_ iface.OpenFileFS = (*vfs)(nil)
 )
 
 // NewFS creates a new filtered filesystem that wraps the provided filesystem.
@@ -31,6 +34,22 @@ func (f *vfs) Open(name string) (fs.File, error) {
 	return f.fs.Open(name)
 }
 
+func (f *vfs) OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error) {
+	if err := f.accept("open", name); err != nil {
+		return nil, err
+	}
+
+	if ofs, ok := f.fs.(iface.OpenFileFS); ok {
+		return ofs.OpenFile(name, flag, perm)
+	}
+
+	return nil, &fs.PathError{
+		Op:   "open",
+		Path: name,
+		Err:  errors.Join(errors.ErrUnsupported, fs.ErrPermission),
+	}
+}
+
 func (f *vfs) ReadFile(name string) ([]byte, error) {
 	if err := f.accept("open", name); err != nil {
 		return nil, err
@@ -40,7 +59,7 @@ func (f *vfs) ReadFile(name string) ([]byte, error) {
 		return vfs.ReadFile(name)
 	}
 
-	return nil, &fs.PathError{Op: "readfile", Path: name, Err: fs.ErrInvalid}
+	return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrInvalid}
 }
 
 // validatePath checks if the provided path is a valid URL.

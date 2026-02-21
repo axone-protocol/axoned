@@ -1,6 +1,7 @@
 package filtered
 
 import (
+	"errors"
 	"fmt"
 	"io/fs"
 	"testing"
@@ -11,10 +12,37 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	fsiface "github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/util"
 )
+
+type mockOpenFileFS struct {
+	open     func(name string) (fs.File, error)
+	readFile func(name string) ([]byte, error)
+	openFile func(name string, flag int, perm fs.FileMode) (fs.File, error)
+}
+
+func (m mockOpenFileFS) Open(name string) (fs.File, error) {
+	return m.open(name)
+}
+
+func (m mockOpenFileFS) ReadFile(name string) ([]byte, error) {
+	return m.readFile(name)
+}
+
+func (m mockOpenFileFS) OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error) {
+	return m.openFile(name, flag, perm)
+}
+
+type mockFS struct {
+	open func(name string) (fs.File, error)
+}
+
+func (m mockFS) Open(name string) (fs.File, error) {
+	return m.open(name)
+}
 
 func TestFilteredVFS(t *testing.T) {
 	Convey("Given test cases", t, func() {
@@ -145,8 +173,105 @@ func TestFilteredVFS(t *testing.T) {
 
 				Convey("then an error should be returned", func() {
 					So(err, ShouldNotBeNil)
-					So(err, ShouldEqual, &fs.PathError{Op: "readfile", Path: "file", Err: fs.ErrInvalid})
+					So(err, ShouldEqual, &fs.PathError{Op: "open", Path: "file", Err: fs.ErrInvalid})
 				})
+			})
+		})
+	})
+}
+
+func TestFilteredVFSOpenFile(t *testing.T) {
+	Convey("Given a filtered file system backed by an OpenFile-capable filesystem", t, func() {
+		content := []byte("42")
+		var gotName string
+		var gotFlag int
+		var gotPerm fs.FileMode
+
+		filteredFS := NewFS(
+			mockOpenFileFS{
+				open: func(name string) (fs.File, error) {
+					return wasm.NewVirtualFile(name, content, time.Unix(1681389446, 0)), nil
+				},
+				readFile: func(_ string) ([]byte, error) {
+					return content, nil
+				},
+				openFile: func(name string, flag int, perm fs.FileMode) (fs.File, error) {
+					gotName = name
+					gotFlag = flag
+					gotPerm = perm
+					return wasm.NewVirtualFile(name, content, time.Unix(1681389446, 0)), nil
+				},
+			},
+			lo.Map([]string{"file1"}, util.Indexed(util.ParseURLMust)),
+			nil,
+		)
+
+		Convey("when OpenFile is called on an allowed path", func() {
+			ofs, ok := filteredFS.(fsiface.OpenFileFS)
+			So(ok, ShouldBeTrue)
+
+			file, err := ofs.OpenFile("file1", 123, 0o640)
+
+			Convey("then it should delegate OpenFile to the underlying filesystem", func() {
+				So(err, ShouldBeNil)
+				So(file, ShouldNotBeNil)
+				So(gotName, ShouldEqual, "file1")
+				So(gotFlag, ShouldEqual, 123)
+				So(gotPerm, ShouldEqual, 0o640)
+			})
+		})
+	})
+
+	Convey("Given a filtered file system backed by a filesystem without OpenFile support", t, func() {
+		filteredFS := NewFS(
+			mockFS{
+				open: func(name string) (fs.File, error) {
+					return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrNotExist}
+				},
+			},
+			nil,
+			nil,
+		)
+
+		Convey("when OpenFile is called", func() {
+			ofs, ok := filteredFS.(fsiface.OpenFileFS)
+			So(ok, ShouldBeTrue)
+
+			_, err := ofs.OpenFile("file1", 123, 0o640)
+
+			Convey("then it should return an unsupported operation error", func() {
+				So(err, ShouldNotBeNil)
+				So(errors.Is(err, errors.ErrUnsupported), ShouldBeTrue)
+			})
+		})
+	})
+
+	Convey("Given a filtered file system with restrictive whitelist", t, func() {
+		content := []byte("42")
+		filteredFS := NewFS(
+			mockOpenFileFS{
+				open: func(name string) (fs.File, error) {
+					return wasm.NewVirtualFile(name, content, time.Unix(1681389446, 0)), nil
+				},
+				readFile: func(_ string) ([]byte, error) {
+					return content, nil
+				},
+				openFile: func(name string, _ int, _ fs.FileMode) (fs.File, error) {
+					return wasm.NewVirtualFile(name, content, time.Unix(1681389446, 0)), nil
+				},
+			},
+			lo.Map([]string{"file2"}, util.Indexed(util.ParseURLMust)),
+			nil,
+		)
+
+		Convey("when OpenFile is called on a denied path", func() {
+			ofs, ok := filteredFS.(fsiface.OpenFileFS)
+			So(ok, ShouldBeTrue)
+
+			_, err := ofs.OpenFile("file1", 123, 0o640)
+
+			Convey("then it should fail with a permission error", func() {
+				So(err, ShouldResemble, &fs.PathError{Op: "open", Path: "file1", Err: fs.ErrPermission})
 			})
 		})
 	})
