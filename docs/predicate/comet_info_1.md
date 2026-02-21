@@ -51,7 +51,7 @@ where:
 ## Signature
 
 ```text
-comet_info(?CometInfo) is det
+comet_info(-CometInfo) is det
 ```
 
 ## Examples

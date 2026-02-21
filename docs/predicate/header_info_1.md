@@ -41,7 +41,7 @@ where:
 ## Signature
 
 ```text
-header_info(?HeaderInfo) is det
+header_info(-HeaderInfo) is det
 ```
 
 ## Examples
