@@ -57,27 +57,27 @@ func NewFS(ctx context.Context) fs.ReadFileFS {
 }
 
 func (f *vfs) Open(name string) (fs.File, error) {
-	data, err := f.readFile("open", name)
+	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
+	headerInfo := prolog.ResolveHeaderInfo(sdkCtx)
+
+	data, err := f.readFile("open", name, headerInfo)
 	if err != nil {
 		return nil, err
 	}
 
-	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
-	return virtualfile.New(name, data, prolog.ResolveHeaderInfo(sdkCtx).Time), nil
+	return virtualfile.New(name, data, headerInfo.Time), nil
 }
 
 func (f *vfs) ReadFile(name string) ([]byte, error) {
-	return f.readFile("readfile", name)
+	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
+	return f.readFile("readfile", name, prolog.ResolveHeaderInfo(sdkCtx))
 }
 
-func (f *vfs) readFile(op, name string) ([]byte, error) {
+func (f *vfs) readFile(op, name string, headerInfo coreheader.Info) ([]byte, error) {
 	subpath, err := pathutil.NormalizeSubpath(name)
 	if err != nil {
 		return nil, &fs.PathError{Op: op, Path: name, Err: err}
 	}
-
-	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
-	headerInfo := prolog.ResolveHeaderInfo(sdkCtx)
 
 	content, err := renderFile(headerInfo, subpath)
 	if err != nil {
