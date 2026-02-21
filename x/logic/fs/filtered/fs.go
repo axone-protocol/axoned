@@ -5,13 +5,9 @@ import (
 	"io/fs"
 	"net/url"
 
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
 	"github.com/axone-protocol/axoned/v14/x/logic/util"
 )
-
-type openFileFS interface {
-	fs.FS
-	OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error)
-}
 
 type vfs struct {
 	fs        fs.FS
@@ -20,9 +16,9 @@ type vfs struct {
 }
 
 var (
-	_ fs.FS         = (*vfs)(nil)
-	_ fs.ReadFileFS = (*vfs)(nil)
-	_ openFileFS    = (*vfs)(nil)
+	_ fs.FS            = (*vfs)(nil)
+	_ fs.ReadFileFS    = (*vfs)(nil)
+	_ iface.OpenFileFS = (*vfs)(nil)
 )
 
 // NewFS creates a new filtered filesystem that wraps the provided filesystem.
@@ -43,7 +39,7 @@ func (f *vfs) OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error)
 		return nil, err
 	}
 
-	if ofs, ok := f.fs.(openFileFS); ok {
+	if ofs, ok := f.fs.(iface.OpenFileFS); ok {
 		return ofs.OpenFile(name, flag, perm)
 	}
 

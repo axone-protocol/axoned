@@ -5,12 +5,9 @@ import (
 	"io"
 	"io/fs"
 	"net/url"
-)
 
-type openFileFS interface {
-	fs.FS
-	OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error)
-}
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
+)
 
 type vfs struct {
 	pathFS   fs.FS
@@ -18,9 +15,9 @@ type vfs struct {
 }
 
 var (
-	_ fs.FS         = (*vfs)(nil)
-	_ fs.ReadFileFS = (*vfs)(nil)
-	_ openFileFS    = (*vfs)(nil)
+	_ fs.FS            = (*vfs)(nil)
+	_ fs.ReadFileFS    = (*vfs)(nil)
+	_ iface.OpenFileFS = (*vfs)(nil)
 )
 
 // NewFS creates a dual-stack filesystem:
@@ -52,7 +49,7 @@ func (f *vfs) OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error)
 		selected = f.legacyFS
 	}
 
-	if ofs, ok := selected.(openFileFS); ok {
+	if ofs, ok := selected.(iface.OpenFileFS); ok {
 		return ofs.OpenFile(name, flag, perm)
 	}
 

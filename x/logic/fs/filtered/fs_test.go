@@ -12,6 +12,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	fsiface "github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/util"
@@ -206,7 +207,7 @@ func TestFilteredVFSOpenFile(t *testing.T) {
 		)
 
 		Convey("when OpenFile is called on an allowed path", func() {
-			ofs, ok := filteredFS.(openFileFS)
+			ofs, ok := filteredFS.(fsiface.OpenFileFS)
 			So(ok, ShouldBeTrue)
 
 			file, err := ofs.OpenFile("file1", 123, 0o640)
@@ -233,7 +234,7 @@ func TestFilteredVFSOpenFile(t *testing.T) {
 		)
 
 		Convey("when OpenFile is called", func() {
-			ofs, ok := filteredFS.(openFileFS)
+			ofs, ok := filteredFS.(fsiface.OpenFileFS)
 			So(ok, ShouldBeTrue)
 
 			_, err := ofs.OpenFile("file1", 123, 0o640)
@@ -264,7 +265,7 @@ func TestFilteredVFSOpenFile(t *testing.T) {
 		)
 
 		Convey("when OpenFile is called on a denied path", func() {
-			ofs, ok := filteredFS.(openFileFS)
+			ofs, ok := filteredFS.(fsiface.OpenFileFS)
 			So(ok, ShouldBeTrue)
 
 			_, err := ofs.OpenFile("file1", 123, 0o640)

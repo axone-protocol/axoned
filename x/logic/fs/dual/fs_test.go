@@ -8,6 +8,8 @@ import (
 	"testing/fstest"
 
 	. "github.com/smartystreets/goconvey/convey"
+
+	fsiface "github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
 )
 
 type recordingFS struct {
@@ -95,7 +97,7 @@ func TestDualFSOpenFileDispatch(t *testing.T) {
 		dualFS := NewFS(pathFS, legacyFS)
 
 		Convey("when opening a path source-sink in OpenFile mode", func() {
-			ofs, ok := dualFS.(openFileFS)
+			ofs, ok := dualFS.(fsiface.OpenFileFS)
 			So(ok, ShouldBeTrue)
 
 			_, err := ofs.OpenFile("/v1/codec/bech32", 42, 0o640)
@@ -109,7 +111,7 @@ func TestDualFSOpenFileDispatch(t *testing.T) {
 		})
 
 		Convey("when opening a URI source-sink in OpenFile mode", func() {
-			ofs, ok := dualFS.(openFileFS)
+			ofs, ok := dualFS.(fsiface.OpenFileFS)
 			So(ok, ShouldBeTrue)
 
 			_, err := ofs.OpenFile("cosmwasm:storage:addr?query=foo", 84, 0o600)
@@ -129,7 +131,7 @@ func TestDualFSOpenFileDispatch(t *testing.T) {
 		dualFS := NewFS(pathFS, legacyFS)
 
 		Convey("when opening a path source-sink in OpenFile mode", func() {
-			ofs, ok := dualFS.(openFileFS)
+			ofs, ok := dualFS.(fsiface.OpenFileFS)
 			So(ok, ShouldBeTrue)
 
 			_, err := ofs.OpenFile("/v1/codec/bech32", 42, 0o640)
@@ -149,7 +151,7 @@ func TestDualFSOpenFileDispatch(t *testing.T) {
 		dualFS := NewFS(pathFS, legacyFS)
 
 		Convey("when opening a URI source-sink in OpenFile mode", func() {
-			ofs, ok := dualFS.(openFileFS)
+			ofs, ok := dualFS.(fsiface.OpenFileFS)
 			So(ok, ShouldBeTrue)
 
 			_, err := ofs.OpenFile("cosmwasm:storage:addr?query=foo", 84, 0o600)

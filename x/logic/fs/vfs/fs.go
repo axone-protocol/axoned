@@ -5,13 +5,12 @@ import (
 	"io/fs"
 	"sort"
 	"strings"
+
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
 )
 
 // OpenFileFS is implemented by file systems that support opening files with flags.
-type OpenFileFS interface {
-	fs.FS
-	OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error)
-}
+type OpenFileFS = iface.OpenFileFS
 
 // Mount defines a filesystem mounted at a canonical absolute prefix.
 type Mount struct {
