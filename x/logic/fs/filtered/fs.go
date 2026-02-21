@@ -59,7 +59,7 @@ func (f *vfs) ReadFile(name string) ([]byte, error) {
 		return vfs.ReadFile(name)
 	}
 
-	return nil, &fs.PathError{Op: "readfile", Path: name, Err: fs.ErrInvalid}
+	return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrInvalid}
 }
 
 // validatePath checks if the provided path is a valid URL.

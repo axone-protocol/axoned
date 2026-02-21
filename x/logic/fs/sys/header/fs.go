@@ -70,7 +70,7 @@ func (f *vfs) Open(name string) (fs.File, error) {
 
 func (f *vfs) ReadFile(name string) ([]byte, error) {
 	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
-	return f.readFile("readfile", name, prolog.ResolveHeaderInfo(sdkCtx))
+	return f.readFile("open", name, prolog.ResolveHeaderInfo(sdkCtx))
 }
 
 func (f *vfs) readFile(op, name string, headerInfo coreheader.Info) ([]byte, error) {

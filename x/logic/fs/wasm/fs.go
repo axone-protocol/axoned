@@ -53,7 +53,7 @@ func (f *vfs) Open(name string) (fs.File, error) {
 }
 
 func (f *vfs) ReadFile(name string) ([]byte, error) {
-	return f.readFile("readfile", name)
+	return f.readFile("open", name)
 }
 
 func (f *vfs) readFile(op string, name string) ([]byte, error) {

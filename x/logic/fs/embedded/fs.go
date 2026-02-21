@@ -37,12 +37,12 @@ func (f *vfs) Open(name string) (fs.File, error) {
 func (f *vfs) ReadFile(name string) ([]byte, error) {
 	subpath, err := pathutil.NormalizeSubpath(name)
 	if err != nil {
-		return nil, &fs.PathError{Op: "readfile", Path: name, Err: err}
+		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
 	}
 
 	content, err := fs.ReadFile(f.fsys, subpath)
 	if err != nil {
-		return nil, &fs.PathError{Op: "readfile", Path: name, Err: pathutil.UnwrapPathError(err)}
+		return nil, &fs.PathError{Op: "open", Path: name, Err: pathutil.UnwrapPathError(err)}
 	}
 
 	return content, nil

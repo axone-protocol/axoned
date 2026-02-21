@@ -208,7 +208,7 @@ func TestWasmVFS(t *testing.T) {
 								Convey("then the result should be as expected", func() {
 									if tc.wantError != "" {
 										So(err, ShouldNotBeNil)
-										So(err.Error(), ShouldEqual, fmt.Sprintf("readfile %s", tc.wantError))
+										So(err.Error(), ShouldEqual, fmt.Sprintf("open %s", tc.wantError))
 									} else {
 										So(err, ShouldBeNil)
 										So(result, ShouldResemble, tc.wantResult)

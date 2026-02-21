@@ -83,7 +83,7 @@ func (f *vfs) Open(name string) (fs.File, error) {
 
 func (f *vfs) ReadFile(name string) ([]byte, error) {
 	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
-	return f.readFile("readfile", name, sdkCtx)
+	return f.readFile("open", name, sdkCtx)
 }
 
 func (f *vfs) readFile(op, name string, sdkCtx sdk.Context) ([]byte, error) {

@@ -173,7 +173,7 @@ func TestFilteredVFS(t *testing.T) {
 
 				Convey("then an error should be returned", func() {
 					So(err, ShouldNotBeNil)
-					So(err, ShouldEqual, &fs.PathError{Op: "readfile", Path: "file", Err: fs.ErrInvalid})
+					So(err, ShouldEqual, &fs.PathError{Op: "open", Path: "file", Err: fs.ErrInvalid})
 				})
 			})
 		})
