@@ -34,7 +34,7 @@ import (
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
 	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
-	logicsys "github.com/axone-protocol/axoned/v14/x/logic/fs/sys"
+	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
 	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
@@ -305,8 +305,8 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 			if err := pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)); err != nil {
 				panic(fmt.Errorf("failed to mount /v1/lib: %w", err))
 			}
-			if err := pathFS.Mount("/v1/sys", logicsys.NewFS(ctx)); err != nil {
-				panic(fmt.Errorf("failed to mount /v1/sys: %w", err))
+			if err := pathFS.Mount("/v1/sys/header", logicsysheader.NewFS(ctx)); err != nil {
+				panic(fmt.Errorf("failed to mount /v1/sys/header: %w", err))
 			}
 
 			return dual.NewFS(pathFS, legacyFS), nil

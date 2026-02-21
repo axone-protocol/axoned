@@ -136,7 +136,7 @@ import (
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
 	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
-	logicsys "github.com/axone-protocol/axoned/v14/x/logic/fs/sys"
+	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
 	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	wasm2 "github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	logicmodulekeeper "github.com/axone-protocol/axoned/v14/x/logic/keeper"
@@ -1178,8 +1178,8 @@ func (app *App) provideFS(ctx context.Context) (fs.FS, error) {
 	if err := pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)); err != nil {
 		return nil, fmt.Errorf("failed to mount /v1/lib: %w", err)
 	}
-	if err := pathFS.Mount("/v1/sys", logicsys.NewFS(ctx)); err != nil {
-		return nil, fmt.Errorf("failed to mount /v1/sys: %w", err)
+	if err := pathFS.Mount("/v1/sys/header", logicsysheader.NewFS(ctx)); err != nil {
+		return nil, fmt.Errorf("failed to mount /v1/sys/header: %w", err)
 	}
 
 	return dual.NewFS(pathFS, legacyFS), nil
