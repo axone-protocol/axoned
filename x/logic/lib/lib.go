@@ -4,5 +4,5 @@ import "embed"
 
 // Files contains embedded Prolog library files mounted under /v1/lib.
 //
-//go:embed .keepme
+//go:embed *.pl
 var Files embed.FS
