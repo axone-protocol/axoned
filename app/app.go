@@ -134,6 +134,8 @@ import (
 	"github.com/axone-protocol/axoned/v14/docs"
 	logicmodule "github.com/axone-protocol/axoned/v14/x/logic"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
+	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	wasm2 "github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	logicmodulekeeper "github.com/axone-protocol/axoned/v14/x/logic/keeper"
 	logicmoduletypes "github.com/axone-protocol/axoned/v14/x/logic/types"
@@ -1164,11 +1166,12 @@ func (app *App) SimulationManager() *module.SimulationManager {
 }
 
 // provideFS is used to provide the virtual file system used for the logic module
-// to load external file.
+// to load devices and other files. It is passed to the logic module keeper, which passes it to the logic module when executing logic.
 func (app *App) provideFS(ctx context.Context) fs.FS {
-	vfs := composite.NewFS()
+	legacyFS := composite.NewFS()
+	legacyFS.Mount(wasm2.Scheme, wasm2.NewFS(ctx, app.WasmKeeper))
 
-	vfs.Mount(wasm2.Scheme, wasm2.NewFS(ctx, app.WasmKeeper))
+	pathFS := logicvfs.New()
 
-	return vfs
+	return dual.NewFS(pathFS, legacyFS)
 }
