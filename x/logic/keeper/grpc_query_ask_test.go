@@ -5,11 +5,13 @@ import (
 	"fmt"
 	"io/fs"
 	"testing"
+	"time"
 
 	"go.uber.org/mock/gomock"
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	coreheader "cosmossdk.io/core/header"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -19,7 +21,13 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
+	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
+	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
+	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
+	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
 	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
@@ -144,8 +152,8 @@ func TestGRPCAsk(t *testing.T) {
 				},
 			},
 			{
-				program: "block_height(X) :- block_header(Header), X = Header.height.",
-				query:   "block_height(X).",
+				program: "block_height(X) :- header_info(Header), X = Header.height.",
+				query:   "consult('/v1/lib/chain.pl'), block_height(X).",
 				expectedAnswer: &types.Answer{
 					Variables: []string{"X"},
 					Results: []types.Result{{Substitutions: []types.Substitution{{
@@ -154,19 +162,19 @@ func TestGRPCAsk(t *testing.T) {
 				},
 			},
 			{
-				program:       "block_height(X) :- block_header(Header), X = Header.height.",
-				query:         "block_height(X).",
+				program:       "block_height(X) :- header_info(Header), X = Header.height.",
+				query:         "consult('/v1/lib/chain.pl'), block_height(X).",
 				maxGas:        1000,
 				expectedError: "out of gas: logic <ReadPerByte> (1018/1000): limit exceeded",
 			},
 			{
-				program: "block_height(X) :- block_header(Header), X = Header.height.",
-				query:   "block_height(X).",
+				program: "block_height(X) :- header_info(Header), X = Header.height.",
+				query:   "consult('/v1/lib/chain.pl'), block_height(X).",
 				maxGas:  3000,
 				predicateCosts: map[string]uint64{
-					"block_header/1": 10000,
+					"consult/1": 10000,
 				},
-				expectedError: "out of gas: logic <block_header/1> (11141/3000): limit exceeded",
+				expectedError: "out of gas: logic <consult/1> (11125/3000): limit exceeded",
 			},
 			{
 				program:       "recursionOfDeath :- recursionOfDeath.",
@@ -255,23 +263,23 @@ func TestGRPCAsk(t *testing.T) {
 				},
 			},
 			{
-				program:            "",
-				query:              "block_header(X).",
-				predicateBlacklist: []string{"block_header/1"},
+				program:            "header(X) :- consult('/v1/lib/chain.pl'), header_info(X).",
+				query:              "header(X).",
+				predicateBlacklist: []string{"consult/1"},
 				expectedAnswer: &types.Answer{
 					HasMore:   false,
 					Variables: []string{"X"},
-					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_header/1),root)"}},
+					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,consult/1),header/1)"}},
 				},
 			},
 			{
-				program:            "contains_forbidden_predicate(X) :- block_header(X).",
+				program:            "contains_forbidden_predicate(X) :- consult('/v1/lib/chain.pl'), header_info(X).",
 				query:              "contains_forbidden_predicate(X).",
-				predicateBlacklist: []string{"block_header/1"},
+				predicateBlacklist: []string{"consult/1"},
 				expectedAnswer: &types.Answer{
 					HasMore:   false,
 					Variables: []string{"X"},
-					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,block_header/1),contains_forbidden_predicate/1)"}},
+					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,consult/1),contains_forbidden_predicate/1)"}},
 				},
 			},
 			{
@@ -421,13 +429,24 @@ func TestGRPCAsk(t *testing.T) {
 					encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
 					key := storetypes.NewKVStoreKey(types.StoreKey)
 					testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+					testCtx.Ctx = testCtx.Ctx.WithHeaderInfo(coreheader.Info{
+						Height:  0,
+						Hash:    nil,
+						Time:    time.Unix(0, 0).UTC(),
+						ChainID: "axone-testchain-1",
+						AppHash: nil,
+					})
 
 					// gomock initializations
 					ctrl := gomock.NewController(t)
 					accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
 					authQueryService := logictestutil.NewMockAuthQueryService(ctrl)
 					bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
-					fsProvider := logictestutil.NewMockFS(ctrl)
+					pathFS := logicvfs.New()
+					So(pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)), ShouldBeNil)
+					So(pathFS.Mount("/v1/sys/header", logicsysheader.NewFS(testCtx.Ctx)), ShouldBeNil)
+					legacyFS := composite.NewFS()
+					storageFS := dual.NewFS(pathFS, legacyFS)
 
 					logicKeeper := keeper.NewKeeper(
 						encCfg.Codec,
@@ -439,7 +458,7 @@ func TestGRPCAsk(t *testing.T) {
 						authQueryService,
 						bankKeeper,
 						func(_ gocontext.Context) (fs.FS, error) {
-							return fsProvider, nil
+							return storageFS, nil
 						})
 
 					params := types.DefaultParams()

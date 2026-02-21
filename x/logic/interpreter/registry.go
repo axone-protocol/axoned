@@ -102,7 +102,6 @@ var registry = orderedmap.New[string, any](
 		{Key: "nth1/3", Value: engine.Nth1},
 		{Key: "call_nth/2", Value: engine.CallNth},
 		{Key: "./3", Value: engine.Op3},
-		{Key: "block_header/1", Value: predicate.BlockHeader},
 		{Key: "bank_balances/2", Value: predicate.BankBalances},
 		{Key: "bank_spendable_balances/2", Value: predicate.BankSpendableBalances},
 		{Key: "bank_locked_balances/2", Value: predicate.BankLockedBalances},
