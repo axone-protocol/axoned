@@ -1,26 +1,26 @@
 ---
-sidebar_position: 139
+sidebar_position: 146
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
-# put_code/2
+# sublist/2
 
 ## Module
 
-This predicate is provided by `stdlib.pl`.
+This predicate is provided by `lists.pl`.
 
 Load this module before using the predicate:
 
 ```prolog
-:- consult('/v1/lib/stdlib.pl').
+:- consult('/v1/lib/lists.pl').
 ```
 
 ## Description
 
-Writes the character represented by Code to Stream.
+True if SubList is a contiguous sublist of List.
 
 ## Signature
 
 ```text
-put_code(+Stream, +Code) is det
+sublist(?SubList, +List) is nondet
 ```
