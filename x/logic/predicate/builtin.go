@@ -2,11 +2,7 @@ package predicate
 
 import (
 	"github.com/axone-protocol/prolog/v3/engine"
-
-	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
 )
-
-var atomOpen = engine.NewAtom("open")
 
 // Call is a predicate that executes a given goal.
 //
@@ -579,26 +575,6 @@ func SetOutput(vm *engine.VM, output engine.Term, cont engine.Cont, env *engine.
 //   - base64Decode: (Optional) If true, the response is base64-decoded. Otherwise, the response is returned as is.
 func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Open(vm, sourceSink, mode, stream, options, k, env)
-}
-
-// Open3 is a predicate which opens a stream to a source or sink.
-// This predicate is a shorthand for open/4 with an empty list of options.
-//
-// # Signature
-//
-//	open(+SourceSink, +Mode, -Stream)
-//
-// where:
-//   - SourceSink is an atom representing the source or sink of the stream, which is typically a URI.
-//   - Mode is an atom representing the mode of the stream to be opened. It can be one of "read", "write", or "append".
-//   - Stream is the stream to be opened.
-//
-// open/3 gives True when SourceSink can be opened in Mode.
-func Open3(vm *engine.VM, sourceSink, mode, stream engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
-	return engine.Call(
-		vm,
-		atomOpen.Apply(sourceSink, mode, stream, prolog.AtomEmptyList),
-		k, env)
 }
 
 // Close is a predicate that closes a stream.

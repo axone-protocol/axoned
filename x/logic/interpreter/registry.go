@@ -56,7 +56,6 @@ var registry = orderedmap.New[string, any](
 		{Key: "set_input/1", Value: predicate.SetInput},
 		{Key: "set_output/1", Value: predicate.SetOutput},
 		{Key: "open/4", Value: predicate.Open},
-		{Key: "open/3", Value: predicate.Open3},
 		{Key: "close/2", Value: predicate.Close},
 		{Key: "flush_output/1", Value: predicate.FlushOutput},
 		{Key: "stream_property/2", Value: predicate.StreamProperty},
