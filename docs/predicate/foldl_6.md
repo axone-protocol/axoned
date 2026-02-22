@@ -1,9 +1,9 @@
 ---
-sidebar_position: 125
+sidebar_position: 117
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
-# maplist/3
+# foldl/6
 
 ## Module
 
@@ -17,10 +17,11 @@ Load this module before using the predicate:
 
 ## Description
 
-Applies Goal to pairs of elements from List1 and List2.
+Left-folds three lists in lockstep using Goal.
+Goal is called as call(Goal, Elem1, Elem2, Elem3, Acc0, Acc1).
 
 ## Signature
 
 ```text
-maplist(:Goal, ?List1, ?List2) is semidet
+foldl(:Goal, +List1, +List2, +List3, +V0, -V) is det
 ```
