@@ -1,27 +1,30 @@
 ---
-sidebar_position: 76
+sidebar_position: 129
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
 # open/3
 
+## Module
+
+This predicate is provided by `stdlib.pl`.
+
+Load this module before using the predicate:
+
+```prolog
+:- consult('/v1/lib/stdlib.pl').
+```
+
 ## Description
 
-`open/3` is a predicate which opens a stream to a source or sink. This predicate is a shorthand for open/4 with an empty list of options.
+Opens SourceSink in Mode and unifies Stream with the opened stream.
+Equivalent to open(SourceSink, Mode, Stream, []).
 
 ## Signature
 
 ```text
-open(+SourceSink, +Mode, -Stream)
+open(+SourceSink, +Mode, -Stream) is det
 ```
-
-where:
-
-- SourceSink is an atom representing the source or sink of the stream, which is typically a URI.
-- Mode is an atom representing the mode of the stream to be opened. It can be one of "read", "write", or "append".
-- Stream is the stream to be opened.
-
-open/3 gives True when SourceSink can be opened in Mode.
 
 ## Examples
 
