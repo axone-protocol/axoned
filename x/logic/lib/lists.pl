@@ -14,3 +14,30 @@ member(Elem, [_|Tail]) :-
 select(Elem, [Elem|Tail], Tail).
 select(Elem, [Head|Tail], [Head|Rest]) :-
   select(Elem, Tail, Rest).
+
+% append(+ListOfLists, ?List) is det.
+%
+% Concatenates a list of lists into a single list.
+append([], []).
+append([List|Lists], Concatenated) :-
+  append(List, Rest, Concatenated),
+  append(Lists, Rest).
+
+% prefix(?Prefix, +List) is nondet.
+%
+% True if Prefix is a prefix of List.
+prefix(Prefix, List) :-
+  append(Prefix, _, List).
+
+% suffix(?Suffix, +List) is nondet.
+%
+% True if Suffix is a suffix of List.
+suffix(Suffix, List) :-
+  append(_, Suffix, List).
+
+% sublist(?SubList, +List) is nondet.
+%
+% True if SubList is a contiguous sublist of List.
+sublist(SubList, List) :-
+  append(_, Rest, List),
+  append(SubList, _, Rest).
