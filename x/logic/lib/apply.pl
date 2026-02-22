@@ -56,3 +56,39 @@ maplist(_Goal, [], [], [], [], [], [], []).
 maplist(Goal, [E1|E1s], [E2|E2s], [E3|E3s], [E4|E4s], [E5|E5s], [E6|E6s], [E7|E7s]) :-
   call(Goal, E1, E2, E3, E4, E5, E6, E7),
   maplist(Goal, E1s, E2s, E3s, E4s, E5s, E6s, E7s).
+
+% foldl(:Goal, +List, +V0, -V) is det.
+%
+% Left-folds List using Goal.
+% Goal is called as call(Goal, Elem, Acc0, Acc1).
+foldl(_Goal, [], V, V).
+foldl(Goal, [Elem|Elems], V0, V) :-
+  call(Goal, Elem, V0, V1),
+  foldl(Goal, Elems, V1, V).
+
+% foldl(:Goal, +List1, +List2, +V0, -V) is det.
+%
+% Left-folds two lists in lockstep using Goal.
+% Goal is called as call(Goal, Elem1, Elem2, Acc0, Acc1).
+foldl(_Goal, [], [], V, V).
+foldl(Goal, [Elem1|Elems1], [Elem2|Elems2], V0, V) :-
+  call(Goal, Elem1, Elem2, V0, V1),
+  foldl(Goal, Elems1, Elems2, V1, V).
+
+% foldl(:Goal, +List1, +List2, +List3, +V0, -V) is det.
+%
+% Left-folds three lists in lockstep using Goal.
+% Goal is called as call(Goal, Elem1, Elem2, Elem3, Acc0, Acc1).
+foldl(_Goal, [], [], [], V, V).
+foldl(Goal, [Elem1|Elems1], [Elem2|Elems2], [Elem3|Elems3], V0, V) :-
+  call(Goal, Elem1, Elem2, Elem3, V0, V1),
+  foldl(Goal, Elems1, Elems2, Elems3, V1, V).
+
+% foldl(:Goal, +List1, +List2, +List3, +List4, +V0, -V) is det.
+%
+% Left-folds four lists in lockstep using Goal.
+% Goal is called as call(Goal, Elem1, Elem2, Elem3, Elem4, Acc0, Acc1).
+foldl(_Goal, [], [], [], [], V, V).
+foldl(Goal, [Elem1|Elems1], [Elem2|Elems2], [Elem3|Elems3], [Elem4|Elems4], V0, V) :-
+  call(Goal, Elem1, Elem2, Elem3, Elem4, V0, V1),
+  foldl(Goal, Elems1, Elems2, Elems3, Elems4, V1, V).
