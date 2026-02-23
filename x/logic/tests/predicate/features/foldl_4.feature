@@ -49,3 +49,53 @@ Feature: foldl/4
         results:
         - error: "error(existence_error(procedure,foldl/4),root)"
       """
+
+  Scenario: Fold an empty list returns the initial accumulator
+
+    Given the program:
+      """ prolog
+      sum(Elem, Acc0, Acc) :- Acc is Acc0 + Elem.
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/apply.pl'),
+      foldl(sum, [], 42, Total).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 3992
+      answer:
+        has_more: false
+        variables: ["Total"]
+        results:
+        - substitutions:
+          - variable: Total
+            expression: 42
+      """
+
+  Scenario: Fold with non-numeric accumulator (list building)
+
+    Given the program:
+      """ prolog
+      cons(Elem, Acc0, [Elem|Acc0]).
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/apply.pl'),
+      foldl(cons, [a,b,c], [], Result).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 3992
+      answer:
+        has_more: false
+        variables: ["Result"]
+        results:
+        - substitutions:
+          - variable: Result
+            expression: "[c,b,a]"
+      """
