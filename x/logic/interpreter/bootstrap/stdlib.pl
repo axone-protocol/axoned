@@ -67,7 +67,7 @@ at_end_of_stream :-
 % Succeeds if Stream is at or past end of stream.
 at_end_of_stream(Stream) :-
   stream_property(Stream, end_of_stream(E)), !,
-  (E = at; E = past).
+  memberchk(E, [at, past]).
 
 % get_char(?Char) is det.
 %
@@ -233,3 +233,13 @@ write_canonical(Term) :-
 % Writes Term to Stream in canonical form.
 write_canonical(Stream, Term) :-
   write_term(Stream, Term, [quoted(true), ignore_ops(true)]).
+
+% memberchk(?Elem, +List) is semidet.
+%
+% Succeeds if Elem is a member of List. This is a deterministic predicate
+% that commits to the first unification and does not leave a choice point.
+% Useful when List is ground and you only need to check membership once.
+memberchk(X, [X|_]) :-
+  !.
+memberchk(X, [_|T]) :-
+  memberchk(X, T).

@@ -28,10 +28,11 @@ import (
 var f embed.FS
 
 const (
-	predicatesPath       = "x/logic/predicate"
-	prologPredicatesPath = "x/logic/lib"
-	featuresPath         = "x/logic"
-	outputPath           = "docs/predicate"
+	predicatesPath          = "x/logic/predicate"
+	prologPredicatesPath    = "x/logic/lib"
+	bootstrapPredicatesPath = "x/logic/interpreter/bootstrap"
+	featuresPath            = "x/logic"
+	outputPath              = "docs/predicate"
 )
 
 var (
@@ -45,6 +46,7 @@ type prologPredicateDocumentation struct {
 	Signature   string
 	Description string
 	ModulePath  string
+	IsBuiltin   bool
 }
 
 func generatePredicateDocumentation() error {
@@ -109,15 +111,21 @@ func generateGoPredicateDocs(
 func generatePrologPredicateDocs(
 	wd string, goPredicateCount int, features map[string]*messages.Feature, written map[string]struct{},
 ) error {
-	prologPredicates, err := loadPrologPredicates(path.Join(wd, prologPredicatesPath))
+	builtinPredicates, err := loadPrologPredicates(path.Join(wd, bootstrapPredicatesPath), true)
 	if err != nil {
 		return err
 	}
-	slices.SortFunc(prologPredicates, func(a, b prologPredicateDocumentation) int {
+	libPredicates, err := loadPrologPredicates(path.Join(wd, prologPredicatesPath), false)
+	if err != nil {
+		return err
+	}
+
+	builtinPredicates = append(builtinPredicates, libPredicates...)
+	slices.SortFunc(builtinPredicates, func(a, b prologPredicateDocumentation) int {
 		return strings.Compare(a.Predicate, b.Predicate)
 	})
 
-	for idx, predicate := range prologPredicates {
+	for idx, predicate := range builtinPredicates {
 		name := predicateFileName(predicate.Predicate)
 		if _, exists := written[name]; exists {
 			return fmt.Errorf("predicate %s is documented in both Go and Prolog sources", predicate.Predicate)
@@ -153,7 +161,7 @@ func loadGoPredicates(wd string) ([]*lang.Func, error) {
 	return funcs, nil
 }
 
-func loadPrologPredicates(root string) ([]prologPredicateDocumentation, error) {
+func loadPrologPredicates(root string, isBuiltin bool) ([]prologPredicateDocumentation, error) {
 	docs := make(map[string]prologPredicateDocumentation)
 
 	err := filepath.Walk(root, func(filePath string, info os.FileInfo, err error) error {
@@ -179,6 +187,7 @@ func loadPrologPredicates(root string) ([]prologPredicateDocumentation, error) {
 			if _, exists := docs[predicateDoc.Predicate]; exists {
 				return fmt.Errorf("duplicate Prolog documentation for predicate %s", predicateDoc.Predicate)
 			}
+			predicateDoc.IsBuiltin = isBuiltin
 			docs[predicateDoc.Predicate] = predicateDoc
 		}
 
@@ -459,11 +468,15 @@ func renderPrologPredicateMarkdown(
 	out.WriteString(fmt.Sprintf("# %s\n\n", predicateDoc.Predicate))
 
 	out.WriteString("## Module\n\n")
-	out.WriteString(fmt.Sprintf("This predicate is provided by `%s`.\n\n", predicateDoc.ModulePath))
-	out.WriteString("Load this module before using the predicate:\n\n")
-	out.WriteString("```prolog\n")
-	out.WriteString(fmt.Sprintf(":- consult('/v1/lib/%s').\n", predicateDoc.ModulePath))
-	out.WriteString("```\n")
+	if predicateDoc.IsBuiltin {
+		out.WriteString("Built-in predicate.\n")
+	} else {
+		out.WriteString(fmt.Sprintf("This predicate is provided by `%s`.\n\n", predicateDoc.ModulePath))
+		out.WriteString("Load this module before using the predicate:\n\n")
+		out.WriteString("```prolog\n")
+		out.WriteString(fmt.Sprintf(":- consult('/v1/lib/%s').\n", predicateDoc.ModulePath))
+		out.WriteString("```\n")
+	}
 
 	out.WriteString("## Description\n\n")
 	description := strings.TrimSpace(predicateDoc.Description)
