@@ -1,5 +1,5 @@
 ---
-sidebar_position: 118
+sidebar_position: 119
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -52,7 +52,7 @@ foldl(quad_sum, [1,2], [3,4], [5,6], [7,8], 0, Result).
 
 ```  yaml
 height: 42
-gas_used: 3992
+gas_used: 3984
 answer:
   has_more: false
   variables: ["Result"]
@@ -60,4 +60,68 @@ answer:
   - substitutions:
     - variable: Result
       expression: 36
+```
+
+### Fold four empty lists returns the initial accumulator
+
+Here are the steps of the scenario:
+
+- **Given** the program:
+
+```  prolog
+quad_sum(W, X, Y, Z, Acc0, Acc) :- Acc is Acc0 + W + X + Y + Z.
+```
+
+- **Given** the query:
+
+```  prolog
+consult('/v1/lib/apply.pl'),
+foldl(quad_sum, [], [], [], [], 100, Result).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 3976
+answer:
+  has_more: false
+  variables: ["Result"]
+  results:
+  - substitutions:
+    - variable: Result
+      expression: 100
+```
+
+### Fold four lists to build a structured result
+
+Here are the steps of the scenario:
+
+- **Given** the program:
+
+```  prolog
+make_quad(W, X, Y, Z, Acc0, [[W,X,Y,Z]|Acc0]).
+```
+
+- **Given** the query:
+
+```  prolog
+consult('/v1/lib/apply.pl'),
+foldl(make_quad, [a], [1], [x], [true], [], Quads).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 3979
+answer:
+  has_more: false
+  variables: ["Quads"]
+  results:
+  - substitutions:
+    - variable: Quads
+      expression: "[[a,1,x,true]]"
 ```

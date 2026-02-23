@@ -1,5 +1,5 @@
 ---
-sidebar_position: 145
+sidebar_position: 147
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -7,13 +7,7 @@ sidebar_position: 145
 
 ## Module
 
-This predicate is provided by `stdlib.pl`.
-
-Load this module before using the predicate:
-
-```prolog
-:- consult('/v1/lib/stdlib.pl').
-```
+Built-in predicate.
 
 ## Description
 

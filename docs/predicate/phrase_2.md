@@ -1,9 +1,9 @@
 ---
-sidebar_position: 134
+sidebar_position: 141
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
-# nl/0
+# phrase/2
 
 ## Module
 
@@ -11,10 +11,4 @@ Built-in predicate.
 
 ## Description
 
-Writes a newline to the current output stream.
-
-## Signature
-
-```text
-nl is det
-```
+Definite clause grammar

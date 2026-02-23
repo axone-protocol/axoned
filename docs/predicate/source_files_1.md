@@ -1,9 +1,9 @@
 ---
-sidebar_position: 134
+sidebar_position: 153
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
-# nl/0
+# source_files/1
 
 ## Module
 
@@ -11,10 +11,4 @@ Built-in predicate.
 
 ## Description
 
-Writes a newline to the current output stream.
-
-## Signature
-
-```text
-nl is det
-```
+Prolog prologue
