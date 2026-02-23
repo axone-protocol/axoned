@@ -28,6 +28,7 @@ Feature: foldl/7
             expression: 36
       """
 
+  @great_for_documentation
   Scenario: Fold four empty lists returns the initial accumulator
 
     Given the program:
@@ -53,6 +54,7 @@ Feature: foldl/7
             expression: 100
       """
 
+  @great_for_documentation
   Scenario: Fold four lists to build a structured result
 
     Given the program:

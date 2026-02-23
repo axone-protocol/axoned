@@ -28,6 +28,7 @@ Feature: foldl/6
             expression: 63
       """
 
+  @great_for_documentation
   Scenario: Fold three empty lists returns the initial accumulator
 
     Given the program:
@@ -53,6 +54,7 @@ Feature: foldl/6
             expression: 42
       """
 
+  @great_for_documentation
   Scenario: Fold three lists to build a structured result
 
     Given the program:

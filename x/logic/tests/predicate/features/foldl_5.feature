@@ -28,6 +28,7 @@ Feature: foldl/5
             expression: 32
       """
 
+  @great_for_documentation
   Scenario: Fold two empty lists returns the initial accumulator
 
     Given the program:
@@ -53,6 +54,7 @@ Feature: foldl/5
             expression: 99
       """
 
+  @great_for_documentation
   Scenario: Fold two lists to build a pair list
 
     Given the program:

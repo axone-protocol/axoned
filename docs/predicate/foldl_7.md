@@ -25,3 +25,39 @@ Goal is called as call(Goal, Elem1, Elem2, Elem3, Elem4, Acc0, Acc1).
 ```text
 foldl(:Goal, +List1, +List2, +List3, +List4, +V0, -V) is det
 ```
+
+## Examples
+
+### Fold four lists in lockstep to compute a combined result
+
+This scenario demonstrates how to use foldl/7 to fold four lists simultaneously.
+
+Here are the steps of the scenario:
+
+- **Given** the program:
+
+```  prolog
+quad_sum(W, X, Y, Z, Acc0, Acc) :- Acc is Acc0 + W + X + Y + Z.
+```
+
+- **Given** the query:
+
+```  prolog
+consult('/v1/lib/apply.pl'),
+foldl(quad_sum, [1,2], [3,4], [5,6], [7,8], 0, Result).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 3992
+answer:
+  has_more: false
+  variables: ["Result"]
+  results:
+  - substitutions:
+    - variable: Result
+      expression: 36
+```

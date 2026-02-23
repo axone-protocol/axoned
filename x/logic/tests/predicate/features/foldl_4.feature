@@ -50,6 +50,7 @@ Feature: foldl/4
         - error: "error(existence_error(procedure,foldl/4),root)"
       """
 
+  @great_for_documentation
   Scenario: Fold an empty list returns the initial accumulator
 
     Given the program:
@@ -75,6 +76,7 @@ Feature: foldl/4
             expression: 42
       """
 
+  @great_for_documentation
   Scenario: Fold with non-numeric accumulator (list building)
 
     Given the program:
