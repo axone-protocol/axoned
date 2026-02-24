@@ -203,6 +203,7 @@ func loadPrologPredicates(root string, isBuiltin bool) ([]prologPredicateDocumen
 	return lo.Values(docs), nil
 }
 
+//nolint:funlen
 func parsePrologPredicateDocs(filePath, modulePath string) ([]prologPredicateDocumentation, error) {
 	content, err := os.ReadFile(filePath)
 	if err != nil {
