@@ -214,11 +214,14 @@ func parsePrologPredicateDocs(filePath, modulePath string) ([]prologPredicateDoc
 	seen := make(map[string]struct{})
 
 	for i := 0; i < len(lines); i++ {
-		if !isPrologCommentLine(lines[i]) {
+		if !isPrologDocCommentLine(lines[i]) {
 			continue
 		}
 
 		commentBlock := make([]string, 0)
+		commentBlock = append(commentBlock, prologCommentLine(lines[i]))
+		i++
+
 		for i < len(lines) && isPrologCommentLine(lines[i]) {
 			commentBlock = append(commentBlock, prologCommentLine(lines[i]))
 			i++
@@ -269,9 +272,18 @@ func isPrologCommentLine(line string) bool {
 	return strings.HasPrefix(strings.TrimSpace(line), "%")
 }
 
+func isPrologDocCommentLine(line string) bool {
+	return strings.HasPrefix(strings.TrimSpace(line), "%!")
+}
+
 func prologCommentLine(line string) string {
 	trimmed := strings.TrimSpace(line)
-	trimmed = strings.TrimPrefix(trimmed, "%")
+	// Remove %! for doc comments, or just % for continuation lines
+	if strings.HasPrefix(trimmed, "%!") {
+		trimmed = strings.TrimPrefix(trimmed, "%!")
+	} else {
+		trimmed = strings.TrimPrefix(trimmed, "%")
+	}
 	return strings.TrimPrefix(trimmed, " ")
 }
 
