@@ -21,6 +21,7 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 
 	coreheader "cosmossdk.io/core/header"
+	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
@@ -31,6 +32,7 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
 	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
@@ -173,6 +175,57 @@ func givenTheQuery(ctx context.Context, query *godog.DocString) error {
 	return nil
 }
 
+func givenTheAccountHasTheFollowingBalances(ctx context.Context, address string, balancesTable *godog.Table) error {
+	if len(balancesTable.Rows) < 1 {
+		return fmt.Errorf("balances table must have at least a header row")
+	}
+
+	addr, err := sdk.AccAddressFromBech32(address)
+	if err != nil {
+		return fmt.Errorf("invalid address %s: %w", address, err)
+	}
+
+	coins := sdk.NewCoins()
+	for i := 1; i < len(balancesTable.Rows); i++ {
+		row := balancesTable.Rows[i]
+		if len(row.Cells) != 2 {
+			return fmt.Errorf("each balance row must have exactly 2 cells (denom, amount)")
+		}
+
+		denom := row.Cells[0].Value
+		amountStr := row.Cells[1].Value
+
+		if denom == "" || amountStr == "" {
+			continue // Skip empty rows
+		}
+
+		amount, ok := math.NewIntFromString(amountStr)
+		if !ok {
+			return fmt.Errorf("invalid amount %s", amountStr)
+		}
+
+		if err := sdk.ValidateDenom(denom); err != nil {
+			return fmt.Errorf("invalid denom %s: %w", denom, err)
+		}
+
+		if amount.IsNegative() {
+			return fmt.Errorf("amount must be non-negative, got %s", amountStr)
+		}
+
+		coins = coins.Add(sdk.NewCoin(denom, amount))
+	}
+
+	coins = coins.Sort()
+
+	bankKeeper := testCaseFromContext(ctx).bankKeeper
+	bankKeeper.EXPECT().
+		GetAllBalances(gomock.Any(), addr).
+		Return(coins).
+		AnyTimes()
+
+	return nil
+}
+
 func whenTheQueryIsRun(ctx context.Context) error {
 	tc := testCaseFromContext(ctx)
 
@@ -229,8 +282,8 @@ func assert(actual any, assertion Assertion, expected ...any) error {
 	}
 	sb := strings.Builder{}
 	sb.WriteString("assertion failed\n\u001B[0m")
-	sb.WriteString(fmt.Sprintf("Actual:\n%s\n", failureView.Actual))
-	sb.WriteString(fmt.Sprintf("Expected:\n%s\n", failureView.Expected))
+	fmt.Fprintf(&sb, "Actual:\n%s\n", failureView.Actual)
+	fmt.Fprintf(&sb, "Expected:\n%s\n", failureView.Expected)
 	sb.WriteString("Diff:\n")
 
 	dmp := diffmatchpatch.New()
@@ -277,6 +330,7 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 		ctx.Given(`the module configuration:`, givenTheModuleConfiguration)
 		ctx.Given(`a block with the following header:`, givenABlockWithTheFollowingHeader)
 		ctx.Given(`the CosmWasm smart contract "([^"]+)" and the behavior:`, givenASmartContractWithAddress)
+		ctx.Given(`the account "([^"]+)" has the following balances:`, givenTheAccountHasTheFollowingBalances)
 		ctx.Given(`the query:`, givenTheQuery)
 		ctx.Given(`the program:`, givenTheProgram)
 		ctx.When(`^the query is run$`, whenTheQueryIsRun)
@@ -303,14 +357,19 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 			legacyFS.Mount(wasm.Scheme, wasm.NewFS(ctx, tc.wasmKeeper))
 
 			pathFS := logicvfs.New()
-			if err := pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)); err != nil {
-				panic(fmt.Errorf("failed to mount /v1/lib: %w", err))
+			mounts := []struct {
+				path string
+				fs   fs.FS
+			}{
+				{"/v1/lib", logicembeddedfs.NewFS(logiclib.Files)},
+				{"/v1/sys/header", logicsysheader.NewFS(ctx)},
+				{"/v1/sys/comet", logicsyscomet.NewFS(ctx)},
+				{"/v1/bank", bank.NewFS(ctx)},
 			}
-			if err := pathFS.Mount("/v1/sys/header", logicsysheader.NewFS(ctx)); err != nil {
-				panic(fmt.Errorf("failed to mount /v1/sys/header: %w", err))
-			}
-			if err := pathFS.Mount("/v1/sys/comet", logicsyscomet.NewFS(ctx)); err != nil {
-				panic(fmt.Errorf("failed to mount /v1/sys/comet: %w", err))
+			for _, m := range mounts {
+				if err := pathFS.Mount(m.path, m.fs); err != nil {
+					return nil, fmt.Errorf("failed to mount %s: %w", m.path, err)
+				}
 			}
 
 			return dual.NewFS(pathFS, legacyFS), nil

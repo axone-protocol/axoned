@@ -49,6 +49,12 @@ type prologPredicateDocumentation struct {
 	IsBuiltin   bool
 }
 
+type predicateEntry struct {
+	name      string
+	goFunc    *lang.Func
+	prologDoc *prologPredicateDocumentation
+}
+
 func generatePredicateDocumentation() error {
 	wd, err := os.Getwd()
 	if err != nil {
@@ -60,57 +66,6 @@ func generatePredicateDocumentation() error {
 		return err
 	}
 
-	features, err := loadFeatures(featuresPath)
-	if err != nil {
-		return err
-	}
-
-	written, err := generateGoPredicateDocs(funcs, features)
-	if err != nil {
-		return err
-	}
-
-	return generatePrologPredicateDocs(wd, len(funcs), features, written)
-}
-
-func generateGoPredicateDocs(
-	funcs []*lang.Func, features map[string]*messages.Feature,
-) (map[string]struct{}, error) {
-	written := make(map[string]struct{}, len(funcs))
-
-	for idx, f := range funcs {
-		name := predicateFileName(functorName(f))
-
-		// globalCtx used to keep track of contexts between templates.
-		// (yes it's a hack).
-		globalCtx := make(map[string]any)
-		globalCtx["frontmatter"] = map[string]any{
-			"sidebar_position": idx + 1,
-		}
-		globalCtx["feature"] = features[name]
-
-		out, err := createRenderer(globalCtx)
-		if err != nil {
-			return nil, err
-		}
-
-		content, err := out.Func(f)
-		if err != nil {
-			return nil, err
-		}
-		err = writeToFile(fmt.Sprintf("%s/%s.md", outputPath, name), content)
-		if err != nil {
-			return nil, err
-		}
-		written[name] = struct{}{}
-	}
-
-	return written, nil
-}
-
-func generatePrologPredicateDocs(
-	wd string, goPredicateCount int, features map[string]*messages.Feature, written map[string]struct{},
-) error {
 	builtinPredicates, err := loadPrologPredicates(path.Join(wd, bootstrapPredicatesPath), true)
 	if err != nil {
 		return err
@@ -120,25 +75,95 @@ func generatePrologPredicateDocs(
 		return err
 	}
 
-	builtinPredicates = append(builtinPredicates, libPredicates...)
-	slices.SortFunc(builtinPredicates, func(a, b prologPredicateDocumentation) int {
-		return strings.Compare(a.Predicate, b.Predicate)
-	})
+	features, err := loadFeatures(path.Join(wd, featuresPath))
+	if err != nil {
+		return err
+	}
 
-	for idx, predicate := range builtinPredicates {
-		name := predicateFileName(predicate.Predicate)
-		if _, exists := written[name]; exists {
-			return fmt.Errorf("predicate %s is documented in both Go and Prolog sources", predicate.Predicate)
-		}
+	predicates := buildUnifiedPredicateList(funcs, builtinPredicates, libPredicates)
 
-		content := renderPrologPredicateMarkdown(predicate, goPredicateCount+idx+1, features[name])
-		if err := writeToFile(fmt.Sprintf("%s/%s.md", outputPath, name), content); err != nil {
+	for idx, pred := range predicates {
+		if err := writePredicateDoc(pred, idx+1, features); err != nil {
 			return err
 		}
-		written[name] = struct{}{}
 	}
 
 	return nil
+}
+
+func buildUnifiedPredicateList(
+	funcs []*lang.Func,
+	builtinPredicates, libPredicates []prologPredicateDocumentation,
+) []predicateEntry {
+	predicateMap := make(map[string]predicateEntry)
+
+	for _, f := range funcs {
+		name := functorName(f)
+		predicateMap[name] = predicateEntry{
+			name:   name,
+			goFunc: f,
+		}
+	}
+
+	builtinPredicates = append(builtinPredicates, libPredicates...)
+	for idx := range builtinPredicates {
+		name := builtinPredicates[idx].Predicate
+		if _, exists := predicateMap[name]; !exists {
+			predicateMap[name] = predicateEntry{
+				name:      name,
+				prologDoc: &builtinPredicates[idx],
+			}
+		}
+	}
+
+	allPredicates := lo.Values(predicateMap)
+	slices.SortFunc(allPredicates, func(a, b predicateEntry) int {
+		return strings.Compare(a.name, b.name)
+	})
+
+	return allPredicates
+}
+
+func writePredicateDoc(pred predicateEntry, position int, features map[string]*messages.Feature) error {
+	if pred.goFunc != nil {
+		return writeGoPredicateDoc(pred.goFunc, position, features)
+	}
+	if pred.prologDoc != nil {
+		return writePrologPredicateDoc(*pred.prologDoc, position, features)
+	}
+	return nil
+}
+
+func writeGoPredicateDoc(f *lang.Func, position int, features map[string]*messages.Feature) error {
+	name := predicateFileName(functorName(f))
+
+	globalCtx := make(map[string]any)
+	globalCtx["frontmatter"] = map[string]any{
+		"sidebar_position": position,
+	}
+	globalCtx["feature"] = features[name]
+
+	out, err := createRenderer(globalCtx)
+	if err != nil {
+		return err
+	}
+
+	content, err := out.Func(f)
+	if err != nil {
+		return err
+	}
+
+	return writeToFile(fmt.Sprintf("%s/%s.md", outputPath, name), content)
+}
+
+func writePrologPredicateDoc(
+	doc prologPredicateDocumentation,
+	position int,
+	features map[string]*messages.Feature,
+) error {
+	name := predicateFileName(doc.Predicate)
+	content := renderPrologPredicateMarkdown(doc, position, features[name])
+	return writeToFile(fmt.Sprintf("%s/%s.md", outputPath, name), content)
 }
 
 func loadGoPredicates(wd string) ([]*lang.Func, error) {
