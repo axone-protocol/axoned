@@ -105,8 +105,20 @@ func LockedCoinsSorted(ctx context.Context, bankKeeper types.BankKeeper, bech32A
 func CoinsToTerm(coins sdk.Coins) engine.Term {
 	terms := make([]engine.Term, 0, len(coins))
 	for _, coin := range coins {
-		terms = append(terms, prolog.AtomPair.Apply(engine.NewAtom(coin.Denom), engine.Integer(coin.Amount.Int64())))
+		terms = append(terms, CoinToTerm(coin))
 	}
 
 	return engine.List(terms...)
+}
+
+// CoinToTerm converts a single coin to a Prolog term.
+func CoinToTerm(coin sdk.Coin) engine.Term {
+	var amountTerm engine.Term
+	if coin.Amount.IsInt64() {
+		amountTerm = engine.Integer(coin.Amount.Int64())
+	} else {
+		// For amounts that don't fit in int64, represent as atom string
+		amountTerm = engine.NewAtom(coin.Amount.String())
+	}
+	return prolog.AtomPair.Apply(engine.NewAtom(coin.Denom), amountTerm)
 }

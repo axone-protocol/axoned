@@ -133,6 +133,7 @@ import (
 	axonewasm "github.com/axone-protocol/axoned/v14/app/wasm"
 	"github.com/axone-protocol/axoned/v14/docs"
 	logicmodule "github.com/axone-protocol/axoned/v14/x/logic"
+	logicbank "github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
 	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
@@ -1176,14 +1177,20 @@ func (app *App) provideFS(ctx context.Context) (fs.FS, error) {
 	legacyFS.Mount(wasm2.Scheme, wasm2.NewFS(ctx, app.WasmKeeper))
 
 	pathFS := logicvfs.New()
-	if err := pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)); err != nil {
-		return nil, fmt.Errorf("failed to mount /v1/lib: %w", err)
+	mounts := []struct {
+		path string
+		fs   fs.FS
+	}{
+		{"/v1/lib", logicembeddedfs.NewFS(logiclib.Files)},
+		{"/v1/sys/header", logicsysheader.NewFS(ctx)},
+		{"/v1/sys/comet", logicsyscomet.NewFS(ctx)},
+		{"/v1/bank", logicbank.NewFS(ctx)},
 	}
-	if err := pathFS.Mount("/v1/sys/header", logicsysheader.NewFS(ctx)); err != nil {
-		return nil, fmt.Errorf("failed to mount /v1/sys/header: %w", err)
-	}
-	if err := pathFS.Mount("/v1/sys/comet", logicsyscomet.NewFS(ctx)); err != nil {
-		return nil, fmt.Errorf("failed to mount /v1/sys/comet: %w", err)
+
+	for _, m := range mounts {
+		if err := pathFS.Mount(m.path, m.fs); err != nil {
+			return nil, fmt.Errorf("failed to mount %s: %w", m.path, err)
+		}
 	}
 
 	return dual.NewFS(pathFS, legacyFS), nil
