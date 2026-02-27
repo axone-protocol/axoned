@@ -85,13 +85,6 @@ func AllBalancesSorted(ctx context.Context, bankKeeper types.BankKeeper, bech32A
 	return fetchedBalances
 }
 
-// SpendableCoinsSorted returns the list of spendable coins for the given address, sorted by coin denomination.
-func SpendableCoinsSorted(ctx context.Context, bankKeeper types.BankKeeper, bech32Addr sdk.AccAddress) sdk.Coins {
-	fetchedBalances := bankKeeper.SpendableCoins(ctx, bech32Addr)
-	SortBalances(fetchedBalances)
-	return fetchedBalances
-}
-
 // LockedCoinsSorted returns the list of spendable coins for the given address, sorted by coin denomination.
 func LockedCoinsSorted(ctx context.Context, bankKeeper types.BankKeeper, bech32Addr sdk.AccAddress) sdk.Coins {
 	fetchedBalances := bankKeeper.LockedCoins(ctx, bech32Addr)
