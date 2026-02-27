@@ -176,50 +176,29 @@ func givenTheQuery(ctx context.Context, query *godog.DocString) error {
 }
 
 func givenTheAccountHasTheFollowingBalances(ctx context.Context, address string, balancesTable *godog.Table) error {
-	if len(balancesTable.Rows) < 1 {
-		return fmt.Errorf("balances table must have at least a header row")
-	}
-
-	addr, err := sdk.AccAddressFromBech32(address)
+	addr, coins, err := addressAndCoinsFromBalancesTable(address, balancesTable)
 	if err != nil {
-		return fmt.Errorf("invalid address %s: %w", address, err)
+		return err
 	}
-
-	coins := sdk.NewCoins()
-	for i := 1; i < len(balancesTable.Rows); i++ {
-		row := balancesTable.Rows[i]
-		if len(row.Cells) != 2 {
-			return fmt.Errorf("each balance row must have exactly 2 cells (denom, amount)")
-		}
-
-		denom := row.Cells[0].Value
-		amountStr := row.Cells[1].Value
-
-		if denom == "" || amountStr == "" {
-			continue // Skip empty rows
-		}
-
-		amount, ok := math.NewIntFromString(amountStr)
-		if !ok {
-			return fmt.Errorf("invalid amount %s", amountStr)
-		}
-
-		if err := sdk.ValidateDenom(denom); err != nil {
-			return fmt.Errorf("invalid denom %s: %w", denom, err)
-		}
-
-		if amount.IsNegative() {
-			return fmt.Errorf("amount must be non-negative, got %s", amountStr)
-		}
-
-		coins = coins.Add(sdk.NewCoin(denom, amount))
-	}
-
-	coins = coins.Sort()
 
 	bankKeeper := testCaseFromContext(ctx).bankKeeper
 	bankKeeper.EXPECT().
 		GetAllBalances(gomock.Any(), addr).
+		Return(coins).
+		AnyTimes()
+
+	return nil
+}
+
+func givenTheAccountHasTheFollowingSpendableBalances(ctx context.Context, address string, balancesTable *godog.Table) error {
+	addr, coins, err := addressAndCoinsFromBalancesTable(address, balancesTable)
+	if err != nil {
+		return err
+	}
+
+	bankKeeper := testCaseFromContext(ctx).bankKeeper
+	bankKeeper.EXPECT().
+		SpendableCoins(gomock.Any(), addr).
 		Return(coins).
 		AnyTimes()
 
@@ -331,6 +310,7 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 		ctx.Given(`a block with the following header:`, givenABlockWithTheFollowingHeader)
 		ctx.Given(`the CosmWasm smart contract "([^"]+)" and the behavior:`, givenASmartContractWithAddress)
 		ctx.Given(`the account "([^"]+)" has the following balances:`, givenTheAccountHasTheFollowingBalances)
+		ctx.Given(`the account "([^"]+)" has the following spendable balances:`, givenTheAccountHasTheFollowingSpendableBalances)
 		ctx.Given(`the query:`, givenTheQuery)
 		ctx.Given(`the program:`, givenTheProgram)
 		ctx.When(`^the query is run$`, whenTheQueryIsRun)
@@ -404,4 +384,47 @@ func parseDocStringYaml(docString *godog.DocString, v any) error {
 	}
 
 	return nil
+}
+
+func addressAndCoinsFromBalancesTable(address string, balancesTable *godog.Table) (sdk.AccAddress, sdk.Coins, error) {
+	if len(balancesTable.Rows) < 1 {
+		return nil, nil, fmt.Errorf("balances table must have at least a header row")
+	}
+
+	addr, err := sdk.AccAddressFromBech32(address)
+	if err != nil {
+		return nil, nil, fmt.Errorf("invalid address %s: %w", address, err)
+	}
+
+	coins := sdk.NewCoins()
+	for i := 1; i < len(balancesTable.Rows); i++ {
+		row := balancesTable.Rows[i]
+		if len(row.Cells) != 2 {
+			return nil, nil, fmt.Errorf("each balance row must have exactly 2 cells (denom, amount)")
+		}
+
+		denom := row.Cells[0].Value
+		amountStr := row.Cells[1].Value
+
+		if denom == "" || amountStr == "" {
+			return nil, nil, fmt.Errorf("row %d: denom and amount must both be set", i)
+		}
+
+		amount, ok := math.NewIntFromString(amountStr)
+		if !ok {
+			return nil, nil, fmt.Errorf("row %d: invalid amount %s", i, amountStr)
+		}
+
+		if err := sdk.ValidateDenom(denom); err != nil {
+			return nil, nil, fmt.Errorf("row %d: invalid denom %s: %w", i, denom, err)
+		}
+
+		if amount.IsNegative() {
+			return nil, nil, fmt.Errorf("row %d: amount must be non-negative, got %s", i, amountStr)
+		}
+
+		coins = coins.Add(sdk.NewCoin(denom, amount))
+	}
+
+	return addr, coins.Sort(), nil
 }
