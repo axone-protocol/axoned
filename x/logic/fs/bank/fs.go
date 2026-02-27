@@ -2,7 +2,7 @@ package bank
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"io"
 	"io/fs"
 	"strings"
@@ -22,9 +22,12 @@ import (
 )
 
 const (
-	balancesPath = "balances"
-	atPath       = "@"
+	balancesPath  = "balances"
+	spendablePath = "spendable"
+	atPath        = "@"
 )
+
+type balancesFetcher func(context.Context, types.BankKeeper, sdk.AccAddress) sdk.Coins
 
 type vfs struct {
 	ctx context.Context
@@ -33,6 +36,8 @@ type vfs struct {
 var (
 	_ fs.FS         = (*vfs)(nil)
 	_ fs.ReadFileFS = (*vfs)(nil)
+
+	errVFSUnavailable = errors.New("vfs_unavailable")
 )
 
 // NewFS creates the /v1/bank filesystem.
@@ -48,17 +53,17 @@ func (f *vfs) Open(name string) (fs.File, error) {
 		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
 	}
 
-	addr, err := f.validatePath(subpath)
+	addr, fetcher, err := f.validatePath(subpath)
 	if err != nil {
 		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
 	}
 
 	bankKeeper, err := prolog.ContextValue[types.BankKeeper](f.ctx, types.BankKeeperContextKey, nil)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: fmt.Errorf("bank keeper not found in context: %w", err)}
+		return nil, &fs.PathError{Op: "open", Path: name, Err: errVFSUnavailable}
 	}
 
-	return newStreamingFile(f.ctx, name, sdkCtx.HeaderInfo().Time, bankKeeper, addr), nil
+	return newStreamingFile(f.ctx, name, sdkCtx.HeaderInfo().Time, bankKeeper, addr, fetcher), nil
 }
 
 func (f *vfs) ReadFile(name string) ([]byte, error) {
@@ -71,23 +76,34 @@ func (f *vfs) ReadFile(name string) ([]byte, error) {
 	return io.ReadAll(file)
 }
 
-func (f *vfs) validatePath(subpath string) (sdk.AccAddress, error) {
+func (f *vfs) validatePath(subpath string) (sdk.AccAddress, balancesFetcher, error) {
 	segments := strings.Split(subpath, "/")
-	if len(segments) != 3 || segments[1] != balancesPath || segments[2] != atPath {
-		return nil, fs.ErrNotExist
+	if len(segments) != 3 || segments[2] != atPath {
+		return nil, nil, fs.ErrNotExist
 	}
 
 	address := segments[0]
 	if address == "" {
-		return nil, fs.ErrNotExist
+		return nil, nil, fs.ErrNotExist
 	}
 
 	addr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
-		return nil, fmt.Errorf("invalid address: %w", err)
+		return nil, nil, fs.ErrNotExist
 	}
 
-	return addr, nil
+	switch segments[1] {
+	case balancesPath:
+		return addr, func(ctx context.Context, keeper types.BankKeeper, accAddr sdk.AccAddress) sdk.Coins {
+			return keeper.GetAllBalances(ctx, accAddr)
+		}, nil
+	case spendablePath:
+		return addr, func(ctx context.Context, keeper types.BankKeeper, accAddr sdk.AccAddress) sdk.Coins {
+			return keeper.SpendableCoins(ctx, accAddr)
+		}, nil
+	default:
+		return nil, nil, fs.ErrNotExist
+	}
 }
 
 func newStreamingFile(
@@ -96,9 +112,10 @@ func newStreamingFile(
 	modTime time.Time,
 	keeper types.BankKeeper,
 	addr sdk.AccAddress,
+	fetcher balancesFetcher,
 ) fs.File {
 	open := func() (streamingfile.Next[sdk.Coin], streamingfile.Stop, error) {
-		coins := keeper.GetAllBalances(ctx, addr)
+		coins := fetcher(ctx, keeper, addr)
 
 		idx := 0
 		next := func() (sdk.Coin, bool, error) {

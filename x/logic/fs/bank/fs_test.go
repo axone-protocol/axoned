@@ -2,6 +2,7 @@ package bank
 
 import (
 	"context"
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -58,6 +59,25 @@ func TestVFS(t *testing.T) {
 			})
 		})
 
+		Convey("When reading a valid spendable balances file", func() {
+			coins := sdk.NewCoins(
+				sdk.NewCoin("uatom", math.NewInt(80)),
+				sdk.NewCoin("uaxone", math.NewInt(150)),
+			)
+
+			mockBankKeeper.EXPECT().
+				SpendableCoins(gomock.Any(), sdk.MustAccAddressFromBech32(addr)).
+				Return(coins)
+
+			data, err := bankFS.ReadFile(addr + "/spendable/@")
+
+			Convey("Then it should return the spendable balances as Prolog terms", func() {
+				So(err, ShouldBeNil)
+				So(string(data), ShouldContainSubstring, "-(uatom,80)")
+				So(string(data), ShouldContainSubstring, "-(uaxone,150)")
+			})
+		})
+
 		Convey("When reading with invalid paths", func() {
 			cases := []struct {
 				name    string
@@ -65,7 +85,8 @@ func TestVFS(t *testing.T) {
 				message string
 			}{
 				{name: "non-bank path", path: "invalid/path", message: "does not exist"},
-				{name: "invalid bech32 address", path: "invalid_addr/balances/@", message: "invalid address"},
+				{name: "unknown balances collection", path: addr + "/unknown/@", message: "does not exist"},
+				{name: "invalid bech32 address", path: "invalid_addr/balances/@", message: "does not exist"},
 				{name: "missing address segment", path: "/balances/@", message: "does not exist"},
 			}
 
@@ -127,6 +148,17 @@ func TestVFS(t *testing.T) {
 				stat, err := file.Stat()
 				So(err, ShouldBeNil)
 				So(stat.Name(), ShouldEqual, "@")
+			})
+		})
+
+		Convey("When the bank keeper is missing from context", func() {
+			bankFS := NewFS(newTestContext())
+
+			_, err := bankFS.Open(addr + "/balances/@")
+
+			Convey("Then it should surface a term error", func() {
+				So(err, ShouldNotBeNil)
+				So(errors.Is(err, errVFSUnavailable), ShouldBeTrue)
 			})
 		})
 	})
