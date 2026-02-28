@@ -19,7 +19,7 @@ COPY . /src/
 RUN BUILD_TAGS=muslc LINK_STATICALLY=true make build-go
 
 #--- Image stage
-FROM alpine:3.22.2
+FROM alpine:3.23.3
 
 COPY --from=go-builder /src/target/dist/axoned /usr/bin/axoned
 
