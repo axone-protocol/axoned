@@ -234,6 +234,516 @@ write_canonical(Term) :-
 write_canonical(Stream, Term) :-
   write_term(Stream, Term, [quoted(true), ignore_ops(true)]).
 
+%! term_to_atom(?Term, ?Atom) is det.
+%
+% Relates a ground Term with its textual Atom representation.
+%
+% where:
+%
+% - Term is a ground term that unifies with the parsed representation of Atom;
+% - Atom is an atom containing a canonical textual representation of Term.
+%
+% When Term is ground, Atom is unified with a canonical textual representation
+% that can be parsed back by this predicate. When Atom is instantiated, it is
+% parsed back into Term.
+%
+% The supported syntax matches the canonical text produced here: atoms, quoted
+% atoms, numbers, double-quoted strings (lists of one-character atoms), lists and compounds.
+%
+% Throws:
+%
+% - error(instantiation_error, term_to_atom/2) when both arguments are variables;
+% - error(type_error(atom, Atom), term_to_atom/2) when Atom is instantiated but is not an atom;
+% - error(syntax_error(term), term_to_atom/2) when Atom is an atom that does not contain a valid canonical term.
+term_to_atom(Term, Atom) :-
+  ( nonvar(Atom),
+    \+atom(Atom)
+  -> throw(error(type_error(atom, Atom), term_to_atom/2))
+  ; ground(Term)
+  -> term_to_atom_chars(Term, Chars),
+     atom_chars(Atom, Chars)
+  ; atom(Atom)
+  -> atom_chars(Atom, Chars),
+     ( Chars = []
+     -> Term = ''
+     ; phrase(term_to_atom_term(Term), Chars)
+     -> true
+     ; throw(error(syntax_error(term), term_to_atom/2))
+     )
+  ; throw(error(instantiation_error, term_to_atom/2))
+  ).
+
+term_to_atom_chars([], [Open, Close]) :-
+  term_to_atom_lbracket_char(Open),
+  term_to_atom_rbracket_char(Close),
+  !.
+term_to_atom_chars(Term, Chars) :-
+  atom(Term),
+  !,
+  term_to_atom_atom_chars(Term, Chars).
+term_to_atom_chars(Term, Chars) :-
+  number(Term),
+  !,
+  number_chars(Term, Chars).
+term_to_atom_chars(Term, Chars) :-
+  term_to_atom_is_char_list(Term),
+  !,
+  term_to_atom_double_quoted_string_chars(Term, Chars).
+term_to_atom_chars([Head|Tail], [Open|Chars]) :-
+  term_to_atom_lbracket_char(Open),
+  !,
+  term_to_atom_list_chars([Head|Tail], Chars).
+term_to_atom_chars(Term, Chars) :-
+  compound(Term),
+  functor(Term, Functor, Arity),
+  term_to_atom_atom_chars(Functor, FunctorChars),
+  term_to_atom_lparen_char(Open),
+  append(FunctorChars, [Open|ArgsChars], Chars),
+  term_to_atom_args_chars(1, Arity, Term, ArgsChars).
+
+term_to_atom_atom_chars(Atom, Chars) :-
+  atom_chars(Atom, RawChars),
+  ( term_to_atom_is_bare_atom_chars(RawChars)
+  -> Chars = RawChars
+  ; term_to_atom_is_symbol_atom_chars(RawChars)
+  -> Chars = RawChars
+  ; term_to_atom_quoted_atom_chars(RawChars, Chars)
+  ).
+
+term_to_atom_is_bare_atom_chars([Head|Tail]) :-
+  term_to_atom_lowercase_char(Head),
+  term_to_atom_is_bare_atom_tail_chars(Tail).
+
+term_to_atom_is_bare_atom_tail_chars([]).
+term_to_atom_is_bare_atom_tail_chars([Head|Tail]) :-
+  term_to_atom_identifier_char(Head),
+  term_to_atom_is_bare_atom_tail_chars(Tail).
+
+term_to_atom_is_symbol_atom_chars([Head|Tail]) :-
+  term_to_atom_symbol_char(Head),
+  term_to_atom_is_symbol_atom_tail_chars(Tail).
+
+term_to_atom_is_symbol_atom_tail_chars([]).
+term_to_atom_is_symbol_atom_tail_chars([Head|Tail]) :-
+  term_to_atom_token_char(Head),
+  term_to_atom_is_symbol_atom_tail_chars(Tail).
+
+term_to_atom_quoted_atom_chars(RawChars, [Quote|Chars]) :-
+  term_to_atom_quote_char(Quote),
+  term_to_atom_quoted_atom_body_chars(RawChars, BodyChars),
+  append(BodyChars, [Quote], Chars).
+
+term_to_atom_quoted_atom_body_chars([], []).
+term_to_atom_quoted_atom_body_chars([Head|Tail], [Escape, Quote|Chars]) :-
+  term_to_atom_quote_char(Head),
+  !,
+  term_to_atom_backslash_char(Escape),
+  term_to_atom_quote_char(Quote),
+  term_to_atom_quoted_atom_body_chars(Tail, Chars).
+term_to_atom_quoted_atom_body_chars([Head|Tail], [Escape, Backslash|Chars]) :-
+  term_to_atom_backslash_char(Head),
+  !,
+  term_to_atom_backslash_char(Escape),
+  term_to_atom_backslash_char(Backslash),
+  term_to_atom_quoted_atom_body_chars(Tail, Chars).
+term_to_atom_quoted_atom_body_chars([Head|Tail], [Head|Chars]) :-
+  term_to_atom_quoted_atom_body_chars(Tail, Chars).
+
+% A "string" is represented as a proper list of one-character atoms.
+term_to_atom_is_char_list([]).
+term_to_atom_is_char_list([H|T]) :-
+  atom(H),
+  atom_length(H, 1),
+  term_to_atom_is_char_list(T).
+
+term_to_atom_double_quoted_string_chars(String, [Quote|Chars]) :-
+  term_to_atom_double_quote_char(Quote),
+  term_to_atom_double_quoted_body_chars(String, BodyChars),
+  append(BodyChars, [Quote], Chars).
+
+term_to_atom_double_quoted_body_chars([], []).
+term_to_atom_double_quoted_body_chars([Head|Tail], [Escape, Quote|Chars]) :-
+  term_to_atom_double_quote_char(Head),
+  !,
+  term_to_atom_backslash_char(Escape),
+  term_to_atom_double_quote_char(Quote),
+  term_to_atom_double_quoted_body_chars(Tail, Chars).
+term_to_atom_double_quoted_body_chars([Head|Tail], [Escape, Backslash|Chars]) :-
+  term_to_atom_backslash_char(Head),
+  !,
+  term_to_atom_backslash_char(Escape),
+  term_to_atom_backslash_char(Backslash),
+  term_to_atom_double_quoted_body_chars(Tail, Chars).
+term_to_atom_double_quoted_body_chars([Head|Tail], [Head|Chars]) :-
+  term_to_atom_double_quoted_body_chars(Tail, Chars).
+
+term_to_atom_list_chars([], [Close]) :-
+  term_to_atom_rbracket_char(Close).
+term_to_atom_list_chars([Head|Tail], Chars) :-
+  term_to_atom_chars(Head, HeadChars),
+  append(HeadChars, TailChars, Chars),
+  term_to_atom_list_tail_chars(Tail, TailChars).
+
+term_to_atom_list_tail_chars([], [Close]) :-
+  term_to_atom_rbracket_char(Close),
+  !.
+term_to_atom_list_tail_chars([Head|Tail], [Comma|Chars]) :-
+  term_to_atom_comma_char(Comma),
+  !,
+  term_to_atom_chars(Head, HeadChars),
+  append(HeadChars, TailChars, Chars),
+  term_to_atom_list_tail_chars(Tail, TailChars).
+term_to_atom_list_tail_chars(Tail, [Pipe|Chars]) :-
+  term_to_atom_pipe_char(Pipe),
+  term_to_atom_chars(Tail, TailChars),
+  term_to_atom_rbracket_char(Close),
+  append(TailChars, [Close], Chars).
+
+term_to_atom_args_chars(Index, Arity, Term, Chars) :-
+  arg(Index, Term, Arg),
+  term_to_atom_chars(Arg, ArgChars),
+  ( Index =:= Arity
+  -> term_to_atom_rparen_char(Close),
+     append(ArgChars, [Close], Chars)
+  ; term_to_atom_comma_char(Comma),
+    append(ArgChars, [Comma|TailChars], Chars),
+    Next is Index + 1,
+    term_to_atom_args_chars(Next, Arity, Term, TailChars)
+  ).
+
+term_to_atom_term(Term) -->
+  term_to_atom_blanks,
+  term_to_atom_value(Term),
+  term_to_atom_blanks.
+
+term_to_atom_value([]) -->
+  [Open],
+  {term_to_atom_lbracket_char(Open)},
+  term_to_atom_blanks,
+  [Close],
+  {term_to_atom_rbracket_char(Close)},
+  !.
+term_to_atom_value(List) -->
+  [Open],
+  {term_to_atom_lbracket_char(Open)},
+  term_to_atom_blanks,
+  term_to_atom_list_value(List),
+  term_to_atom_blanks,
+  [Close],
+  {term_to_atom_rbracket_char(Close)},
+  !.
+term_to_atom_value(String) -->
+  term_to_atom_double_quoted_string(String),
+  !.
+term_to_atom_value(Number) -->
+  term_to_atom_number(Number),
+  !.
+term_to_atom_value(Term) -->
+  term_to_atom_atom_or_compound(Term).
+
+term_to_atom_list_value([Head|Tail]) -->
+  term_to_atom_value(Head),
+  term_to_atom_blanks,
+  ( [Comma],
+    {term_to_atom_comma_char(Comma)},
+    term_to_atom_blanks,
+    term_to_atom_list_value(Tail)
+  ; [Pipe],
+    {term_to_atom_pipe_char(Pipe)},
+    term_to_atom_blanks,
+    term_to_atom_value(Tail)
+  ; {Tail = []}
+  ).
+
+term_to_atom_double_quoted_string(String) -->
+  [Quote],
+  {term_to_atom_double_quote_char(Quote)},
+  term_to_atom_double_quoted_chars(Chars),
+  [Quote],
+  {String = Chars}.
+
+term_to_atom_double_quoted_chars([Char|Chars]) -->
+  term_to_atom_double_quoted_char(Char),
+  !,
+  term_to_atom_double_quoted_chars(Chars).
+term_to_atom_double_quoted_chars([]) -->
+  [].
+
+term_to_atom_double_quoted_char('"') -->
+  [Escape, Quote],
+  {term_to_atom_backslash_char(Escape), term_to_atom_double_quote_char(Quote)}.
+term_to_atom_double_quoted_char(Char) -->
+  [Escape, Char],
+  {term_to_atom_backslash_char(Escape), term_to_atom_backslash_char(Char)}.
+term_to_atom_double_quoted_char(Char) -->
+  [Char],
+  {\+ term_to_atom_double_quote_char(Char), \+ term_to_atom_backslash_char(Char)}.
+
+term_to_atom_number(Number) -->
+  term_to_atom_token(Token),
+  {
+    Token \= [],
+    catch(number_chars(Number, Token), _Error, fail)
+  }.
+
+term_to_atom_atom_or_compound(Term) -->
+  term_to_atom_functor(Functor),
+  term_to_atom_blanks,
+  ( [Open],
+    {term_to_atom_lparen_char(Open)},
+    term_to_atom_blanks,
+    term_to_atom_arguments(Args),
+    term_to_atom_blanks,
+    [Close],
+    {term_to_atom_rparen_char(Close)},
+    {Term =.. [Functor|Args]}
+  ; {Term = Functor}
+  ).
+
+term_to_atom_arguments([Arg|Args]) -->
+  term_to_atom_value(Arg),
+  term_to_atom_blanks,
+  ( [Comma],
+    {term_to_atom_comma_char(Comma)},
+    term_to_atom_blanks,
+    term_to_atom_arguments(Args)
+  ; {Args = []}
+  ).
+
+term_to_atom_functor(Functor) -->
+  term_to_atom_quoted_atom(Functor),
+  !.
+term_to_atom_functor(Functor) -->
+  term_to_atom_bare_atom(Functor),
+  !.
+term_to_atom_functor(Functor) -->
+  term_to_atom_symbol_atom(Functor).
+
+term_to_atom_quoted_atom(Atom) -->
+  [Quote],
+  {term_to_atom_quote_char(Quote)},
+  term_to_atom_single_quoted_chars(Chars),
+  [Quote],
+  {atom_chars(Atom, Chars)}.
+
+term_to_atom_single_quoted_chars([Char|Chars]) -->
+  term_to_atom_single_quoted_char(Char),
+  !,
+  term_to_atom_single_quoted_chars(Chars).
+term_to_atom_single_quoted_chars([]) -->
+  [].
+
+term_to_atom_single_quoted_char(Char) -->
+  [Escape, Char],
+  {term_to_atom_backslash_char(Escape), term_to_atom_quote_char(Char)}.
+term_to_atom_single_quoted_char(Char) -->
+  [Escape, Char],
+  {term_to_atom_backslash_char(Escape), term_to_atom_backslash_char(Char)}.
+term_to_atom_single_quoted_char(Char) -->
+  [Char],
+  {\+ term_to_atom_quote_char(Char), \+ term_to_atom_backslash_char(Char)}.
+
+term_to_atom_bare_atom(Atom) -->
+  term_to_atom_bare_atom_chars(Chars),
+  {atom_chars(Atom, Chars)}.
+
+term_to_atom_symbol_atom(Atom) -->
+  term_to_atom_symbol_atom_chars(Chars),
+  {atom_chars(Atom, Chars)}.
+
+term_to_atom_bare_atom_chars([Head|Tail]) -->
+  [Head],
+  {term_to_atom_lowercase_char(Head)},
+  term_to_atom_bare_atom_tail_chars(Tail).
+
+term_to_atom_bare_atom_tail_chars([Head|Tail]) -->
+  [Head],
+  {term_to_atom_identifier_char(Head)},
+  !,
+  term_to_atom_bare_atom_tail_chars(Tail).
+term_to_atom_bare_atom_tail_chars([]) -->
+  [].
+
+term_to_atom_symbol_atom_chars([Head|Tail]) -->
+  [Head],
+  {term_to_atom_symbol_char(Head)},
+  term_to_atom_symbol_atom_tail_chars(Tail).
+
+term_to_atom_symbol_atom_tail_chars([Head|Tail]) -->
+  [Head],
+  {term_to_atom_token_char(Head)},
+  !,
+  term_to_atom_symbol_atom_tail_chars(Tail).
+term_to_atom_symbol_atom_tail_chars([]) -->
+  [].
+
+term_to_atom_token([Head|Tail]) -->
+  [Head],
+  {term_to_atom_token_char(Head)},
+  term_to_atom_token_tail(Tail).
+
+term_to_atom_token_tail([Head|Tail]) -->
+  [Head],
+  {term_to_atom_token_char(Head)},
+  !,
+  term_to_atom_token_tail(Tail).
+term_to_atom_token_tail([]) -->
+  [].
+
+term_to_atom_blanks -->
+  [Char],
+  {term_to_atom_blank(Char)},
+  !,
+  term_to_atom_blanks.
+term_to_atom_blanks -->
+  [].
+
+term_to_atom_blank(' ').
+term_to_atom_blank('\n').
+term_to_atom_blank('\r').
+term_to_atom_blank('\t').
+
+term_to_atom_token_char(Char) :-
+  \+term_to_atom_blank(Char),
+  \+term_to_atom_lparen_char(Char),
+  \+term_to_atom_rparen_char(Char),
+  \+term_to_atom_lbracket_char(Char),
+  \+term_to_atom_rbracket_char(Char),
+  \+term_to_atom_comma_char(Char),
+  \+term_to_atom_pipe_char(Char).
+
+term_to_atom_identifier_char(Char) :-
+  term_to_atom_lowercase_char(Char).
+term_to_atom_identifier_char(Char) :-
+  term_to_atom_uppercase_char(Char).
+term_to_atom_identifier_char(Char) :-
+  term_to_atom_digit_char(Char).
+term_to_atom_identifier_char('_').
+
+term_to_atom_symbol_char(Char) :-
+  term_to_atom_token_char(Char),
+  \+term_to_atom_identifier_char(Char).
+
+term_to_atom_lowercase_char(Char) :-
+  char_code(Char, Code),
+  Code >= 97,
+  Code =< 122.
+
+term_to_atom_uppercase_char(Char) :-
+  char_code(Char, Code),
+  Code >= 65,
+  Code =< 90.
+
+term_to_atom_digit_char(Char) :-
+  char_code(Char, Code),
+  Code >= 48,
+  Code =< 57.
+
+term_to_atom_quote_char(Char) :-
+  char_code(Char, 39).
+
+term_to_atom_backslash_char(Char) :-
+  char_code(Char, 92).
+
+term_to_atom_double_quote_char(Char) :-
+  char_code(Char, 34).
+
+term_to_atom_lparen_char(Char) :-
+  char_code(Char, 40).
+
+term_to_atom_rparen_char(Char) :-
+  char_code(Char, 41).
+
+term_to_atom_comma_char(Char) :-
+  char_code(Char, 44).
+
+term_to_atom_lbracket_char(Char) :-
+  char_code(Char, 91).
+
+term_to_atom_rbracket_char(Char) :-
+  char_code(Char, 93).
+
+term_to_atom_pipe_char(Char) :-
+  char_code(Char, 124).
+
+%! atomic_list_concat(+List, ?Atom) is det.
+%
+% Unifies Atom with the concatenation of the atomic textual representation of
+% each element in List.
+%
+% where:
+%
+% - List is a proper list of ground terms. Each element is converted using term_to_atom/2, so atoms, numbers,
+%   double-quoted strings, lists and compounds are supported;
+% - Atom is an atom representing the concatenation of the textual representation of each element in List.
+%
+% Throws:
+%
+% - error(instantiation_error, atomic_list_concat/2) when List is insufficiently instantiated;
+% - error(type_error(list, List), atomic_list_concat/2) when List is not a proper list.
+atomic_list_concat(List, Atom) :-
+  atomic_list_concat_must_be_list(List, atomic_list_concat/2),
+  atomic_list_concat_parts(List, '', Atom).
+
+%! atomic_list_concat(+List, +Separator, ?Atom) is det.
+%
+% Unifies Atom with the concatenation of the atomic textual representation of
+% each element in List, inserting Separator between adjacent elements.
+%
+% where:
+%
+% - List is a proper list of ground terms. Each element is converted using term_to_atom/2, so atoms, numbers,
+%   double-quoted strings, lists and compounds are supported;
+% - Separator is an atom inserted between adjacent elements;
+% - Atom is an atom representing the concatenation of the textual representation of each element in List.
+%
+% Throws:
+%
+% - error(instantiation_error, atomic_list_concat/3) when List or Separator is insufficiently instantiated;
+% - error(type_error(list, List), atomic_list_concat/3) when List is not a proper list;
+% - error(type_error(atom, Separator), atomic_list_concat/3) when Separator is instantiated but is not an atom.
+atomic_list_concat(List, Separator, Atom) :-
+  atomic_list_concat_must_be_list(List, atomic_list_concat/3),
+  ( var(Separator)
+  -> throw(error(instantiation_error, atomic_list_concat/3))
+  ; atom(Separator)
+  -> atomic_list_concat_parts(List, Separator, Atom)
+  ; throw(error(type_error(atom, Separator), atomic_list_concat/3))
+  ).
+
+atomic_list_concat_parts([], _, '').
+atomic_list_concat_parts([Head|Tail], Separator, Atom) :-
+  term_to_atom(Head, HeadAtom),
+  atomic_list_concat_tail_parts(Tail, Separator, HeadAtom, Atom).
+
+atomic_list_concat_tail_parts([], _, Atom, Atom).
+atomic_list_concat_tail_parts([Head|Tail], Separator, Prefix, Atom) :-
+  term_to_atom(Head, HeadAtom),
+  atom_concat(Prefix, Separator, WithSeparator),
+  atom_concat(WithSeparator, HeadAtom, NextPrefix),
+  atomic_list_concat_tail_parts(Tail, Separator, NextPrefix, Atom).
+
+atomic_list_concat_must_be_list(List, Context) :-
+  ( var(List)
+  -> throw(error(instantiation_error, Context))
+  ; atomic_list_concat_is_partial_list(List)
+  -> throw(error(instantiation_error, Context))
+  ; atomic_list_concat_is_list(List)
+  -> true
+  ; throw(error(type_error(list, List), Context))
+  ).
+
+atomic_list_concat_is_list([]).
+atomic_list_concat_is_list([_|Tail]) :-
+  nonvar(Tail),
+  atomic_list_concat_is_list(Tail).
+
+atomic_list_concat_is_partial_list([_|Tail]) :-
+  ( var(Tail)
+  ; nonvar(Tail),
+    atomic_list_concat_is_partial_list(Tail)
+  ).
+
 % memberchk(?Elem, +List) is semidet.
 %
 % Succeeds if Elem is a member of List. This is a deterministic predicate
