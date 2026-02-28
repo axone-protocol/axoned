@@ -16,7 +16,7 @@ Feature: atomic_list_concat/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4295
+      gas_used: 4244
       answer:
         has_more: false
         variables: ["Atom"]
