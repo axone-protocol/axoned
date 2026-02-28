@@ -72,6 +72,40 @@ bank_spendable_balances(Address, Balances) :-
     close(Stream)
   ).
 
+%! bank_locked_balances(+Address, -Balances) is det.
+%
+% Unifies Balances with the list of locked coin balances for the given account Address.
+% The address must be instantiated (non-variable) and in Bech32 format.
+%
+% Returned term shape:
+% ```prolog
+% [Denom-Amount, ...]
+% ```
+%
+% where:
+% - Denom is an atom representing the coin denomination.
+% - Amount is an integer when it fits in int64, otherwise an atom preserving full precision.
+% - The list is sorted by denomination.
+%
+% Throws instantiation_error if Address is a variable.
+% Throws domain_error(encoding(bech32), Address) if Address is not a valid Bech32 address.
+%
+% Examples:
+% ```prolog
+% ?- bank_locked_balances('axone1...', Balances).
+% Balances = [uatom-100, uaxone-200].
+% ```
+bank_locked_balances(Address, Balances) :-
+  must_be(nonvar, Address),
+  validate_bech32_address(Address, bank_locked_balances/2),
+  atom_concat('/v1/bank/', Address, Path1),
+  atom_concat(Path1, '/locked/@', Path),
+  setup_call_cleanup(
+    open(Path, read, Stream, [type(text)]),
+    read_terms_from_stream(Stream, Balances),
+    close(Stream)
+  ).
+
 % validate_bech32_address(+Address, +Context) is det.
 %
 % Verifies that Address is valid Bech32 and maps only this specific validation error
