@@ -5,30 +5,264 @@ sidebar_position: 16
 
 # bank_locked_balances/2
 
+## Module
+
+This predicate is provided by `bank.pl`.
+
+Load this module before using the predicate:
+
+```prolog
+:- consult('/v1/lib/bank.pl').
+```
+
 ## Description
 
-`bank_locked_balances/2` is a predicate which unifies the given terms with the list of locked coins of the given account.
+Unifies Balances with the list of locked coin balances for the given account Address.
+The address must be instantiated (non-variable) and in Bech32 format.
 
-The signature is as follows:
+Returned term shape:
 
-```text
-bank_locked_balances(?Address, ?Balances)
+```prolog
+[Denom-Amount, ...]
 ```
 
 where:
 
-- Address represents the account address \(in Bech32 format\).
-- Balances represents the locked balances of the account as a list of pairs of coin denomination and amount.
+- Denom is an atom representing the coin denomination.
+- Amount is an integer when it fits in int64, otherwise an atom preserving full precision.
+- The list is sorted by denomination.
+
+Throws instantiation_error if Address is a variable.
+Throws domain_error(encoding(bech32), Address) if Address is not a valid Bech32 address.
+
+Examples:
+
+```prolog
+?- bank_locked_balances('axone1...', Balances).
+Balances = [uatom-100, uaxone-200].
+```
+
+## Signature
+
+```text
+bank_locked_balances(+Address, -Balances) is det
+```
 
 ## Examples
 
-```text
-# Query the locked coins of the account.
-- bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', X).
+### Query locked balances of an account with coins
 
-# Query the locked balances of all accounts. The result is a list of pairs of account address and balances.
-- bank_locked_balances(X, Y).
+This scenario demonstrates how to query the locked balances of an account.
 
-# Query the first locked balances of the given account by unifying the denomination and amount with the given terms.
-- bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', [-(D, A), _]).
+Here are the steps of the scenario:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/bank.pl').
+```
+
+- **And** the account "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa" has the following locked balances:
+
+| key | value |
+| --- | ----- |
+| denom | amount |
+| uaxone | 300 |
+| uatom | 125 |
+
+- **Given** the query:
+
+```  prolog
+bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', Balances).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 4033
+answer:
+  has_more: false
+  variables: ["Balances"]
+  results:
+  - substitutions:
+    - variable: Balances
+      expression: "[uatom-125,uaxone-300]"
+```
+
+### Query locked balances of an account with no coins
+
+This scenario demonstrates querying locked balances for an account that currently has no locked coin.
+
+Here are the steps of the scenario:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/bank.pl').
+```
+
+- **And** the account "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep" has the following locked balances:
+
+| key | value |
+| --- | ----- |
+| denom | amount |
+
+- **Given** the query:
+
+```  prolog
+bank_locked_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', Balances).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 4017
+answer:
+  has_more: false
+  variables: ["Balances"]
+  results:
+  - substitutions:
+    - variable: Balances
+      expression: "[]"
+```
+
+### Use member/2 to check for a specific locked coin
+
+This scenario demonstrates using member/2 to retrieve one specific locked denomination.
+
+Here are the steps of the scenario:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/bank.pl').
+
+locked_has_coin(Address, Denom, Amount) :-
+    bank_locked_balances(Address, Balances),
+    member(Denom-Amount, Balances).
+```
+
+- **And** the account "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa" has the following locked balances:
+
+| key | value |
+| --- | ----- |
+| denom | amount |
+| uaxone | 1000 |
+| uatom | 500 |
+
+- **Given** the query:
+
+```  prolog
+locked_has_coin('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', uaxone, Amount).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 4037
+answer:
+  has_more: false
+  variables: ["Amount"]
+  results:
+  - substitutions:
+    - variable: Amount
+      expression: "1000"
+```
+
+### Fail when address is a variable
+
+This scenario shows what happens when the address argument is left unbound.
+
+Here are the steps of the scenario:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/bank.pl').
+```
+
+- **Given** the query:
+
+```  prolog
+bank_locked_balances(Address, Balances).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 4002
+answer:
+  has_more: false
+  variables: ["Address", "Balances"]
+  results:
+  - error: "error(instantiation_error,must_be/2)"
+```
+
+### Fail with invalid address format
+
+This scenario shows the error returned when the address is not a valid Bech32 value.
+
+Here are the steps of the scenario:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/bank.pl').
+```
+
+- **Given** the query:
+
+```  prolog
+bank_locked_balances('invalid_address', Balances).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 3999
+answer:
+  has_more: false
+  variables: ["Balances"]
+  results:
+  - error: "error(domain_error(encoding(bech32),invalid_address),bank_locked_balances/2)"
+```
+
+### Fail when address is not an atom
+
+This scenario shows that the address must be an atom (e.g. a Bech32 string), not a number.
+
+Here are the steps of the scenario:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/bank.pl').
+```
+
+- **Given** the query:
+
+```  prolog
+bank_locked_balances(42, _).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 3999
+answer:
+  has_more: false
+  results:
+  - error: "error(type_error(atom,42),bech32_address/2)"
 ```
