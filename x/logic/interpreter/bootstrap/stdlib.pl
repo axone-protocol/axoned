@@ -713,15 +713,27 @@ atomic_list_concat(List, Separator, Atom) :-
 
 atomic_list_concat_parts([], _, '').
 atomic_list_concat_parts([Head|Tail], Separator, Atom) :-
-  term_to_atom(Head, HeadAtom),
-  atomic_list_concat_tail_parts(Tail, Separator, HeadAtom, Atom).
+  atom_chars(Separator, SeparatorChars),
+  term_to_atom_chars(Head, HeadChars),
+  atomic_list_concat_collect_chars(Tail, SeparatorChars, [HeadChars], CharLists),
+  atomic_list_concat_flatten_fast(CharLists, Chars),
+  atom_chars(Atom, Chars).
 
-atomic_list_concat_tail_parts([], _, Atom, Atom).
-atomic_list_concat_tail_parts([Head|Tail], Separator, Prefix, Atom) :-
-  term_to_atom(Head, HeadAtom),
-  atom_concat(Prefix, Separator, WithSeparator),
-  atom_concat(WithSeparator, HeadAtom, NextPrefix),
-  atomic_list_concat_tail_parts(Tail, Separator, NextPrefix, Atom).
+% Collect character lists in reverse order
+atomic_list_concat_collect_chars([], _, Acc, Acc).
+atomic_list_concat_collect_chars([Head|Tail], SeparatorChars, Acc, CharLists) :-
+  term_to_atom_chars(Head, HeadChars),
+  atomic_list_concat_collect_chars(Tail, SeparatorChars, [HeadChars, SeparatorChars|Acc], CharLists).
+
+% Flatten by computing total length first, then building result
+atomic_list_concat_flatten_fast(CharLists, Chars) :-
+  atomic_list_concat_flatten_reverse(CharLists, [], Chars).
+
+% Flatten from right to left (reversed list) to avoid O(n²) appends
+atomic_list_concat_flatten_reverse([], Acc, Acc).
+atomic_list_concat_flatten_reverse([Chars|Rest], Acc, Result) :-
+  append(Chars, Acc, NewAcc),
+  atomic_list_concat_flatten_reverse(Rest, NewAcc, Result).
 
 atomic_list_concat_must_be_list(List, Context) :-
   ( var(List)
