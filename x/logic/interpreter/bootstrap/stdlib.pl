@@ -730,6 +730,10 @@ atomic_list_concat_flatten_fast(CharLists, Chars) :-
   atomic_list_concat_flatten_reverse(CharLists, [], Chars).
 
 % Flatten from right to left (reversed list) to avoid O(n²) appends
+% This is efficient because we append small character lists (one element at a time)
+% to a growing accumulator. Since append(SmallList, BigList, Result) is O(|SmallList|),
+% and each character list is small (length of one element's representation),
+% the total complexity is O(total_chars) which is optimal.
 atomic_list_concat_flatten_reverse([], Acc, Acc).
 atomic_list_concat_flatten_reverse([Chars|Rest], Acc, Result) :-
   append(Chars, Acc, NewAcc),
