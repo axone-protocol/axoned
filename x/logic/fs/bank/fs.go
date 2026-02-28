@@ -24,6 +24,7 @@ import (
 const (
 	balancesPath  = "balances"
 	spendablePath = "spendable"
+	lockedPath    = "locked"
 	atPath        = "@"
 )
 
@@ -100,6 +101,10 @@ func (f *vfs) validatePath(subpath string) (sdk.AccAddress, balancesFetcher, err
 	case spendablePath:
 		return addr, func(ctx context.Context, keeper types.BankKeeper, accAddr sdk.AccAddress) sdk.Coins {
 			return keeper.SpendableCoins(ctx, accAddr)
+		}, nil
+	case lockedPath:
+		return addr, func(ctx context.Context, keeper types.BankKeeper, accAddr sdk.AccAddress) sdk.Coins {
+			return keeper.LockedCoins(ctx, accAddr)
 		}, nil
 	default:
 		return nil, nil, fs.ErrNotExist
