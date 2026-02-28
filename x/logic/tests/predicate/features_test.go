@@ -205,6 +205,21 @@ func givenTheAccountHasTheFollowingSpendableBalances(ctx context.Context, addres
 	return nil
 }
 
+func givenTheAccountHasTheFollowingLockedBalances(ctx context.Context, address string, balancesTable *godog.Table) error {
+	addr, coins, err := addressAndCoinsFromBalancesTable(address, balancesTable)
+	if err != nil {
+		return err
+	}
+
+	bankKeeper := testCaseFromContext(ctx).bankKeeper
+	bankKeeper.EXPECT().
+		LockedCoins(gomock.Any(), addr).
+		Return(coins).
+		AnyTimes()
+
+	return nil
+}
+
 func whenTheQueryIsRun(ctx context.Context) error {
 	tc := testCaseFromContext(ctx)
 
@@ -311,6 +326,7 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 		ctx.Given(`the CosmWasm smart contract "([^"]+)" and the behavior:`, givenASmartContractWithAddress)
 		ctx.Given(`the account "([^"]+)" has the following balances:`, givenTheAccountHasTheFollowingBalances)
 		ctx.Given(`the account "([^"]+)" has the following spendable balances:`, givenTheAccountHasTheFollowingSpendableBalances)
+		ctx.Given(`the account "([^"]+)" has the following locked balances:`, givenTheAccountHasTheFollowingLockedBalances)
 		ctx.Given(`the query:`, givenTheQuery)
 		ctx.Given(`the program:`, givenTheProgram)
 		ctx.When(`^the query is run$`, whenTheQueryIsRun)

@@ -78,6 +78,25 @@ func TestVFS(t *testing.T) {
 			})
 		})
 
+		Convey("When reading a valid locked balances file", func() {
+			coins := sdk.NewCoins(
+				sdk.NewCoin("uatom", math.NewInt(20)),
+				sdk.NewCoin("uaxone", math.NewInt(50)),
+			)
+
+			mockBankKeeper.EXPECT().
+				LockedCoins(gomock.Any(), sdk.MustAccAddressFromBech32(addr)).
+				Return(coins)
+
+			data, err := bankFS.ReadFile(addr + "/locked/@")
+
+			Convey("Then it should return the locked balances as Prolog terms", func() {
+				So(err, ShouldBeNil)
+				So(string(data), ShouldContainSubstring, "-(uatom,20)")
+				So(string(data), ShouldContainSubstring, "-(uaxone,50)")
+			})
+		})
+
 		Convey("When reading with invalid paths", func() {
 			cases := []struct {
 				name    string
