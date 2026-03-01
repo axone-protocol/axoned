@@ -108,7 +108,7 @@ jobs:
         uses: golangci/golangci-lint-action@v9
         if: steps.changed-go-files.outputs.any_changed == 'true'
         with:
-          version: v2.1.6
+          version: v2.10.1
 
       - name: Verify Go modules are tidy
         if: steps.changed-go-files.outputs.any_changed == 'true'
