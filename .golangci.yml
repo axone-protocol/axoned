@@ -27,6 +27,7 @@ linters:
     - ineffassign
     - lll
     - makezero
+    - modernize
     - nakedret
     - nestif
     - nilerr

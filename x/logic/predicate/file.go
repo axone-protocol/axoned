@@ -2,6 +2,7 @@ package predicate
 
 import (
 	"context"
+	"slices"
 
 	"github.com/axone-protocol/prolog/v3/engine"
 
@@ -42,10 +43,8 @@ func SourceFile(vm *engine.VM, file engine.Term, cont engine.Cont, env *engine.E
 		return engine.Delay(promises...)
 	case engine.Atom:
 		inputFile := file.String()
-		for i := range loaded {
-			if loaded[i] == inputFile {
-				return cont(env)
-			}
+		if slices.Contains(loaded, inputFile) {
+			return cont(env)
 		}
 		return engine.Bool(false)
 	default:

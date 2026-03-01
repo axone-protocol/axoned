@@ -75,7 +75,7 @@ func TestSysHeaderVFSOpen(t *testing.T) {
 
 			content, err := io.ReadAll(f)
 			So(err, ShouldBeNil)
-			So(content, ShouldResemble, []byte(fmt.Sprintf("%d.\n", headerTime.Unix())))
+			So(content, ShouldResemble, fmt.Appendf(nil, "%d.\n", headerTime.Unix()))
 		})
 	})
 }
