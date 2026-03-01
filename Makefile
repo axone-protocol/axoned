@@ -169,12 +169,21 @@ all: help
 lint: lint-go lint-proto ## Lint all available linters
 
 .PHONY: lint-go
-lint-go: lint-go-golangci ## Lint go source code
+lint-go: lint-go-golangci lint-go-gofumpt ## Lint go source code
 
 .PHONY: lint-go-golangci
 lint-go-golangci: $(TOOL_GOLANGCI_BIN) ## Lint go source code with golangci-lint
 	@$(call echo_msg, 🔍, Inspecting, go source code, [golangci-lint]...)
 	@$(TOOL_GOLANGCI_BIN) run -v
+
+.PHONY: lint-go-gofumpt
+lint-go-gofumpt: $(TOOL_GOFUMPT_BIN) ## Lint go source code format with gofumpt
+	@$(call echo_msg, 🔍, Inspecting, go source code, [gofumpt]...)
+	@if [ "$$($(TOOL_GOFUMPT_BIN) -l .)" != "" ]; then \
+		echo "❌ Code is not gofumpt!"; \
+		exit 1; \
+	fi
+	@echo "✅ Code is gofumpt!"
 
 .PHONY: lint-proto
 lint-proto: ## Lint proto files

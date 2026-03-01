@@ -112,6 +112,7 @@ Targets:
     lint                Lint all available linters
     lint-go             Lint go source code
     lint-go-golangci    Lint go source code with golangci-lint
+    lint-go-gofumpt     Lint go source code format with gofumpt
     lint-proto          Lint proto files
   Format:
     format              Run all available formatters
