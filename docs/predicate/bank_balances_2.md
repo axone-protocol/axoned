@@ -82,7 +82,7 @@ bank_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', Balances).
 
 ```  yaml
 height: 42
-gas_used: 4033
+gas_used: 3835
 answer:
   has_more: false
   variables: ["Balances"]
@@ -121,7 +121,7 @@ bank_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', Balances).
 
 ```  yaml
 height: 42
-gas_used: 4017
+gas_used: 3819
 answer:
   has_more: false
   variables: ["Balances"]
@@ -166,7 +166,7 @@ first_denom('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', Denom).
 
 ```  yaml
 height: 42
-gas_used: 4035
+gas_used: 3837
 answer:
   has_more: false
   variables: ["Denom"]
@@ -211,7 +211,7 @@ has_coin('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', uaxone, Amount).
 
 ```  yaml
 height: 42
-gas_used: 4037
+gas_used: 3839
 answer:
   has_more: false
   variables: ["Amount"]
@@ -244,7 +244,7 @@ bank_balances(Address, Balances).
 
 ```  yaml
 height: 42
-gas_used: 4002
+gas_used: 3804
 answer:
   has_more: false
   variables: ["Address", "Balances"]
@@ -275,7 +275,7 @@ bank_balances('invalid_address', Balances).
 
 ```  yaml
 height: 42
-gas_used: 3999
+gas_used: 3801
 answer:
   has_more: false
   variables: ["Balances"]
@@ -306,7 +306,7 @@ bank_balances(42, _).
 
 ```  yaml
 height: 42
-gas_used: 3999
+gas_used: 3801
 answer:
   has_more: false
   results:

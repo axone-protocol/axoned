@@ -21,6 +21,7 @@ import (
 var upgrades = []string{
 	"v11.0.0",
 	"v13.0.0",
+	"v15.0.0",
 }
 
 // registerUpgradeHandlers registers the chain upgrade handlers.

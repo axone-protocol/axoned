@@ -9,14 +9,12 @@ import (
 	"github.com/axone-protocol/prolog/v3"
 	"github.com/axone-protocol/prolog/v3/engine"
 	"github.com/samber/lo"
-	orderedmap "github.com/wk8/go-ordered-map/v2"
 
 	errorsmod "cosmossdk.io/errors"
 	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/filtered"
 	"github.com/axone-protocol/axoned/v14/x/logic/interpreter"
 	"github.com/axone-protocol/axoned/v14/x/logic/interpreter/bootstrap"
 	"github.com/axone-protocol/axoned/v14/x/logic/meter"
@@ -82,17 +80,6 @@ func (k Keeper) queryInterpreter(
 func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolog.Interpreter, fmt.Stringer, error) {
 	sdkctx := sdk.UnwrapSDKContext(ctx)
 
-	interpreterParams := params.GetInterpreter()
-	whitelistPredicates := util.NonZeroOrDefault(interpreterParams.PredicatesFilter.Whitelist, interpreter.RegistryNames)
-	blacklistPredicates := interpreterParams.PredicatesFilter.Blacklist
-
-	whitelistUrls := lo.Map(
-		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Whitelist, []string{}),
-		util.Indexed(util.ParseURLMust))
-	blacklistUrls := lo.Map(
-		util.NonZeroOrDefault(interpreterParams.VirtualFilesFilter.Blacklist, []string{}),
-		util.Indexed(util.ParseURLMust))
-
 	var userOutputBuffer writerStringer
 	limits := params.GetLimits()
 	if limits.MaxUserOutputSize > 0 {
@@ -108,14 +95,13 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 
 	options := []interpreter.Option{
 		interpreter.WithHooks(
-			whitelistBlacklistHookFn(whitelistPredicates, blacklistPredicates),
 			gasMeterHookFn(sdkctx, params.GetGasPolicy()),
 			telemetryPredicateCallCounterHookFn(),
 			telemetryPredicateDurationHookFn(),
 		),
 		interpreter.WithPredicates(ctx, interpreter.RegistryNames),
-		interpreter.WithBootstrap(ctx, util.NonZeroOrDefault(interpreterParams.GetBootstrap(), bootstrap.Bootstrap())),
-		interpreter.WithFS(filtered.NewFS(fsProvider, whitelistUrls, blacklistUrls)),
+		interpreter.WithBootstrap(ctx, bootstrap.Bootstrap()),
+		interpreter.WithFS(fsProvider),
 		interpreter.WithUserOutputWriter(userOutputBuffer),
 		interpreter.WithMaxVariables(limits.MaxVariables),
 	}
@@ -123,45 +109,6 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 	i, err := interpreter.New(options...)
 
 	return i, userOutputBuffer, err
-}
-
-// whitelistBlacklistHookFn returns a hook function that checks if the given predicate is allowed to be executed.
-// The predicate is allowed if it is in the whitelist or not in the blacklist.
-func whitelistBlacklistHookFn(whitelist, blacklist []string) engine.HookFunc {
-	allowed := lo.Reduce(
-		lo.Filter(interpreter.RegistryNames,
-			util.Indexed(util.WhitelistBlacklistMatches(whitelist, blacklist, prolog2.PredicateMatches))),
-		func(agg *orderedmap.OrderedMap[string, struct{}], item string, _ int) *orderedmap.OrderedMap[string, struct{}] {
-			agg.Set(item, struct{}{})
-			return agg
-		},
-		orderedmap.New[string, struct{}](orderedmap.WithCapacity[string, struct{}](len(interpreter.RegistryNames))))
-
-	return func(opcode engine.Opcode, operand engine.Term, env *engine.Env) error {
-		if opcode != engine.OpCall {
-			return nil
-		}
-
-		predicate, ok := stringifyOperand(operand)
-		if !ok {
-			return engine.SyntaxError(operand, env)
-		}
-
-		if !interpreter.IsRegistered(predicate) {
-			return nil
-		}
-
-		if _, found := allowed.Get(predicate); !found {
-			return engine.PermissionError(
-				prolog2.AtomOperationExecute,
-				prolog2.AtomPermissionForbiddenPredicate,
-				engine.NewAtom(predicate),
-				env,
-			)
-		}
-
-		return nil
-	}
 }
 
 // gasMeterHookFn returns a hook function that consumes gas based on the cost of the executed predicate.

@@ -47,7 +47,7 @@ assert_fact, father(X, Y).
 
 ```  yaml
 height: 42
-gas_used: 3977
+gas_used: 3779
 answer:
   has_more: false
   variables: ["X", "Y"]
@@ -83,7 +83,7 @@ assertz(parent(john, alice)).
 
 ```  yaml
 height: 42
-gas_used: 3975
+gas_used: 3777
 answer:
   has_more: false
   results:
@@ -120,7 +120,7 @@ assert_fact, parent(X, alice).
 
 ```  yaml
 height: 42
-gas_used: 3977
+gas_used: 3779
 answer:
   has_more: false
   variables: ["X"]
@@ -164,7 +164,7 @@ findall(I, inventory(I), CurrentInventory).
 
 ```  yaml
 height: 42
-gas_used: 3984
+gas_used: 3786
 answer:
   has_more: false
   variables: ["I","CurrentInventory"]

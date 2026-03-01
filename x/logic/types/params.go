@@ -2,7 +2,6 @@ package types
 
 import (
 	"fmt"
-	"net/url"
 )
 
 // Parameter store keys.
@@ -11,18 +10,16 @@ var (
 )
 
 // NewParams creates a new Params object.
-func NewParams(interpreter Interpreter, limits Limits, gasPolicy GasPolicy) Params {
+func NewParams(limits Limits, gasPolicy GasPolicy) Params {
 	return Params{
-		Interpreter: interpreter,
-		Limits:      limits,
-		GasPolicy:   gasPolicy,
+		Limits:    limits,
+		GasPolicy: gasPolicy,
 	}
 }
 
 // DefaultParams returns a default set of parameters.
 func DefaultParams() Params {
 	return NewParams(
-		NewInterpreter(),
 		NewLimits(
 			WithMaxSize(5000),
 			WithMaxResultCount(3),
@@ -35,92 +32,12 @@ func DefaultParams() Params {
 
 // Validate validates the set of params.
 func (p Params) Validate() error {
-	if err := validateInterpreter(p.Interpreter); err != nil {
-		return err
-	}
 	return validateLimits(p.Limits)
 }
 
 // String implements the Stringer interface.
 func (p Params) String() string {
-	return p.Interpreter.String() + "\n" +
-		p.Limits.String()
-}
-
-// NewInterpreter creates a new Interpreter with the given options.
-func NewInterpreter(opts ...InterpreterOption) Interpreter {
-	i := Interpreter{}
-	for _, opt := range opts {
-		opt(&i)
-	}
-
-	if i.PredicatesFilter.Whitelist == nil {
-		i.PredicatesFilter.Whitelist = []string{}
-	}
-
-	if i.PredicatesFilter.Blacklist == nil {
-		i.PredicatesFilter.Blacklist = []string{}
-	}
-
-	return i
-}
-
-// InterpreterOption is a functional option for configuring the Interpreter.
-type InterpreterOption func(*Interpreter)
-
-// WithPredicatesWhitelist sets the whitelist of predicates.
-func WithPredicatesWhitelist(whitelist []string) InterpreterOption {
-	return func(i *Interpreter) {
-		i.PredicatesFilter.Whitelist = whitelist
-	}
-}
-
-// WithPredicatesBlacklist sets the blacklist of predicates.
-func WithPredicatesBlacklist(blacklist []string) InterpreterOption {
-	return func(i *Interpreter) {
-		i.PredicatesFilter.Blacklist = blacklist
-	}
-}
-
-// WithVirtualFilesWhitelist sets the whitelist of predicates.
-func WithVirtualFilesWhitelist(whitelist []string) InterpreterOption {
-	return func(i *Interpreter) {
-		i.VirtualFilesFilter.Whitelist = whitelist
-	}
-}
-
-// WithVirtualFilesBlacklist sets the blacklist of predicates.
-func WithVirtualFilesBlacklist(blacklist []string) InterpreterOption {
-	return func(i *Interpreter) {
-		i.VirtualFilesFilter.Blacklist = blacklist
-	}
-}
-
-// WithBootstrap sets the bootstrap program.
-func WithBootstrap(bootstrap string) InterpreterOption {
-	return func(i *Interpreter) {
-		i.Bootstrap = bootstrap
-	}
-}
-
-func validateInterpreter(i any) error {
-	interpreter, ok := i.(Interpreter)
-	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
-	}
-
-	for _, file := range interpreter.VirtualFilesFilter.Whitelist {
-		if _, err := url.Parse(file); err != nil {
-			return fmt.Errorf("invalid virtual file in whitelist: %s", file)
-		}
-	}
-	for _, file := range interpreter.VirtualFilesFilter.Blacklist {
-		if _, err := url.Parse(file); err != nil {
-			return fmt.Errorf("invalid virtual file in blacklist: %s", file)
-		}
-	}
-
-	return nil
+	return p.Limits.String() + "\n" + p.GasPolicy.String()
 }
 
 // LimitsOption is a functional option for configuring the Limits.

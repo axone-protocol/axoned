@@ -18,7 +18,7 @@ Feature: foldl/7
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3984
+      gas_used: 3786
       answer:
         has_more: false
         variables: ["Result"]
@@ -44,7 +44,7 @@ Feature: foldl/7
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3976
+      gas_used: 3778
       answer:
         has_more: false
         variables: ["Result"]
@@ -70,7 +70,7 @@ Feature: foldl/7
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3979
+      gas_used: 3781
       answer:
         has_more: false
         variables: ["Quads"]

@@ -15,7 +15,7 @@ Feature: base64/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3976
+      gas_used: 3778
       answer:
         has_more: false
         variables: ["Encoded", "Decoded"]

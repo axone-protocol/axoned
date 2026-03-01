@@ -76,7 +76,7 @@ comet_info(CometInfo).
 
 ```  yaml
 height: 42
-gas_used: 3991
+gas_used: 3793
 answer:
   has_more: false
   variables: ["CometInfo"]
@@ -114,7 +114,7 @@ proposer_address(Address).
 
 ```  yaml
 height: 42
-gas_used: 3994
+gas_used: 3796
 answer:
   has_more: false
   variables: ["Address"]
@@ -151,7 +151,7 @@ last_commit_round(Round).
 
 ```  yaml
 height: 42
-gas_used: 3995
+gas_used: 3797
 answer:
   has_more: false
   variables: ["Round"]
@@ -191,7 +191,7 @@ healthy_consensus_snapshot.
 
 ```  yaml
 height: 42
-gas_used: 3991
+gas_used: 3793
 answer:
   has_more: false
   results:

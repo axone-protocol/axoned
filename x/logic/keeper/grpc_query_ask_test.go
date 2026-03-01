@@ -32,24 +32,20 @@ import (
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
-//nolint:lll,gocognit
 func TestGRPCAsk(t *testing.T) {
 	emptySolution := types.Result{}
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
-			program               string
-			query                 string
-			limit                 uint64
-			maxResultCount        uint64
-			maxSize               uint64
-			predicateBlacklist    []string
-			virtualFilesWhitelist []string
-			virtualFilesBlacklist []string
-			maxGas                uint64
-			maxVariables          uint64
-			predicateCosts        map[string]uint64
-			expectedAnswer        *types.Answer
-			expectedError         string
+			program        string
+			query          string
+			limit          uint64
+			maxResultCount uint64
+			maxSize        uint64
+			maxGas         uint64
+			maxVariables   uint64
+			predicateCosts map[string]uint64
+			expectedAnswer *types.Answer
+			expectedError  string
 		}{
 			{
 				program: "foo.",
@@ -174,7 +170,7 @@ func TestGRPCAsk(t *testing.T) {
 				predicateCosts: map[string]uint64{
 					"consult/1": 10000,
 				},
-				expectedError: "out of gas: logic <consult/1> (11125/3000): limit exceeded",
+				expectedError: "out of gas: logic <consult/1> (11107/3000): limit exceeded",
 			},
 			{
 				program:       "recursionOfDeath :- recursionOfDeath.",
@@ -260,56 +256,6 @@ func TestGRPCAsk(t *testing.T) {
 				expectedAnswer: &types.Answer{
 					Variables: []string{"X", "O"},
 					Results:   []types.Result{{Error: "error(existence_error(procedure,father/3),root)"}},
-				},
-			},
-			{
-				program:            "header(X) :- consult('/v1/lib/chain.pl'), header_info(X).",
-				query:              "header(X).",
-				predicateBlacklist: []string{"consult/1"},
-				expectedAnswer: &types.Answer{
-					HasMore:   false,
-					Variables: []string{"X"},
-					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,consult/1),header/1)"}},
-				},
-			},
-			{
-				program:            "contains_forbidden_predicate(X) :- consult('/v1/lib/chain.pl'), header_info(X).",
-				query:              "contains_forbidden_predicate(X).",
-				predicateBlacklist: []string{"consult/1"},
-				expectedAnswer: &types.Answer{
-					HasMore:   false,
-					Variables: []string{"X"},
-					Results:   []types.Result{{Error: "error(permission_error(execute,forbidden_predicate,consult/1),contains_forbidden_predicate/1)"}},
-				},
-			},
-			{
-				program:            "cannot_be_blacklisted(X) :- X = 42.",
-				query:              "cannot_be_blacklisted(X).",
-				predicateBlacklist: []string{"cannot_be_blacklisted/1"},
-				expectedAnswer: &types.Answer{
-					HasMore:   false,
-					Variables: []string{"X"},
-					Results: []types.Result{{Substitutions: []types.Substitution{{
-						Variable: "X", Expression: "42",
-					}}}},
-				},
-			},
-			{
-				program:               `test :- open('cosmwasm:okp4-objectarium:okp41ffzp0xmjhwkltuxcvccl0z9tyfuu7txp5ke0tpkcjpzuq9fcj3pqrteqt3?query=%7B%22object_data%22%3A%7B%22id%22%3A%22content1%22%7D%7D', read, _, []).`,
-				query:                 "test.",
-				virtualFilesBlacklist: []string{"cosmwasm:"},
-				expectedAnswer: &types.Answer{
-					HasMore: false,
-					Results: []types.Result{{Error: "error(permission_error(open,source_sink,cosmwasm:okp4-objectarium:okp41ffzp0xmjhwkltuxcvccl0z9tyfuu7txp5ke0tpkcjpzuq9fcj3pqrteqt3?query=%7B%22object_data%22%3A%7B%22id%22%3A%22content1%22%7D%7D),open/4)"}},
-				},
-			},
-			{
-				program:               `test :- open('https://example.com/data.pl', read, _, []).`,
-				query:                 "test.",
-				virtualFilesWhitelist: []string{"cosmwasm:"},
-				expectedAnswer: &types.Answer{
-					HasMore: false,
-					Results: []types.Result{{Error: "error(permission_error(open,source_sink,https://example.com/data.pl),open/4)"}},
 				},
 			},
 			{
@@ -466,15 +412,6 @@ func TestGRPCAsk(t *testing.T) {
 					params.Limits.MaxSize = tc.maxSize
 					params.Limits.MaxVariables = tc.maxVariables
 
-					if tc.predicateBlacklist != nil {
-						params.Interpreter.PredicatesFilter.Blacklist = tc.predicateBlacklist
-					}
-					if tc.virtualFilesWhitelist != nil {
-						params.Interpreter.VirtualFilesFilter.Whitelist = tc.virtualFilesWhitelist
-					}
-					if tc.virtualFilesBlacklist != nil {
-						params.Interpreter.VirtualFilesFilter.Blacklist = tc.virtualFilesBlacklist
-					}
 					if tc.predicateCosts != nil {
 						predicateCosts := make([]types.PredicateCost, 0, len(tc.predicateCosts))
 						for predicate, cost := range tc.predicateCosts {

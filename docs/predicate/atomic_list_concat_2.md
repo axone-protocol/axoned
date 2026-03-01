@@ -56,7 +56,7 @@ atomic_list_concat([hello, '-', 42, '-', world], Atom).
 
 ```  yaml
 height: 42
-gas_used: 4295
+gas_used: 4097
 answer:
   has_more: false
   variables: ["Atom"]

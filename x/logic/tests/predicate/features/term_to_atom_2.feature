@@ -16,7 +16,7 @@ Feature: term_to_atom/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4172
+      gas_used: 3974
       answer:
         has_more: false
         variables: ["Atom"]
@@ -41,7 +41,7 @@ Feature: term_to_atom/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5033
+      gas_used: 4835
       answer:
         has_more: false
         variables: ["Term"]
@@ -64,7 +64,7 @@ Feature: term_to_atom/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3991
+      gas_used: 3793
       answer:
         has_more: false
         variables: ["Term", "Atom"]
@@ -85,7 +85,7 @@ Feature: term_to_atom/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3984
+      gas_used: 3786
       answer:
         has_more: false
         variables: ["Term"]
@@ -106,7 +106,7 @@ Feature: term_to_atom/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4473
+      gas_used: 4275
       answer:
         has_more: false
         variables: ["Term"]

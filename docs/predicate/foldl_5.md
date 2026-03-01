@@ -52,7 +52,7 @@ foldl(add_product, [1,2,3], [4,5,6], 0, DotProduct).
 
 ```  yaml
 height: 42
-gas_used: 3988
+gas_used: 3790
 answer:
   has_more: false
   variables: ["DotProduct"]
@@ -84,7 +84,7 @@ foldl(add_product, [], [], 99, Result).
 
 ```  yaml
 height: 42
-gas_used: 3976
+gas_used: 3778
 answer:
   has_more: false
   variables: ["Result"]
@@ -116,7 +116,7 @@ foldl(make_pair, [a,b], [1,2], [], Pairs).
 
 ```  yaml
 height: 42
-gas_used: 3982
+gas_used: 3784
 answer:
   has_more: false
   variables: ["Pairs"]

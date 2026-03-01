@@ -62,7 +62,7 @@ term_to_atom(greeting(hello, [world, 42]), Atom).
 
 ```  yaml
 height: 42
-gas_used: 4172
+gas_used: 3974
 answer:
   has_more: false
   variables: ["Atom"]
@@ -95,7 +95,7 @@ term_to_atom(Term, 'payload(\"hi\", [foo, 42])').
 
 ```  yaml
 height: 42
-gas_used: 5033
+gas_used: 4835
 answer:
   has_more: false
   variables: ["Term"]
