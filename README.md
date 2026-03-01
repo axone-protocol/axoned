@@ -112,7 +112,6 @@ Targets:
     lint                Lint all available linters
     lint-go             Lint go source code
     lint-go-golangci    Lint go source code with golangci-lint
-    lint-go-modernize   Lint go source code with modernize
     lint-proto          Lint proto files
   Format:
     format              Run all available formatters
@@ -149,11 +148,9 @@ Targets:
     release-assets      Generate release assets
   Dependencies:
     deps                Install all the dependencies (tools, etc.)
-    deps-tparse         Install tparse (v0.17.0)
     deps-heighliner     Install heighliner (v1.7.4)
     deps-cosmovisor     Install cosmovisor (v1.7.1)
     deps-golangci-lint  Install golangci-lint (v2.10.1)
-    deps-modernize      Install modernize (v0.20.0)
   Help:
     help                Show this help.
 
