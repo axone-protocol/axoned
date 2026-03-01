@@ -642,7 +642,8 @@ func New(
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 
-	appModules := []module.AppModule{
+	appModules := make([]module.AppModule, 0, 24)
+	appModules = append(appModules,
 		genutil.NewAppModule(
 			app.AccountKeeper,
 			app.StakingKeeper,
@@ -665,7 +666,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper), //nolint:staticcheck // x/params is deprecated upstream; retained until SDK replacement
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		circuit.NewAppModule(appCodec, app.CircuitKeeper),
-	}
+	)
 
 	appModules = append(appModules,
 		capability.NewAppModule(appCodec, *app.CapabilityKeeper, false),

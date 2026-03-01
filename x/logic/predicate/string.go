@@ -68,7 +68,7 @@ func ReadString(vm *engine.VM, stream, length, result engine.Term, cont engine.C
 	var r engine.Term = engine.NewAtom(builder.String())
 	return engine.Unify(
 		vm, prolog.Tuple(result, length),
-		prolog.Tuple(r, engine.Integer(totalLen)), cont, env) //nolint:gosec // disable G115
+		prolog.Tuple(r, engine.Integer(totalLen)), cont, env)
 }
 
 // StringBytes is a predicate that unifies a string with a list of bytes, returning true when the (Unicode) String is

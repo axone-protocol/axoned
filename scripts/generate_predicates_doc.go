@@ -501,18 +501,18 @@ func renderPrologPredicateMarkdown(
 	predicateDoc prologPredicateDocumentation, sidebarPosition int, feature *messages.Feature,
 ) string {
 	var out strings.Builder
-	out.WriteString(fmt.Sprintf("---\nsidebar_position: %d\n---\n", sidebarPosition))
+	fmt.Fprintf(&out, "---\nsidebar_position: %d\n---\n", sidebarPosition)
 	out.WriteString("[//]: # (This file is auto-generated. Please do not modify it yourself.)\n\n")
-	out.WriteString(fmt.Sprintf("# %s\n\n", predicateDoc.Predicate))
+	fmt.Fprintf(&out, "# %s\n\n", predicateDoc.Predicate)
 
 	out.WriteString("## Module\n\n")
 	if predicateDoc.IsBuiltin {
 		out.WriteString("Built-in predicate.\n")
 	} else {
-		out.WriteString(fmt.Sprintf("This predicate is provided by `%s`.\n\n", predicateDoc.ModulePath))
+		fmt.Fprintf(&out, "This predicate is provided by `%s`.\n\n", predicateDoc.ModulePath)
 		out.WriteString("Load this module before using the predicate:\n\n")
 		out.WriteString("```prolog\n")
-		out.WriteString(fmt.Sprintf(":- consult('/v1/lib/%s').\n", predicateDoc.ModulePath))
+		fmt.Fprintf(&out, ":- consult('/v1/lib/%s').\n", predicateDoc.ModulePath)
 		out.WriteString("```\n")
 	}
 
@@ -553,7 +553,7 @@ func renderFeatureExamples(feature *messages.Feature) string {
 		}
 
 		var out strings.Builder
-		out.WriteString(fmt.Sprintf("### %s\n\n", scenario.Name))
+		fmt.Fprintf(&out, "### %s\n\n", scenario.Name)
 
 		description := strings.TrimSpace(dedent.String(scenario.Description))
 		if description != "" {
@@ -562,14 +562,14 @@ func renderFeatureExamples(feature *messages.Feature) string {
 
 		out.WriteString("Here are the steps of the scenario:\n\n")
 		for _, step := range scenario.Steps {
-			out.WriteString(fmt.Sprintf("- **%s** %s\n", strings.TrimSpace(step.Keyword), step.Text))
+			fmt.Fprintf(&out, "- **%s** %s\n", strings.TrimSpace(step.Keyword), step.Text)
 
 			if step.DocString != nil {
 				mediaType := step.DocString.MediaType
 				if mediaType == "" {
 					mediaType = "text"
 				}
-				out.WriteString(fmt.Sprintf("\n``` %s\n%s\n```\n", mediaType, step.DocString.Content))
+				fmt.Fprintf(&out, "\n``` %s\n%s\n```\n", mediaType, step.DocString.Content)
 			}
 
 			if step.DataTable != nil {
@@ -578,7 +578,7 @@ func renderFeatureExamples(feature *messages.Feature) string {
 					if len(row.Cells) < 2 {
 						continue
 					}
-					out.WriteString(fmt.Sprintf("| %s | %s |\n", row.Cells[0].Value, row.Cells[1].Value))
+					fmt.Fprintf(&out, "| %s | %s |\n", row.Cells[0].Value, row.Cells[1].Value)
 				}
 			}
 		}
