@@ -124,7 +124,7 @@ jobs:
       - name: Lint go code (gofumpt)
         if: steps.changed-go-files.outputs.any_changed == 'true'
         run: |
-          go install mvdan.cc/gofumpt@v0.4.0
+          go install mvdan.cc/gofumpt@v0.9.2
           if [ "$(gofumpt -l .)" != "" ]; then
             echo "❌ Code is not gofumpt!"
             exit 1
