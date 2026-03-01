@@ -305,8 +305,8 @@ func isPrologDocCommentLine(line string) bool {
 func prologCommentLine(line string) string {
 	trimmed := strings.TrimSpace(line)
 	// Remove %! for doc comments, or just % for continuation lines
-	if strings.HasPrefix(trimmed, "%!") {
-		trimmed = strings.TrimPrefix(trimmed, "%!")
+	if after, found := strings.CutPrefix(trimmed, "%!"); found {
+		trimmed = after
 	} else {
 		trimmed = strings.TrimPrefix(trimmed, "%")
 	}

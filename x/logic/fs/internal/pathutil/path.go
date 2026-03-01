@@ -15,7 +15,7 @@ func NormalizeSubpath(name string) (string, error) {
 		return ".", nil
 	}
 
-	for _, segment := range strings.Split(trimmed, "/") {
+	for segment := range strings.SplitSeq(trimmed, "/") {
 		if segment == ".." {
 			return "", fs.ErrPermission
 		}
