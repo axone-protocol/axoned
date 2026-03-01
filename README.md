@@ -151,6 +151,7 @@ Targets:
     deps-heighliner     Install heighliner (v1.7.4)
     deps-cosmovisor     Install cosmovisor (v1.7.1)
     deps-golangci-lint  Install golangci-lint (v2.10.1)
+    deps-gofumpt        Install gofumpt (v0.7.0)
   Help:
     help                Show this help.
 

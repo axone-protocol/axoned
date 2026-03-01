@@ -41,6 +41,11 @@ TOOL_GOLANGCI_NAME       := golangci-lint
 TOOL_GOLANGCI_VERSION    := v2.10.1
 TOOL_GOLANGCI_BIN        := ${TOOLS_FOLDER}/$(TOOL_GOLANGCI_NAME)/$(TOOL_GOLANGCI_VERSION)/$(TOOL_GOLANGCI_NAME)
 
+TOOL_GOFUMPT_NAME        := gofumpt
+TOOL_GOFUMPT_VERSION     := v0.7.0
+TOOL_GOFUMPT_PKG         := mvdan.cc/$(TOOL_GOFUMPT_NAME)@$(TOOL_GOFUMPT_VERSION)
+TOOL_GOFUMPT_BIN         := ${TOOLS_FOLDER}/$(TOOL_GOFUMPT_NAME)/$(TOOL_GOFUMPT_VERSION)/$(TOOL_GOFUMPT_NAME)
+
 # Coverage settings
 COVERPKG := $(shell go list ./x/logic/... | grep -v '/tests/' | tr '\n' ',' | sed 's/,$$//')
 ALL_PKGS := $(shell go list ./... | grep -v '/vendor/')
@@ -181,14 +186,9 @@ lint-proto: ## Lint proto files
 format: format-go ## Run all available formatters
 
 .PHONY: format-go
-format-go: ## Format go files
+format-go: $(TOOL_GOFUMPT_BIN) ## Format go files
 	@${call echo_msg, 📐, Formatting, go source code, [gofumpt]...}
-	@docker run --rm \
-		-v `pwd`:/app:rw \
-		-w /app \
-		${DOCKER_IMAGE_GOLANG} \
-		sh -c \
-		"go install mvdan.cc/gofumpt@v0.7.0; gofumpt -w -l ."
+	@$(TOOL_GOFUMPT_BIN) -w -l .
 
 .PHONY: format-proto
 format-proto: ## Format proto files
@@ -501,7 +501,7 @@ ensure-buildx-builder:
 
 ## Dependencies:
 .PHONY: deps
-deps: deps-$(TOOL_GOLANGCI_NAME) deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) ## Install all the dependencies (tools, etc.)
+deps: deps-$(TOOL_GOLANGCI_NAME) deps-$(TOOL_GOFUMPT_NAME) deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) ## Install all the dependencies (tools, etc.)
 
 .PHONY: deps-$(TOOL_HEIGHLINER_NAME)
 deps-heighliner: $(TOOL_HEIGHLINER_BIN) ## Install $TOOL_HEIGHLINER_NAME ($TOOL_HEIGHLINER_VERSION)
@@ -511,6 +511,9 @@ deps-cosmovisor: $(TOOL_COSMOVISOR_BIN) ## Install $TOOL_COSMOVISOR_NAME ($TOOL_
 
 .PHONY: deps-$(TOOL_GOLANGCI_NAME)
 deps-golangci-lint: $(TOOL_GOLANGCI_BIN) ## Install $TOOL_GOLANGCI_NAME ($TOOL_GOLANGCI_VERSION)
+
+.PHONY: deps-$(TOOL_GOFUMPT_NAME)
+deps-gofumpt: $(TOOL_GOFUMPT_BIN) ## Install $TOOL_GOFUMPT_NAME ($TOOL_GOFUMPT_VERSION)
 
 $(TOOL_HEIGHLINER_BIN):
 	@${call echo_msg, 📦, Installing, $(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION),...}
@@ -537,6 +540,11 @@ $(TOOL_GOLANGCI_BIN):
 		sh -s -- -b $(shell go env GOPATH)/bin $(TOOL_GOLANGCI_VERSION)
 	@mkdir -p $(dir $(TOOL_GOLANGCI_BIN))
 	@cp $(shell go env GOPATH)/bin/golangci-lint $(dir $(TOOL_GOLANGCI_BIN))
+
+$(TOOL_GOFUMPT_BIN):
+	@$(call echo_msg, 📦, Installing, $(TOOL_GOFUMPT_NAME)@$(TOOL_GOFUMPT_VERSION),...)
+	@mkdir -p $(dir $(TOOL_GOFUMPT_BIN))
+	@GOBIN=$(dir $(abspath $(TOOL_GOFUMPT_BIN))) go install $(TOOL_GOFUMPT_PKG)
 
 ## Help:
 .PHONY: help
