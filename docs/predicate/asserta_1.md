@@ -47,7 +47,7 @@ assert_fact, father(X, Y).
 
 ```  yaml
 height: 42
-gas_used: 3977
+gas_used: 3779
 answer:
   has_more: false
   variables: ["X", "Y"]
@@ -83,7 +83,7 @@ asserta(parent(john, alice)).
 
 ```  yaml
 height: 42
-gas_used: 3975
+gas_used: 3777
 answer:
   has_more: false
   results:
@@ -120,7 +120,7 @@ assert_fact, parent(X, alice).
 
 ```  yaml
 height: 42
-gas_used: 3977
+gas_used: 3779
 answer:
   has_more: false
   variables: ["X"]
@@ -163,7 +163,7 @@ counter(InitialValue), increment_counter, increment_counter, counter(Incremented
 
 ```  yaml
 height: 42
-gas_used: 3989
+gas_used: 3791
 answer:
   has_more: false
   variables: ["InitialValue", "IncrementedValue", "DecrementedValue"]

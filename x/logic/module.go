@@ -23,7 +23,7 @@ import (
 )
 
 // ConsensusVersion defines the current x/logic module consensus version.
-const ConsensusVersion = 4
+const ConsensusVersion = 5
 
 var (
 	_ module.HasGenesis  = AppModule{}
@@ -127,6 +127,11 @@ func (am AppModule) IsAppModule() {}
 func (am AppModule) RegisterServices(cfg module.Configurator) {
 	types.RegisterMsgServiceServer(cfg.MsgServer(), keeper.NewMsgServerImpl(am.keeper))
 	types.RegisterQueryServiceServer(cfg.QueryServer(), am.keeper)
+
+	m := keeper.NewMigrator(am.keeper)
+	if err := cfg.RegisterMigration(types.ModuleName, 4, m.Migrate4to5); err != nil {
+		panic(fmt.Sprintf("failed to migrate x/%s from version 4 to 5: %v", types.ModuleName, err))
+	}
 }
 
 // InitGenesis performs the module's genesis initialization. It returns no validator updates.

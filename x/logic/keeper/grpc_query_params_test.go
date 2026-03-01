@@ -31,13 +31,6 @@ func TestGRPCParams(t *testing.T) {
 		}{
 			{
 				params: types.NewParams(
-					types.NewInterpreter(
-						types.WithBootstrap("bootstrap"),
-						types.WithPredicatesBlacklist([]string{"halt/1"}),
-						types.WithPredicatesWhitelist([]string{"source_file/1"}),
-						types.WithVirtualFilesBlacklist([]string{"file1"}),
-						types.WithVirtualFilesWhitelist([]string{"file2"}),
-					),
 					types.NewLimits(
 						types.WithMaxSize(2),
 						types.WithMaxResultCount(3),
@@ -49,13 +42,6 @@ func TestGRPCParams(t *testing.T) {
 			},
 			{
 				params: types.NewParams(
-					types.NewInterpreter(
-						types.WithBootstrap("bootstrap"),
-						types.WithPredicatesBlacklist([]string{"halt/1"}),
-						types.WithPredicatesWhitelist([]string{"source_file/1"}),
-						types.WithVirtualFilesBlacklist([]string{"file1"}),
-						types.WithVirtualFilesWhitelist([]string{"file2"}),
-					),
 					types.NewLimits(
 						types.WithMaxSize(2),
 						types.WithMaxResultCount(3),

@@ -52,7 +52,7 @@ foldl(quad_sum, [1,2], [3,4], [5,6], [7,8], 0, Result).
 
 ```  yaml
 height: 42
-gas_used: 3984
+gas_used: 3786
 answer:
   has_more: false
   variables: ["Result"]
@@ -84,7 +84,7 @@ foldl(quad_sum, [], [], [], [], 100, Result).
 
 ```  yaml
 height: 42
-gas_used: 3976
+gas_used: 3778
 answer:
   has_more: false
   variables: ["Result"]
@@ -116,7 +116,7 @@ foldl(make_quad, [a], [1], [x], [true], [], Quads).
 
 ```  yaml
 height: 42
-gas_used: 3979
+gas_used: 3781
 answer:
   has_more: false
   variables: ["Quads"]

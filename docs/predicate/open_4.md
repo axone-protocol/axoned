@@ -100,7 +100,7 @@ open(URI, read, _, []).
 
 ```  yaml
 height: 42
-gas_used: 3988
+gas_used: 3790
 answer:
   has_more: false
   variables: ["URI"]
@@ -152,7 +152,7 @@ read_resource('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08x
 
 ```  yaml
 height: 42
-gas_used: 3979
+gas_used: 3781
 answer:
   has_more: false
   variables: ["Chars"]
@@ -202,7 +202,7 @@ read_resource('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08x
 
 ```  yaml
 height: 42
-gas_used: 3979
+gas_used: 3781
 answer:
   has_more: false
   variables: ["Chars"]
@@ -229,7 +229,7 @@ open('foo:bar', read, Stream, []).
 
 ```  yaml
 height: 42
-gas_used: 3975
+gas_used: 3777
 answer:
   has_more: false
   variables: ["Stream"]
@@ -255,7 +255,7 @@ open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3t
 
 ```  yaml
 height: 42
-gas_used: 3975
+gas_used: 3777
 answer:
   has_more: false
   variables: ["Stream"]
@@ -281,7 +281,7 @@ open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3t
 
 ```  yaml
 height: 42
-gas_used: 3975
+gas_used: 3777
 answer:
   has_more: false
   variables: ["Stream"]
@@ -317,7 +317,7 @@ open('cosmwasm:storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3t
 
 ```  yaml
 height: 42
-gas_used: 3975
+gas_used: 3777
 answer:
   has_more: false
   variables: ["Stream"]

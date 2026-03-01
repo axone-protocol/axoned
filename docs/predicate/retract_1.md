@@ -41,7 +41,7 @@ assertz(parent(john, alice)), retract(parent(john, alice)), parent(X, Y).
 
 ```  yaml
 height: 42
-gas_used: 3977
+gas_used: 3779
 answer:
   has_more: false
   variables: ["X","Y"]
@@ -72,7 +72,7 @@ retract(parent(jane, alice)).
 
 ```  yaml
 height: 42
-gas_used: 3975
+gas_used: 3777
 answer:
   has_more: false
   results:

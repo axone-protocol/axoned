@@ -15,7 +15,7 @@ Feature: header_info/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3991
+      gas_used: 3793
       answer:
         has_more: false
         variables: ["HeaderInfo"]
@@ -50,7 +50,7 @@ Feature: header_info/1
     Then the answer we get is:
       """ yaml
       height: 100
-      gas_used: 3994
+      gas_used: 3796
       answer:
         has_more: false
         variables: ["Height"]
@@ -84,7 +84,7 @@ Feature: header_info/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3994
+      gas_used: 3796
       answer:
         has_more: false
         variables: ["Time"]
@@ -121,7 +121,7 @@ Feature: header_info/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3991
+      gas_used: 3793
       answer:
         has_more: false
         results:

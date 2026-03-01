@@ -52,7 +52,7 @@ foldl(weighted_sum, [1,2], [3,4], [5,6], 0, Result).
 
 ```  yaml
 height: 42
-gas_used: 3984
+gas_used: 3786
 answer:
   has_more: false
   variables: ["Result"]
@@ -84,7 +84,7 @@ foldl(weighted_sum, [], [], [], 42, Result).
 
 ```  yaml
 height: 42
-gas_used: 3976
+gas_used: 3778
 answer:
   has_more: false
   variables: ["Result"]
@@ -116,7 +116,7 @@ foldl(make_triple, [a,b], [1,2], [x,y], [], Triples).
 
 ```  yaml
 height: 42
-gas_used: 3982
+gas_used: 3784
 answer:
   has_more: false
   variables: ["Triples"]

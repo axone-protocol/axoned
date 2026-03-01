@@ -52,7 +52,7 @@ foldl(sum, [1,2,3,4], 0, Total).
 
 ```  yaml
 height: 42
-gas_used: 3992
+gas_used: 3794
 answer:
   has_more: false
   variables: ["Total"]
@@ -84,7 +84,7 @@ foldl(sum, [], 42, Total).
 
 ```  yaml
 height: 42
-gas_used: 3976
+gas_used: 3778
 answer:
   has_more: false
   variables: ["Total"]
@@ -116,7 +116,7 @@ foldl(cons, [a,b,c], [], Result).
 
 ```  yaml
 height: 42
-gas_used: 3985
+gas_used: 3787
 answer:
   has_more: false
   variables: ["Result"]
