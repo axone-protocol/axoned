@@ -16,7 +16,7 @@ Feature: atomic_list_concat/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6717
+      gas_used: 6539
       answer:
         has_more: false
         variables: ["Atom"]
@@ -39,7 +39,7 @@ Feature: atomic_list_concat/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4107
+      gas_used: 3929
       answer:
         has_more: false
         variables: ["List", "Atom"]
@@ -61,7 +61,7 @@ Feature: atomic_list_concat/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4229
+      gas_used: 4051
       answer:
         has_more: false
         variables: ["List", "Tail", "Atom"]
@@ -82,7 +82,7 @@ Feature: atomic_list_concat/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4274
+      gas_used: 4096
       answer:
         has_more: false
         variables: ["Atom"]

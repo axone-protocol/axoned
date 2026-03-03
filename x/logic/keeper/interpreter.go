@@ -92,6 +92,10 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 	}
 
 	options := []interpreter.Option{
+		interpreter.WithHooks(telemetryPredicateCallCounterHookFn(), telemetryPredicateDurationHookFn()),
+		interpreter.WithPredicates(ctx, interpreter.RegistryNames),
+		// Bootstrap is part of the kernel space and must not affect user-space gas accounting.
+		interpreter.WithBootstrap(ctx, bootstrap.Bootstrap()),
 		interpreter.WithMeter(
 			meter.NewVMMeter(
 				sdkctx.GasMeter(),
@@ -100,9 +104,6 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 				params.GetGasPolicy().UnifyCoeff,
 			),
 		),
-		interpreter.WithHooks(telemetryPredicateCallCounterHookFn(), telemetryPredicateDurationHookFn()),
-		interpreter.WithPredicates(ctx, interpreter.RegistryNames),
-		interpreter.WithBootstrap(ctx, bootstrap.Bootstrap()),
 		interpreter.WithFS(fsProvider),
 		interpreter.WithUserOutputWriter(userOutputBuffer),
 		interpreter.WithMaxVariables(limits.MaxVariables),

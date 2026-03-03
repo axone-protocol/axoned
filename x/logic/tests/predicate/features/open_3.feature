@@ -31,7 +31,7 @@ Feature: open/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4026
+      gas_used: 3848
       answer:
         has_more: false
         variables:

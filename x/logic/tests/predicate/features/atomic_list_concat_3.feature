@@ -16,7 +16,7 @@ Feature: atomic_list_concat/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5644
+      gas_used: 5466
       answer:
         has_more: false
         variables: ["Atom"]
@@ -41,7 +41,7 @@ Feature: atomic_list_concat/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5938
+      gas_used: 5760
       answer:
         has_more: false
         variables: ["URI"]
@@ -64,7 +64,7 @@ Feature: atomic_list_concat/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4523
+      gas_used: 4345
       answer:
         has_more: false
         variables: ["Separator", "Atom"]
@@ -85,7 +85,7 @@ Feature: atomic_list_concat/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4612
+      gas_used: 4434
       answer:
         has_more: false
         variables: ["Atom"]

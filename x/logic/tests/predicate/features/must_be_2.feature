@@ -14,7 +14,7 @@ Feature: must_be/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4007
+      gas_used: 3829
       answer:
         has_more: false
         results:
@@ -38,7 +38,7 @@ Feature: must_be/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4117
+      gas_used: 3939
       answer:
         has_more: false
         variables: ["Result"]
@@ -64,7 +64,7 @@ Feature: must_be/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4326
+      gas_used: 4148
       answer:
         has_more: false
         variables: ["X"]
@@ -86,7 +86,7 @@ Feature: must_be/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4362
+      gas_used: 4184
       answer:
         has_more: false
         results:
@@ -108,7 +108,7 @@ Feature: must_be/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4480
+      gas_used: 4302
       answer:
         has_more: false
         variables: ["Partial", "Tail"]

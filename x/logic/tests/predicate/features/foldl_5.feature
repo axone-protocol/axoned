@@ -18,7 +18,7 @@ Feature: foldl/5
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4314
+      gas_used: 4136
       answer:
         has_more: false
         variables: ["DotProduct"]
@@ -44,7 +44,7 @@ Feature: foldl/5
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4036
+      gas_used: 3858
       answer:
         has_more: false
         variables: ["Result"]
@@ -70,7 +70,7 @@ Feature: foldl/5
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4219
+      gas_used: 4041
       answer:
         has_more: false
         variables: ["Pairs"]

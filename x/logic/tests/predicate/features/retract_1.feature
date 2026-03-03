@@ -16,7 +16,7 @@ Feature: retract/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4024
+      gas_used: 3846
       answer:
         has_more: false
         variables: ["X","Y"]
@@ -40,7 +40,7 @@ Feature: retract/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4013
+      gas_used: 3835
       answer:
         has_more: false
         results:

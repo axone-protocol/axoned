@@ -43,7 +43,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4188
+      gas_used: 4010
       answer:
         has_more: false
         variables: ["URI"]
@@ -86,7 +86,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
      height: 42
-      gas_used: 4040
+      gas_used: 3862
       answer:
         has_more: false
         variables: ["Chars"]
@@ -127,7 +127,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4040
+      gas_used: 3862
       answer:
         has_more: false
         variables: ["Chars"]
@@ -149,7 +149,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4013
+      gas_used: 3835
       answer:
         has_more: false
         variables: ["Stream"]
@@ -170,7 +170,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4013
+      gas_used: 3835
       answer:
         has_more: false
         variables: ["Stream"]
@@ -191,7 +191,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4013
+      gas_used: 3835
       answer:
         has_more: false
         variables: ["Stream"]
@@ -221,7 +221,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4016
+      gas_used: 3838
       answer:
         has_more: false
         variables: ["Stream"]
@@ -241,7 +241,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4013
+      gas_used: 3835
       answer:
         has_more: false
         variables: ["Stream"]
@@ -260,7 +260,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4013
+      gas_used: 3835
       answer:
         has_more: false
         variables: ["Stream"]
@@ -279,7 +279,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4013
+      gas_used: 3835
       answer:
         has_more: false
         variables: ["Resource", "Stream"]
@@ -298,7 +298,7 @@ Feature: open/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4013
+      gas_used: 3835
       answer:
         has_more: false
         variables: ["Mode", "Stream"]
