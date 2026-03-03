@@ -113,21 +113,30 @@ func WithUnifyCoeff(unifyCoeff uint64) GasPolicyOption {
 	}
 }
 
+// WithSourceCoeff sets the coefficient applied to user source bytes.
+func WithSourceCoeff(sourceCoeff uint64) GasPolicyOption {
+	return func(i *GasPolicy) {
+		i.SourceCoeff = sourceCoeff
+	}
+}
+
 // DefaultGasPolicy returns the default gas policy coefficients.
 func DefaultGasPolicy() GasPolicy {
 	return NewGasPolicy(
 		WithComputeCoeff(1),
 		WithMemoryCoeff(1),
 		WithUnifyCoeff(1),
+		WithSourceCoeff(1),
 	)
 }
 
 // CanonicalGasPolicy returns a gas policy with explicit default values.
 func CanonicalGasPolicy(policy GasPolicy) GasPolicy {
 	return NewGasPolicy(
-		WithComputeCoeff(nonZeroOrDefaultUint64(policy.ComputeCoeff, 1)),
-		WithMemoryCoeff(nonZeroOrDefaultUint64(policy.MemoryCoeff, 1)),
-		WithUnifyCoeff(nonZeroOrDefaultUint64(policy.UnifyCoeff, 1)),
+		WithComputeCoeff(nonZeroOrOneUint64(policy.ComputeCoeff)),
+		WithMemoryCoeff(nonZeroOrOneUint64(policy.MemoryCoeff)),
+		WithUnifyCoeff(nonZeroOrOneUint64(policy.UnifyCoeff)),
+		WithSourceCoeff(nonZeroOrOneUint64(policy.SourceCoeff)),
 	)
 }
 
@@ -141,9 +150,9 @@ func NewGasPolicy(opts ...GasPolicyOption) GasPolicy {
 	return g
 }
 
-func nonZeroOrDefaultUint64(v, defaultValue uint64) uint64 {
+func nonZeroOrOneUint64(v uint64) uint64 {
 	if v == 0 {
-		return defaultValue
+		return 1
 	}
 
 	return v

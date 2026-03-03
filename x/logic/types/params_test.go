@@ -32,6 +32,7 @@ func TestValidateParams(t *testing.T) {
 						ComputeCoeff: 2,
 						MemoryCoeff:  3,
 						UnifyCoeff:   4,
+						SourceCoeff:  5,
 					},
 				),
 			},

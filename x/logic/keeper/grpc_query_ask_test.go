@@ -46,6 +46,7 @@ func TestGRPCAsk(t *testing.T) {
 			computeCoeff   uint64
 			memoryCoeff    uint64
 			unifyCoeff     uint64
+			sourceCoeff    uint64
 			expectedAnswer *types.Answer
 			expectedError  string
 		}{
@@ -135,7 +136,7 @@ func TestGRPCAsk(t *testing.T) {
 				program:       "father(bob, alice). father(bob, john).",
 				query:         "father(bob, X).",
 				maxSize:       5,
-				expectedError: "query: 15 > MaxSize: 5: limit exceeded",
+				expectedError: "source: 53 > MaxSize: 5: limit exceeded",
 			},
 			{
 				program: "father(bob, alice). father(bob, john).",
@@ -170,7 +171,7 @@ func TestGRPCAsk(t *testing.T) {
 				query:         "consult('/v1/lib/chain.pl'), block_height(X).",
 				maxGas:        3000,
 				computeCoeff:  10000,
-				expectedError: "out of gas: logic <Instruction> (11039/3000): limit exceeded",
+				expectedError: "out of gas: logic <Instruction> (11142/3000): limit exceeded",
 			},
 			{
 				program:       "recursionOfDeath :- recursionOfDeath.",
@@ -415,6 +416,7 @@ func TestGRPCAsk(t *testing.T) {
 					params.GasPolicy.ComputeCoeff = tc.computeCoeff
 					params.GasPolicy.MemoryCoeff = tc.memoryCoeff
 					params.GasPolicy.UnifyCoeff = tc.unifyCoeff
+					params.GasPolicy.SourceCoeff = tc.sourceCoeff
 					err := logicKeeper.SetParams(testCtx.Ctx, params)
 
 					So(err, ShouldBeNil)

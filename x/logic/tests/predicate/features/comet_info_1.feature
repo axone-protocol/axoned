@@ -16,7 +16,7 @@ Feature: comet_info/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3972
+      gas_used: 4089
       answer:
         has_more: false
         variables: ["CometInfo"]
@@ -47,7 +47,7 @@ Feature: comet_info/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3989
+      gas_used: 4211
       answer:
         has_more: false
         variables: ["Address"]
@@ -77,7 +77,7 @@ Feature: comet_info/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3994
+      gas_used: 4213
       answer:
         has_more: false
         variables: ["Round"]
@@ -110,7 +110,7 @@ Feature: comet_info/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3973
+      gas_used: 4229
       answer:
         has_more: false
         results:

@@ -2,6 +2,8 @@ package keeper
 
 import (
 	goctx "context"
+	"math"
+	"math/bits"
 
 	errorsmod "cosmossdk.io/errors"
 	storetypes "cosmossdk.io/store/types"
@@ -36,6 +38,7 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 	if err := checkLimits(req, params.Limits); err != nil {
 		return nil, err
 	}
+	consumeSourceGas(sdkCtx.GasMeter(), req, params.GasPolicy.SourceCoeff)
 
 	return k.execute(
 		sdkCtx,
@@ -46,13 +49,33 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 }
 
 func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) error {
-	size := uint64(len(request.GetQuery()))
+	size := sourceSize(request)
 
 	if limits.MaxSize != 0 && size > limits.MaxSize {
-		return errorsmod.Wrapf(types.ErrLimitExceeded, "query: %d > MaxSize: %d", size, limits.MaxSize)
+		return errorsmod.Wrapf(types.ErrLimitExceeded, "source: %d > MaxSize: %d", size, limits.MaxSize)
 	}
 
 	return nil
+}
+
+func consumeSourceGas(gasMeter storetypes.GasMeter, request *types.QueryServiceAskRequest, coeff uint64) {
+	coeff = max(coeff, 1)
+	sourceSize := sourceSize(request)
+	if sourceSize == 0 {
+		return
+	}
+
+	hi, lo := bits.Mul64(sourceSize, coeff)
+	if hi != 0 {
+		gasMeter.ConsumeGas(math.MaxUint64, "Source")
+		return
+	}
+
+	gasMeter.ConsumeGas(lo, "Source")
+}
+
+func sourceSize(request *types.QueryServiceAskRequest) uint64 {
+	return uint64(len(request.GetProgram()) + len(request.GetQuery()))
 }
 
 // withSafeGasMeter returns a new context with a gas meter that has the given limit.

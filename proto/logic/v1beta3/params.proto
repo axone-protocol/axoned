@@ -31,8 +31,9 @@ message Params {
 message Limits {
   option (gogoproto.goproto_stringer) = true;
 
-  // max_size specifies the maximum size, in bytes, that is accepted for a program.
-  // A value of 0 means that there is no limit on the size of the program.
+  // max_size specifies the maximum total size, in bytes, accepted for the user-supplied
+  // program and query sources.
+  // A value of 0 means that there is no limit on the total source size.
   uint64 max_size = 3 [(gogoproto.moretags) = "yaml:\"max_size\""];
 
   // max_result_count specifies the maximum number of results that can be requested for a query.
@@ -65,4 +66,8 @@ message GasPolicy {
   // unify_coeff applies to UnifyStep VM meter kind.
   // If set to 0, the value considered is 1.
   uint64 unify_coeff = 6 [(gogoproto.moretags) = "yaml:\"unify_coeff\""];
+
+  // source_coeff applies to the total size in bytes of the user-supplied program and query sources.
+  // If set to 0, the value considered is 1.
+  uint64 source_coeff = 7 [(gogoproto.moretags) = "yaml:\"source_coeff\""];
 }

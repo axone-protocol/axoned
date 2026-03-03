@@ -20,7 +20,7 @@ Feature: asserta/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3847
+      gas_used: 3982
       answer:
         has_more: false
         variables: ["X", "Y"]
@@ -49,7 +49,7 @@ Feature: asserta/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3835
+      gas_used: 3950
       answer:
         has_more: false
         results:
@@ -79,7 +79,7 @@ Feature: asserta/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3852
+      gas_used: 4037
       answer:
         has_more: false
         variables: ["X"]
@@ -115,7 +115,7 @@ Feature: asserta/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3923
+      gas_used: 4308
       answer:
         has_more: false
         variables: ["InitialValue", "IncrementedValue", "DecrementedValue"]
