@@ -24,9 +24,7 @@ func DefaultParams() Params {
 			WithMaxSize(5000),
 			WithMaxResultCount(3),
 			WithMaxVariables(100000)),
-		NewGasPolicy(
-			WithWeightingFactor(1),
-			WithDefaultPredicateCost(1)),
+		DefaultGasPolicy(),
 	)
 }
 
@@ -94,25 +92,43 @@ func validateLimits(i any) error {
 // GasPolicyOption is a functional option for configuring the GasPolicy.
 type GasPolicyOption func(*GasPolicy)
 
-// WithWeightingFactor sets the weighting factor.
-func WithWeightingFactor(weightingFactor uint64) GasPolicyOption {
+// WithComputeCoeff sets the coefficient applied to compute-related VM meter kinds.
+func WithComputeCoeff(computeCoeff uint64) GasPolicyOption {
 	return func(i *GasPolicy) {
-		i.WeightingFactor = weightingFactor
+		i.ComputeCoeff = computeCoeff
 	}
 }
 
-// WithDefaultPredicateCost sets the default cost of a predicate.
-func WithDefaultPredicateCost(defaultPredicateCost uint64) GasPolicyOption {
+// WithMemoryCoeff sets the coefficient applied to memory-related VM meter kinds.
+func WithMemoryCoeff(memoryCoeff uint64) GasPolicyOption {
 	return func(i *GasPolicy) {
-		i.DefaultPredicateCost = defaultPredicateCost
+		i.MemoryCoeff = memoryCoeff
 	}
 }
 
-// WithPredicateCosts sets the cost of a predicate.
-func WithPredicateCosts(predicateCosts []PredicateCost) GasPolicyOption {
+// WithUnifyCoeff sets the coefficient applied to unify-related VM meter kinds.
+func WithUnifyCoeff(unifyCoeff uint64) GasPolicyOption {
 	return func(i *GasPolicy) {
-		i.PredicateCosts = predicateCosts
+		i.UnifyCoeff = unifyCoeff
 	}
+}
+
+// DefaultGasPolicy returns the default gas policy coefficients.
+func DefaultGasPolicy() GasPolicy {
+	return NewGasPolicy(
+		WithComputeCoeff(1),
+		WithMemoryCoeff(1),
+		WithUnifyCoeff(1),
+	)
+}
+
+// CanonicalGasPolicy returns a gas policy with explicit default values.
+func CanonicalGasPolicy(policy GasPolicy) GasPolicy {
+	return NewGasPolicy(
+		WithComputeCoeff(nonZeroOrDefaultUint64(policy.ComputeCoeff, 1)),
+		WithMemoryCoeff(nonZeroOrDefaultUint64(policy.MemoryCoeff, 1)),
+		WithUnifyCoeff(nonZeroOrDefaultUint64(policy.UnifyCoeff, 1)),
+	)
 }
 
 // NewGasPolicy creates a new GasPolicy object.
@@ -123,4 +139,12 @@ func NewGasPolicy(opts ...GasPolicyOption) GasPolicy {
 	}
 
 	return g
+}
+
+func nonZeroOrDefaultUint64(v, defaultValue uint64) uint64 {
+	if v == 0 {
+		return defaultValue
+	}
+
+	return v
 }

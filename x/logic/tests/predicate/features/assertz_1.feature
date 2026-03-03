@@ -20,7 +20,7 @@ Feature: assertz/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3779
+      gas_used: 4025
       answer:
         has_more: false
         variables: ["X", "Y"]
@@ -49,7 +49,7 @@ Feature: assertz/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3777
+      gas_used: 4013
       answer:
         has_more: false
         results:
@@ -79,7 +79,7 @@ Feature: assertz/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3779
+      gas_used: 4030
       answer:
         has_more: false
         variables: ["X"]
@@ -116,7 +116,7 @@ Scenario: Add and remove items in an inventory.
   Then the answer we get is:
     """ yaml
     height: 42
-    gas_used: 3786
+    gas_used: 4083
     answer:
       has_more: false
       variables: ["I","CurrentInventory"]

@@ -43,7 +43,9 @@ func TestGRPCAsk(t *testing.T) {
 			maxSize        uint64
 			maxGas         uint64
 			maxVariables   uint64
-			predicateCosts map[string]uint64
+			computeCoeff   uint64
+			memoryCoeff    uint64
+			unifyCoeff     uint64
 			expectedAnswer *types.Answer
 			expectedError  string
 		}{
@@ -164,25 +166,23 @@ func TestGRPCAsk(t *testing.T) {
 				expectedError: "out of gas: logic <ReadPerByte> (1018/1000): limit exceeded",
 			},
 			{
-				program: "block_height(X) :- header_info(Header), X = Header.height.",
-				query:   "consult('/v1/lib/chain.pl'), block_height(X).",
-				maxGas:  3000,
-				predicateCosts: map[string]uint64{
-					"consult/1": 10000,
-				},
-				expectedError: "out of gas: logic <consult/1> (11107/3000): limit exceeded",
+				program:       "block_height(X) :- header_info(Header), X = Header.height.",
+				query:         "consult('/v1/lib/chain.pl'), block_height(X).",
+				maxGas:        3000,
+				computeCoeff:  10000,
+				expectedError: "out of gas: logic <Instruction> (11039/3000): limit exceeded",
 			},
 			{
 				program:       "recursionOfDeath :- recursionOfDeath.",
 				query:         "recursionOfDeath.",
 				maxGas:        3000,
-				expectedError: "out of gas: logic <recursionOfDeath/0> (3001/3000): limit exceeded",
+				expectedError: "out of gas: logic <Instruction> (3001/3000): limit exceeded",
 			},
 			{
 				program:       "backtrackOfDeath :- repeat, fail.",
 				query:         "backtrackOfDeath.",
 				maxGas:        3014,
-				expectedError: "out of gas: logic <fail/0> (3015/3014): limit exceeded",
+				expectedError: "out of gas: logic <Instruction> (3015/3014): limit exceeded",
 			},
 			{
 				query:         "length(List, 100000).",
@@ -412,16 +412,9 @@ func TestGRPCAsk(t *testing.T) {
 					params.Limits.MaxSize = tc.maxSize
 					params.Limits.MaxVariables = tc.maxVariables
 
-					if tc.predicateCosts != nil {
-						predicateCosts := make([]types.PredicateCost, 0, len(tc.predicateCosts))
-						for predicate, cost := range tc.predicateCosts {
-							predicateCosts = append(predicateCosts, types.PredicateCost{
-								Predicate: predicate,
-								Cost:      cost,
-							})
-						}
-						params.GasPolicy.PredicateCosts = predicateCosts
-					}
+					params.GasPolicy.ComputeCoeff = tc.computeCoeff
+					params.GasPolicy.MemoryCoeff = tc.memoryCoeff
+					params.GasPolicy.UnifyCoeff = tc.unifyCoeff
 					err := logicKeeper.SetParams(testCtx.Ctx, params)
 
 					So(err, ShouldBeNil)

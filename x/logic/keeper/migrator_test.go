@@ -8,6 +8,7 @@ import (
 
 	storetypes "cosmossdk.io/store/types"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
@@ -56,19 +57,13 @@ func TestMigrator_Migrate4to5(t *testing.T) {
 					types.WithMaxUserOutputSize(13),
 					types.WithMaxVariables(17),
 				),
-				types.NewGasPolicy(
-					types.WithWeightingFactor(19),
-					types.WithDefaultPredicateCost(23),
-					types.WithPredicateCosts([]types.PredicateCost{
-						{Predicate: "consult/1", Cost: 29},
-					}),
-				),
+				types.DefaultGasPolicy(),
 			)
 
 			expectedBz, err := encCfg.Codec.Marshal(&expectedParams)
 			require.NoError(t, err)
 
-			legacyBz := legacyParamsBytes(expectedBz, tc.populateLegacyFields)
+			legacyBz := legacyParamsBytes(encCfg.Codec, expectedParams.Limits, tc.populateLegacyFields)
 			require.NotEqual(t, expectedBz, legacyBz)
 
 			store := testCtx.Ctx.KVStore(key)
@@ -83,7 +78,7 @@ func TestMigrator_Migrate4to5(t *testing.T) {
 	}
 }
 
-func legacyParamsBytes(canonical []byte, populateLegacyFields bool) []byte {
+func legacyParamsBytes(codec codec.BinaryCodec, limits types.Limits, populateLegacyFields bool) []byte {
 	var interpreter []byte
 	if populateLegacyFields {
 		interpreter = appendLegacyFilter(interpreter, 1, []string{"consult/1"}, []string{"open/4"})
@@ -92,9 +87,26 @@ func legacyParamsBytes(canonical []byte, populateLegacyFields bool) []byte {
 		interpreter = appendLegacyFilter(interpreter, 4, []string{"cosmwasm:"}, []string{"https://"})
 	}
 
+	var gasPolicy []byte
+	if populateLegacyFields {
+		gasPolicy = protowire.AppendTag(gasPolicy, 1, protowire.VarintType)
+		gasPolicy = protowire.AppendVarint(gasPolicy, 19)
+		gasPolicy = protowire.AppendTag(gasPolicy, 2, protowire.VarintType)
+		gasPolicy = protowire.AppendVarint(gasPolicy, 23)
+		gasPolicy = appendLegacyPredicateCost(gasPolicy, "consult/1", 29)
+	}
+
+	limitsBz, err := codec.Marshal(&limits)
+	if err != nil {
+		panic(err)
+	}
+
 	legacy := protowire.AppendTag(nil, 1, protowire.BytesType)
 	legacy = protowire.AppendBytes(legacy, interpreter)
-	legacy = append(legacy, canonical...)
+	legacy = protowire.AppendTag(legacy, 2, protowire.BytesType)
+	legacy = protowire.AppendBytes(legacy, limitsBz)
+	legacy = protowire.AppendTag(legacy, 3, protowire.BytesType)
+	legacy = protowire.AppendBytes(legacy, gasPolicy)
 
 	return legacy
 }
@@ -112,6 +124,19 @@ func appendLegacyFilter(dst []byte, fieldNum protowire.Number, whitelist, blackl
 
 	dst = protowire.AppendTag(dst, fieldNum, protowire.BytesType)
 	dst = protowire.AppendBytes(dst, filter)
+
+	return dst
+}
+
+func appendLegacyPredicateCost(dst []byte, predicate string, cost uint64) []byte {
+	var predicateCost []byte
+	predicateCost = protowire.AppendTag(predicateCost, 1, protowire.BytesType)
+	predicateCost = protowire.AppendString(predicateCost, predicate)
+	predicateCost = protowire.AppendTag(predicateCost, 2, protowire.VarintType)
+	predicateCost = protowire.AppendVarint(predicateCost, cost)
+
+	dst = protowire.AppendTag(dst, 3, protowire.BytesType)
+	dst = protowire.AppendBytes(dst, predicateCost)
 
 	return dst
 }

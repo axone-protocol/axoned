@@ -17,8 +17,8 @@ func NewMigrator(k Keeper) Migrator {
 }
 
 // Migrate4to5 rewrites the stored params using the v5 canonical schema.
-// Removed interpreter filter and bootstrap fields are ignored on read and
-// dropped from the rewritten state.
+// Removed interpreter fields and the legacy predicate-based gas policy are
+// ignored on read and dropped from the rewritten state.
 func (m Migrator) Migrate4to5(ctx sdk.Context) error {
 	store := ctx.KVStore(m.keeper.storeKey)
 	bz := store.Get(types.ParamsKey)
@@ -30,6 +30,7 @@ func (m Migrator) Migrate4to5(ctx sdk.Context) error {
 	if err := m.keeper.cdc.Unmarshal(bz, &params); err != nil {
 		return err
 	}
+	params.GasPolicy = types.CanonicalGasPolicy(params.GasPolicy)
 
 	return m.keeper.SetParams(ctx, params)
 }
