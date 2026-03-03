@@ -61,3 +61,40 @@ func TestNewInterpreterBootstrapIsFree(t *testing.T) {
 		})
 	})
 }
+
+func TestConsumeSourceGas(t *testing.T) {
+	Convey("Given a user source request", t, func() {
+		request := &types.QueryServiceAskRequest{
+			Program: "foo. bar.",
+			Query:   "foo.",
+		}
+
+		Convey("When consuming source gas with a zero coefficient", func() {
+			gasMeter := storetypes.NewGasMeter(100)
+			consumeSourceGas(gasMeter, request, 0)
+
+			Convey("Then the source coefficient should default to one", func() {
+				So(gasMeter.GasConsumed(), ShouldEqual, 13)
+			})
+		})
+
+		Convey("When consuming source gas beyond the available limit", func() {
+			gasMeter := storetypes.NewGasMeter(1010)
+			var recovered any
+
+			func() {
+				defer func() {
+					recovered = recover()
+				}()
+				consumeSourceGas(gasMeter, request, 100)
+			}()
+
+			Convey("Then it should fail as source gas consumption", func() {
+				So(recovered, ShouldNotBeNil)
+				gasErr, ok := recovered.(storetypes.ErrorOutOfGas)
+				So(ok, ShouldBeTrue)
+				So(gasErr.Descriptor, ShouldEqual, "Source")
+			})
+		})
+	})
+}
