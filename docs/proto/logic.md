@@ -197,7 +197,6 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
   - [GasPolicy](#logic.v1beta3.GasPolicy)
   - [Limits](#logic.v1beta3.Limits)
   - [Params](#logic.v1beta3.Params)
-  - [PredicateCost](#logic.v1beta3.PredicateCost)
   
 - [logic/v1beta3/genesis.proto](#logic/v1beta3/genesis.proto)
   - [GenesisState](#logic.v1beta3.GenesisState)
@@ -232,15 +231,14 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
 
 ### GasPolicy
 
-GasPolicy defines the policy for calculating predicate invocation costs and the resulting gas consumption.
-The gas policy is defined as a list of predicates and their associated unit costs, a default unit cost for predicates
-if not specified in the list, and a weighting factor that is applied to the unit cost of each predicate to yield.
+GasPolicy defines the coefficients used to translate VM metering units into SDK gas.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `weighting_factor` | [uint64](#uint64) |  | WeightingFactor is the factor that is applied to the unit cost of each predicate to yield the gas value. If set to 0, the value considered is 1. |
-| `default_predicate_cost` | [uint64](#uint64) |  | DefaultPredicateCost is the default unit cost of a predicate when not specified in the PredicateCosts list. If set to 0, the value considered is 1. |
-| `predicate_costs` | [PredicateCost](#logic.v1beta3.PredicateCost) | repeated | PredicateCosts is the list of predicates and their associated unit costs. |
+| `compute_coeff` | [uint64](#uint64) |  | compute_coeff applies to Instruction, ArithNode, and CompareStep VM meter kinds. If set to 0, the value considered is 1. |
+| `memory_coeff` | [uint64](#uint64) |  | memory_coeff applies to CopyNode and ListCell VM meter kinds. If set to 0, the value considered is 1. |
+| `unify_coeff` | [uint64](#uint64) |  | unify_coeff applies to UnifyStep VM meter kind. If set to 0, the value considered is 1. |
+| `source_coeff` | [uint64](#uint64) |  | source_coeff applies to the total size in bytes of the user-supplied program and query sources. If set to 0, the value considered is 1. |
 
 <a name="logic.v1beta3.Limits"></a>
 
@@ -250,7 +248,7 @@ Limits defines the limits of the logic module.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| `max_size` | [uint64](#uint64) |  | max_size specifies the maximum size, in bytes, that is accepted for a program. A value of 0 means that there is no limit on the size of the program. |
+| `max_size` | [uint64](#uint64) |  | max_size specifies the maximum total size, in bytes, accepted for the user-supplied program and query sources. A value of 0 means that there is no limit on the total source size. |
 | `max_result_count` | [uint64](#uint64) |  | max_result_count specifies the maximum number of results that can be requested for a query. A value of 0 means that there is no limit on the number of results. |
 | `max_user_output_size` | [uint64](#uint64) |  | max_user_output_size specifies the maximum number of bytes to keep in the user output. If the user output exceeds this size, the interpreter will overwrite the oldest bytes with the new ones to keep the size constant. A value of 0 means the user output is disabled. |
 | `max_variables` | [uint64](#uint64) |  | max_variables specifies the maximum number of variables that can be create by the interpreter. A value of 0 means that there is no limit on the number of variables. |
@@ -264,18 +262,7 @@ Params defines all the configuration parameters of the "logic" module.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `limits` | [Limits](#logic.v1beta3.Limits) |  | Limits defines the limits of the logic module. The limits are used to prevent the interpreter from running for too long. If the interpreter runs for too long, the execution will be aborted. |
-| `gas_policy` | [GasPolicy](#logic.v1beta3.GasPolicy) |  | GasPolicy defines the parameters for calculating predicate invocation costs. |
-
-<a name="logic.v1beta3.PredicateCost"></a>
-
-### PredicateCost
-
-PredicateCost defines the unit cost of a predicate during its invocation by the interpreter.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `predicate` | [string](#string) |  | Predicate is the name of the predicate, optionally followed by its arity (e.g. "findall/3"). If no arity is specified, the unit cost is applied to all predicates with the same name. |
-| `cost` | [uint64](#uint64) |  | Cost is the unit cost of the predicate. If set to 0, the value considered is 1. |
+| `gas_policy` | [GasPolicy](#logic.v1beta3.GasPolicy) |  | GasPolicy defines the coefficients used to translate VM metering units into SDK gas. |
 
  [//]: # (end messages)
 
