@@ -46,7 +46,7 @@ base64(Decoded, 'SGVsbG8gd29ybGQ=').
 
 ```  yaml
 height: 42
-gas_used: 3778
+gas_used: 3998
 answer:
   has_more: false
   variables: ["Encoded", "Decoded"]

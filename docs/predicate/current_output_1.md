@@ -61,7 +61,7 @@ write_char_to_user_output(x).
 
 ```  yaml
 height: 42
-gas_used: 3845
+gas_used: 4164
 answer:
   has_more: false
   variables:
@@ -108,7 +108,7 @@ log_message('Hello world!').
 
 ```  yaml
 height: 42
-gas_used: 3847
+gas_used: 4210
 answer:
   has_more: false
   variables:
@@ -155,7 +155,7 @@ log_message('Hello world!').
 
 ```  yaml
 height: 42
-gas_used: 3846
+gas_used: 4175
 answer:
   has_more: false
   variables:
@@ -205,7 +205,7 @@ log_message("Hello 🧙!").
 
 ```  yaml
 height: 42
-gas_used: 3867
+gas_used: 4312
 answer:
   has_more: false
   variables:
