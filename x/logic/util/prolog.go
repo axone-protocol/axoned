@@ -170,7 +170,7 @@ func AsLimitExceededError(ctx context.Context, err error) error {
 		sdkCtx := sdk.UnwrapSDKContext(ctx)
 		return errorsmod.Wrapf(
 			types.ErrLimitExceeded, "out of gas: %s <%s> (%d/%d)",
-			types.ModuleName, meterDescriptor(descriptor), sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
+			types.ModuleName, descriptor, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
 	}
 
 	if message, ok := isPanicError(ex.Term()); ok {
@@ -183,27 +183,27 @@ func AsLimitExceededError(ctx context.Context, err error) error {
 func isMeterLimitError(term engine.Term) (string, bool) {
 	var env *engine.Env
 	if env, ok := env.Unify(term, errMeterLimitError); ok {
-		return fmt.Sprintf("%s", env.Resolve(errResourceVar)), true
+		return meterDescriptor(fmt.Sprintf("%s", env.Resolve(errResourceVar)))
 	}
 
 	return "", false
 }
 
-func meterDescriptor(resource string) string {
+func meterDescriptor(resource string) (string, bool) {
 	switch strings.ToLower(resource) {
 	case "instruction":
-		return "Instruction"
+		return "Instruction", true
 	case "arith_node":
-		return "ArithNode"
+		return "ArithNode", true
 	case "compare_step":
-		return "CompareStep"
+		return "CompareStep", true
 	case "copy_node":
-		return "CopyNode"
+		return "CopyNode", true
 	case "list_cell":
-		return "ListCell"
+		return "ListCell", true
 	case "unify_step":
-		return "UnifyStep"
+		return "UnifyStep", true
 	default:
-		return resource
+		return "", false
 	}
 }

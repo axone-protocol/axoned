@@ -7,6 +7,7 @@ import (
 
 	"github.com/axone-protocol/prolog/v3/engine"
 	dbm "github.com/cosmos/cosmos-db"
+
 	. "github.com/smartystreets/goconvey/convey"
 
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
@@ -70,6 +71,16 @@ func TestAsLimitExceededError(t *testing.T) {
 				expectedError: "maximum number of variables reached: limit exceeded",
 			},
 			{
+				name: "unknown resource error with context",
+				err: engine.NewException(
+					engine.Atom("error").Apply(
+						engine.Atom("resource_error").Apply(engine.Atom("foo")),
+						engine.Atom("root"),
+					),
+					nil,
+				),
+			},
+			{
 				name: "unrecognized prolog exception",
 				err: engine.NewException(
 					engine.Atom("error").Apply(engine.Atom("unexpected")),
@@ -111,20 +122,24 @@ func TestMeterDescriptor(t *testing.T) {
 		testCases := []struct {
 			resource string
 			expected string
+			ok       bool
 		}{
-			{resource: "instruction", expected: "Instruction"},
-			{resource: "arith_node", expected: "ArithNode"},
-			{resource: "compare_step", expected: "CompareStep"},
-			{resource: "copy_node", expected: "CopyNode"},
-			{resource: "list_cell", expected: "ListCell"},
-			{resource: "unify_step", expected: "UnifyStep"},
-			{resource: "custom", expected: "custom"},
+			{resource: "instruction", expected: "Instruction", ok: true},
+			{resource: "arith_node", expected: "ArithNode", ok: true},
+			{resource: "compare_step", expected: "CompareStep", ok: true},
+			{resource: "copy_node", expected: "CopyNode", ok: true},
+			{resource: "list_cell", expected: "ListCell", ok: true},
+			{resource: "unify_step", expected: "UnifyStep", ok: true},
+			{resource: "custom", expected: "", ok: false},
 		}
 
 		for _, tc := range testCases {
 			Convey(fmt.Sprintf("When converting %s", tc.resource), func() {
 				Convey("Then the descriptor should match expectations", func() {
-					So(meterDescriptor(tc.resource), ShouldEqual, tc.expected)
+					actual, ok := meterDescriptor(tc.resource)
+
+					So(ok, ShouldEqual, tc.ok)
+					So(actual, ShouldEqual, tc.expected)
 				})
 			})
 		}

@@ -50,6 +50,11 @@ func TestNewInterpreterBootstrapIsFree(t *testing.T) {
 			})
 
 			Convey("And when executing user-space logic", func() {
+				So(err, ShouldBeNil)
+				if err != nil {
+					return
+				}
+
 				err = interpreter.ExecContext(testCtx.Ctx, "foo.")
 				_, queryErr := util.QueryInterpreter(testCtx.Ctx, interpreter, "foo.", 1)
 
