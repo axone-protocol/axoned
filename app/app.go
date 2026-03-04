@@ -1185,7 +1185,7 @@ func (app *App) provideFS(ctx context.Context) (fs.FS, error) {
 		{"/v1/lib", logicembeddedfs.NewFS(logiclib.Files)},
 		{"/v1/sys/header", logicsysheader.NewFS(ctx)},
 		{"/v1/sys/comet", logicsyscomet.NewFS(ctx)},
-		{"/v1/bank", logicbank.NewFS(ctx)},
+		{"/v1/state/bank", logicbank.NewFS(ctx)},
 	}
 
 	for _, m := range mounts {

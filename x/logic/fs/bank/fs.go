@@ -41,7 +41,7 @@ var (
 	errVFSUnavailable = errors.New("vfs_unavailable")
 )
 
-// NewFS creates the /v1/bank filesystem.
+// NewFS creates the /v1/state/bank filesystem.
 func NewFS(ctx context.Context) fs.ReadFileFS {
 	return &vfs{ctx: ctx}
 }
