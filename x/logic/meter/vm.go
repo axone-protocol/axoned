@@ -22,7 +22,8 @@ func NewVMMeter(gasMeter storetypes.GasMeter, computeCoeff, memoryCoeff, unifyCo
 		consumed, overflow := multiplyUint64Overflow(coeff, units)
 		defer func() {
 			if r := recover(); r != nil {
-				if _, ok := r.(storetypes.ErrorOutOfGas); ok {
+				switch r.(type) {
+				case storetypes.ErrorOutOfGas, storetypes.ErrorGasOverflow:
 					formal = engine.NewAtom("resource_error").Apply(engine.NewAtom(resource))
 					return
 				}
