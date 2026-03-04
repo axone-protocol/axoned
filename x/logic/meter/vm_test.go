@@ -9,6 +9,8 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
+	storetypes "cosmossdk.io/store/types"
+
 	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
 )
 
@@ -76,4 +78,33 @@ func TestVMMeter(t *testing.T) {
 			sut(engine.MeterInstruction, 2)
 		})
 	})
+
+	Convey("Given a VM meter hitting the SDK gas limit", t, func() {
+		gasMeter := storetypes.NewGasMeter(10)
+		sut := NewVMMeter(gasMeter, 2, 1, 1)
+
+		Convey("it converts the out-of-gas panic into a Prolog resource_error", func() {
+			formal := sut(engine.MeterInstruction, 6)
+
+			So(matchesTerm(formal, engine.NewAtom("resource_error").Apply(engine.NewAtom("instruction"))), ShouldBeTrue)
+		})
+	})
+
+	Convey("Given a VM meter saturation on a non-empty gas meter", t, func() {
+		gasMeter := storetypes.NewGasMeter(math.MaxUint64)
+		gasMeter.ConsumeGas(1, "seed")
+		sut := NewVMMeter(gasMeter, math.MaxUint64, 1, 1)
+
+		Convey("it converts the gas overflow panic into a Prolog resource_error", func() {
+			formal := sut(engine.MeterInstruction, 2)
+
+			So(matchesTerm(formal, engine.NewAtom("resource_error").Apply(engine.NewAtom("instruction"))), ShouldBeTrue)
+		})
+	})
+}
+
+func matchesTerm(actual, expected engine.Term) bool {
+	_, ok := ((*engine.Env)(nil)).Unify(actual, expected)
+
+	return ok
 }
