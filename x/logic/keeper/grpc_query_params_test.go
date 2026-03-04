@@ -49,11 +49,10 @@ func TestGRPCParams(t *testing.T) {
 						types.WithMaxVariables(5),
 					),
 					types.GasPolicy{
-						WeightingFactor:      2,
-						DefaultPredicateCost: 1,
-						PredicateCosts: []types.PredicateCost{
-							{Predicate: "foo", Cost: 1},
-						},
+						ComputeCoeff: 2,
+						MemoryCoeff:  3,
+						UnifyCoeff:   4,
+						SourceCoeff:  5,
 					},
 				),
 			},

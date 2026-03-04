@@ -20,7 +20,7 @@ message Params {
     (gogoproto.moretags) = "yaml:\"limits\""
   ];
 
-  // GasPolicy defines the parameters for calculating predicate invocation costs.
+  // GasPolicy defines the coefficients used to translate VM metering units into SDK gas.
   GasPolicy gas_policy = 3 [
     (gogoproto.nullable) = false,
     (gogoproto.moretags) = "yaml:\"gas_policy\""
@@ -31,8 +31,9 @@ message Params {
 message Limits {
   option (gogoproto.goproto_stringer) = true;
 
-  // max_size specifies the maximum size, in bytes, that is accepted for a program.
-  // A value of 0 means that there is no limit on the size of the program.
+  // max_size specifies the maximum total size, in bytes, accepted for the user-supplied
+  // program and query sources.
+  // A value of 0 means that there is no limit on the total source size.
   uint64 max_size = 3 [(gogoproto.moretags) = "yaml:\"max_size\""];
 
   // max_result_count specifies the maximum number of results that can be requested for a query.
@@ -49,36 +50,24 @@ message Limits {
   uint64 max_variables = 5 [(gogoproto.moretags) = "yaml:\"max_variables\""];
 }
 
-// GasPolicy defines the policy for calculating predicate invocation costs and the resulting gas consumption.
-// The gas policy is defined as a list of predicates and their associated unit costs, a default unit cost for predicates
-// if not specified in the list, and a weighting factor that is applied to the unit cost of each predicate to yield.
+// GasPolicy defines the coefficients used to translate VM metering units into SDK gas.
 message GasPolicy {
-  // WeightingFactor is the factor that is applied to the unit cost of each predicate
-  // to yield the gas value.
+  reserved 1, 2, 3;
+  reserved "weighting_factor", "default_predicate_cost", "predicate_costs";
+
+  // compute_coeff applies to Instruction, ArithNode, and CompareStep VM meter kinds.
   // If set to 0, the value considered is 1.
-  uint64 weighting_factor = 1 [(gogoproto.moretags) = "yaml:\"weighting_factor\""];
+  uint64 compute_coeff = 4 [(gogoproto.moretags) = "yaml:\"compute_coeff\""];
 
-  // DefaultPredicateCost is the default unit cost of a predicate when not specified in the PredicateCosts list.
+  // memory_coeff applies to CopyNode and ListCell VM meter kinds.
   // If set to 0, the value considered is 1.
-  uint64 default_predicate_cost = 2 [(gogoproto.moretags) = "yaml:\"default_predicate_cost\""];
+  uint64 memory_coeff = 5 [(gogoproto.moretags) = "yaml:\"memory_coeff\""];
 
-  // PredicateCosts is the list of predicates and their associated unit costs.
-  repeated PredicateCost predicate_costs = 3 [
-    (gogoproto.nullable) = false,
-    (gogoproto.moretags) = "yaml:\"predicate_cost\""
-  ];
-}
-
-// PredicateCost defines the unit cost of a predicate during its invocation by the interpreter.
-message PredicateCost {
-  // Predicate is the name of the predicate, optionally followed by its arity (e.g. "findall/3").
-  // If no arity is specified, the unit cost is applied to all predicates with the same name.
-  string predicate = 1 [
-    (gogoproto.nullable) = true,
-    (gogoproto.moretags) = "yaml:\"predicate\""
-  ];
-
-  // Cost is the unit cost of the predicate.
+  // unify_coeff applies to UnifyStep VM meter kind.
   // If set to 0, the value considered is 1.
-  uint64 cost = 2 [(gogoproto.moretags) = "yaml:\"cost\""];
+  uint64 unify_coeff = 6 [(gogoproto.moretags) = "yaml:\"unify_coeff\""];
+
+  // source_coeff applies to the total size in bytes of the user-supplied program and query sources.
+  // If set to 0, the value considered is 1.
+  uint64 source_coeff = 7 [(gogoproto.moretags) = "yaml:\"source_coeff\""];
 }

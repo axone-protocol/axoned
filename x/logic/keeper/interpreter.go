@@ -7,11 +7,8 @@ import (
 	"strings"
 
 	"github.com/axone-protocol/prolog/v3"
-	"github.com/axone-protocol/prolog/v3/engine"
-	"github.com/samber/lo"
 
 	errorsmod "cosmossdk.io/errors"
-	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -21,11 +18,6 @@ import (
 	prolog2 "github.com/axone-protocol/axoned/v14/x/logic/prolog"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 	"github.com/axone-protocol/axoned/v14/x/logic/util"
-)
-
-const (
-	defaultPredicateCost = uint64(1)
-	defaultWeightFactor  = uint64(1)
 )
 
 // writerStringer is an interface that combines io.Writer with capabilities of fmt.Stringer.
@@ -50,9 +42,15 @@ func (k Keeper) execute(
 
 	i, userOutput, err := k.newInterpreter(ctx, params)
 	if err != nil {
+		if limitErr := util.AsLimitExceededError(ctx, err); limitErr != nil {
+			return nil, limitErr
+		}
 		return nil, errorsmod.Wrapf(types.ErrInternal, "error creating interpreter: %v", err.Error())
 	}
 	if err := i.ExecContext(ctx, program); err != nil {
+		if limitErr := util.AsLimitExceededError(ctx, err); limitErr != nil {
+			return nil, limitErr
+		}
 		return nil, errorsmod.Wrapf(types.ErrInvalidArgument, "error compiling query: %v", err.Error())
 	}
 
@@ -94,13 +92,18 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 	}
 
 	options := []interpreter.Option{
-		interpreter.WithHooks(
-			gasMeterHookFn(sdkctx, params.GetGasPolicy()),
-			telemetryPredicateCallCounterHookFn(),
-			telemetryPredicateDurationHookFn(),
-		),
+		interpreter.WithHooks(telemetryPredicateCallCounterHookFn(), telemetryPredicateDurationHookFn()),
 		interpreter.WithPredicates(ctx, interpreter.RegistryNames),
+		// Bootstrap is part of the kernel space and must not affect user-space gas accounting.
 		interpreter.WithBootstrap(ctx, bootstrap.Bootstrap()),
+		interpreter.WithMeter(
+			meter.NewVMMeter(
+				sdkctx.GasMeter(),
+				params.GetGasPolicy().ComputeCoeff,
+				params.GetGasPolicy().MemoryCoeff,
+				params.GetGasPolicy().UnifyCoeff,
+			),
+		),
 		interpreter.WithFS(fsProvider),
 		interpreter.WithUserOutputWriter(userOutputBuffer),
 		interpreter.WithMaxVariables(limits.MaxVariables),
@@ -109,57 +112,6 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 	i, err := interpreter.New(options...)
 
 	return i, userOutputBuffer, err
-}
-
-// gasMeterHookFn returns a hook function that consumes gas based on the cost of the executed predicate.
-func gasMeterHookFn(ctx context.Context, gasPolicy types.GasPolicy) engine.HookFunc {
-	sdkctx := sdk.UnwrapSDKContext(ctx)
-	gasMeter := meter.WithWeightedMeter(sdkctx.GasMeter(), lo.CoalesceOrEmpty(gasPolicy.WeightingFactor, defaultWeightFactor))
-
-	return func(opcode engine.Opcode, operand engine.Term, env *engine.Env) (err error) {
-		if opcode != engine.OpCall {
-			return nil
-		}
-
-		predicate, ok := stringifyOperand(operand)
-		if !ok {
-			return engine.SyntaxError(operand, env)
-		}
-
-		cost := lookupCost(predicate,
-			lo.CoalesceOrEmpty(gasPolicy.DefaultPredicateCost, defaultPredicateCost),
-			gasPolicy.PredicateCosts)
-
-		defer func() {
-			if r := recover(); r != nil {
-				switch rType := r.(type) {
-				case storetypes.ErrorOutOfGas:
-					err = errorsmod.Wrapf(
-						types.ErrLimitExceeded, "out of gas: %s <%s> (%d/%d)",
-						types.ModuleName, rType.Descriptor, sdkctx.GasMeter().GasConsumed(), sdkctx.GasMeter().Limit())
-				default:
-					panic(r)
-				}
-			}
-		}()
-		gasMeter.ConsumeGas(cost, predicate)
-
-		return nil
-	}
-}
-
-func lookupCost(predicate string, defaultCost uint64, costs []types.PredicateCost) uint64 {
-	if !interpreter.IsRegistered(predicate) {
-		return defaultCost
-	}
-
-	for _, c := range costs {
-		if prolog2.PredicateMatches(predicate)(c.Predicate) {
-			return lo.CoalesceOrEmpty(c.Cost, defaultCost)
-		}
-	}
-
-	return defaultCost
 }
 
 // calculateSolutionLimit returns the final number of solutions to be returned based on the given number of solutions and the

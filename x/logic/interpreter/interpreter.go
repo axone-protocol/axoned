@@ -85,6 +85,14 @@ func WithHooks(hooks ...engine.HookFunc) Option {
 	}
 }
 
+// WithMeter configures the interpreter to use the specified VM meter.
+func WithMeter(meter engine.MeterFunc) Option {
+	return func(i *prolog.Interpreter) error {
+		i.InstallMeter(meter)
+		return nil
+	}
+}
+
 // New creates a new prolog.Interpreter with the specified options.
 func New(
 	opts ...Option,

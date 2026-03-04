@@ -34,7 +34,7 @@ Feature: consult/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3780
+      gas_used: 4224
       answer:
         has_more: false
         variables: ["Who"]
@@ -90,7 +90,7 @@ Feature: consult/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3779
+      gas_used: 4168
       answer:
         has_more: false
         variables: ["X"]
@@ -144,7 +144,7 @@ Feature: consult/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3778
+      gas_used: 4386
       answer:
         has_more: false
         variables: ["File"]

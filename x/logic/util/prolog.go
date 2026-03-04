@@ -22,13 +22,16 @@ const (
 )
 
 var (
-	errMessageVar = engine.NewVariable()
-	errPanicError = engine.Atom("error").Apply(engine.AtomPanicError.Apply(errMessageVar))
+	errMessageVar      = engine.NewVariable()
+	errResourceVar     = engine.NewVariable()
+	errContextVar      = engine.NewVariable()
+	errPanicError      = engine.Atom("error").Apply(engine.AtomPanicError.Apply(errMessageVar))
+	errMeterLimitError = engine.Atom("error").Apply(engine.Atom("resource_error").Apply(errResourceVar), errContextVar)
 )
 
 // QueryInterpreter interprets a query and returns the solutions up to the given limit.
 //
-//nolint:nestif,funlen
+//nolint:nestif
 func QueryInterpreter(
 	ctx context.Context, i *prolog.Interpreter, query string, solutionsLimit uint64,
 ) (*types.Answer, error) {
@@ -56,19 +59,12 @@ func QueryInterpreter(
 	}
 
 	if callErr != nil {
+		if err := AsLimitExceededError(ctx, callErr); err != nil {
+			return nil, err
+		}
+
 		if uint64(len(results)) < solutionsLimit {
 			// error is not part of the look-ahead and should be included in the solutions
-			if errors.Is(callErr, types.ErrLimitExceeded) {
-				return nil, callErr
-			}
-
-			var err engine.Exception
-			if errors.As(callErr, &err) {
-				if err, ok := isPanicError(err.Term()); ok {
-					return nil, errorsmod.Wrapf(types.ErrLimitExceeded, "%s", err)
-				}
-			}
-
 			if err := func() error {
 				defer func() {
 					_ = recover()
@@ -154,4 +150,60 @@ func isPanicError(term engine.Term) (string, bool) {
 	}
 
 	return "", false
+}
+
+// AsLimitExceededError rewrites VM metering exceptions into module limit exceeded errors.
+func AsLimitExceededError(ctx context.Context, err error) error {
+	if err == nil {
+		return nil
+	}
+	if errors.Is(err, types.ErrLimitExceeded) {
+		return err
+	}
+
+	var ex engine.Exception
+	if !errors.As(err, &ex) {
+		return nil
+	}
+
+	if descriptor, ok := isMeterLimitError(ex.Term()); ok {
+		sdkCtx := sdk.UnwrapSDKContext(ctx)
+		return errorsmod.Wrapf(
+			types.ErrLimitExceeded, "out of gas: %s <%s> (%d/%d)",
+			types.ModuleName, descriptor, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
+	}
+
+	if message, ok := isPanicError(ex.Term()); ok {
+		return errorsmod.Wrapf(types.ErrLimitExceeded, "%s", message)
+	}
+
+	return nil
+}
+
+func isMeterLimitError(term engine.Term) (string, bool) {
+	var env *engine.Env
+	if env, ok := env.Unify(term, errMeterLimitError); ok {
+		return meterDescriptor(fmt.Sprintf("%s", env.Resolve(errResourceVar)))
+	}
+
+	return "", false
+}
+
+func meterDescriptor(resource string) (string, bool) {
+	switch strings.ToLower(resource) {
+	case "instruction":
+		return "Instruction", true
+	case "arith_node":
+		return "ArithNode", true
+	case "compare_step":
+		return "CompareStep", true
+	case "copy_node":
+		return "CopyNode", true
+	case "list_cell":
+		return "ListCell", true
+	case "unify_step":
+		return "UnifyStep", true
+	default:
+		return "", false
+	}
 }

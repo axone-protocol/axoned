@@ -57,7 +57,7 @@ Result = ok.
 
 ```  yaml
 height: 42
-gas_used: 3788
+gas_used: 4068
 answer:
   has_more: false
   variables: ["Result"]
@@ -91,7 +91,7 @@ must_be(atom, X).
 
 ```  yaml
 height: 42
-gas_used: 3799
+gas_used: 4260
 answer:
   has_more: false
   variables: ["X"]
