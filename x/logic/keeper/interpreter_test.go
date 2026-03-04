@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	"io/fs"
+	"math"
 	"testing"
 	"testing/fstest"
 
@@ -78,6 +79,15 @@ func TestConsumeSourceGas(t *testing.T) {
 			})
 		})
 
+		Convey("When consuming source gas for an empty request", func() {
+			gasMeter := storetypes.NewGasMeter(100)
+			consumeSourceGas(gasMeter, &types.QueryServiceAskRequest{}, 1)
+
+			Convey("Then no gas should be consumed", func() {
+				So(gasMeter.GasConsumed(), ShouldEqual, 0)
+			})
+		})
+
 		Convey("When consuming source gas beyond the available limit", func() {
 			gasMeter := storetypes.NewGasMeter(1010)
 			var recovered any
@@ -94,6 +104,17 @@ func TestConsumeSourceGas(t *testing.T) {
 				gasErr, ok := recovered.(storetypes.ErrorOutOfGas)
 				So(ok, ShouldBeTrue)
 				So(gasErr.Descriptor, ShouldEqual, "Source")
+			})
+		})
+
+		Convey("When source gas multiplication overflows uint64", func() {
+			gasMeter := storetypes.NewInfiniteGasMeter()
+			overflowRequest := &types.QueryServiceAskRequest{Program: "ab"}
+
+			consumeSourceGas(gasMeter, overflowRequest, math.MaxUint64/2+1)
+
+			Convey("Then the charge should saturate to MaxUint64", func() {
+				So(gasMeter.GasConsumed(), ShouldEqual, uint64(math.MaxUint64))
 			})
 		})
 	})
