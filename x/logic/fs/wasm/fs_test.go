@@ -24,6 +24,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/device"
 	fsiface "github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
 	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
 )
@@ -172,6 +173,25 @@ func TestWasmDeviceFSErrors(t *testing.T) {
 
 			_, err = file.Read(make([]byte, 8))
 			So(errors.Is(err, errWasmQueryFailed), ShouldBeTrue)
+		})
+
+		Convey("when wasm response exceeds the configured maximum size", func() {
+			keeper := testutil.NewMockWasmKeeper(ctrl)
+			keeper.EXPECT().
+				QuerySmart(ctx, contractAddr, []byte(`{"ping":"pong"}`)).
+				Return(make([]byte, maxResponseBytes+1), nil).
+				Times(1)
+
+			vfs := NewFS(ctx, keeper)
+			ofs := vfs.(fsiface.OpenFileFS)
+			file, err := ofs.OpenFile(testContractAddress+"/query", os.O_RDWR, 0)
+			So(err, ShouldBeNil)
+
+			_, err = file.(interface{ Write([]byte) (int, error) }).Write([]byte(`{"ping":"pong"}`))
+			So(err, ShouldBeNil)
+
+			_, err = file.Read(make([]byte, 8))
+			So(errors.Is(err, device.ErrResponseTooLarge), ShouldBeTrue)
 		})
 
 		Convey("when closed before first read", func() {

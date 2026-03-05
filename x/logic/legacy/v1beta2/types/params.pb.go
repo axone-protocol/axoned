@@ -211,14 +211,12 @@ type Interpreter struct {
 	// If not specified, the default boot sequence will be executed.
 	Bootstrap string `protobuf:"bytes,3,opt,name=bootstrap,proto3" json:"bootstrap,omitempty" yaml:"bootstrap"`
 	// virtual_files_filter specifies the filter for the virtual files that are allowed to be used by the interpreter.
-	// The filter is used to whitelist or blacklist virtual files represented as URI, for example:
-	// `file:///path/to/file`, `cosmwasm:cw-storage:axone...?query=foo`
-	// The filter is applied to the components of the URI, for example:
-	// `file:///path/to/file` -> `file`, `/path/to/file`
-	// `cosmwasm:cw-storage:axone...?query=foo` -> `cosmwasm`, `cw-storage`, `axone...`, `query=foo`
-	// If a component is included in the filter, then all components with that name will be considered, starting from the
-	// beginning of the URI. For example, if `file` is included in the filter, then all URIs that start with `file` will be
-	// allowed, regardless of the rest of the components. But `file2` will not be allowed.
+	// The filter is used to whitelist or blacklist virtual file paths, for example:
+	// `/v1/lib/chain.pl`, `/v1/dev/wasm/axone1.../query`
+	// The filter is applied to path components, for example:
+	// `/v1/dev/wasm/axone1.../query` -> `v1`, `dev`, `wasm`, `axone1...`, `query`
+	// If a component is included in the filter, then all source-sinks that match from the beginning are considered.
+	// For example, if `v1` is included in the filter, then all `/v1/...` paths will be allowed.
 	// If the component is not included in the filter, then the component is ignored and the next component is considered.
 	VirtualFilesFilter Filter `protobuf:"bytes,4,opt,name=virtual_files_filter,json=virtualFilesFilter,proto3" json:"virtual_files_filter" yaml:"filesystem_filter"`
 }

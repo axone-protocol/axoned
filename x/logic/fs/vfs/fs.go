@@ -2,6 +2,7 @@ package vfs
 
 import (
 	"errors"
+	"io"
 	"io/fs"
 	"sort"
 	"strings"
@@ -29,9 +30,10 @@ type FileSystem struct {
 }
 
 var (
-	_ fs.FS      = (*FileSystem)(nil)
-	_ OpenFileFS = (*FileSystem)(nil)
-	_ Router     = (*FileSystem)(nil)
+	_ fs.FS         = (*FileSystem)(nil)
+	_ fs.ReadFileFS = (*FileSystem)(nil)
+	_ OpenFileFS    = (*FileSystem)(nil)
+	_ Router        = (*FileSystem)(nil)
 )
 
 // New creates an empty VFS router.
@@ -106,6 +108,35 @@ func (v *FileSystem) Open(path string) (fs.File, error) {
 	}
 
 	return f, nil
+}
+
+// ReadFile routes and dispatches to mounted FS.ReadFile when supported.
+func (v *FileSystem) ReadFile(path string) ([]byte, error) {
+	mounted, subpath, err := v.Route(path)
+	if err != nil {
+		return nil, wrapPathError("open", path, err)
+	}
+
+	if rfs, ok := mounted.(fs.ReadFileFS); ok {
+		content, err := rfs.ReadFile(subpath)
+		if err != nil {
+			return nil, wrapPathError("open", path, err)
+		}
+		return content, nil
+	}
+
+	f, err := mounted.Open(subpath)
+	if err != nil {
+		return nil, wrapPathError("open", path, err)
+	}
+	defer f.Close()
+
+	content, err := io.ReadAll(f)
+	if err != nil {
+		return nil, wrapPathError("open", path, err)
+	}
+
+	return content, nil
 }
 
 // OpenFile routes and dispatches to mounted FS.OpenFile when supported.

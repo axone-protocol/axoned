@@ -28,7 +28,7 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4478
+      gas_used: 10447
       answer:
         has_more: false
         variables: ["ResponseBytes"]
@@ -54,7 +54,7 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4000
+      gas_used: 4461
       answer:
         has_more: false
         variables: ["ResponseBytes"]
@@ -82,7 +82,7 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4065
+      gas_used: 5509
       answer:
         has_more: false
         variables: ["ResponseBytes"]
@@ -116,7 +116,7 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4397
+      gas_used: 9378
       answer:
         has_more: false
         variables: ["ResponseBytes"]

@@ -33,8 +33,6 @@ import (
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
 	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
 	logicsyscomet "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/comet"
 	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
@@ -354,9 +352,6 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		tc.authQueryService,
 		tc.bankKeeper,
 		func(ctx context.Context) (fs.FS, error) {
-			legacyFS := composite.NewFS()
-				legacyFS.Mount(wasm.Scheme, wasm.NewLegacyFS(ctx, tc.wasmKeeper))
-
 			pathFS := logicvfs.New()
 			mounts := []struct {
 				path string
@@ -375,7 +370,7 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 				}
 			}
 
-			return dual.NewFS(pathFS, legacyFS), nil
+			return pathFS, nil
 		})
 
 	if err := logicKeeper.SetParams(tc.ctx.Ctx, tc.params); err != nil {

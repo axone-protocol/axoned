@@ -12,7 +12,7 @@ import (
 
 	. "github.com/smartystreets/goconvey/convey"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/virtualfile"
 	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
 )
 
@@ -216,7 +216,7 @@ func registerFileToFS(vfs *testutil.MockFS, name string, content []byte, modTime
 			if corrupted {
 				return nil, &fs.PathError{Op: "open", Path: name, Err: fmt.Errorf("file is corrupted")}
 			}
-			return wasm.NewVirtualFile(
+			return virtualfile.New(
 				file,
 				content,
 				modTime), nil
@@ -229,7 +229,7 @@ func registerFileToReadFileFS(vfs *testutil.MockReadFileFS, name string, content
 			if corrupted {
 				return nil, &fs.PathError{Op: "open", Path: name, Err: fmt.Errorf("file is corrupted")}
 			}
-			return wasm.NewVirtualFile(
+			return virtualfile.New(
 				file,
 				content,
 				modTime), nil

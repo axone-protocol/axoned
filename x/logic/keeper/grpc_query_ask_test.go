@@ -21,8 +21,6 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
 	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
 	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
 	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
@@ -392,8 +390,6 @@ func TestGRPCAsk(t *testing.T) {
 					pathFS := logicvfs.New()
 					So(pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)), ShouldBeNil)
 					So(pathFS.Mount("/v1/sys/header", logicsysheader.NewFS(testCtx.Ctx)), ShouldBeNil)
-					legacyFS := composite.NewFS()
-					storageFS := dual.NewFS(pathFS, legacyFS)
 
 					logicKeeper := keeper.NewKeeper(
 						encCfg.Codec,
@@ -405,7 +401,7 @@ func TestGRPCAsk(t *testing.T) {
 						authQueryService,
 						bankKeeper,
 						func(_ gocontext.Context) (fs.FS, error) {
-							return storageFS, nil
+							return pathFS, nil
 						})
 
 					params := types.DefaultParams()
