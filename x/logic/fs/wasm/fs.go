@@ -2,28 +2,24 @@ package wasm
 
 import (
 	"context"
-	"encoding/base64"
-	"encoding/json"
-	"fmt"
+	"errors"
+	"io"
 	"io/fs"
-	"net/url"
-	"strconv"
+	"os"
 	"strings"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/pathutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
 const (
-	// scheme is the URI scheme for the WASM filesystem.
-	Scheme = "cosmwasm"
-)
-
-const (
-	queryKey        = "query"
-	base64DecodeKey = "base64Decode"
+	queryPath       = "query"
+	maxRequestBytes = 64 * 1024
 )
 
 type vfs struct {
@@ -32,123 +28,160 @@ type vfs struct {
 }
 
 var (
-	_ fs.FS         = (*vfs)(nil)
-	_ fs.ReadFileFS = (*vfs)(nil)
+	_ fs.FS            = (*vfs)(nil)
+	_ iface.OpenFileFS = (*vfs)(nil)
+
+	errInvalidRequest  = errors.New("invalid_request")
+	errWasmQueryFailed = errors.New("wasm_query_failed")
 )
 
-// NewFS creates a new filesystem that can read data from a WASM contract.
-// The URI should be in the format `cosmwasm:{contractName}:{contractAddr}?query={query}`.
-func NewFS(ctx context.Context, wasmKeeper types.WasmKeeper) fs.ReadFileFS {
+// NewFS creates the /v1/dev/wasm transactional device filesystem.
+func NewFS(ctx context.Context, wasmKeeper types.WasmKeeper) fs.FS {
 	return &vfs{ctx: ctx, wasmKeeper: wasmKeeper}
 }
 
 func (f *vfs) Open(name string) (fs.File, error) {
-	data, err := f.readFile("open", name)
+	return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
+}
+
+func (f *vfs) OpenFile(name string, flag int, _ fs.FileMode) (fs.File, error) {
+	if flag != os.O_RDWR {
+		return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
+	}
+
+	subpath, err := pathutil.NormalizeSubpath(name)
 	if err != nil {
-		return nil, err
+		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
+	}
+
+	contractAddr, err := validateQueryPath(subpath)
+	if err != nil {
+		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
 	}
 
 	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
-	return NewVirtualFile(name, data, prolog.ResolveHeaderInfo(sdkCtx).Time), nil
+	return newDeviceFile(name, prolog.ResolveHeaderInfo(sdkCtx).Time, sdkCtx, f.wasmKeeper, contractAddr), nil
 }
 
-func (f *vfs) ReadFile(name string) ([]byte, error) {
-	return f.readFile("open", name)
-}
-
-func (f *vfs) readFile(op string, name string) ([]byte, error) {
-	contractAddr, query, base64Decode, err := f.parsePath(op, name)
-	if err != nil {
-		return nil, err
+func validateQueryPath(subpath string) (sdk.AccAddress, error) {
+	segments := strings.Split(subpath, "/")
+	if len(segments) != 2 || segments[1] != queryPath {
+		return nil, fs.ErrNotExist
 	}
 
-	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
-	data, err := f.wasmKeeper.QuerySmart(sdkCtx, contractAddr, []byte(query))
+	address := segments[0]
+	if address == "" {
+		return nil, fs.ErrNotExist
+	}
+
+	addr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
-		return nil, &fs.PathError{
-			Op:   op,
-			Path: name,
-			Err:  fmt.Errorf("failed to query WASM contract %s: %w", contractAddr, err),
+		return nil, fs.ErrNotExist
+	}
+
+	return addr, nil
+}
+
+type deviceFile struct {
+	path string
+
+	modTime    time.Time
+	ctx        context.Context
+	wasmKeeper types.WasmKeeper
+	addr       sdk.AccAddress
+
+	request   []byte
+	response  []byte
+	readPos   int
+	committed bool
+	closed    bool
+}
+
+func newDeviceFile(
+	path string,
+	modTime time.Time,
+	ctx context.Context,
+	wasmKeeper types.WasmKeeper,
+	addr sdk.AccAddress,
+) fs.File {
+	return &deviceFile{
+		path:       path,
+		modTime:    modTime,
+		ctx:        ctx,
+		wasmKeeper: wasmKeeper,
+		addr:       addr,
+	}
+}
+
+func (f *deviceFile) Stat() (fs.FileInfo, error) {
+	return fileInfo{name: baseName(f.path), modTime: f.modTime}, nil
+}
+
+func (f *deviceFile) Read(p []byte) (int, error) {
+	if f.closed {
+		return 0, fs.ErrClosed
+	}
+
+	if !f.committed {
+		if len(f.request) == 0 {
+			return 0, errInvalidRequest
 		}
-	}
 
-	if base64Decode {
-		var program string
-		err = json.Unmarshal(data, &program)
+		response, err := f.wasmKeeper.QuerySmart(f.ctx, f.addr, append([]byte(nil), f.request...))
 		if err != nil {
-			return nil, &fs.PathError{
-				Op:   op,
-				Path: name,
-				Err:  fmt.Errorf("failed to unmarshal JSON WASM response to string: %w", err),
-			}
+			return 0, &fs.PathError{Op: "read", Path: f.path, Err: errWasmQueryFailed}
 		}
 
-		data, err = base64.StdEncoding.DecodeString(program)
-		if err != nil {
-			return nil, &fs.PathError{
-				Op:   op,
-				Path: name,
-				Err:  fmt.Errorf("failed to decode WASM base64 response: %w", err),
-			}
-		}
+		f.response = response
+		f.committed = true
 	}
 
-	return data, nil
+	if f.readPos >= len(f.response) {
+		return 0, io.EOF
+	}
+
+	n := copy(p, f.response[f.readPos:])
+	f.readPos += n
+	return n, nil
 }
 
-// parsePath parses the provided path and returns its component.
-func (f *vfs) parsePath(op string, path string) (sdk.AccAddress, string, bool, error) {
-	uri, err := url.Parse(path)
-	if err != nil {
-		return nil, "", false,
-			&fs.PathError{Op: op, Path: path, Err: fs.ErrInvalid}
+func (f *deviceFile) Write(p []byte) (int, error) {
+	if f.closed {
+		return 0, fs.ErrClosed
 	}
 
-	if uri.Scheme != Scheme {
-		return nil, "", false,
-			&fs.PathError{Op: op, Path: path, Err: fmt.Errorf("invalid scheme, expected '%s', got '%s'", Scheme, uri.Scheme)}
+	if f.committed {
+		return 0, fs.ErrPermission
 	}
 
-	paths := strings.SplitAfter(uri.Opaque, ":")
-	pathsLen := len(paths)
-	if pathsLen < 1 || paths[pathsLen-1] == "" {
-		return nil, "", false,
-			&fs.PathError{Op: op, Path: path, Err: fmt.Errorf("empty path given, should be '%s:{contractName}:{contractAddr}?query={query}'",
-				Scheme)}
+	if len(f.request)+len(p) > maxRequestBytes {
+		return 0, fs.ErrPermission
 	}
 
-	lastPart := paths[len(paths)-1]
-	contractAddr, err := sdk.AccAddressFromBech32(lastPart)
-	if err != nil {
-		return nil, "", false,
-			&fs.PathError{
-				Op:   op,
-				Path: path,
-				Err:  fmt.Errorf("failed to convert path '%s' to contract address: %w", lastPart, err),
-			}
-	}
+	f.request = append(f.request, p...)
+	return len(p), nil
+}
 
-	query := uri.Query().Get(queryKey)
-	if query == "" {
-		return nil, "", false,
-			&fs.PathError{
-				Op:   op,
-				Path: path,
-				Err:  fmt.Errorf("uri should contains `query` params"),
-			}
-	}
+func (f *deviceFile) Close() error {
+	f.closed = true
+	return nil
+}
 
-	base64Decode := true
-	if uri.Query().Has(base64DecodeKey) {
-		if base64Decode, err = strconv.ParseBool(uri.Query().Get(base64DecodeKey)); err != nil {
-			return nil, "", false,
-				&fs.PathError{
-					Op:   op,
-					Path: path,
-					Err:  fmt.Errorf("failed to convert 'base64Decode' query value to boolean: %w", err),
-				}
-		}
-	}
+type fileInfo struct {
+	name    string
+	modTime time.Time
+}
 
-	return contractAddr, query, base64Decode, nil
+func (fi fileInfo) Name() string       { return fi.name }
+func (fi fileInfo) Size() int64        { return 0 }
+func (fi fileInfo) Mode() fs.FileMode  { return 0o666 }
+func (fi fileInfo) ModTime() time.Time { return fi.modTime }
+func (fi fileInfo) IsDir() bool        { return false }
+func (fi fileInfo) Sys() any           { return nil }
+
+func baseName(path string) string {
+	if idx := strings.LastIndexByte(path, '/'); idx >= 0 {
+		return path[idx+1:]
+	}
+	return path
 }

@@ -541,10 +541,10 @@ func SetOutput(vm *engine.VM, output engine.Term, cont engine.Cont, env *engine.
 //	open(+SourceSink, +Mode, -Stream, +Options)
 //
 // where:
-//   - SourceSink is an atom representing the source or sink of the stream, which is typically a URI.
-//   - Mode is an atom representing the mode of the stream to be opened. It can be one of "read", "write", or "append".
+//   - SourceSink is an atom representing the source or sink of the stream in the virtual file system.
+//   - Mode is an atom representing the mode of the stream to be opened (for example "read", "write", "append", "read_write").
 //   - Stream is the stream to be opened.
-//   - Options is a list of options. No options are currently defined, so the list should be empty.
+//   - Options is a list of stream options.
 //
 // open/4 gives True when SourceSink can be opened in Mode with the given Options.
 //
@@ -555,24 +555,9 @@ func SetOutput(vm *engine.VM, output engine.Term, cont engine.Cont, env *engine.
 // Instead, it operates with a Virtual File System (VFS), a conceptual layer that abstracts the file system. This abstraction
 // offers a unified view across various storage systems, adhering to the constraints imposed by blockchain technology.
 //
-// This VFS extends the file concept to resources, which are identified by a Uniform Resource Identifier (URI). A URI
-// specifies the access protocol for the resource, its path, and any necessary parameters.
-//
-// # CosmWasm URI
-//
-// The cosmwasm URI enables interaction with instantiated CosmWasm smart contract on the blockchain. The URI is used to
-// query the smart contract and retrieve the response. The query is executed on the smart contract, and the response is
-// returned as a stream. Query parameters are passed as part of the URI to customize the interaction with the smart contract.
-//
-// Its format is as follows:
-//
-//	cosmwasm:{contract_name}:{contract_address}?query={contract_query}[&base64Decode={true|false}]
-//
-// where:
-//   - {contract_name}: For informational purposes, indicates the name or type of the smart contract (e.g., "axone-objectarium").
-//   - {contract_address}: Specifies the smart contract instance to query.
-//   - {contract_query}: The query to be executed on the smart contract. It is a JSON object that specifies the query payload.
-//   - base64Decode: (Optional) If true, the response is base64-decoded. Otherwise, the response is returned as is.
+// This VFS extends the file concept to module-provided resources and devices exposed as paths, for example:
+//   - immutable snapshots under /v1/sys/*
+//   - transactional devices under /v1/dev/*
 func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Open(vm, sourceSink, mode, stream, options, k, env)
 }
