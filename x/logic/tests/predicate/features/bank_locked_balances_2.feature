@@ -21,7 +21,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4684
+      gas_used: 4686
       answer:
         has_more: false
         variables: ["Balances"]
@@ -49,7 +49,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4443
+      gas_used: 4445
       answer:
         has_more: false
         variables: ["Balances"]
@@ -83,7 +83,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4911
+      gas_used: 4913
       answer:
         has_more: false
         variables: ["Amount"]
@@ -111,7 +111,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4601
+      gas_used: 4603
       answer:
         has_more: false
         results:
@@ -134,7 +134,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4352
+      gas_used: 4356
       answer:
         has_more: false
         variables: ["Address", "Balances"]
@@ -158,7 +158,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4439
+      gas_used: 4441
       answer:
         has_more: false
         variables: ["Balances"]
@@ -182,7 +182,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4291
+      gas_used: 4293
       answer:
         has_more: false
         results:

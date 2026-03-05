@@ -361,6 +361,7 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 				{"/v1/sys/header", logicsysheader.NewFS(ctx)},
 				{"/v1/sys/comet", logicsyscomet.NewFS(ctx)},
 				{"/v1/state/bank", bank.NewFS(ctx)},
+				{"/v1/dev/echo", newEchoDeviceFS()},
 			}
 			for _, m := range mounts {
 				if err := pathFS.Mount(m.path, m.fs); err != nil {
