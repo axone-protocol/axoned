@@ -77,6 +77,7 @@ type testCase struct {
 type SmartContractConfiguration struct {
 	Message  string `json:"message" yaml:"message"`
 	Response string `json:"response" yaml:"response"`
+	Error    string `json:"error" yaml:"error"`
 }
 
 type testCaseCtxKey struct{}
@@ -159,6 +160,10 @@ func givenASmartContractWithAddress(ctx context.Context, address string, configu
 			}
 
 			if reflect.DeepEqual(message, messageWant) {
+				if smartContractConfiguration.Error != "" {
+					return nil, errors.New(smartContractConfiguration.Error)
+				}
+
 				return []byte(smartContractConfiguration.Response), nil
 			}
 
@@ -361,6 +366,7 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 				{"/v1/sys/header", logicsysheader.NewFS(ctx)},
 				{"/v1/sys/comet", logicsyscomet.NewFS(ctx)},
 				{"/v1/state/bank", bank.NewFS(ctx)},
+				{"/v1/dev/wasm", wasm.NewFS(ctx, tc.wasmKeeper)},
 				{"/v1/dev/echo", newEchoDeviceFS()},
 			}
 			for _, m := range mounts {
