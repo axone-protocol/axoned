@@ -350,7 +350,7 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		tc.bankKeeper,
 		func(ctx context.Context) (fs.FS, error) {
 			legacyFS := composite.NewFS()
-			legacyFS.Mount(wasm.Scheme, wasm.NewFS(ctx, tc.wasmKeeper))
+				legacyFS.Mount(wasm.Scheme, wasm.NewLegacyFS(ctx, tc.wasmKeeper))
 
 			pathFS := logicvfs.New()
 			mounts := []struct {

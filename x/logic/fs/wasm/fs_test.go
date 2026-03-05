@@ -1,11 +1,12 @@
-//nolint:lll
 package wasm
 
 import (
+	"bytes"
 	"errors"
-	"fmt"
 	"io"
 	"io/fs"
+	"os"
+	"sync"
 	"testing"
 	"time"
 
@@ -23,202 +24,181 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	fsiface "github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
 	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
 )
 
-//nolint:gocognit
-func TestWasmVFS(t *testing.T) {
+const testContractAddress = "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk"
+
+func TestWasmDeviceFSOpenFileValidation(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
 
-	Convey("Given a test cases", t, func() {
-		contractAddress := "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk"
-		cases := []struct {
-			contractAddress string
-			query           []byte
-			data            []byte
-			uri             string
-			fail            bool
-			wantResult      []byte
-			wantError       string
-		}{
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
-				uri:             `cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				wantResult:      []byte("calc(X) :-  X is 100 + 200."),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu"),
-				uri:             `cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				wantResult:      []byte("\"\""),
-				wantError:       fmt.Sprintf("cosmwasm:cw-storage:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: failed to unmarshal JSON WASM response to string: invalid character 'Y' looking for beginning of value", contractAddress),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
-				uri:             `cosmwasm:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				wantResult:      []byte("calc(X) :-  X is 100 + 200."),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
-				uri:             `axone:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				wantError:       fmt.Sprintf("axone:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: invalid scheme, expected 'cosmwasm', got 'axone'", contractAddress),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"hey\""),
-				uri:             `cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				wantResult:      []byte("\"\""),
-				wantError:       fmt.Sprintf("cosmwasm:cw-storage:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: failed to decode WASM base64 response: illegal base64 data at input byte 0", contractAddress),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"hey\""),
-				uri:             `cosmwasm:cw-storage?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				wantResult:      []byte("\"\""),
-				wantError:       fmt.Sprintf("cosmwasm:cw-storage?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: failed to convert path 'cw-storage' to contract address: decoding bech32 failed: invalid separator index -1"),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"hey\""),
-				uri:             `cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?wasm=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				wantResult:      []byte("\"\""),
-				wantError:       fmt.Sprintf("cosmwasm:cw-storage:%s?wasm=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: uri should contains `query` params", contractAddress),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"hey\""),
-				uri:             `cosmwasm:?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				wantResult:      []byte("\"\""),
-				wantError:       fmt.Sprintf("cosmwasm:?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D: empty path given, should be 'cosmwasm:{contractName}:{contractAddr}?query={query}'"),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("foo-bar"),
-				uri:             `cosmwasm:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=false`,
-				wantResult:      []byte("foo-bar"),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
-				uri:             `cosmwasm:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=true`,
-				wantResult:      []byte("calc(X) :-  X is 100 + 200."),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"hey\""),
-				uri:             `cosmwasm:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D&base64Decode=foo`,
-				wantResult:      []byte("\"\""),
-				wantError:       fmt.Sprintf(`cosmwasm:%s?query=%%7B%%22object_data%%22%%3A%%7B%%22id%%22%%3A%%20%%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%%22%%7D%%7D&base64Decode=foo: failed to convert 'base64Decode' query value to boolean: strconv.ParseBool: parsing "foo": invalid syntax`, contractAddress),
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"hey\""),
-				uri:             `% %`,
-				wantResult:      []byte("\"\""),
-				wantError:       "% %: invalid argument",
-			},
-			{
-				contractAddress: contractAddress,
-				query:           []byte("{\"object_data\":{\"id\": \"4cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05\"}}"),
-				data:            []byte("\"Y2FsYyhYKSA6LSAgWCBpcyAxMDAgKyAyMDAu\""),
-				uri:             `cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D`,
-				fail:            true,
-				wantError:       "cosmwasm:cw-storage:axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk?query=%7B%22object_data%22%3A%7B%22id%22%3A%20%224cbe36399aabfcc7158ee7a66cbfffa525bb0ceab33d1ff2cff08759fe0a9b05%22%7D%7D: failed to query WASM contract axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk: failed to query smart contract",
-			},
-		}
-		for nc, tc := range cases {
-			Convey(fmt.Sprintf("Given the uri #%d: %s", nc, tc.uri), func() {
-				Convey("and a wasm keeper initialized with the given values", func() {
-					db := dbm.NewMemDB()
-					stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
-					wasmKeeper := testutil.NewMockWasmKeeper(ctrl)
-					headerTime := time.Date(2026, 2, 20, 11, 22, 33, 0, time.UTC)
-					ctx := sdk.
-						NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger()).
-						WithHeaderInfo(coreheader.Info{Time: headerTime})
-					sdk.GetConfig().SetBech32PrefixForAccount("axone", "axonepub")
+	ctx := newSDKContext()
+	keeper := testutil.NewMockWasmKeeper(ctrl)
+	vfs := NewFS(ctx, keeper)
+	ofs, ok := vfs.(fsiface.OpenFileFS)
+	if !ok {
+		t.Fatal("wasm fs should implement OpenFileFS")
+	}
 
-					wasmKeeper.EXPECT().
-						QuerySmart(ctx, sdk.MustAccAddressFromBech32(tc.contractAddress), tc.query).
-						AnyTimes().
-						DoAndReturn(func(_, _, _ any) ([]byte, error) {
-							if tc.fail {
-								return nil, errors.New("failed to query smart contract")
-							}
+	Convey("Given a wasm device filesystem", t, func() {
+		Convey("when opening with unsupported mode", func() {
+			_, err := ofs.OpenFile(testContractAddress+"/query", os.O_RDONLY, 0)
+			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+		})
 
-							return tc.data, nil
-						})
+		Convey("when opening an unknown path", func() {
+			_, err := ofs.OpenFile(testContractAddress+"/info", os.O_RDWR, 0)
+			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+		})
 
-					Convey("and a wasm file system under test", func() {
-						vfs := NewFS(ctx, wasmKeeper)
-
-						Convey(fmt.Sprintf(`when the open("%s") is called`, tc.uri), func() {
-							file, err := vfs.Open(tc.uri)
-
-							Convey("then the result should be as expected", func() {
-								if tc.wantError != "" {
-									So(err, ShouldNotBeNil)
-									So(err.Error(), ShouldEqual, fmt.Sprintf("open %s", tc.wantError))
-								} else {
-									So(err, ShouldBeNil)
-
-									defer file.Close()
-									info, err := file.Stat()
-									So(err, ShouldBeNil)
-
-									So(info.Name(), ShouldEqual, tc.uri)
-									So(info.Size(), ShouldEqual, int64(len(tc.wantResult)))
-									So(info.ModTime(), ShouldEqual, ctx.HeaderInfo().Time)
-									So(info.IsDir(), ShouldBeFalse)
-									So(info.Mode(), ShouldEqual, fs.FileMode(0o444))
-									So(info.Sys(), ShouldBeNil)
-
-									data := make([]byte, info.Size())
-									for {
-										_, err := file.Read(data)
-										if errors.Is(err, io.EOF) {
-											break
-										}
-										continue
-									}
-
-									So(data, ShouldResemble, tc.wantResult)
-								}
-							})
-
-							Convey(fmt.Sprintf(`when the readFile("%s") is called`, tc.uri), func() {
-								result, err := vfs.ReadFile(tc.uri)
-
-								Convey("then the result should be as expected", func() {
-									if tc.wantError != "" {
-										So(err, ShouldNotBeNil)
-										So(err.Error(), ShouldEqual, fmt.Sprintf("open %s", tc.wantError))
-									} else {
-										So(err, ShouldBeNil)
-										So(result, ShouldResemble, tc.wantResult)
-									}
-								})
-							})
-						})
-					})
-				})
-			})
-		}
+		Convey("when opening with invalid contract address", func() {
+			_, err := ofs.OpenFile("not-bech32/query", os.O_RDWR, 0)
+			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+		})
 	})
 }
+
+func TestWasmDeviceFSTransactionLifecycle(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	ctx := newSDKContext()
+	contractAddr := sdk.MustAccAddressFromBech32(testContractAddress)
+	request := []byte(`{"ping":"pong"}`)
+	response := []byte(`{"ok":true}`)
+
+	keeper := testutil.NewMockWasmKeeper(ctrl)
+	keeper.EXPECT().
+		QuerySmart(ctx, contractAddr, request).
+		Return(response, nil).
+		Times(1)
+
+	vfs := NewFS(ctx, keeper)
+	ofs, ok := vfs.(fsiface.OpenFileFS)
+	if !ok {
+		t.Fatal("wasm fs should implement OpenFileFS")
+	}
+
+	Convey("Given an opened wasm query device", t, func() {
+		file, err := ofs.OpenFile(testContractAddress+"/query", os.O_RDWR, 0)
+		So(err, ShouldBeNil)
+
+		rw, ok := file.(interface {
+			Read([]byte) (int, error)
+			Write([]byte) (int, error)
+			Close() error
+		})
+		So(ok, ShouldBeTrue)
+
+		Convey("when writing request bytes and reading response", func() {
+			n, err := rw.Write(request[:6])
+			So(err, ShouldBeNil)
+			So(n, ShouldEqual, 6)
+
+			n, err = rw.Write(request[6:])
+			So(err, ShouldBeNil)
+			So(n, ShouldEqual, len(request)-6)
+
+			got := bytes.NewBuffer(nil)
+			buf := make([]byte, 4)
+			for {
+				readN, readErr := rw.Read(buf)
+				if readN > 0 {
+					_, _ = got.Write(buf[:readN])
+				}
+				if errors.Is(readErr, io.EOF) {
+					break
+				}
+				So(readErr, ShouldBeNil)
+			}
+			So(got.Bytes(), ShouldResemble, response)
+
+			_, err = rw.Write([]byte("!"))
+			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+		})
+	})
+}
+
+func TestWasmDeviceFSErrors(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	ctx := newSDKContext()
+	contractAddr := sdk.MustAccAddressFromBech32(testContractAddress)
+
+	Convey("Given a wasm device filesystem", t, func() {
+		Convey("when first read happens without request payload", func() {
+			keeper := testutil.NewMockWasmKeeper(ctrl)
+			vfs := NewFS(ctx, keeper)
+			ofs := vfs.(fsiface.OpenFileFS)
+
+			file, err := ofs.OpenFile(testContractAddress+"/query", os.O_RDWR, 0)
+			So(err, ShouldBeNil)
+
+			buf := make([]byte, 8)
+			_, err = file.Read(buf)
+			So(errors.Is(err, errInvalidRequest), ShouldBeTrue)
+		})
+
+		Convey("when request payload exceeds limit", func() {
+			keeper := testutil.NewMockWasmKeeper(ctrl)
+			vfs := NewFS(ctx, keeper)
+			ofs := vfs.(fsiface.OpenFileFS)
+
+			file, err := ofs.OpenFile(testContractAddress+"/query", os.O_RDWR, 0)
+			So(err, ShouldBeNil)
+
+			huge := make([]byte, maxRequestBytes+1)
+			_, err = file.(interface{ Write([]byte) (int, error) }).Write(huge)
+			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+		})
+
+		Convey("when wasm query fails at commit", func() {
+			keeper := testutil.NewMockWasmKeeper(ctrl)
+			keeper.EXPECT().
+				QuerySmart(ctx, contractAddr, []byte(`{"ping":"pong"}`)).
+				Return(nil, errors.New("boom")).
+				Times(1)
+
+			vfs := NewFS(ctx, keeper)
+			ofs := vfs.(fsiface.OpenFileFS)
+			file, err := ofs.OpenFile(testContractAddress+"/query", os.O_RDWR, 0)
+			So(err, ShouldBeNil)
+
+			_, err = file.(interface{ Write([]byte) (int, error) }).Write([]byte(`{"ping":"pong"}`))
+			So(err, ShouldBeNil)
+
+			_, err = file.Read(make([]byte, 8))
+			So(errors.Is(err, errWasmQueryFailed), ShouldBeTrue)
+		})
+
+		Convey("when closed before first read", func() {
+			keeper := testutil.NewMockWasmKeeper(ctrl)
+			vfs := NewFS(ctx, keeper)
+			ofs := vfs.(fsiface.OpenFileFS)
+			file, err := ofs.OpenFile(testContractAddress+"/query", os.O_RDWR, 0)
+			So(err, ShouldBeNil)
+
+			_, err = file.(interface{ Write([]byte) (int, error) }).Write([]byte(`{"ping":"pong"}`))
+			So(err, ShouldBeNil)
+
+			So(file.Close(), ShouldBeNil)
+		})
+	})
+}
+
+func newSDKContext() sdk.Context {
+	bech32ConfigOnce.Do(func() {
+		sdk.GetConfig().SetBech32PrefixForAccount("axone", "axonepub")
+	})
+	stateStore := store.NewCommitMultiStore(dbm.NewMemDB(), log.NewNopLogger(), metrics.NewNoOpMetrics())
+	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
+	return ctx.WithHeaderInfo(coreheader.Info{
+		Height: 42,
+		Time:   time.Date(2026, 3, 5, 10, 0, 0, 0, time.UTC),
+	})
+}
+
+var bech32ConfigOnce sync.Once
