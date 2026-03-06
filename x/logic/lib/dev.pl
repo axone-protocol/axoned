@@ -5,14 +5,58 @@
 
 %! dev_call(+Path, +Type, :WriteGoal, :ReadGoal) is det.
 %
-% Executes a transactional device call:
-% 1. open device stream in read_write mode
-% 2. run WriteGoal(Stream)
-% 3. run ReadGoal(Stream)
-% 4. close stream
+% Executes a transactional device call following a half-duplex protocol.
 %
-% The transactional commit is device-defined and is typically triggered by the
-% first read operation performed inside ReadGoal/1.
+% ## Overview
+%
+% A device is a special type of file in the virtual filesystem that implements
+% a transactional request-response protocol. Unlike regular files, devices follow
+% a strict half-duplex communication pattern with three distinct phases:
+%
+% 1. **Request phase**: Write operations accumulate bytes into a request buffer
+% 2. **Commit phase**: First read operation commits the accumulated request
+% 3. **Response phase**: Subsequent reads stream the response until EOF
+%
+% Once committed (after the first read), the device transitions to read-only mode
+% and rejects any further write attempts with a permission error.
+%
+% ## Protocol Flow
+%
+% ```
+% 1. open device stream in read_write mode
+% 2. run WriteGoal(Stream)  ← builds request
+% 3. run ReadGoal(Stream)   ← commits & reads response  
+% 4. close stream
+% ```
+%
+% The commit operation is device-specific and executes the actual transaction
+% (e.g., a smart contract query, a database call, etc.). Most devices require
+% at least one write before the first read; reading without writing typically
+% fails with an `invalid_request` error.
+%
+% ## Arguments
+%
+% - `Path`: atom representing the device path in the VFS (e.g., '/v1/dev/wasm/...')
+% - `Type`: stream type, either `text` or `binary`
+% - `WriteGoal`: callable that receives Stream as first argument to build the request
+% - `ReadGoal`: callable that receives Stream as first argument to read the response
+%
+% ## Usage Notes
+%
+% **⚠️ Advanced Feature**: This predicate provides low-level access to transactional
+% devices in the virtual filesystem of the Prolog VM. 
+% For most use cases, prefer higher-level predicates like `wasm_query/3` for smart 
+% contracts, which provide simpler interfaces.
+%
+% Use `dev_call/4` only when you need:
+% - Direct control over the device protocol
+% - Custom request/response handling
+% - Integration with devices that don't have specialized predicates
+%
+% Transactional devices include:
+% - Codecs and transforms (bech32, base64, etc.) exposed as devices
+% - WASM smart contract interactions (prefer `wasm_query/3` for common cases)
+% - Other transactional operations as needed
 dev_call(Path, Type, WriteGoal, ReadGoal) :-
   setup_call_cleanup(
     dev_open(Path, Type, Stream),
