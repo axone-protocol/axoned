@@ -1,3 +1,4 @@
+//nolint:revive // Package name 'fs' conflicts with stdlib io/fs but provides domain-specific filesystem abstractions
 package fs
 
 import (

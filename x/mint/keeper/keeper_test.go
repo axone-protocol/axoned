@@ -1,10 +1,12 @@
 package keeper_test
 
 import (
+	"reflect"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
+
+	. "github.com/smartystreets/goconvey/convey"
 
 	"cosmossdk.io/math"
 	storetypes "cosmossdk.io/store/types"
@@ -22,9 +24,7 @@ import (
 	"github.com/axone-protocol/axoned/v14/x/mint/types"
 )
 
-type IntegrationTestSuite struct {
-	suite.Suite
-
+type integrationTestContext struct {
 	mintKeeper    keeper.Keeper
 	ctx           sdk.Context
 	msgServer     types.MsgServer
@@ -32,26 +32,23 @@ type IntegrationTestSuite struct {
 	bankKeeper    *minttestutil.MockBankKeeper
 }
 
-func TestKeeperTestSuite(t *testing.T) {
-	suite.Run(t, new(IntegrationTestSuite))
-}
+func setupIntegrationTestContext(t *testing.T) *integrationTestContext {
+	t.Helper()
 
-func (s *IntegrationTestSuite) SetupTest() {
 	encCfg := moduletestutil.MakeTestEncodingConfig(mint.AppModuleBasic{})
 	key := storetypes.NewKVStoreKey(types.StoreKey)
 	storeService := runtime.NewKVStoreService(key)
-	testCtx := testutil.DefaultContextWithDB(s.T(), key, storetypes.NewTransientStoreKey("transient_test"))
-	s.ctx = testCtx.Ctx
+	testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
 
 	// gomock initializations
-	ctrl := gomock.NewController(s.T())
+	ctrl := gomock.NewController(t)
 	accountKeeper := minttestutil.NewMockAccountKeeper(ctrl)
 	bankKeeper := minttestutil.NewMockBankKeeper(ctrl)
 	stakingKeeper := minttestutil.NewMockStakingKeeper(ctrl)
 
 	accountKeeper.EXPECT().GetModuleAddress(types.ModuleName).Return(sdk.AccAddress{})
 
-	s.mintKeeper = keeper.NewKeeper(
+	mintKeeper := keeper.NewKeeper(
 		encCfg.Codec,
 		storeService,
 		stakingKeeper,
@@ -60,38 +57,50 @@ func (s *IntegrationTestSuite) SetupTest() {
 		authtypes.FeeCollectorName,
 		authtypes.NewModuleAddress(govtypes.ModuleName).String(),
 	)
-	s.stakingKeeper = stakingKeeper
-	s.bankKeeper = bankKeeper
 
-	s.Require().Equal(testCtx.Ctx.Logger().With("module", "x/"+types.ModuleName),
-		s.mintKeeper.Logger(testCtx.Ctx))
+	if !reflect.DeepEqual(testCtx.Ctx.Logger().With("module", "x/"+types.ModuleName), mintKeeper.Logger(testCtx.Ctx)) {
+		t.Fatal("unexpected module logger")
+	}
 
-	err := s.mintKeeper.Params.Set(s.ctx, types.DefaultParams())
-	s.Require().NoError(err)
-	s.Require().NoError(s.mintKeeper.Minter.Set(s.ctx, types.DefaultInitialMinter()))
+	if err := mintKeeper.Params.Set(testCtx.Ctx, types.DefaultParams()); err != nil {
+		t.Fatalf("set params: %v", err)
+	}
+	if err := mintKeeper.Minter.Set(testCtx.Ctx, types.DefaultInitialMinter()); err != nil {
+		t.Fatalf("set minter: %v", err)
+	}
 
-	s.msgServer = keeper.NewMsgServerImpl(s.mintKeeper)
+	return &integrationTestContext{
+		mintKeeper:    mintKeeper,
+		ctx:           testCtx.Ctx,
+		msgServer:     keeper.NewMsgServerImpl(mintKeeper),
+		stakingKeeper: stakingKeeper,
+		bankKeeper:    bankKeeper,
+	}
 }
 
-func (s *IntegrationTestSuite) TestAliasFunctions() {
-	stakingTokenSupply := math.NewIntFromUint64(100000000000)
-	s.stakingKeeper.EXPECT().StakingTokenSupply(s.ctx).Return(stakingTokenSupply, nil)
-	tokenSupply, err := s.mintKeeper.StakingTokenSupply(s.ctx)
-	s.Require().NoError(err)
-	s.Require().Equal(tokenSupply, stakingTokenSupply)
+func TestAliasFunctions(t *testing.T) {
+	Convey("Given a mint keeper", t, func() {
+		tc := setupIntegrationTestContext(t)
 
-	bondedRatio := math.LegacyNewDecWithPrec(15, 2)
-	s.stakingKeeper.EXPECT().BondedRatio(s.ctx).Return(bondedRatio, nil)
-	ratio, err := s.mintKeeper.BondedRatio(s.ctx)
-	s.Require().NoError(err)
-	s.Require().Equal(ratio, bondedRatio)
+		stakingTokenSupply := math.NewIntFromUint64(100000000000)
+		tc.stakingKeeper.EXPECT().StakingTokenSupply(tc.ctx).Return(stakingTokenSupply, nil)
+		tokenSupply, err := tc.mintKeeper.StakingTokenSupply(tc.ctx)
+		So(err, ShouldBeNil)
+		So(tokenSupply, ShouldResemble, stakingTokenSupply)
 
-	coins := sdk.NewCoins(sdk.NewCoin("stake", math.NewInt(1000000)))
-	s.bankKeeper.EXPECT().MintCoins(s.ctx, types.ModuleName, coins).Return(nil)
-	s.Require().Equal(s.mintKeeper.MintCoins(s.ctx, sdk.NewCoins()), nil)
-	s.Require().Nil(s.mintKeeper.MintCoins(s.ctx, coins))
+		bondedRatio := math.LegacyNewDecWithPrec(15, 2)
+		tc.stakingKeeper.EXPECT().BondedRatio(tc.ctx).Return(bondedRatio, nil)
+		ratio, err := tc.mintKeeper.BondedRatio(tc.ctx)
+		So(err, ShouldBeNil)
+		So(ratio, ShouldResemble, bondedRatio)
 
-	fees := sdk.NewCoins(sdk.NewCoin("stake", math.NewInt(1000)))
-	s.bankKeeper.EXPECT().SendCoinsFromModuleToModule(s.ctx, types.ModuleName, authtypes.FeeCollectorName, fees).Return(nil)
-	s.Require().Nil(s.mintKeeper.AddCollectedFees(s.ctx, fees))
+		coins := sdk.NewCoins(sdk.NewCoin("stake", math.NewInt(1000000)))
+		tc.bankKeeper.EXPECT().MintCoins(tc.ctx, types.ModuleName, coins).Return(nil)
+		So(tc.mintKeeper.MintCoins(tc.ctx, sdk.NewCoins()), ShouldBeNil)
+		So(tc.mintKeeper.MintCoins(tc.ctx, coins), ShouldBeNil)
+
+		fees := sdk.NewCoins(sdk.NewCoin("stake", math.NewInt(1000)))
+		tc.bankKeeper.EXPECT().SendCoinsFromModuleToModule(tc.ctx, types.ModuleName, authtypes.FeeCollectorName, fees).Return(nil)
+		So(tc.mintKeeper.AddCollectedFees(tc.ctx, fees), ShouldBeNil)
+	})
 }

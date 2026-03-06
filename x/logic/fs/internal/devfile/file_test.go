@@ -294,7 +294,6 @@ func TestBaseName(t *testing.T) {
 		}
 
 		for _, tc := range testCases {
-			tc := tc
 			Convey(tc.path, func() {
 				So(baseName(tc.path), ShouldEqual, tc.want)
 			})

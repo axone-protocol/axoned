@@ -4,7 +4,7 @@ import (
 	"math/rand"
 	"testing"
 
-	"gotest.tools/v3/assert"
+	. "github.com/smartystreets/goconvey/convey"
 
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
@@ -19,29 +19,49 @@ import (
 )
 
 func TestProposalMsgs(t *testing.T) {
-	// initialize parameters
-	s := rand.NewSource(1)
-	r := rand.New(s) //nolint:gosec
+	Convey("Given a deterministic simulation context", t, func() {
+		s := rand.NewSource(1)
+		r := rand.New(s) //nolint:gosec
 
-	ctx := sdk.NewContext(nil, tmproto.Header{}, true, nil)
-	accounts := simtypes.RandomAccounts(r, 3)
+		ctx := sdk.NewContext(nil, tmproto.Header{}, true, nil)
+		accounts := simtypes.RandomAccounts(r, 3)
 
-	// execute ProposalMsgs function
-	weightedProposalMsgs := simulation.ProposalMsgs()
-	assert.Assert(t, len(weightedProposalMsgs) == 1)
+		Convey("When proposal messages are generated", func() {
+			weightedProposalMsgs := simulation.ProposalMsgs()
 
-	w0 := weightedProposalMsgs[0]
+			Convey("Then exactly one weighted proposal is returned", func() {
+				So(len(weightedProposalMsgs), ShouldEqual, 1)
+			})
 
-	// tests w0 interface:
-	assert.Equal(t, simulation.OpWeightMsgUpdateParams, w0.AppParamsKey())
-	assert.Equal(t, simulation.DefaultWeightMsgUpdateParams, w0.DefaultWeight())
+			Convey("And the weighted proposal exposes expected metadata", func() {
+				So(len(weightedProposalMsgs), ShouldEqual, 1)
+				if len(weightedProposalMsgs) != 1 {
+					return
+				}
 
-	msg := w0.MsgSimulatorFn()(r, ctx, accounts)
-	msgUpdateParams, ok := msg.(*types.MsgUpdateParams)
-	assert.Assert(t, ok)
+				w0 := weightedProposalMsgs[0]
+				So(w0.AppParamsKey(), ShouldEqual, simulation.OpWeightMsgUpdateParams)
+				So(w0.DefaultWeight(), ShouldEqual, simulation.DefaultWeightMsgUpdateParams)
+			})
 
-	assert.Equal(t, sdk.AccAddress(address.Module("gov")).String(), msgUpdateParams.Authority)
-	assert.Equal(t, uint64(122877), msgUpdateParams.Params.BlocksPerYear)
-	assert.DeepEqual(t, math.LegacyNewDecWithPrec(95, 2), msgUpdateParams.Params.InflationCoef)
-	assert.Equal(t, "eAerqyNEUz", msgUpdateParams.Params.MintDenom)
+			Convey("When the message simulator function is executed", func() {
+				So(len(weightedProposalMsgs), ShouldEqual, 1)
+				if len(weightedProposalMsgs) != 1 {
+					return
+				}
+
+				w0 := weightedProposalMsgs[0]
+				msg := w0.MsgSimulatorFn()(r, ctx, accounts)
+				msgUpdateParams, ok := msg.(*types.MsgUpdateParams)
+
+				Convey("Then it returns a MsgUpdateParams with expected fields", func() {
+					So(ok, ShouldBeTrue)
+					So(msgUpdateParams.Authority, ShouldEqual, sdk.AccAddress(address.Module("gov")).String())
+					So(msgUpdateParams.Params.BlocksPerYear, ShouldEqual, uint64(122877))
+					So(msgUpdateParams.Params.InflationCoef, ShouldResemble, math.LegacyNewDecWithPrec(95, 2))
+					So(msgUpdateParams.Params.MintDenom, ShouldEqual, "eAerqyNEUz")
+				})
+			})
+		})
+	})
 }

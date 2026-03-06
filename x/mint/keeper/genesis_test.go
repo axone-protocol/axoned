@@ -1,10 +1,12 @@
 package keeper_test
 
 import (
+	"errors"
 	"testing"
 
-	"github.com/stretchr/testify/suite"
 	"go.uber.org/mock/gomock"
+
+	. "github.com/smartystreets/goconvey/convey"
 
 	"cosmossdk.io/collections"
 	"cosmossdk.io/math"
@@ -25,9 +27,7 @@ import (
 
 var minterAcc = authtypes.NewEmptyModuleAccount(types.ModuleName, authtypes.Minter)
 
-type GenesisTestSuite struct {
-	suite.Suite
-
+type genesisTestContext struct {
 	sdkCtx        sdk.Context
 	keeper        keeper.Keeper
 	cdc           codec.BinaryCodec
@@ -35,62 +35,68 @@ type GenesisTestSuite struct {
 	key           *storetypes.KVStoreKey
 }
 
-func TestGenesisTestSuite(t *testing.T) {
-	suite.Run(t, new(GenesisTestSuite))
-}
+func setupGenesisTestContext(t *testing.T) *genesisTestContext {
+	t.Helper()
 
-func (s *GenesisTestSuite) SetupTest() {
 	key := storetypes.NewKVStoreKey(types.StoreKey)
-	testCtx := testutil.DefaultContextWithDB(s.T(), key, storetypes.NewTransientStoreKey("transient_test"))
+	testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
 	encCfg := moduletestutil.MakeTestEncodingConfig(mint.AppModuleBasic{})
 
 	// gomock initializations
-	ctrl := gomock.NewController(s.T())
-	s.cdc = codec.NewProtoCodec(encCfg.InterfaceRegistry)
-	s.sdkCtx = testCtx.Ctx
-	s.key = key
+	ctrl := gomock.NewController(t)
+	cdc := codec.NewProtoCodec(encCfg.InterfaceRegistry)
 
 	stakingKeeper := minttestutil.NewMockStakingKeeper(ctrl)
 	accountKeeper := minttestutil.NewMockAccountKeeper(ctrl)
 	bankKeeper := minttestutil.NewMockBankKeeper(ctrl)
-	s.accountKeeper = accountKeeper
-	accountKeeper.EXPECT().GetModuleAddress(minterAcc.Name).Return(minterAcc.GetAddress())
-	accountKeeper.EXPECT().GetModuleAccount(s.sdkCtx, minterAcc.Name).Return(minterAcc)
 
-	s.keeper = keeper.NewKeeper(
-		s.cdc,
-		runtime.NewKVStoreService(key),
-		stakingKeeper,
-		accountKeeper,
-		bankKeeper,
-		"",
-		"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn",
-	)
+	accountKeeper.EXPECT().GetModuleAddress(minterAcc.Name).Return(minterAcc.GetAddress())
+	accountKeeper.EXPECT().GetModuleAccount(testCtx.Ctx, minterAcc.Name).Return(minterAcc)
+
+	return &genesisTestContext{
+		sdkCtx: testCtx.Ctx,
+		keeper: keeper.NewKeeper(
+			cdc,
+			runtime.NewKVStoreService(key),
+			stakingKeeper,
+			accountKeeper,
+			bankKeeper,
+			"",
+			"cosmos10d07y265gmmuvt4z0w9aw880jnsr700j6zn9kn",
+		),
+		cdc:           cdc,
+		accountKeeper: accountKeeper,
+		key:           key,
+	}
 }
 
-func (s *GenesisTestSuite) TestImportExportGenesis() {
-	genesisState := types.DefaultGenesisState()
-	genesisState.Minter = types.NewMinter(math.LegacyNewDecWithPrec(20, 2), math.LegacyNewDec(1))
-	genesisState.Params = types.NewParams(
-		"testDenom",
-		math.LegacyNewDecWithPrec(69, 2),
-		uint64(60*60*8766/5),
-	)
+func TestImportExportGenesis(t *testing.T) {
+	Convey("Given a mint keeper genesis state", t, func() {
+		testCtx := setupGenesisTestContext(t)
 
-	s.keeper.InitGenesis(s.sdkCtx, s.accountKeeper, genesisState)
+		genesisState := types.DefaultGenesisState()
+		genesisState.Minter = types.NewMinter(math.LegacyNewDecWithPrec(20, 2), math.LegacyNewDec(1))
+		genesisState.Params = types.NewParams(
+			"testDenom",
+			math.LegacyNewDecWithPrec(69, 2),
+			uint64(60*60*8766/5),
+		)
 
-	minter, err := s.keeper.Minter.Get(s.sdkCtx)
-	s.Require().Equal(genesisState.Minter, minter)
-	s.Require().NoError(err)
+		testCtx.keeper.InitGenesis(testCtx.sdkCtx, testCtx.accountKeeper, genesisState)
 
-	invalidCtx := testutil.DefaultContextWithDB(s.T(), s.key, storetypes.NewTransientStoreKey("transient_test"))
-	_, err = s.keeper.Minter.Get(invalidCtx.Ctx)
-	s.Require().ErrorIs(err, collections.ErrNotFound)
+		minter, err := testCtx.keeper.Minter.Get(testCtx.sdkCtx)
+		So(err, ShouldBeNil)
+		So(minter, ShouldResemble, genesisState.Minter)
 
-	params, err := s.keeper.Params.Get(s.sdkCtx)
-	s.Require().Equal(genesisState.Params, params)
-	s.Require().NoError(err)
+		invalidCtx := testutil.DefaultContextWithDB(t, testCtx.key, storetypes.NewTransientStoreKey("transient_test"))
+		_, err = testCtx.keeper.Minter.Get(invalidCtx.Ctx)
+		So(errors.Is(err, collections.ErrNotFound), ShouldBeTrue)
 
-	genesisState2 := s.keeper.ExportGenesis(s.sdkCtx)
-	s.Require().Equal(genesisState, genesisState2)
+		params, err := testCtx.keeper.Params.Get(testCtx.sdkCtx)
+		So(err, ShouldBeNil)
+		So(params, ShouldResemble, genesisState.Params)
+
+		genesisState2 := testCtx.keeper.ExportGenesis(testCtx.sdkCtx)
+		So(genesisState2, ShouldResemble, genesisState)
+	})
 }
