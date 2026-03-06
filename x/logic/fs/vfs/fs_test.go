@@ -3,6 +3,7 @@ package vfs
 import (
 	"errors"
 	"fmt"
+	"io"
 	"io/fs"
 	"os"
 	"testing"
@@ -28,12 +29,16 @@ type recordingOpenFileFS struct {
 	lastOpenFilePath string
 	lastFlag         int
 	lastPerm         fs.FileMode
+	openFileErr      error
 }
 
 func (r *recordingOpenFileFS) OpenFile(name string, flag int, perm fs.FileMode) (fs.File, error) {
 	r.lastOpenFilePath = name
 	r.lastFlag = flag
 	r.lastPerm = perm
+	if r.openFileErr != nil {
+		return nil, r.openFileErr
+	}
 	return fstest.MapFS{
 		"ok": &fstest.MapFile{Data: []byte("ok")},
 	}.Open("ok")
@@ -77,6 +82,73 @@ func (runtimeErrorFileInfo) Mode() fs.FileMode  { return 0o644 }
 func (runtimeErrorFileInfo) ModTime() time.Time { return time.Unix(0, 0) }
 func (runtimeErrorFileInfo) IsDir() bool        { return false }
 func (runtimeErrorFileInfo) Sys() any           { return nil }
+
+type readFileCapableFS struct {
+	data         []byte
+	readFileErr  error
+	lastReadFile string
+}
+
+func (r *readFileCapableFS) Open(_ string) (fs.File, error) {
+	return fstest.MapFS{
+		"ok": &fstest.MapFile{Data: []byte("ok")},
+	}.Open("ok")
+}
+
+func (r *readFileCapableFS) ReadFile(name string) ([]byte, error) {
+	r.lastReadFile = name
+	if r.readFileErr != nil {
+		return nil, r.readFileErr
+	}
+
+	return append([]byte(nil), r.data...), nil
+}
+
+type openOnlyFS struct {
+	openErr  error
+	openFile fs.File
+	lastOpen string
+}
+
+func (o *openOnlyFS) Open(name string) (fs.File, error) {
+	o.lastOpen = name
+	if o.openErr != nil {
+		return nil, o.openErr
+	}
+
+	return o.openFile, nil
+}
+
+type flakyFile struct {
+	statErr  error
+	readErr  error
+	closeErr error
+	content  []byte
+	pos      int
+}
+
+func (f *flakyFile) Stat() (fs.FileInfo, error) {
+	return runtimeErrorFileInfo{}, f.statErr
+}
+
+func (f *flakyFile) Read(p []byte) (int, error) {
+	if f.readErr != nil {
+		return 0, f.readErr
+	}
+
+	if f.pos >= len(f.content) {
+		return 0, io.EOF
+	}
+
+	n := copy(p, f.content[f.pos:])
+	f.pos += n
+
+	return n, nil
+}
+
+func (f *flakyFile) Close() error {
+	return f.closeErr
+}
 
 func TestNormalizePath(t *testing.T) {
 	Convey("Given normalization cases", t, func() {
@@ -163,6 +235,14 @@ func TestFileSystemRoute(t *testing.T) {
 			So(subpath, ShouldEqual, "block")
 		})
 
+		Convey("when routing exact mount path /v1/sys", func() {
+			mounted, subpath, err := v.Route("/v1/sys")
+
+			So(err, ShouldBeNil)
+			So(mounted, ShouldEqual, sys)
+			So(subpath, ShouldEqual, ".")
+		})
+
 		Convey("when routing /v1/system", func() {
 			mounted, subpath, err := v.Route("/v1/system")
 
@@ -242,6 +322,22 @@ func TestFileSystemMountErrors(t *testing.T) {
 			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
 		})
 	})
+
+	Convey("Given mounts with same prefix length", t, func() {
+		v := New()
+		aa := &recordingFS{}
+		ab := &recordingFS{}
+		So(v.Mount("/aa", aa), ShouldBeNil)
+		So(v.Mount("/ab", ab), ShouldBeNil)
+
+		Convey("when routing /ab/x", func() {
+			mounted, subpath, err := v.Route("/ab/x")
+
+			So(err, ShouldBeNil)
+			So(mounted, ShouldEqual, ab)
+			So(subpath, ShouldEqual, "x")
+		})
+	})
 }
 
 func TestFileSystemOpenDispatch(t *testing.T) {
@@ -263,6 +359,19 @@ func TestFileSystemOpenDispatch(t *testing.T) {
 			So(err, ShouldNotBeNil)
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
 		})
+
+		Convey("when mounted Open fails", func() {
+			bad := &openOnlyFS{openErr: errors.New("open failed")}
+			So(v.Mount("/v1/bad", bad), ShouldBeNil)
+
+			_, err := v.Open("/v1/bad/block")
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, errors.New("open failed")), ShouldBeFalse)
+
+			var pathErr *fs.PathError
+			So(errors.As(err, &pathErr), ShouldBeTrue)
+			So(pathErr.Path, ShouldEqual, "/v1/bad/block")
+		})
 	})
 }
 
@@ -280,6 +389,17 @@ func TestFileSystemOpenFileDispatch(t *testing.T) {
 			So(sys.lastFlag, ShouldEqual, 42)
 			So(sys.lastPerm, ShouldEqual, 0o640)
 		})
+
+		Convey("when mounted OpenFile fails", func() {
+			sys.openFileErr = &fs.PathError{Op: "open", Path: "block", Err: fs.ErrPermission}
+			_, err := v.OpenFile("/v1/sys/block", 42, 0o640)
+
+			So(err, ShouldNotBeNil)
+			var pathErr *fs.PathError
+			So(errors.As(err, &pathErr), ShouldBeTrue)
+			So(pathErr.Path, ShouldEqual, "/v1/sys/block")
+			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+		})
 	})
 
 	Convey("Given a VFS with mount not implementing OpenFile", t, func() {
@@ -292,6 +412,14 @@ func TestFileSystemOpenFileDispatch(t *testing.T) {
 			So(err, ShouldNotBeNil)
 			So(errors.Is(err, errors.ErrUnsupported), ShouldBeTrue)
 		})
+	})
+
+	Convey("Given a VFS with no matching mount for OpenFile", t, func() {
+		v := New()
+		_, err := v.OpenFile("/v1/sys/block", 42, 0o640)
+
+		So(err, ShouldNotBeNil)
+		So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
 	})
 
 	Convey("Given a VFS with a mount returning runtime PathError values", t, func() {
@@ -324,5 +452,135 @@ func TestFileSystemOpenFileDispatch(t *testing.T) {
 			So(errors.As(err, &pathErr), ShouldBeTrue)
 			So(pathErr.Path, ShouldEqual, "/v1/dev/block")
 		})
+	})
+}
+
+func TestFileSystemReadFileDispatch(t *testing.T) {
+	Convey("Given a VFS with ReadFile-capable mount", t, func() {
+		v := New()
+		sys := &readFileCapableFS{data: []byte("payload")}
+		So(v.Mount("/v1/sys", sys), ShouldBeNil)
+
+		Convey("when reading /v1/sys/block", func() {
+			content, err := v.ReadFile("/v1/sys/block")
+
+			So(err, ShouldBeNil)
+			So(string(content), ShouldEqual, "payload")
+			So(sys.lastReadFile, ShouldEqual, "block")
+		})
+
+		Convey("when mounted ReadFile fails", func() {
+			sys.readFileErr = &fs.PathError{Op: "open", Path: "block", Err: fs.ErrPermission}
+			_, err := v.ReadFile("/v1/sys/block")
+
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+
+			var pathErr *fs.PathError
+			So(errors.As(err, &pathErr), ShouldBeTrue)
+			So(pathErr.Path, ShouldEqual, "/v1/sys/block")
+		})
+	})
+
+	Convey("Given a VFS with Open-only mount", t, func() {
+		v := New()
+		So(v.Mount("/v1/sys", &openOnlyFS{openFile: &flakyFile{content: []byte("ok")}}), ShouldBeNil)
+
+		Convey("when reading through Open + io.ReadAll", func() {
+			content, err := v.ReadFile("/v1/sys/block")
+
+			So(err, ShouldBeNil)
+			So(string(content), ShouldEqual, "ok")
+		})
+	})
+
+	Convey("Given a VFS where Open fails for ReadFile fallback", t, func() {
+		v := New()
+		So(v.Mount("/v1/sys", &openOnlyFS{openErr: fs.ErrNotExist}), ShouldBeNil)
+
+		Convey("when reading /v1/sys/block", func() {
+			_, err := v.ReadFile("/v1/sys/block")
+
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+		})
+	})
+
+	Convey("Given a VFS where fallback reader fails", t, func() {
+		v := New()
+		So(v.Mount("/v1/sys", &openOnlyFS{openFile: &flakyFile{readErr: errors.New("boom")}}), ShouldBeNil)
+
+		Convey("when reading /v1/sys/block", func() {
+			_, err := v.ReadFile("/v1/sys/block")
+
+			So(err, ShouldNotBeNil)
+			var pathErr *fs.PathError
+			So(errors.As(err, &pathErr), ShouldBeTrue)
+			So(pathErr.Path, ShouldEqual, "/v1/sys/block")
+		})
+	})
+
+	Convey("Given a VFS with no matching mount", t, func() {
+		v := New()
+		_, err := v.ReadFile("/v1/sys/block")
+
+		So(err, ShouldNotBeNil)
+		So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+	})
+}
+
+func TestWrappedFileStatAndClose(t *testing.T) {
+	Convey("Given a wrapped file from vfs.Open", t, func() {
+		v := New()
+		So(v.Mount("/v1/sys", &openOnlyFS{openFile: &flakyFile{content: []byte("ok")}}), ShouldBeNil)
+
+		f, err := v.Open("/v1/sys/block")
+		So(err, ShouldBeNil)
+
+		Convey("when calling Stat and Close with nil underlying errors", func() {
+			_, err := f.Stat()
+			So(err, ShouldBeNil)
+
+			So(f.Close(), ShouldBeNil)
+		})
+	})
+
+	Convey("Given a wrapped file with stat/close errors", t, func() {
+		v := New()
+		underlying := &flakyFile{
+			statErr:  &fs.PathError{Op: "stat", Path: "block", Err: fs.ErrPermission},
+			closeErr: &fs.PathError{Op: "close", Path: "block", Err: fs.ErrPermission},
+		}
+		So(v.Mount("/v1/sys", &openOnlyFS{openFile: underlying}), ShouldBeNil)
+
+		f, err := v.Open("/v1/sys/block")
+		So(err, ShouldBeNil)
+
+		Convey("when calling Stat", func() {
+			_, err := f.Stat()
+			So(err, ShouldNotBeNil)
+			var pathErr *fs.PathError
+			So(errors.As(err, &pathErr), ShouldBeTrue)
+			So(pathErr.Path, ShouldEqual, "/v1/sys/block")
+		})
+
+		Convey("when calling Close", func() {
+			err := f.Close()
+			So(err, ShouldNotBeNil)
+			var pathErr *fs.PathError
+			So(errors.As(err, &pathErr), ShouldBeTrue)
+			So(pathErr.Path, ShouldEqual, "/v1/sys/block")
+		})
+	})
+}
+
+func TestWrapPathErrorBranches(t *testing.T) {
+	Convey("wrapPathError nil branch", t, func() {
+		So(wrapPathError("open", "/v1/sys/block", nil), ShouldBeNil)
+	})
+
+	Convey("wrapPathError EOF branch", t, func() {
+		err := wrapPathError("read", "/v1/sys/block", io.EOF)
+		So(errors.Is(err, io.EOF), ShouldBeTrue)
 	})
 }
