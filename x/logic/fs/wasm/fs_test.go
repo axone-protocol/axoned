@@ -24,7 +24,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/device"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/devfile"
 	fsiface "github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
 	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
 )
@@ -173,6 +173,10 @@ func TestWasmDeviceFSErrors(t *testing.T) {
 
 			_, err = file.Read(make([]byte, 8))
 			So(errors.Is(err, errWasmQueryFailed), ShouldBeTrue)
+
+			var pathErr *fs.PathError
+			So(errors.As(err, &pathErr), ShouldBeTrue)
+			So(pathErr.Path, ShouldEqual, testContractAddress+"/query")
 		})
 
 		Convey("when wasm response exceeds the configured maximum size", func() {
@@ -191,7 +195,7 @@ func TestWasmDeviceFSErrors(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			_, err = file.Read(make([]byte, 8))
-			So(errors.Is(err, device.ErrResponseTooLarge), ShouldBeTrue)
+			So(errors.Is(err, devfile.ErrResponseTooLarge), ShouldBeTrue)
 		})
 
 		Convey("when closed before first read", func() {

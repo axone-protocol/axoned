@@ -107,7 +107,7 @@ func (v *FileSystem) Open(path string) (fs.File, error) {
 		return nil, wrapPathError("open", path, err)
 	}
 
-	return f, nil
+	return wrapFile(path, f), nil
 }
 
 // ReadFile routes and dispatches to mounted FS.ReadFile when supported.
@@ -156,11 +156,70 @@ func (v *FileSystem) OpenFile(path string, flag int, perm fs.FileMode) (fs.File,
 		return nil, wrapPathError("open", path, err)
 	}
 
-	return f, nil
+	return wrapFile(path, f), nil
 }
 
-//nolint:unparam
+func wrapFile(path string, file fs.File) fs.File {
+	wrapped := &pathErrorFile{
+		file: file,
+		path: path,
+	}
+
+	if writer, ok := file.(interface{ Write([]byte) (int, error) }); ok {
+		return &pathErrorWritableFile{
+			pathErrorFile: wrapped,
+			writer:        writer,
+		}
+	}
+
+	return wrapped
+}
+
+type pathErrorFile struct {
+	file fs.File
+	path string
+}
+
+func (f *pathErrorFile) Stat() (fs.FileInfo, error) {
+	info, err := f.file.Stat()
+	return info, wrapPathError("stat", f.path, err)
+}
+
+func (f *pathErrorFile) Read(p []byte) (int, error) {
+	n, err := f.file.Read(p)
+	if err != nil {
+		err = wrapPathError("read", f.path, err)
+	}
+
+	return n, err
+}
+
+func (f *pathErrorFile) Close() error {
+	return wrapPathError("close", f.path, f.file.Close())
+}
+
+type pathErrorWritableFile struct {
+	*pathErrorFile
+	writer interface{ Write([]byte) (int, error) }
+}
+
+func (f *pathErrorWritableFile) Write(p []byte) (int, error) {
+	n, err := f.writer.Write(p)
+	if err != nil {
+		err = wrapPathError("write", f.path, err)
+	}
+
+	return n, err
+}
+
 func wrapPathError(op, path string, err error) error {
+	if err == nil {
+		return nil
+	}
+	if errors.Is(err, io.EOF) {
+		return err
+	}
+
 	var pathErr *fs.PathError
 	if errors.As(err, &pathErr) {
 		err = pathErr.Err

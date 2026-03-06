@@ -4,8 +4,10 @@ import (
 	"errors"
 	"fmt"
 	"io/fs"
+	"os"
 	"testing"
 	"testing/fstest"
+	"time"
 
 	. "github.com/smartystreets/goconvey/convey"
 )
@@ -36,6 +38,45 @@ func (r *recordingOpenFileFS) OpenFile(name string, flag int, perm fs.FileMode) 
 		"ok": &fstest.MapFile{Data: []byte("ok")},
 	}.Open("ok")
 }
+
+type runtimeErrorOpenFileFS struct{}
+
+func (f *runtimeErrorOpenFileFS) Open(name string) (fs.File, error) {
+	return &runtimeErrorFile{subpath: name}, nil
+}
+
+func (f *runtimeErrorOpenFileFS) OpenFile(name string, _ int, _ fs.FileMode) (fs.File, error) {
+	return &runtimeErrorFile{subpath: name}, nil
+}
+
+type runtimeErrorFile struct {
+	subpath string
+}
+
+func (f *runtimeErrorFile) Stat() (fs.FileInfo, error) {
+	return runtimeErrorFileInfo{}, nil
+}
+
+func (f *runtimeErrorFile) Read(_ []byte) (int, error) {
+	return 0, &fs.PathError{Op: "read", Path: f.subpath, Err: fs.ErrPermission}
+}
+
+func (f *runtimeErrorFile) Write(_ []byte) (int, error) {
+	return 0, &fs.PathError{Op: "write", Path: f.subpath, Err: fs.ErrPermission}
+}
+
+func (f *runtimeErrorFile) Close() error {
+	return nil
+}
+
+type runtimeErrorFileInfo struct{}
+
+func (runtimeErrorFileInfo) Name() string       { return "runtime" }
+func (runtimeErrorFileInfo) Size() int64        { return 0 }
+func (runtimeErrorFileInfo) Mode() fs.FileMode  { return 0o644 }
+func (runtimeErrorFileInfo) ModTime() time.Time { return time.Unix(0, 0) }
+func (runtimeErrorFileInfo) IsDir() bool        { return false }
+func (runtimeErrorFileInfo) Sys() any           { return nil }
 
 func TestNormalizePath(t *testing.T) {
 	Convey("Given normalization cases", t, func() {
@@ -250,6 +291,38 @@ func TestFileSystemOpenFileDispatch(t *testing.T) {
 
 			So(err, ShouldNotBeNil)
 			So(errors.Is(err, errors.ErrUnsupported), ShouldBeTrue)
+		})
+	})
+
+	Convey("Given a VFS with a mount returning runtime PathError values", t, func() {
+		v := New()
+		So(v.Mount("/v1/dev", &runtimeErrorOpenFileFS{}), ShouldBeNil)
+
+		Convey("when reading from an opened file", func() {
+			f, err := v.OpenFile("/v1/dev/block", os.O_RDWR, 0)
+			So(err, ShouldBeNil)
+
+			_, err = f.Read(make([]byte, 1))
+			So(err, ShouldNotBeNil)
+
+			var pathErr *fs.PathError
+			So(errors.As(err, &pathErr), ShouldBeTrue)
+			So(pathErr.Path, ShouldEqual, "/v1/dev/block")
+		})
+
+		Convey("when writing to an opened file", func() {
+			f, err := v.OpenFile("/v1/dev/block", os.O_RDWR, 0)
+			So(err, ShouldBeNil)
+
+			writer, ok := f.(interface{ Write([]byte) (int, error) })
+			So(ok, ShouldBeTrue)
+
+			_, err = writer.Write([]byte("x"))
+			So(err, ShouldNotBeNil)
+
+			var pathErr *fs.PathError
+			So(errors.As(err, &pathErr), ShouldBeTrue)
+			So(pathErr.Path, ShouldEqual, "/v1/dev/block")
 		})
 	})
 }

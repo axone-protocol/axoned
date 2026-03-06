@@ -9,7 +9,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/device"
+	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/devfile"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/pathutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
@@ -31,7 +31,7 @@ var (
 	_ fs.FS            = (*vfs)(nil)
 	_ iface.OpenFileFS = (*vfs)(nil)
 
-	errInvalidRequest  = device.ErrInvalidRequest
+	errInvalidRequest  = devfile.ErrInvalidRequest
 	errWasmQueryFailed = errors.New("wasm_query_failed")
 )
 
@@ -60,21 +60,21 @@ func (f *vfs) OpenFile(name string, flag int, _ fs.FileMode) (fs.File, error) {
 	}
 
 	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
-	return device.New(device.HalfDuplexConfig{
-		Path:              name,
-		ModTime:           prolog.ResolveHeaderInfo(sdkCtx).Time,
-		MaxRequestBytes:   maxRequestBytes,
-		MaxResponseBytes:  maxResponseBytes,
-		AllowEmptyRequest: false,
-		Commit: func(request []byte) ([]byte, error) {
+	return devfile.New(
+		devfile.WithPath(name),
+		devfile.WithModTime(prolog.ResolveHeaderInfo(sdkCtx).Time),
+		devfile.WithMaxRequestBytes(maxRequestBytes),
+		devfile.WithMaxResponseBytes(maxResponseBytes),
+		devfile.WithAllowEmptyRequest(false),
+		devfile.WithCommit(func(request []byte) ([]byte, error) {
 			response, err := f.wasmKeeper.QuerySmart(sdkCtx, contractAddr, request)
 			if err != nil {
-				return nil, &fs.PathError{Op: "read", Path: name, Err: errWasmQueryFailed}
+				return nil, errWasmQueryFailed
 			}
 
 			return response, nil
-		},
-	}), nil
+		}),
+	)
 }
 
 func validateQueryPath(subpath string) (sdk.AccAddress, error) {
