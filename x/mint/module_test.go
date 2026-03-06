@@ -3,7 +3,7 @@ package mint_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
+	. "github.com/smartystreets/goconvey/convey"
 
 	"cosmossdk.io/depinject"
 	"cosmossdk.io/log"
@@ -17,16 +17,18 @@ import (
 )
 
 func TestItCreatesModuleAccountOnInitBlock(t *testing.T) {
-	var accountKeeper authkeeper.AccountKeeper
+	Convey("Given the module initialization", t, func() {
+		var accountKeeper authkeeper.AccountKeeper
 
-	app, err := simtestutil.SetupAtGenesis(
-		depinject.Configs(
-			testutil.AppConfig,
-			depinject.Supply(log.NewNopLogger()),
-		), &accountKeeper)
-	require.NoError(t, err)
+		app, err := simtestutil.SetupAtGenesis(
+			depinject.Configs(
+				testutil.AppConfig,
+				depinject.Supply(log.NewNopLogger()),
+			), &accountKeeper)
+		So(err, ShouldBeNil)
 
-	ctx := app.NewContext(false)
-	acc := accountKeeper.GetAccount(ctx, authtypes.NewModuleAddress(types.ModuleName))
-	require.NotNil(t, acc)
+		ctx := app.NewContext(false)
+		acc := accountKeeper.GetAccount(ctx, authtypes.NewModuleAddress(types.ModuleName))
+		So(acc, ShouldNotBeNil)
+	})
 }

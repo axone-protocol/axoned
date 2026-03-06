@@ -32,8 +32,6 @@ func GenInflationCoefMax(_ *rand.Rand) math.LegacyDec {
 }
 
 // RandomizedGenState generates a random GenesisState for mint.
-//
-//nolint:forbidigo
 func RandomizedGenState(simState *module.SimulationState) {
 	// minter
 	var inflation math.LegacyDec

@@ -7,6 +7,7 @@ linters:
     - bodyclose
     - copyloopvar
     - cyclop
+    - depguard
     - dupl
     - durationcheck
     - errcheck
@@ -49,6 +50,30 @@ linters:
   settings:
     cyclop:
       max-complexity: 20
+    depguard:
+      rules:
+        test-no-assertion-frameworks:
+          files:
+            - "**/*_test.go"
+          deny:
+            - pkg: github.com/stretchr/testify
+              desc: "testify is forbidden in tests, use GoConvey."
+            - pkg: gotest.tools
+              desc: "gotest.tools is forbidden in tests, use GoConvey."
+            - pkg: github.com/onsi/ginkgo
+              desc: "ginkgo is forbidden in tests, use GoConvey."
+            - pkg: github.com/onsi/gomega
+              desc: "gomega is forbidden in tests, use GoConvey."
+    forbidigo:
+      forbid:
+        - pattern: '(^|[^[:alnum:]_])assert\.[A-Za-z_][A-Za-z0-9_]*\('
+          msg: "assert-style helpers are forbidden; use GoConvey assertions."
+        - pattern: '(^|[^[:alnum:]_])require\.[A-Za-z_][A-Za-z0-9_]*\('
+          msg: "require-style helpers are forbidden; use GoConvey assertions."
+        - pattern: '(^|[^[:alnum:]_])suite\.Run\('
+          msg: "testify suite is forbidden; use GoConvey."
+        - pattern: '(^|[^[:alnum:]_])suite\.Suite\b'
+          msg: "testify suite is forbidden; use GoConvey."
     funlen:
       statements: 65
     godot:

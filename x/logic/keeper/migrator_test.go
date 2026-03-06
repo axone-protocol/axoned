@@ -3,8 +3,9 @@ package keeper_test
 import (
 	"testing"
 
-	"github.com/stretchr/testify/require"
 	"google.golang.org/protobuf/encoding/protowire"
+
+	. "github.com/smartystreets/goconvey/convey"
 
 	storetypes "cosmossdk.io/store/types"
 
@@ -20,62 +21,64 @@ import (
 )
 
 func TestMigrator_Migrate4to5(t *testing.T) {
-	for _, tc := range []struct {
-		name                 string
-		populateLegacyFields bool
-	}{
-		{
-			name:                 "legacy interpreter fields empty",
-			populateLegacyFields: false,
-		},
-		{
-			name:                 "legacy interpreter fields populated",
-			populateLegacyFields: true,
-		},
-	} {
-		t.Run(tc.name, func(t *testing.T) {
-			encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
-			key := storetypes.NewKVStoreKey(types.StoreKey)
-			testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+	Convey("Given legacy params payloads", t, func() {
+		for _, tc := range []struct {
+			name                 string
+			populateLegacyFields bool
+		}{
+			{
+				name:                 "legacy interpreter fields empty",
+				populateLegacyFields: false,
+			},
+			{
+				name:                 "legacy interpreter fields populated",
+				populateLegacyFields: true,
+			},
+		} {
+			Convey(tc.name, func() {
+				encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
+				key := storetypes.NewKVStoreKey(types.StoreKey)
+				testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
 
-			logicKeeper := keeper.NewKeeper(
-				encCfg.Codec,
-				encCfg.InterfaceRegistry,
-				key,
-				key,
-				authtypes.NewModuleAddress(govtypes.ModuleName),
-				nil,
-				nil,
-				nil,
-				nil,
-			)
+				logicKeeper := keeper.NewKeeper(
+					encCfg.Codec,
+					encCfg.InterfaceRegistry,
+					key,
+					key,
+					authtypes.NewModuleAddress(govtypes.ModuleName),
+					nil,
+					nil,
+					nil,
+					nil,
+				)
 
-			expectedParams := types.NewParams(
-				types.NewLimits(
-					types.WithMaxSize(11),
-					types.WithMaxResultCount(7),
-					types.WithMaxUserOutputSize(13),
-					types.WithMaxVariables(17),
-				),
-				types.DefaultGasPolicy(),
-			)
+				expectedParams := types.NewParams(
+					types.NewLimits(
+						types.WithMaxSize(11),
+						types.WithMaxResultCount(7),
+						types.WithMaxUserOutputSize(13),
+						types.WithMaxVariables(17),
+					),
+					types.DefaultGasPolicy(),
+				)
 
-			expectedBz, err := encCfg.Codec.Marshal(&expectedParams)
-			require.NoError(t, err)
+				expectedBz, err := encCfg.Codec.Marshal(&expectedParams)
+				So(err, ShouldBeNil)
 
-			legacyBz := legacyParamsBytes(encCfg.Codec, expectedParams.Limits, tc.populateLegacyFields)
-			require.NotEqual(t, expectedBz, legacyBz)
+				legacyBz := legacyParamsBytes(encCfg.Codec, expectedParams.Limits, tc.populateLegacyFields)
+				So(legacyBz, ShouldNotResemble, expectedBz)
 
-			store := testCtx.Ctx.KVStore(key)
-			store.Set(types.ParamsKey, legacyBz)
+				store := testCtx.Ctx.KVStore(key)
+				store.Set(types.ParamsKey, legacyBz)
 
-			err = keeper.NewMigrator(*logicKeeper).Migrate4to5(testCtx.Ctx)
-			require.NoError(t, err)
+				err = keeper.NewMigrator(*logicKeeper).Migrate4to5(testCtx.Ctx)
+				So(err, ShouldBeNil)
 
-			require.Equal(t, expectedBz, store.Get(types.ParamsKey))
-			require.Equal(t, expectedParams, logicKeeper.GetParams(testCtx.Ctx))
-		})
-	}
+				So(store.Get(types.ParamsKey), ShouldResemble, expectedBz)
+				So(logicKeeper.GetParams(testCtx.Ctx), ShouldResemble, expectedParams)
+			})
+		}
+	})
 }
 
 func legacyParamsBytes(codec codec.BinaryCodec, limits types.Limits, populateLegacyFields bool) []byte {
