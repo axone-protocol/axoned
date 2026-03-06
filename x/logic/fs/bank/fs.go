@@ -64,7 +64,7 @@ func (f *vfs) Open(name string) (fs.File, error) {
 		return nil, &fs.PathError{Op: "open", Path: name, Err: errVFSUnavailable}
 	}
 
-	return newStreamingFile(f.ctx, name, sdkCtx.HeaderInfo().Time, bankKeeper, addr, fetcher), nil
+	return newStreamingFile(f.ctx, name, prolog.ResolveHeaderInfo(sdkCtx).Time, bankKeeper, addr, fetcher), nil
 }
 
 func (f *vfs) ReadFile(name string) ([]byte, error) {
