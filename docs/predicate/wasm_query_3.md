@@ -1,5 +1,5 @@
 ---
-sidebar_position: 128
+sidebar_position: 129
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -69,7 +69,7 @@ wasm_query(
 
 ```  yaml
 height: 42
-gas_used: 10447
+gas_used: 10454
 answer:
   has_more: false
   variables: ["ResponseBytes"]
@@ -102,7 +102,7 @@ wasm_query('invalid-address', [123,125], ResponseBytes).
 
 ```  yaml
 height: 42
-gas_used: 4461
+gas_used: 4468
 answer:
   has_more: false
   variables: ["ResponseBytes"]
@@ -137,7 +137,7 @@ wasm_query(
 
 ```  yaml
 height: 42
-gas_used: 5509
+gas_used: 5516
 answer:
   has_more: false
   variables: ["ResponseBytes"]
@@ -180,7 +180,7 @@ wasm_query(
 
 ```  yaml
 height: 42
-gas_used: 9378
+gas_used: 9385
 answer:
   has_more: false
   variables: ["ResponseBytes"]
