@@ -6,235 +6,328 @@ import (
 	"io/fs"
 	"testing"
 	"time"
+
+	. "github.com/smartystreets/goconvey/convey"
 )
 
 func TestHalfDuplexLifecycle(t *testing.T) {
-	commitCalls := 0
-	file, err := New(
-		WithPath("/v1/dev/echo"),
-		WithModTime(time.Unix(0, 0).UTC()),
-		WithAllowEmptyRequest(false),
-		WithCommit(func(request []byte) ([]byte, error) {
-			commitCalls++
-			if string(request) != "ping" {
-				t.Fatalf("unexpected request: %q", string(request))
-			}
-			return []byte("pong"), nil
-		}),
-	)
-	if err != nil {
-		t.Fatalf("New failed: %v", err)
-	}
+	Convey("Given a half-duplex file with a valid request and response", t, func() {
+		commitCalls := 0
+		file, err := New(
+			WithPath("/v1/dev/echo"),
+			WithModTime(time.Unix(0, 0).UTC()),
+			WithAllowEmptyRequest(false),
+			WithCommit(func(request []byte) ([]byte, error) {
+				commitCalls++
+				So(string(request), ShouldEqual, "ping")
+				return []byte("pong"), nil
+			}),
+		)
+		So(err, ShouldBeNil)
 
-	if _, err := file.(interface{ Write([]byte) (int, error) }).Write([]byte("ping")); err != nil {
-		t.Fatalf("write failed: %v", err)
-	}
+		writer, ok := file.(interface{ Write([]byte) (int, error) })
+		So(ok, ShouldBeTrue)
 
-	buf := make([]byte, 8)
-	n, err := file.Read(buf)
-	if err != nil {
-		t.Fatalf("read failed: %v", err)
-	}
-	if got := string(buf[:n]); got != "pong" {
-		t.Fatalf("unexpected response: %q", got)
-	}
+		n, err := writer.Write([]byte("ping"))
+		So(err, ShouldBeNil)
+		So(n, ShouldEqual, 4)
 
-	if _, err := file.Read(buf); !errors.Is(err, io.EOF) {
-		t.Fatalf("expected EOF, got: %v", err)
-	}
+		buf := make([]byte, 8)
+		n, err = file.Read(buf)
+		So(err, ShouldBeNil)
+		So(string(buf[:n]), ShouldEqual, "pong")
 
-	if _, err := file.(interface{ Write([]byte) (int, error) }).Write([]byte("x")); !errors.Is(err, fs.ErrPermission) {
-		t.Fatalf("expected write permission error after commit, got: %v", err)
-	}
+		n, err = file.Read(buf)
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, io.EOF), ShouldBeTrue)
 
-	if commitCalls != 1 {
-		t.Fatalf("commit should be called once, got: %d", commitCalls)
-	}
+		n, err = writer.Write([]byte("x"))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+
+		So(commitCalls, ShouldEqual, 1)
+	})
 }
 
 func TestHalfDuplexEmptyRequestValidation(t *testing.T) {
-	commitCalled := false
-	file, err := New(
-		WithPath("/v1/dev/test"),
-		WithModTime(time.Unix(0, 0).UTC()),
-		WithAllowEmptyRequest(false),
-		WithCommit(func(_ []byte) ([]byte, error) {
-			commitCalled = true
-			return nil, nil
-		}),
-	)
-	if err != nil {
-		t.Fatalf("New failed: %v", err)
-	}
+	Convey("Given a half-duplex file that rejects empty requests", t, func() {
+		commitCalled := false
+		file, err := New(
+			WithPath("/v1/dev/test"),
+			WithModTime(time.Unix(0, 0).UTC()),
+			WithAllowEmptyRequest(false),
+			WithCommit(func(_ []byte) ([]byte, error) {
+				commitCalled = true
+				return nil, nil
+			}),
+		)
+		So(err, ShouldBeNil)
 
-	_, err = file.Read(make([]byte, 1))
-	if !errors.Is(err, ErrInvalidRequest) {
-		t.Fatalf("expected ErrInvalidRequest, got: %v", err)
-	}
+		_, err = file.Read(make([]byte, 1))
+		So(errors.Is(err, ErrInvalidRequest), ShouldBeTrue)
 
-	if _, err := file.Read(make([]byte, 1)); !errors.Is(err, ErrInvalidRequest) {
-		t.Fatalf("expected same ErrInvalidRequest on subsequent reads, got: %v", err)
-	}
+		_, err = file.Read(make([]byte, 1))
+		So(errors.Is(err, ErrInvalidRequest), ShouldBeTrue)
 
-	if _, err := file.(interface{ Write([]byte) (int, error) }).Write([]byte("x")); !errors.Is(err, fs.ErrPermission) {
-		t.Fatalf("expected fs.ErrPermission after failed commit, got: %v", err)
-	}
+		writer, ok := file.(interface{ Write([]byte) (int, error) })
+		So(ok, ShouldBeTrue)
 
-	if commitCalled {
-		t.Fatal("commit should not be called when request is missing")
-	}
+		n, err := writer.Write([]byte("x"))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+		So(commitCalled, ShouldBeFalse)
+	})
 }
 
 func TestHalfDuplexAllowEmptyRequest(t *testing.T) {
-	file, err := New(
-		WithPath("/v1/dev/test"),
-		WithModTime(time.Unix(0, 0).UTC()),
-		WithAllowEmptyRequest(true),
-		WithCommit(func(request []byte) ([]byte, error) {
-			if len(request) != 0 {
-				t.Fatalf("expected empty request, got: %v", request)
-			}
-			return []byte("ok"), nil
-		}),
-	)
-	if err != nil {
-		t.Fatalf("New failed: %v", err)
-	}
+	Convey("Given a half-duplex file that allows empty requests", t, func() {
+		file, err := New(
+			WithPath("/v1/dev/test"),
+			WithModTime(time.Unix(0, 0).UTC()),
+			WithAllowEmptyRequest(true),
+			WithCommit(func(request []byte) ([]byte, error) {
+				So(len(request), ShouldEqual, 0)
+				return []byte("ok"), nil
+			}),
+		)
+		So(err, ShouldBeNil)
 
-	buf := make([]byte, 2)
-	n, err := file.Read(buf)
-	if err != nil {
-		t.Fatalf("read failed: %v", err)
-	}
-	if got := string(buf[:n]); got != "ok" {
-		t.Fatalf("unexpected response: %q", got)
-	}
+		buf := make([]byte, 2)
+		n, err := file.Read(buf)
+		So(err, ShouldBeNil)
+		So(string(buf[:n]), ShouldEqual, "ok")
+	})
 }
 
 func TestHalfDuplexMaxRequestBytes(t *testing.T) {
-	file, err := New(
-		WithPath("/v1/dev/test"),
-		WithModTime(time.Unix(0, 0).UTC()),
-		WithMaxRequestBytes(4),
-		WithAllowEmptyRequest(false),
-		WithCommit(func(request []byte) ([]byte, error) {
-			return request, nil
-		}),
-	)
-	if err != nil {
-		t.Fatalf("New failed: %v", err)
-	}
+	Convey("Given a half-duplex file with max request bytes", t, func() {
+		file, err := New(
+			WithPath("/v1/dev/test"),
+			WithModTime(time.Unix(0, 0).UTC()),
+			WithMaxRequestBytes(4),
+			WithAllowEmptyRequest(false),
+			WithCommit(func(request []byte) ([]byte, error) {
+				return request, nil
+			}),
+		)
+		So(err, ShouldBeNil)
 
-	if _, err := file.(interface{ Write([]byte) (int, error) }).Write([]byte("12345")); !errors.Is(err, fs.ErrPermission) {
-		t.Fatalf("expected fs.ErrPermission, got: %v", err)
-	}
+		writer, ok := file.(interface{ Write([]byte) (int, error) })
+		So(ok, ShouldBeTrue)
+
+		n, err := writer.Write([]byte("12345"))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+	})
 }
 
 func TestHalfDuplexClosed(t *testing.T) {
-	file, err := New(
-		WithPath("/v1/dev/test"),
-		WithModTime(time.Unix(0, 0).UTC()),
-		WithAllowEmptyRequest(false),
-		WithCommit(func(request []byte) ([]byte, error) {
-			return request, nil
-		}),
-	)
-	if err != nil {
-		t.Fatalf("New failed: %v", err)
-	}
+	Convey("Given a closed half-duplex file", t, func() {
+		file, err := New(
+			WithPath("/v1/dev/test"),
+			WithModTime(time.Unix(0, 0).UTC()),
+			WithAllowEmptyRequest(false),
+			WithCommit(func(request []byte) ([]byte, error) {
+				return request, nil
+			}),
+		)
+		So(err, ShouldBeNil)
+		So(file.Close(), ShouldBeNil)
 
-	if err := file.Close(); err != nil {
-		t.Fatalf("close failed: %v", err)
-	}
+		n, err := file.Read(make([]byte, 1))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, fs.ErrClosed), ShouldBeTrue)
 
-	if _, err := file.Read(make([]byte, 1)); !errors.Is(err, fs.ErrClosed) {
-		t.Fatalf("expected fs.ErrClosed on read, got: %v", err)
-	}
-	if _, err := file.(interface{ Write([]byte) (int, error) }).Write([]byte("x")); !errors.Is(err, fs.ErrClosed) {
-		t.Fatalf("expected fs.ErrClosed on write, got: %v", err)
-	}
+		writer, ok := file.(interface{ Write([]byte) (int, error) })
+		So(ok, ShouldBeTrue)
+
+		n, err = writer.Write([]byte("x"))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, fs.ErrClosed), ShouldBeTrue)
+	})
 }
 
 func TestHalfDuplexCommitErrorPropagation(t *testing.T) {
-	expected := errors.New("boom")
-	commitCalls := 0
-	file, err := New(
-		WithPath("/v1/dev/test"),
-		WithModTime(time.Unix(0, 0).UTC()),
-		WithAllowEmptyRequest(false),
-		WithCommit(func(_ []byte) ([]byte, error) {
-			commitCalls++
-			return nil, expected
-		}),
-	)
-	if err != nil {
-		t.Fatalf("New failed: %v", err)
-	}
+	Convey("Given a half-duplex file whose commit fails", t, func() {
+		expected := errors.New("boom")
+		commitCalls := 0
+		file, err := New(
+			WithPath("/v1/dev/test"),
+			WithModTime(time.Unix(0, 0).UTC()),
+			WithAllowEmptyRequest(false),
+			WithCommit(func(_ []byte) ([]byte, error) {
+				commitCalls++
+				return nil, expected
+			}),
+		)
+		So(err, ShouldBeNil)
 
-	if _, err := file.(interface{ Write([]byte) (int, error) }).Write([]byte("x")); err != nil {
-		t.Fatalf("write failed: %v", err)
-	}
+		writer, ok := file.(interface{ Write([]byte) (int, error) })
+		So(ok, ShouldBeTrue)
 
-	if _, err := file.Read(make([]byte, 1)); !errors.Is(err, expected) {
-		t.Fatalf("expected commit error, got: %v", err)
-	}
+		n, err := writer.Write([]byte("x"))
+		So(err, ShouldBeNil)
+		So(n, ShouldEqual, 1)
 
-	if _, err := file.(interface{ Write([]byte) (int, error) }).Write([]byte("y")); !errors.Is(err, fs.ErrPermission) {
-		t.Fatalf("expected fs.ErrPermission after failed commit, got: %v", err)
-	}
+		n, err = file.Read(make([]byte, 1))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, expected), ShouldBeTrue)
 
-	if _, err := file.Read(make([]byte, 1)); !errors.Is(err, expected) {
-		t.Fatalf("expected same commit error on subsequent reads, got: %v", err)
-	}
+		n, err = writer.Write([]byte("y"))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
 
-	if commitCalls != 1 {
-		t.Fatalf("commit should be called once, got: %d", commitCalls)
-	}
+		n, err = file.Read(make([]byte, 1))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, expected), ShouldBeTrue)
+
+		So(commitCalls, ShouldEqual, 1)
+	})
 }
 
 func TestHalfDuplexMaxResponseBytes(t *testing.T) {
-	commitCalls := 0
-	file, err := New(
-		WithPath("/v1/dev/test"),
-		WithModTime(time.Unix(0, 0).UTC()),
-		WithAllowEmptyRequest(false),
-		WithMaxResponseBytes(2),
-		WithCommit(func(_ []byte) ([]byte, error) {
-			commitCalls++
-			return []byte("too-big"), nil
-		}),
-	)
-	if err != nil {
-		t.Fatalf("New failed: %v", err)
-	}
+	Convey("Given a half-duplex file with max response bytes", t, func() {
+		commitCalls := 0
+		file, err := New(
+			WithPath("/v1/dev/test"),
+			WithModTime(time.Unix(0, 0).UTC()),
+			WithAllowEmptyRequest(false),
+			WithMaxResponseBytes(2),
+			WithCommit(func(_ []byte) ([]byte, error) {
+				commitCalls++
+				return []byte("too-big"), nil
+			}),
+		)
+		So(err, ShouldBeNil)
 
-	if _, err := file.(interface{ Write([]byte) (int, error) }).Write([]byte("x")); err != nil {
-		t.Fatalf("write failed: %v", err)
-	}
+		writer, ok := file.(interface{ Write([]byte) (int, error) })
+		So(ok, ShouldBeTrue)
 
-	if _, err := file.Read(make([]byte, 16)); !errors.Is(err, ErrResponseTooLarge) {
-		t.Fatalf("expected ErrResponseTooLarge, got: %v", err)
-	}
+		n, err := writer.Write([]byte("x"))
+		So(err, ShouldBeNil)
+		So(n, ShouldEqual, 1)
 
-	if _, err := file.(interface{ Write([]byte) (int, error) }).Write([]byte("y")); !errors.Is(err, fs.ErrPermission) {
-		t.Fatalf("expected fs.ErrPermission after oversized response, got: %v", err)
-	}
+		n, err = file.Read(make([]byte, 16))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, ErrResponseTooLarge), ShouldBeTrue)
 
-	if _, err := file.Read(make([]byte, 16)); !errors.Is(err, ErrResponseTooLarge) {
-		t.Fatalf("expected same response-too-large error on subsequent reads, got: %v", err)
-	}
+		n, err = writer.Write([]byte("y"))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
 
-	if commitCalls != 1 {
-		t.Fatalf("commit should be called once, got: %d", commitCalls)
-	}
+		n, err = file.Read(make([]byte, 16))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, ErrResponseTooLarge), ShouldBeTrue)
+
+		So(commitCalls, ShouldEqual, 1)
+	})
 }
 
 func TestHalfDuplexMissingCommit(t *testing.T) {
-	_, err := New(
-		WithPath("/v1/dev/test"),
-		WithModTime(time.Unix(0, 0).UTC()),
-	)
-	if !errors.Is(err, ErrMissingCommit) {
-		t.Fatalf("expected ErrMissingCommit, got: %v", err)
-	}
+	Convey("Given a half-duplex file without commit function", t, func() {
+		file, err := New(
+			WithPath("/v1/dev/test"),
+			WithModTime(time.Unix(0, 0).UTC()),
+		)
+
+		So(file, ShouldBeNil)
+		So(errors.Is(err, ErrMissingCommit), ShouldBeTrue)
+	})
+}
+
+func TestHalfDuplexEmptyRequestCustomError(t *testing.T) {
+	Convey("Given a half-duplex file with custom empty request error", t, func() {
+		customErr := errors.New("custom-empty-request")
+		commitCalled := false
+
+		file, err := New(
+			WithPath("/v1/dev/test"),
+			WithAllowEmptyRequest(false),
+			WithEmptyRequestError(customErr),
+			WithCommit(func(_ []byte) ([]byte, error) {
+				commitCalled = true
+				return nil, nil
+			}),
+		)
+		So(err, ShouldBeNil)
+
+		n, err := file.Read(make([]byte, 1))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, customErr), ShouldBeTrue)
+		So(commitCalled, ShouldBeFalse)
+	})
+}
+
+func TestHalfDuplexStat(t *testing.T) {
+	Convey("Given a half-duplex file", t, func() {
+		modTime := time.Unix(123, 0).UTC()
+		file, err := New(
+			WithPath("/v1/dev/echo"),
+			WithModTime(modTime),
+			WithAllowEmptyRequest(true),
+			WithCommit(func(_ []byte) ([]byte, error) {
+				return nil, nil
+			}),
+		)
+		So(err, ShouldBeNil)
+
+		info, err := file.Stat()
+		So(err, ShouldBeNil)
+		So(info.Name(), ShouldEqual, "echo")
+		So(info.Size(), ShouldEqual, int64(0))
+		So(info.Mode(), ShouldEqual, fs.FileMode(0o666))
+		So(info.ModTime(), ShouldEqual, modTime)
+		So(info.IsDir(), ShouldBeFalse)
+		So(info.Sys(), ShouldBeNil)
+	})
+}
+
+func TestBaseName(t *testing.T) {
+	Convey("Given path variants", t, func() {
+		testCases := []struct {
+			path string
+			want string
+		}{
+			{path: "/v1/dev/echo", want: "echo"},
+			{path: "echo", want: "echo"},
+			{path: "/", want: ""},
+		}
+
+		for _, tc := range testCases {
+			tc := tc
+			Convey(tc.path, func() {
+				So(baseName(tc.path), ShouldEqual, tc.want)
+			})
+		}
+	})
+}
+
+func TestPathError(t *testing.T) {
+	Convey("Given a halfDuplex file", t, func() {
+		f := &halfDuplexFile{cfg: halfDuplexConfig{path: "/v1/dev/test"}}
+
+		Convey("when the input error is nil", func() {
+			So(f.pathError("read", nil), ShouldBeNil)
+		})
+
+		Convey("when the input error is EOF", func() {
+			So(f.pathError("read", io.EOF), ShouldEqual, io.EOF)
+		})
+
+		Convey("when the input error is already an fs.PathError", func() {
+			pathErr := &fs.PathError{Op: "open", Path: "/other", Err: fs.ErrNotExist}
+			So(f.pathError("read", pathErr), ShouldEqual, pathErr)
+		})
+
+		Convey("when the input error is not an fs.PathError", func() {
+			innerErr := errors.New("boom")
+			err := f.pathError("write", innerErr)
+
+			var wrapped *fs.PathError
+			So(errors.As(err, &wrapped), ShouldBeTrue)
+			So(wrapped.Op, ShouldEqual, "write")
+			So(wrapped.Path, ShouldEqual, "/v1/dev/test")
+			So(errors.Is(wrapped.Err, innerErr), ShouldBeTrue)
+		})
+	})
 }
