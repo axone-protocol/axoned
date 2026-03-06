@@ -39,7 +39,7 @@ Feature: dev_call/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6270
+      gas_used: 6277
       answer:
         has_more: false
         variables: ["Echoed"]
@@ -78,7 +78,7 @@ Feature: dev_call/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5021
+      gas_used: 5028
       answer:
         has_more: false
         results:
@@ -116,7 +116,7 @@ Feature: dev_call/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6415
+      gas_used: 6422
       answer:
         has_more: false
         results:
@@ -151,7 +151,7 @@ Feature: dev_call/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5803
+      gas_used: 5810
       answer:
         has_more: false
         variables: ["Result"]
