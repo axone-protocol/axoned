@@ -32,14 +32,10 @@ import (
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
+	logicfs "github.com/axone-protocol/axoned/v14/x/logic/fs"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
-	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
-	logicsyscomet "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/comet"
-	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
-	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
-	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
 	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
@@ -352,25 +348,15 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		tc.authQueryService,
 		tc.bankKeeper,
 		func(ctx context.Context) (fs.FS, error) {
-			pathFS := logicvfs.New()
-			mounts := []struct {
-				path string
-				fs   fs.FS
-			}{
-				{"/v1/lib", logicembeddedfs.NewFS(logiclib.Files)},
-				{"/v1/sys/header", logicsysheader.NewFS(ctx)},
-				{"/v1/sys/comet", logicsyscomet.NewFS(ctx)},
-				{"/v1/state/bank", bank.NewFS(ctx)},
-				{"/v1/dev/wasm", wasm.NewFS(ctx, tc.wasmKeeper)},
-				{"/v1/dev/echo", newEchoDeviceFS()},
-			}
-			for _, m := range mounts {
-				if err := pathFS.Mount(m.path, m.fs); err != nil {
-					return nil, fmt.Errorf("failed to mount %s: %w", m.path, err)
-				}
-			}
-
-			return pathFS, nil
+			return logicfs.NewVFS(
+				ctx,
+				bank.NewFS(ctx),
+				wasm.NewFS(ctx, tc.wasmKeeper),
+				logicfs.Mount{
+					Path: "/v1/dev/echo",
+					FS:   newEchoDeviceFS(),
+				},
+			)
 		})
 
 	if err := logicKeeper.SetParams(tc.ctx.Ctx, tc.params); err != nil {

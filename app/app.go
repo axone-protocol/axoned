@@ -5,7 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
-	"io/fs"
+	iofs "io/fs"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -133,14 +133,10 @@ import (
 	axonewasm "github.com/axone-protocol/axoned/v14/app/wasm"
 	"github.com/axone-protocol/axoned/v14/docs"
 	logicmodule "github.com/axone-protocol/axoned/v14/x/logic"
+	logicfs "github.com/axone-protocol/axoned/v14/x/logic/fs"
 	logicbank "github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
-	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
-	logicsyscomet "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/comet"
-	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
-	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	logicwasm "github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	logicmodulekeeper "github.com/axone-protocol/axoned/v14/x/logic/keeper"
-	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
 	logicmoduletypes "github.com/axone-protocol/axoned/v14/x/logic/types"
 	"github.com/axone-protocol/axoned/v14/x/mint"
 	mintkeeper "github.com/axone-protocol/axoned/v14/x/mint/keeper"
@@ -1171,24 +1167,10 @@ func (app *App) SimulationManager() *module.SimulationManager {
 
 // provideFS is used to provide the virtual file system used for the logic module
 // to load devices and other files. It is passed to the logic module keeper, which passes it to the logic module when executing logic.
-func (app *App) provideFS(ctx context.Context) (fs.FS, error) {
-	pathFS := logicvfs.New()
-	mounts := []struct {
-		path string
-		fs   fs.FS
-	}{
-		{"/v1/lib", logicembeddedfs.NewFS(logiclib.Files)},
-		{"/v1/sys/header", logicsysheader.NewFS(ctx)},
-		{"/v1/sys/comet", logicsyscomet.NewFS(ctx)},
-		{"/v1/state/bank", logicbank.NewFS(ctx)},
-		{"/v1/dev/wasm", logicwasm.NewFS(ctx, app.WasmKeeper)},
-	}
-
-	for _, m := range mounts {
-		if err := pathFS.Mount(m.path, m.fs); err != nil {
-			return nil, fmt.Errorf("failed to mount %s: %w", m.path, err)
-		}
-	}
-
-	return pathFS, nil
+func (app *App) provideFS(ctx context.Context) (iofs.FS, error) {
+	return logicfs.NewVFS(
+		ctx,
+		logicbank.NewFS(ctx),
+		logicwasm.NewFS(ctx, app.WasmKeeper),
+	)
 }
