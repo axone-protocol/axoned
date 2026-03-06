@@ -134,13 +134,11 @@ import (
 	"github.com/axone-protocol/axoned/v14/docs"
 	logicmodule "github.com/axone-protocol/axoned/v14/x/logic"
 	logicbank "github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
 	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
 	logicsyscomet "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/comet"
 	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
 	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
-	wasm2 "github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
+	logicwasm "github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	logicmodulekeeper "github.com/axone-protocol/axoned/v14/x/logic/keeper"
 	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
 	logicmoduletypes "github.com/axone-protocol/axoned/v14/x/logic/types"
@@ -1174,9 +1172,6 @@ func (app *App) SimulationManager() *module.SimulationManager {
 // provideFS is used to provide the virtual file system used for the logic module
 // to load devices and other files. It is passed to the logic module keeper, which passes it to the logic module when executing logic.
 func (app *App) provideFS(ctx context.Context) (fs.FS, error) {
-	legacyFS := composite.NewFS()
-	legacyFS.Mount(wasm2.Scheme, wasm2.NewFS(ctx, app.WasmKeeper))
-
 	pathFS := logicvfs.New()
 	mounts := []struct {
 		path string
@@ -1185,7 +1180,8 @@ func (app *App) provideFS(ctx context.Context) (fs.FS, error) {
 		{"/v1/lib", logicembeddedfs.NewFS(logiclib.Files)},
 		{"/v1/sys/header", logicsysheader.NewFS(ctx)},
 		{"/v1/sys/comet", logicsyscomet.NewFS(ctx)},
-		{"/v1/bank", logicbank.NewFS(ctx)},
+		{"/v1/state/bank", logicbank.NewFS(ctx)},
+		{"/v1/dev/wasm", logicwasm.NewFS(ctx, app.WasmKeeper)},
 	}
 
 	for _, m := range mounts {
@@ -1194,5 +1190,5 @@ func (app *App) provideFS(ctx context.Context) (fs.FS, error) {
 		}
 	}
 
-	return dual.NewFS(pathFS, legacyFS), nil
+	return pathFS, nil
 }

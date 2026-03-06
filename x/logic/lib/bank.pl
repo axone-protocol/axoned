@@ -30,7 +30,7 @@
 bank_balances(Address, Balances) :-
   must_be(nonvar, Address),
   validate_bech32_address(Address, bank_balances/2),
-  atom_concat('/v1/bank/', Address, Path1),
+  atom_concat('/v1/state/bank/', Address, Path1),
   atom_concat(Path1, '/balances/@', Path),
   setup_call_cleanup(
     open(Path, read, Stream, [type(text)]),
@@ -64,7 +64,7 @@ bank_balances(Address, Balances) :-
 bank_spendable_balances(Address, Balances) :-
   must_be(nonvar, Address),
   validate_bech32_address(Address, bank_spendable_balances/2),
-  atom_concat('/v1/bank/', Address, Path1),
+  atom_concat('/v1/state/bank/', Address, Path1),
   atom_concat(Path1, '/spendable/@', Path),
   setup_call_cleanup(
     open(Path, read, Stream, [type(text)]),
@@ -98,7 +98,7 @@ bank_spendable_balances(Address, Balances) :-
 bank_locked_balances(Address, Balances) :-
   must_be(nonvar, Address),
   validate_bech32_address(Address, bank_locked_balances/2),
-  atom_concat('/v1/bank/', Address, Path1),
+  atom_concat('/v1/state/bank/', Address, Path1),
   atom_concat(Path1, '/locked/@', Path),
   setup_call_cleanup(
     open(Path, read, Stream, [type(text)]),

@@ -50,6 +50,7 @@ known_type(char).
 known_type(chars).
 known_type(code).
 known_type(codes).
+known_type(byte).
 known_type(compound).
 known_type(constant).
 known_type(float).
@@ -77,6 +78,7 @@ has_type(char, X) :- atom(X), atom_length(X, 1).
 has_type(chars, X) :- proper_char_list(X).
 has_type(code, X) :- integer(X), X >= 0, X =< 1114111.
 has_type(codes, X) :- proper_code_list(X).
+has_type(byte, X) :- integer(X), X >= 0, X =< 255.
 has_type(text, X) :- atom(X).
 has_type(text, X) :- proper_char_list(X).
 has_type(text, X) :- proper_code_list(X).

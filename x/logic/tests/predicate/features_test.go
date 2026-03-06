@@ -33,8 +33,6 @@ import (
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/composite"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/dual"
 	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
 	logicsyscomet "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/comet"
 	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
@@ -77,6 +75,7 @@ type testCase struct {
 type SmartContractConfiguration struct {
 	Message  string `json:"message" yaml:"message"`
 	Response string `json:"response" yaml:"response"`
+	Error    string `json:"error" yaml:"error"`
 }
 
 type testCaseCtxKey struct{}
@@ -159,6 +158,10 @@ func givenASmartContractWithAddress(ctx context.Context, address string, configu
 			}
 
 			if reflect.DeepEqual(message, messageWant) {
+				if smartContractConfiguration.Error != "" {
+					return nil, errors.New(smartContractConfiguration.Error)
+				}
+
 				return []byte(smartContractConfiguration.Response), nil
 			}
 
@@ -349,9 +352,6 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		tc.authQueryService,
 		tc.bankKeeper,
 		func(ctx context.Context) (fs.FS, error) {
-			legacyFS := composite.NewFS()
-			legacyFS.Mount(wasm.Scheme, wasm.NewFS(ctx, tc.wasmKeeper))
-
 			pathFS := logicvfs.New()
 			mounts := []struct {
 				path string
@@ -360,7 +360,9 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 				{"/v1/lib", logicembeddedfs.NewFS(logiclib.Files)},
 				{"/v1/sys/header", logicsysheader.NewFS(ctx)},
 				{"/v1/sys/comet", logicsyscomet.NewFS(ctx)},
-				{"/v1/bank", bank.NewFS(ctx)},
+				{"/v1/state/bank", bank.NewFS(ctx)},
+				{"/v1/dev/wasm", wasm.NewFS(ctx, tc.wasmKeeper)},
+				{"/v1/dev/echo", newEchoDeviceFS()},
 			}
 			for _, m := range mounts {
 				if err := pathFS.Mount(m.path, m.fs); err != nil {
@@ -368,7 +370,7 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 				}
 			}
 
-			return dual.NewFS(pathFS, legacyFS), nil
+			return pathFS, nil
 		})
 
 	if err := logicKeeper.SetParams(tc.ctx.Ctx, tc.params); err != nil {
