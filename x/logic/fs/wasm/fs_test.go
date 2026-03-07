@@ -140,7 +140,7 @@ func TestWasmDeviceFSErrors(t *testing.T) {
 
 			buf := make([]byte, 8)
 			_, err = file.Read(buf)
-			So(errors.Is(err, errInvalidRequest), ShouldBeTrue)
+			So(errors.Is(err, devfile.ErrInvalidRequest), ShouldBeTrue)
 		})
 
 		Convey("when request payload exceeds limit", func() {
