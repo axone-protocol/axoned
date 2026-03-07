@@ -29,8 +29,8 @@
 % Balances = [uatom-100, uaxone-200].
 % ```
 bank_balances(Address, Balances) :-
-  bank_must_be(nonvar, Address, bank_balances/2),
-  validate_bech32_address(Address, bank_balances/2),
+  with_context(bank_balances/2, must_be(nonvar, Address)),
+  with_context(bank_balances/2, bech32_address(_, Address)),
   atom_concat('/v1/state/bank/', Address, Path1),
   atom_concat(Path1, '/balances/@', Path),
   setup_call_cleanup(
@@ -63,8 +63,8 @@ bank_balances(Address, Balances) :-
 % Balances = [uatom-100, uaxone-200].
 % ```
 bank_spendable_balances(Address, Balances) :-
-  bank_must_be(nonvar, Address, bank_spendable_balances/2),
-  validate_bech32_address(Address, bank_spendable_balances/2),
+  with_context(bank_spendable_balances/2, must_be(nonvar, Address)),
+  with_context(bank_spendable_balances/2, bech32_address(_, Address)),
   atom_concat('/v1/state/bank/', Address, Path1),
   atom_concat(Path1, '/spendable/@', Path),
   setup_call_cleanup(
@@ -97,8 +97,8 @@ bank_spendable_balances(Address, Balances) :-
 % Balances = [uatom-100, uaxone-200].
 % ```
 bank_locked_balances(Address, Balances) :-
-  bank_must_be(nonvar, Address, bank_locked_balances/2),
-  validate_bech32_address(Address, bank_locked_balances/2),
+  with_context(bank_locked_balances/2, must_be(nonvar, Address)),
+  with_context(bank_locked_balances/2, bech32_address(_, Address)),
   atom_concat('/v1/state/bank/', Address, Path1),
   atom_concat(Path1, '/locked/@', Path),
   setup_call_cleanup(
@@ -106,38 +106,6 @@ bank_locked_balances(Address, Balances) :-
     read_terms_from_stream(Stream, Balances),
     close(Stream)
   ).
-
-% validate_bech32_address(+Address, +Context) is det.
-%
-% Verifies that Address is valid Bech32 and maps only this specific validation error
-% to the given predicate context while leaving all other errors untouched.
-validate_bech32_address(Address, Context) :-
-  catch(
-    bech32_address(_, Address),
-    Error,
-    rethrow_bech32_error(Error, Address, Context)
-  ).
-
-bank_must_be(Type, Term, Context) :-
-  catch(
-    must_be(Type, Term),
-    error(Formal, must_be/2),
-    throw(error(Formal, Context))
-  ).
-
-rethrow_bech32_error(error(Formal, bech32_address/2), Address, Context) :-
-  !,
-  normalize_bech32_formal(Formal, Address, Normalized),
-  throw(error(Normalized, Context)).
-rethrow_bech32_error(error(Formal, _, _), Address, Context) :-
-  normalize_bech32_formal(Formal, Address, Normalized),
-  throw(error(Normalized, Context)).
-
-normalize_bech32_formal(domain_error(encoding(bech32), _), Address, domain_error(valid_encoding(bech32), Address)) :-
-  !.
-normalize_bech32_formal(domain_error(valid_encoding(bech32), _), Address, domain_error(valid_encoding(bech32), Address)) :-
-  !.
-normalize_bech32_formal(Formal, _Address, Formal).
 
 % read_terms_from_stream(+Stream, -Terms) is det.
 %

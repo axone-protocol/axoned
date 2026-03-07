@@ -28,7 +28,7 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 16104
+      gas_used: 16079
       answer:
         has_more: false
         variables: ["ResponseBytes"]
@@ -54,7 +54,7 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 9213
+      gas_used: 9195
       answer:
         has_more: false
         variables: ["ResponseBytes"]
@@ -64,7 +64,7 @@ Feature: wasm_query/3
 
   @great_for_documentation
   Scenario: Reject a non-byte request payload
-    This scenario demonstrates how wasm_query/3 fails when the payload list contains values outside the byte range [0,255].
+    This scenario demonstrates how wasm_query/3 raises a type error when the payload list contains values outside the byte range [0,255].
 
     Given the program:
       """ prolog
@@ -82,16 +82,17 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 11083
+      gas_used: 11145
       answer:
         has_more: false
         variables: ["ResponseBytes"]
         results:
+        - error: "error(type_error(byte,256),wasm_query/3)"
       """
 
   @great_for_documentation
   Scenario: Surface contract query execution failures
-    This scenario demonstrates that a contract query failure currently makes wasm_query/3 fail.
+    This scenario demonstrates that a contract query failure is surfaced as a system error in wasm_query/3.
 
     Given the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
       """ yaml
@@ -115,9 +116,10 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 14959
+      gas_used: 15035
       answer:
         has_more: false
         variables: ["ResponseBytes"]
         results:
+        - error: "error(system_error,wasm_query/3)"
       """

@@ -19,6 +19,28 @@ must_be(Type, Term) :-
   ; throw(error(instantiation_error, must_be/2))
   ).
 
+%! with_context(+Context, :Goal) is det.
+%
+% Executes Goal and, if it throws a Prolog error term, rethrows the same formal
+% error with Context as the error context.
+%
+% Non-error exceptions are rethrown unchanged.
+with_context(Context, Goal) :-
+  catch(
+    Goal,
+    Error,
+    rethrow_with_context(Context, Error)
+  ).
+
+rethrow_with_context(Context, error(Formal, _, Extra)) :-
+  !,
+  throw(error(Formal, Context, Extra)).
+rethrow_with_context(Context, error(Formal, _)) :-
+  !,
+  throw(error(Formal, Context)).
+rethrow_with_context(_, Error) :-
+  throw(Error).
+
 is_not(var, Term) :-
   !,
   throw(error(uninstantiation_error(Term), must_be/2)).
