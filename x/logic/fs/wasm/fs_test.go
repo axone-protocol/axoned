@@ -153,7 +153,7 @@ func TestWasmDeviceFSErrors(t *testing.T) {
 
 			huge := make([]byte, maxRequestBytes+1)
 			_, err = file.(interface{ Write([]byte) (int, error) }).Write(huge)
-			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+			So(errors.Is(err, devfile.ErrWriteLimit), ShouldBeTrue)
 		})
 
 		Convey("when wasm query fails at commit", func() {
@@ -195,7 +195,7 @@ func TestWasmDeviceFSErrors(t *testing.T) {
 			So(err, ShouldBeNil)
 
 			_, err = file.Read(make([]byte, 8))
-			So(errors.Is(err, devfile.ErrResponseTooLarge), ShouldBeTrue)
+			So(errors.Is(err, devfile.ErrWriteLimit), ShouldBeTrue)
 		})
 
 		Convey("when closed before first read", func() {

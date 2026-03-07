@@ -3,6 +3,7 @@ package wasm
 import (
 	"context"
 	"errors"
+	"io"
 	"io/fs"
 	"os"
 	"strings"
@@ -64,14 +65,23 @@ func (f *vfs) OpenFile(name string, flag int, _ fs.FileMode) (fs.File, error) {
 		devfile.WithModTime(prolog.ResolveHeaderInfo(sdkCtx).Time),
 		devfile.WithMaxRequestBytes(maxRequestBytes),
 		devfile.WithMaxResponseBytes(maxResponseBytes),
-		devfile.WithAllowEmptyRequest(false),
-		devfile.WithCommit(func(request []byte) ([]byte, error) {
-			response, err := f.wasmKeeper.QuerySmart(sdkCtx, contractAddr, request)
+		devfile.WithCommit(func(r io.Reader, w io.Writer) error {
+			request, err := io.ReadAll(r)
 			if err != nil {
-				return nil, errWasmQueryFailed
+				return err
 			}
 
-			return response, nil
+			if len(request) == 0 {
+				return devfile.ErrInvalidRequest
+			}
+
+			response, err := f.wasmKeeper.QuerySmart(sdkCtx, contractAddr, request)
+			if err != nil {
+				return errWasmQueryFailed
+			}
+
+			_, err = w.Write(response)
+			return err
 		}),
 	)
 }

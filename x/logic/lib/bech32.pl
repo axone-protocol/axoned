@@ -142,5 +142,4 @@ bech32_decode_outcome(error(Code), domain_error) :-
 bech32_decode_outcome(_, system_error).
 
 bech32_domain_error_code(invalid_bech32).
-bech32_domain_error_code(invalid_hrp).
 bech32_domain_error_code(invalid_bytes).
