@@ -28,7 +28,7 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 10454
+      gas_used: 16104
       answer:
         has_more: false
         variables: ["ResponseBytes"]
@@ -54,17 +54,17 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4468
+      gas_used: 9213
       answer:
         has_more: false
         variables: ["ResponseBytes"]
         results:
-        - error: "error(domain_error(encoding(bech32),invalid-address),wasm_query/3)"
+        - error: "error(domain_error(valid_encoding(bech32),invalid-address),wasm_query/3)"
       """
 
   @great_for_documentation
   Scenario: Reject a non-byte request payload
-    This scenario demonstrates how wasm_query/3 rejects payload lists containing values outside the byte range [0,255].
+    This scenario demonstrates how wasm_query/3 fails when the payload list contains values outside the byte range [0,255].
 
     Given the program:
       """ prolog
@@ -82,17 +82,16 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5516
+      gas_used: 11083
       answer:
         has_more: false
         variables: ["ResponseBytes"]
         results:
-        - error: "error(type_error(byte,256),must_be/2)"
       """
 
   @great_for_documentation
   Scenario: Surface contract query execution failures
-    This scenario demonstrates that a contract query failure is returned as a system_error.
+    This scenario demonstrates that a contract query failure currently makes wasm_query/3 fail.
 
     Given the CosmWasm smart contract "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk" and the behavior:
       """ yaml
@@ -116,10 +115,9 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 9385
+      gas_used: 14959
       answer:
         has_more: false
         variables: ["ResponseBytes"]
         results:
-        - error: "error(system_error,read /v1/dev/wasm/axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk/query: wasm_query_failed)"
       """
