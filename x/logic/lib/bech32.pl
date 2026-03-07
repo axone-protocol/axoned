@@ -2,6 +2,7 @@
 % Bech32 helpers backed by the codec VFS device.
 
 :- consult('/v1/lib/error.pl').
+:- consult('/v1/lib/crypto.pl').
 :- consult('/v1/lib/dev.pl').
 
 %! bech32_address(?Address, ?Bech32) is det.
@@ -70,23 +71,16 @@ bech32_decode_response(Bech32, Outcome) :-
   bech32_decode_outcome(Response, Outcome).
 
 bech32_encode_request(Address, HrpChars, HexChars) :-
-  bech32_must_be(pair, Address),
+  with_context(bech32_address/2, must_be(pair, Address)),
   Address = Hrp-Bytes,
-  bech32_must_be(atom, Hrp),
+  with_context(bech32_address/2, must_be(atom, Hrp)),
   bech32_request_token_chars(Hrp, Address, HrpChars),
-  bech32_must_be(list(byte), Bytes),
-  bech32_bytes_hex_chars(Bytes, HexChars).
+  with_context(bech32_address/2, hex_bytes(Hex, Bytes)),
+  atom_chars(Hex, HexChars).
 
 bech32_decode_request(Bech32, Bech32Chars) :-
-  bech32_must_be(atom, Bech32),
+  with_context(bech32_address/2, must_be(atom, Bech32)),
   bech32_request_token_chars(Bech32, Bech32, Bech32Chars).
-
-bech32_must_be(Type, Term) :-
-  catch(
-    must_be(Type, Term),
-    error(Formal, must_be/2),
-    throw(error(Formal, bech32_address/2))
-  ).
 
 bech32_request_token_chars(Atom, InvalidValue, Chars) :-
   atom_chars(Atom, Chars),
@@ -102,39 +96,6 @@ bech32_token_chars([Char | Rest]) :-
   Code > 32,
   Code =\= 127,
   bech32_token_chars(Rest).
-
-bech32_bytes_hex_chars([], []).
-bech32_bytes_hex_chars([Byte | Rest], [HiChar, LoChar | HexChars]) :-
-  LoNibble is Byte mod 16,
-  bech32_high_nibble(Byte, HiNibble),
-  bech32_hex_char(HiNibble, HiChar),
-  bech32_hex_char(LoNibble, LoChar),
-  bech32_bytes_hex_chars(Rest, HexChars).
-
-bech32_high_nibble(Byte, 0) :-
-  Byte < 16,
-  !.
-bech32_high_nibble(Byte, HiNibble) :-
-  Byte1 is Byte - 16,
-  bech32_high_nibble(Byte1, PrevNibble),
-  HiNibble is PrevNibble + 1.
-
-bech32_hex_char(0, '0').
-bech32_hex_char(1, '1').
-bech32_hex_char(2, '2').
-bech32_hex_char(3, '3').
-bech32_hex_char(4, '4').
-bech32_hex_char(5, '5').
-bech32_hex_char(6, '6').
-bech32_hex_char(7, '7').
-bech32_hex_char(8, '8').
-bech32_hex_char(9, '9').
-bech32_hex_char(10, 'a').
-bech32_hex_char(11, 'b').
-bech32_hex_char(12, 'c').
-bech32_hex_char(13, 'd').
-bech32_hex_char(14, 'e').
-bech32_hex_char(15, 'f').
 
 bech32_write_encode_request(Stream, HrpChars, HexChars) :-
   bech32_put_chars(Stream, ['e', 'n', 'c', 'o', 'd', 'e', ' ']),

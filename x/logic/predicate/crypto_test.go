@@ -106,10 +106,8 @@ func TestCryptoOperations(t *testing.T) {
 					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 					Convey("and a vm", func() {
-						interpreter := testutil.NewLightInterpreterMust(ctx)
-						interpreter.Register3(engine.NewAtom("crypto_data_hash"), CryptoDataHash)
-						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
-
+					interpreter := testutil.NewComprehensiveInterpreterMust(ctx)
+					interpreter.Register3(engine.NewAtom("crypto_data_hash"), CryptoDataHash)
 						err := interpreter.Compile(ctx, tc.program)
 						So(err, ShouldBeNil)
 
@@ -325,9 +323,7 @@ func TestXVerify(t *testing.T) {
 					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 					Convey("and a vm", func() {
-						interpreter := testutil.NewLightInterpreterMust(ctx)
-						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
-						interpreter.Register4(engine.NewAtom("eddsa_verify"), EDDSAVerify)
+					interpreter := testutil.NewComprehensiveInterpreterMust(ctx)
 						interpreter.Register4(engine.NewAtom("ecdsa_verify"), ECDSAVerify)
 
 						err := interpreter.Compile(ctx, tc.program)
