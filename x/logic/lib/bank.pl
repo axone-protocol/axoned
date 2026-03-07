@@ -2,6 +2,7 @@
 % Bank-related predicates for querying account balances.
 
 :- consult('/v1/lib/error.pl').
+:- consult('/v1/lib/bech32.pl').
 :- consult('/v1/lib/lists.pl').
 
 %! bank_balances(+Address, -Balances) is det.
@@ -20,7 +21,7 @@
 % - The list is sorted by denomination.
 %
 % Throws instantiation_error if Address is a variable.
-% Throws domain_error(encoding(bech32), Address) if Address is not a valid Bech32 address.
+% Throws domain_error(valid_encoding(bech32), Address) if Address is not a valid Bech32 address.
 %
 % Examples:
 % ```prolog
@@ -28,7 +29,7 @@
 % Balances = [uatom-100, uaxone-200].
 % ```
 bank_balances(Address, Balances) :-
-  must_be(nonvar, Address),
+  bank_must_be(nonvar, Address, bank_balances/2),
   validate_bech32_address(Address, bank_balances/2),
   atom_concat('/v1/state/bank/', Address, Path1),
   atom_concat(Path1, '/balances/@', Path),
@@ -54,7 +55,7 @@ bank_balances(Address, Balances) :-
 % - The list is sorted by denomination.
 %
 % Throws instantiation_error if Address is a variable.
-% Throws domain_error(encoding(bech32), Address) if Address is not a valid Bech32 address.
+% Throws domain_error(valid_encoding(bech32), Address) if Address is not a valid Bech32 address.
 %
 % Examples:
 % ```prolog
@@ -62,7 +63,7 @@ bank_balances(Address, Balances) :-
 % Balances = [uatom-100, uaxone-200].
 % ```
 bank_spendable_balances(Address, Balances) :-
-  must_be(nonvar, Address),
+  bank_must_be(nonvar, Address, bank_spendable_balances/2),
   validate_bech32_address(Address, bank_spendable_balances/2),
   atom_concat('/v1/state/bank/', Address, Path1),
   atom_concat(Path1, '/spendable/@', Path),
@@ -88,7 +89,7 @@ bank_spendable_balances(Address, Balances) :-
 % - The list is sorted by denomination.
 %
 % Throws instantiation_error if Address is a variable.
-% Throws domain_error(encoding(bech32), Address) if Address is not a valid Bech32 address.
+% Throws domain_error(valid_encoding(bech32), Address) if Address is not a valid Bech32 address.
 %
 % Examples:
 % ```prolog
@@ -96,7 +97,7 @@ bank_spendable_balances(Address, Balances) :-
 % Balances = [uatom-100, uaxone-200].
 % ```
 bank_locked_balances(Address, Balances) :-
-  must_be(nonvar, Address),
+  bank_must_be(nonvar, Address, bank_locked_balances/2),
   validate_bech32_address(Address, bank_locked_balances/2),
   atom_concat('/v1/state/bank/', Address, Path1),
   atom_concat(Path1, '/locked/@', Path),
@@ -114,17 +115,29 @@ validate_bech32_address(Address, Context) :-
   catch(
     bech32_address(_, Address),
     Error,
-    normalize_bech32_error(Error, Address, Context)
+    rethrow_bech32_error(Error, Address, Context)
   ).
 
-normalize_bech32_error(Error, Address, Context) :-
-  (   bech32_domain_error(Error)
-  ->  throw(error(domain_error(encoding(bech32), Address), Context))
-  ;   throw(Error)
+bank_must_be(Type, Term, Context) :-
+  catch(
+    must_be(Type, Term),
+    error(Formal, must_be/2),
+    throw(error(Formal, Context))
   ).
 
-bech32_domain_error(error(domain_error(encoding(bech32), _), _)).
-bech32_domain_error(error(domain_error(encoding(bech32), _), _, _)).
+rethrow_bech32_error(error(Formal, bech32_address/2), Address, Context) :-
+  !,
+  normalize_bech32_formal(Formal, Address, Normalized),
+  throw(error(Normalized, Context)).
+rethrow_bech32_error(error(Formal, _, _), Address, Context) :-
+  normalize_bech32_formal(Formal, Address, Normalized),
+  throw(error(Normalized, Context)).
+
+normalize_bech32_formal(domain_error(encoding(bech32), _), Address, domain_error(valid_encoding(bech32), Address)) :-
+  !.
+normalize_bech32_formal(domain_error(valid_encoding(bech32), _), Address, domain_error(valid_encoding(bech32), Address)) :-
+  !.
+normalize_bech32_formal(Formal, _Address, Formal).
 
 % read_terms_from_stream(+Stream, -Terms) is det.
 %

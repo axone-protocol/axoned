@@ -2,6 +2,7 @@
 % CosmWasm device helpers.
 
 :- consult('/v1/lib/error.pl').
+:- consult('/v1/lib/bech32.pl').
 :- consult('/v1/lib/dev.pl').
 
 %! wasm_query(+Address, +RequestBytes, -ResponseBytes) is det.
@@ -14,9 +15,9 @@
 %
 % Both RequestBytes and ResponseBytes use lists of integers in [0,255].
 wasm_query(Address, RequestBytes, ResponseBytes) :-
-  must_be(nonvar, Address),
+  wasm_must_be(nonvar, Address, wasm_query/3),
   validate_bech32_address(Address, wasm_query/3),
-  must_be(list(byte), RequestBytes),
+  wasm_must_be(list(byte), RequestBytes, wasm_query/3),
   wasm_query_path(Address, Path),
   dev_call(Path, binary, wasm_write(RequestBytes), wasm_read(ResponseBytes)).
 
@@ -34,14 +35,26 @@ validate_bech32_address(Address, Context) :-
   catch(
     bech32_address(_, Address),
     Error,
-    normalize_bech32_error(Error, Address, Context)
+    rethrow_bech32_error(Error, Address, Context)
   ).
 
-normalize_bech32_error(Error, Address, Context) :-
-  (   bech32_domain_error(Error)
-  ->  throw(error(domain_error(encoding(bech32), Address), Context))
-  ;   throw(Error)
+wasm_must_be(Type, Term, Context) :-
+  catch(
+    must_be(Type, Term),
+    error(Formal, must_be/2),
+    throw(error(Formal, Context))
   ).
 
-bech32_domain_error(error(domain_error(encoding(bech32), _), _)).
-bech32_domain_error(error(domain_error(encoding(bech32), _), _, _)).
+rethrow_bech32_error(error(Formal, bech32_address/2), Address, Context) :-
+  !,
+  normalize_bech32_formal(Formal, Address, Normalized),
+  throw(error(Normalized, Context)).
+rethrow_bech32_error(error(Formal, _, _), Address, Context) :-
+  normalize_bech32_formal(Formal, Address, Normalized),
+  throw(error(Normalized, Context)).
+
+normalize_bech32_formal(domain_error(encoding(bech32), _), Address, domain_error(valid_encoding(bech32), Address)) :-
+  !.
+normalize_bech32_formal(domain_error(valid_encoding(bech32), _), Address, domain_error(valid_encoding(bech32), Address)) :-
+  !.
+normalize_bech32_formal(Formal, _Address, Formal).

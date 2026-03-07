@@ -16,6 +16,8 @@ import (
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
+var errWasmQueryFailed = errors.New("wasm_query_failed")
+
 const (
 	queryPath        = "query"
 	maxRequestBytes  = 64 * 1024
@@ -30,12 +32,9 @@ type vfs struct {
 var (
 	_ fs.FS            = (*vfs)(nil)
 	_ iface.OpenFileFS = (*vfs)(nil)
-
-	errInvalidRequest  = devfile.ErrInvalidRequest
-	errWasmQueryFailed = errors.New("wasm_query_failed")
 )
 
-// NewFS creates the /v1/dev/wasm transactional device filesystem.
+// NewFS creates the dev/wasm transactional device filesystem.
 func NewFS(ctx context.Context, wasmKeeper types.WasmKeeper) fs.FS {
 	return &vfs{ctx: ctx, wasmKeeper: wasmKeeper}
 }
