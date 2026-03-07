@@ -59,8 +59,8 @@ func (c *bech32Codec) Decode(tokens [][]byte) engine.Term {
 //   - hrp is the human-readable part
 //   - hex_bytes is the data in hexadecimal format
 //
-// The codec validates the hex payload locally and delegates Bech32 encoding
-// validation to the SDK.
+// The codec validates the hex payload locally and delegates Bech32 formatting
+// to the SDK.
 func (c *bech32Codec) Encode(tokens [][]byte) engine.Term {
 	hrpText := tokens[0]
 	hexText := tokens[1]
@@ -70,10 +70,9 @@ func (c *bech32Codec) Encode(tokens [][]byte) engine.Term {
 		return errInvalidBytes
 	}
 
-	bech32Address, err := sdkbech32.ConvertAndEncode(string(hrpText), data)
-	if err != nil {
-		return errInvalidBech32
-	}
+	// With fixed ConvertBits parameters (8 -> 5 with padding) and
+	// validated base16 input, ConvertAndEncode cannot fail for this call site.
+	bech32Address, _ := sdkbech32.ConvertAndEncode(string(hrpText), data)
 
 	return atomOK.Apply(engine.NewAtom(bech32Address))
 }

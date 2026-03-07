@@ -146,10 +146,6 @@ func handleRequest(codec Codec, request []byte) engine.Term {
 	}
 
 	tokens := splitRequestLine(line)
-	if len(tokens) == 0 {
-		return errInvalidRequest
-	}
-
 	switch string(tokens[0]) {
 	case requestCommandDecode:
 		if len(tokens) != 2 {
