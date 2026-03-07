@@ -31,6 +31,20 @@ import (
 
 const testContractAddress = "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk"
 
+func TestWasmDeviceFSOpen(t *testing.T) {
+	ctrl := gomock.NewController(t)
+	defer ctrl.Finish()
+
+	ctx := newSDKContext()
+	keeper := testutil.NewMockWasmKeeper(ctrl)
+	vfs := NewFS(ctx, keeper)
+
+	Convey("Given a wasm device filesystem", t, func() {
+		_, err := vfs.Open(testContractAddress + "/query")
+		So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+	})
+}
+
 func TestWasmDeviceFSOpenFileValidation(t *testing.T) {
 	ctrl := gomock.NewController(t)
 	defer ctrl.Finish()
@@ -52,6 +66,11 @@ func TestWasmDeviceFSOpenFileValidation(t *testing.T) {
 		Convey("when opening an unknown path", func() {
 			_, err := ofs.OpenFile(testContractAddress+"/info", os.O_RDWR, 0)
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+		})
+
+		Convey("when opening an escaping path", func() {
+			_, err := ofs.OpenFile("../"+testContractAddress+"/query", os.O_RDWR, 0)
+			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
 		})
 
 		Convey("when opening with invalid contract address", func() {
