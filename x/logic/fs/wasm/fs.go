@@ -66,10 +66,9 @@ func (f *vfs) OpenFile(name string, flag int, _ fs.FileMode) (fs.File, error) {
 		devfile.WithMaxRequestBytes(maxRequestBytes),
 		devfile.WithMaxResponseBytes(maxResponseBytes),
 		devfile.WithCommit(func(r io.Reader, w io.Writer) error {
-			request, err := io.ReadAll(r)
-			if err != nil {
-				return err
-			}
+			// devfile always commits from an in-memory bytes.Reader, so ReadAll
+			// cannot fail at this call site.
+			request, _ := io.ReadAll(r)
 
 			if len(request) == 0 {
 				return devfile.ErrInvalidRequest
@@ -93,10 +92,6 @@ func validateQueryPath(subpath string) (sdk.AccAddress, error) {
 	}
 
 	address := segments[0]
-	if address == "" {
-		return nil, fs.ErrNotExist
-	}
-
 	addr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return nil, fs.ErrNotExist
