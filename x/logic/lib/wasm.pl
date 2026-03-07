@@ -2,6 +2,7 @@
 % CosmWasm device helpers.
 
 :- consult('/v1/lib/error.pl').
+:- consult('/v1/lib/bech32.pl').
 :- consult('/v1/lib/dev.pl').
 
 %! wasm_query(+Address, +RequestBytes, -ResponseBytes) is det.
@@ -14,9 +15,9 @@
 %
 % Both RequestBytes and ResponseBytes use lists of integers in [0,255].
 wasm_query(Address, RequestBytes, ResponseBytes) :-
-  must_be(nonvar, Address),
-  validate_bech32_address(Address, wasm_query/3),
-  must_be(list(byte), RequestBytes),
+  with_context(wasm_query/3, must_be(nonvar, Address)),
+  with_context(wasm_query/3, bech32_address(_, Address)),
+  with_context(wasm_query/3, must_be(list(byte), RequestBytes)),
   wasm_query_path(Address, Path),
   dev_call(Path, binary, wasm_write(RequestBytes), wasm_read(ResponseBytes)).
 
@@ -29,19 +30,3 @@ wasm_write(Stream, RequestBytes) :-
 
 wasm_read(Stream, ResponseBytes) :-
   dev_read_bytes(Stream, ResponseBytes).
-
-validate_bech32_address(Address, Context) :-
-  catch(
-    bech32_address(_, Address),
-    Error,
-    normalize_bech32_error(Error, Address, Context)
-  ).
-
-normalize_bech32_error(Error, Address, Context) :-
-  (   bech32_domain_error(Error)
-  ->  throw(error(domain_error(encoding(bech32), Address), Context))
-  ;   throw(Error)
-  ).
-
-bech32_domain_error(error(domain_error(encoding(bech32), _), _)).
-bech32_domain_error(error(domain_error(encoding(bech32), _), _, _)).

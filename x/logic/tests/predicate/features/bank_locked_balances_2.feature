@@ -21,7 +21,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4693
+      gas_used: 9023
       answer:
         has_more: false
         variables: ["Balances"]
@@ -49,7 +49,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4452
+      gas_used: 8782
       answer:
         has_more: false
         variables: ["Balances"]
@@ -83,7 +83,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4920
+      gas_used: 9250
       answer:
         has_more: false
         variables: ["Amount"]
@@ -111,7 +111,7 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4610
+      gas_used: 8940
       answer:
         has_more: false
         results:
@@ -134,12 +134,12 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4363
+      gas_used: 4475
       answer:
         has_more: false
         variables: ["Address", "Balances"]
         results:
-        - error: "error(instantiation_error,must_be/2)"
+        - error: "error(instantiation_error,bank_locked_balances/2)"
       """
 
   @great_for_documentation
@@ -158,12 +158,12 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4448
+      gas_used: 9180
       answer:
         has_more: false
         variables: ["Balances"]
         results:
-        - error: "error(domain_error(encoding(bech32),invalid_address),bank_locked_balances/2)"
+        - error: "error(domain_error(valid_encoding(bech32),invalid_address),bank_locked_balances/2)"
       """
 
   @great_for_documentation
@@ -182,9 +182,9 @@ Feature: bank_locked_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4300
+      gas_used: 4822
       answer:
         has_more: false
         results:
-        - error: "error(type_error(atom,42),bech32_address/2)"
+        - error: "error(type_error(atom,42),bank_locked_balances/2)"
       """

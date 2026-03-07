@@ -8,7 +8,10 @@ import (
 	"github.com/axone-protocol/prolog/v3"
 	"github.com/axone-protocol/prolog/v3/engine"
 
+	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
+	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
 	"github.com/axone-protocol/axoned/v14/x/logic/interpreter/bootstrap"
+	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
 )
 
 type TermResults map[string]prolog.TermString
@@ -41,8 +44,8 @@ func NewLightInterpreterMust(ctx context.Context) (i *prolog.Interpreter) {
 
 // NewComprehensiveInterpreterMust returns a new Interpreter with the given context or panics if it fails.
 // The Interpreter is configured with the full bootstrap but with a minimal set of predicates.
-func NewComprehensiveInterpreterMust(ctx context.Context) (i *prolog.Interpreter) {
-	i = &prolog.Interpreter{}
+func NewComprehensiveInterpreterMust(ctx context.Context) *prolog.Interpreter {
+	i := &prolog.Interpreter{}
 	i.Register3(engine.NewAtom("op"), engine.Op)
 	i.Register3(engine.NewAtom("compare"), engine.Compare)
 	i.Register2(engine.NewAtom("="), engine.Unify)
@@ -53,13 +56,36 @@ func NewComprehensiveInterpreterMust(ctx context.Context) (i *prolog.Interpreter
 	i.Register2(engine.NewAtom("put_char"), engine.PutChar)
 	i.Register2(engine.NewAtom("get_char"), engine.GetChar)
 	i.Register3(engine.NewAtom("write_term"), engine.WriteTerm)
+	i.Register1(engine.NewAtom("call"), engine.Call)
+	i.Register1(engine.NewAtom("\\+"), engine.Negate)
+	i.Register1(engine.NewAtom("var"), engine.TypeVar)
+	i.Register1(engine.NewAtom("atom"), engine.TypeAtom)
+	i.Register1(engine.NewAtom("integer"), engine.TypeInteger)
+	i.Register1(engine.NewAtom("float"), engine.TypeFloat)
+	i.Register1(engine.NewAtom("compound"), engine.TypeCompound)
+	i.Register2(engine.NewAtom("term_variables"), engine.TermVariables)
+	i.Register3(engine.NewAtom("catch"), engine.Catch)
+	i.Register1(engine.NewAtom("throw"), engine.Throw)
+	i.Register2(engine.NewAtom(">="), engine.GreaterThanOrEqual)
+	i.Register2(engine.NewAtom("=<"), engine.LessThanOrEqual)
+	i.Register2(engine.NewAtom(">"), engine.GreaterThan)
+	i.Register2(engine.NewAtom("<"), engine.LessThan)
+	i.Register2(engine.NewAtom("is"), engine.Is)
+	i.Register2(engine.NewAtom("atom_chars"), engine.AtomChars)
+	i.Register2(engine.NewAtom("char_code"), engine.CharCode)
 
 	err := i.Compile(ctx, bootstrap.Bootstrap())
 	if err != nil {
 		panic(err)
 	}
 
-	return
+	pathFS := logicvfs.New()
+	if err := pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)); err != nil {
+		panic(fmt.Errorf("failed to mount /v1/lib: %w", err))
+	}
+	i.FS = pathFS
+
+	return i
 }
 
 // CompileMust compiles the given source code and panics if it fails.

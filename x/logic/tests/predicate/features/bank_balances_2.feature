@@ -22,7 +22,7 @@ Feature: bank_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4686
+      gas_used: 9016
       answer:
         has_more: false
         variables: ["Balances"]
@@ -50,7 +50,7 @@ Feature: bank_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4445
+      gas_used: 8775
       answer:
         has_more: false
         variables: ["Balances"]
@@ -84,7 +84,7 @@ Feature: bank_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4807
+      gas_used: 9137
       answer:
         has_more: false
         variables: ["Denom"]
@@ -118,7 +118,7 @@ Feature: bank_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4899
+      gas_used: 9229
       answer:
         has_more: false
         variables: ["Amount"]
@@ -151,7 +151,7 @@ Feature: bank_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4904
+      gas_used: 9234
       answer:
         has_more: false
         variables: ["Amount"]
@@ -179,7 +179,7 @@ Feature: bank_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4603
+      gas_used: 8933
       answer:
         has_more: false
         results:
@@ -202,12 +202,12 @@ Feature: bank_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4356
+      gas_used: 4468
       answer:
         has_more: false
         variables: ["Address", "Balances"]
         results:
-        - error: "error(instantiation_error,must_be/2)"
+        - error: "error(instantiation_error,bank_balances/2)"
       """
 
   @great_for_documentation
@@ -226,12 +226,12 @@ Feature: bank_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4441
+      gas_used: 9173
       answer:
         has_more: false
         variables: ["Balances"]
         results:
-        - error: "error(domain_error(encoding(bech32),invalid_address),bank_balances/2)"
+        - error: "error(domain_error(valid_encoding(bech32),invalid_address),bank_balances/2)"
       """
 
   @great_for_documentation
@@ -250,9 +250,9 @@ Feature: bank_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4293
+      gas_used: 4815
       answer:
         has_more: false
         results:
-        - error: "error(type_error(atom,42),bech32_address/2)"
+        - error: "error(type_error(atom,42),bank_balances/2)"
       """

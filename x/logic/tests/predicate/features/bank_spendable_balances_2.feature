@@ -21,7 +21,7 @@ Feature: bank_spendable_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4696
+      gas_used: 9026
       answer:
         has_more: false
         variables: ["Balances"]
@@ -49,7 +49,7 @@ Feature: bank_spendable_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4455
+      gas_used: 8785
       answer:
         has_more: false
         variables: ["Balances"]
@@ -83,7 +83,7 @@ Feature: bank_spendable_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4929
+      gas_used: 9259
       answer:
         has_more: false
         variables: ["Amount"]
@@ -111,7 +111,7 @@ Feature: bank_spendable_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4613
+      gas_used: 8943
       answer:
         has_more: false
         results:
@@ -134,12 +134,12 @@ Feature: bank_spendable_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4366
+      gas_used: 4478
       answer:
         has_more: false
         variables: ["Address", "Balances"]
         results:
-        - error: "error(instantiation_error,must_be/2)"
+        - error: "error(instantiation_error,bank_spendable_balances/2)"
       """
 
   @great_for_documentation
@@ -158,12 +158,12 @@ Feature: bank_spendable_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4451
+      gas_used: 9183
       answer:
         has_more: false
         variables: ["Balances"]
         results:
-        - error: "error(domain_error(encoding(bech32),invalid_address),bank_spendable_balances/2)"
+        - error: "error(domain_error(valid_encoding(bech32),invalid_address),bank_spendable_balances/2)"
       """
 
   @great_for_documentation
@@ -182,9 +182,9 @@ Feature: bank_spendable_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4303
+      gas_used: 4825
       answer:
         has_more: false
         results:
-        - error: "error(type_error(atom,42),bech32_address/2)"
+        - error: "error(type_error(atom,42),bank_spendable_balances/2)"
       """

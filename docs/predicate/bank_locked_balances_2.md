@@ -33,7 +33,7 @@ where:
 - The list is sorted by denomination.
 
 Throws instantiation_error if Address is a variable.
-Throws domain_error(encoding(bech32), Address) if Address is not a valid Bech32 address.
+Throws domain_error(valid_encoding(bech32), Address) if Address is not a valid Bech32 address.
 
 Examples:
 
@@ -81,7 +81,7 @@ bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', Balances).
 
 ```  yaml
 height: 42
-gas_used: 4693
+gas_used: 9023
 answer:
   has_more: false
   variables: ["Balances"]
@@ -120,7 +120,7 @@ bank_locked_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', Balances).
 
 ```  yaml
 height: 42
-gas_used: 4452
+gas_used: 8782
 answer:
   has_more: false
   variables: ["Balances"]
@@ -165,7 +165,7 @@ locked_has_coin('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', uaxone, Amount).
 
 ```  yaml
 height: 42
-gas_used: 4920
+gas_used: 9250
 answer:
   has_more: false
   variables: ["Amount"]
@@ -198,12 +198,12 @@ bank_locked_balances(Address, Balances).
 
 ```  yaml
 height: 42
-gas_used: 4363
+gas_used: 4475
 answer:
   has_more: false
   variables: ["Address", "Balances"]
   results:
-  - error: "error(instantiation_error,must_be/2)"
+  - error: "error(instantiation_error,bank_locked_balances/2)"
 ```
 
 ### Fail with invalid address format
@@ -229,12 +229,12 @@ bank_locked_balances('invalid_address', Balances).
 
 ```  yaml
 height: 42
-gas_used: 4448
+gas_used: 9180
 answer:
   has_more: false
   variables: ["Balances"]
   results:
-  - error: "error(domain_error(encoding(bech32),invalid_address),bank_locked_balances/2)"
+  - error: "error(domain_error(valid_encoding(bech32),invalid_address),bank_locked_balances/2)"
 ```
 
 ### Fail when address is not an atom
@@ -260,9 +260,9 @@ bank_locked_balances(42, _).
 
 ```  yaml
 height: 42
-gas_used: 4300
+gas_used: 4822
 answer:
   has_more: false
   results:
-  - error: "error(type_error(atom,42),bech32_address/2)"
+  - error: "error(type_error(atom,42),bank_locked_balances/2)"
 ```

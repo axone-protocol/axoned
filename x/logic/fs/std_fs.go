@@ -1,4 +1,4 @@
-//nolint:revive // Package name 'fs' conflicts with stdlib io/fs but provides domain-specific filesystem abstractions
+//nolint:revive
 package fs
 
 import (
@@ -6,6 +6,7 @@ import (
 	"fmt"
 	stdfs "io/fs"
 
+	logiccodec "github.com/axone-protocol/axoned/v14/x/logic/fs/codec"
 	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
 	logicsyscomet "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/comet"
 	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
@@ -26,6 +27,7 @@ func StandardMounts(ctx goctx.Context, bankFS, wasmFS stdfs.FS) []Mount {
 		{Path: "/v1/sys/header", FS: logicsysheader.NewFS(ctx)},
 		{Path: "/v1/sys/comet", FS: logicsyscomet.NewFS(ctx)},
 		{Path: "/v1/state/bank", FS: bankFS},
+		{Path: "/v1/dev/codec", FS: logiccodec.NewFS(ctx)},
 		{Path: "/v1/dev/wasm", FS: wasmFS},
 	}
 }

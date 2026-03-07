@@ -106,11 +106,11 @@ func TestCryptoOperations(t *testing.T) {
 					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 					Convey("and a vm", func() {
-						interpreter := testutil.NewLightInterpreterMust(ctx)
+						interpreter := testutil.NewComprehensiveInterpreterMust(ctx)
 						interpreter.Register3(engine.NewAtom("crypto_data_hash"), CryptoDataHash)
-						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
-
-						err := interpreter.Compile(ctx, tc.program)
+						err := interpreter.Compile(ctx, ":- consult('/v1/lib/crypto.pl').")
+						So(err, ShouldBeNil)
+						err = interpreter.Compile(ctx, tc.program)
 						So(err, ShouldBeNil)
 
 						Convey("When the predicate is called", func() {
@@ -208,7 +208,7 @@ func TestXVerify(t *testing.T) {
 				eddsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(syntax_error([%s]),eddsa_verify/4)", badPublicKeyLength),
+				wantError:   fmt.Errorf("error(syntax_error([%s]),hex_bytes/2)", badPublicKeyLength),
 			},
 			{ // Wrong signature
 				program: `verify :-
@@ -227,7 +227,7 @@ func TestXVerify(t *testing.T) {
 				eddsa_verify(PubKey, Msg, Sig, [encoding(octet), type(foo)]).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(cryptographic_algorithm,foo),eddsa_verify/4)"),
+				wantError:   fmt.Errorf("error(type_error(cryptographic_algorithm,foo),hex_bytes/2)"),
 			},
 			{ // Unsupported algo
 				program: `verify :-
@@ -237,7 +237,7 @@ func TestXVerify(t *testing.T) {
 				eddsa_verify(PubKey, Msg, Sig, [encoding(octet), type(secp256k1)]).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(cryptographic_algorithm,secp256k1),eddsa_verify/4)"),
+				wantError:   fmt.Errorf("error(type_error(cryptographic_algorithm,secp256k1),hex_bytes/2)"),
 			},
 			// ECDSA - secp256r1
 			{
@@ -259,7 +259,7 @@ func TestXVerify(t *testing.T) {
 				ecdsa_verify(PubKey, Msg, Sig, encoding(octet)).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(syntax_error([%s]),ecdsa_verify/4)", failedToParsePublicKey),
+				wantError:   fmt.Errorf("error(syntax_error([%s]),hex_bytes/2)", failedToParsePublicKey),
 			},
 			{ // Unsupported algo
 				program: `verify :-
@@ -269,7 +269,7 @@ func TestXVerify(t *testing.T) {
 				ecdsa_verify(PubKey, Msg, Sig, [encoding(octet), type(foo)]).`,
 				query:       `verify.`,
 				wantSuccess: false,
-				wantError:   fmt.Errorf("error(type_error(cryptographic_algorithm,foo),ecdsa_verify/4)"),
+				wantError:   fmt.Errorf("error(type_error(cryptographic_algorithm,foo),hex_bytes/2)"),
 			},
 			{
 				// Wrong msg
@@ -325,12 +325,13 @@ func TestXVerify(t *testing.T) {
 					ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 
 					Convey("and a vm", func() {
-						interpreter := testutil.NewLightInterpreterMust(ctx)
-						interpreter.Register2(engine.NewAtom("hex_bytes"), HexBytes)
-						interpreter.Register4(engine.NewAtom("eddsa_verify"), EDDSAVerify)
+						interpreter := testutil.NewComprehensiveInterpreterMust(ctx)
 						interpreter.Register4(engine.NewAtom("ecdsa_verify"), ECDSAVerify)
+						interpreter.Register4(engine.NewAtom("eddsa_verify"), EDDSAVerify)
 
-						err := interpreter.Compile(ctx, tc.program)
+						err := interpreter.Compile(ctx, ":- consult('/v1/lib/crypto.pl').")
+						So(err, ShouldBeNil)
+						err = interpreter.Compile(ctx, tc.program)
 						So(err, ShouldBeNil)
 
 						Convey("When the predicate is called", func() {

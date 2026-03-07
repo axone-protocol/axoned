@@ -33,7 +33,7 @@ where:
 - The list is sorted by denomination.
 
 Throws instantiation_error if Address is a variable.
-Throws domain_error(encoding(bech32), Address) if Address is not a valid Bech32 address.
+Throws domain_error(valid_encoding(bech32), Address) if Address is not a valid Bech32 address.
 
 Examples:
 
@@ -81,7 +81,7 @@ bank_spendable_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', Balances
 
 ```  yaml
 height: 42
-gas_used: 4696
+gas_used: 9026
 answer:
   has_more: false
   variables: ["Balances"]
@@ -120,7 +120,7 @@ bank_spendable_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', Balances
 
 ```  yaml
 height: 42
-gas_used: 4455
+gas_used: 8785
 answer:
   has_more: false
   variables: ["Balances"]
@@ -165,7 +165,7 @@ spendable_has_coin('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', uaxone, Amoun
 
 ```  yaml
 height: 42
-gas_used: 4929
+gas_used: 9259
 answer:
   has_more: false
   variables: ["Amount"]
@@ -198,12 +198,12 @@ bank_spendable_balances(Address, Balances).
 
 ```  yaml
 height: 42
-gas_used: 4366
+gas_used: 4478
 answer:
   has_more: false
   variables: ["Address", "Balances"]
   results:
-  - error: "error(instantiation_error,must_be/2)"
+  - error: "error(instantiation_error,bank_spendable_balances/2)"
 ```
 
 ### Fail with invalid address format
@@ -229,12 +229,12 @@ bank_spendable_balances('invalid_address', Balances).
 
 ```  yaml
 height: 42
-gas_used: 4451
+gas_used: 9183
 answer:
   has_more: false
   variables: ["Balances"]
   results:
-  - error: "error(domain_error(encoding(bech32),invalid_address),bank_spendable_balances/2)"
+  - error: "error(domain_error(valid_encoding(bech32),invalid_address),bank_spendable_balances/2)"
 ```
 
 ### Fail when address is not an atom
@@ -260,9 +260,9 @@ bank_spendable_balances(42, _).
 
 ```  yaml
 height: 42
-gas_used: 4303
+gas_used: 4825
 answer:
   has_more: false
   results:
-  - error: "error(type_error(atom,42),bech32_address/2)"
+  - error: "error(type_error(atom,42),bank_spendable_balances/2)"
 ```

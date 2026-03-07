@@ -1,6 +1,7 @@
 package devfile
 
 import (
+	"bytes"
 	"errors"
 	"io"
 	"io/fs"
@@ -12,16 +13,13 @@ import (
 // before the first read commit.
 var ErrInvalidRequest = errors.New("invalid_request")
 
-// ErrResponseTooLarge indicates that the committed response exceeds
-// the configured maximum size.
-var ErrResponseTooLarge = errors.New("response_too_large")
-
 // ErrMissingCommit indicates that no commit function was provided.
 var ErrMissingCommit = errors.New("missing_commit_function")
 
 // CommitFunc executes the device transaction once the first read occurs.
-// The input request is an immutable copy of all bytes written before commit.
-type CommitFunc func(request []byte) ([]byte, error)
+// It reads the request from the provided Reader (bounded by maxRequestBytes)
+// and writes the response to the provided Writer (bounded by maxResponseBytes).
+type CommitFunc func(io.Reader, io.Writer) error
 
 // halfDuplexConfig defines a half-duplex transactional protocol:
 //   - Request phase: zero or more writes append request bytes.
@@ -34,13 +32,11 @@ type CommitFunc func(request []byte) ([]byte, error)
 //   - committed (readable, writes rejected)
 //   - closed (all I/O rejected with fs.ErrClosed)
 type halfDuplexConfig struct {
-	path              string
-	modTime           time.Time
-	maxRequestBytes   int
-	maxResponseBytes  int
-	allowEmptyRequest bool
-	emptyRequestErr   error
-	commit            CommitFunc
+	path             string
+	modTime          time.Time
+	maxRequestBytes  int
+	maxResponseBytes int
+	commit           CommitFunc
 }
 
 // Option is a functional option for configuring a half-duplex file.
@@ -61,7 +57,7 @@ func WithModTime(modTime time.Time) Option {
 }
 
 // WithMaxRequestBytes sets the maximum number of bytes that can be written before commit.
-// If exceeded, writes will fail with fs.ErrPermission.
+// If exceeded, writes will fail with ErrWriteLimit.
 func WithMaxRequestBytes(maxBytes int) Option {
 	return func(cfg *halfDuplexConfig) {
 		cfg.maxRequestBytes = maxBytes
@@ -69,27 +65,10 @@ func WithMaxRequestBytes(maxBytes int) Option {
 }
 
 // WithMaxResponseBytes sets the maximum number of bytes in the response.
-// If exceeded, the commit will fail with ErrResponseTooLarge.
+// If exceeded, the commit will fail with ErrWriteLimit.
 func WithMaxResponseBytes(maxBytes int) Option {
 	return func(cfg *halfDuplexConfig) {
 		cfg.maxResponseBytes = maxBytes
-	}
-}
-
-// WithAllowEmptyRequest allows committing without writing any bytes.
-// By default, at least one byte must be written before the first read.
-func WithAllowEmptyRequest(allow bool) Option {
-	return func(cfg *halfDuplexConfig) {
-		cfg.allowEmptyRequest = allow
-	}
-}
-
-// WithEmptyRequestError sets the error returned when reading before writing any bytes.
-// Only effective when AllowEmptyRequest is false (the default).
-// If not set, ErrInvalidRequest is used.
-func WithEmptyRequestError(err error) Option {
-	return func(cfg *halfDuplexConfig) {
-		cfg.emptyRequestErr = err
 	}
 }
 
@@ -104,8 +83,7 @@ func WithCommit(commit CommitFunc) Option {
 type halfDuplexFile struct {
 	cfg halfDuplexConfig
 
-	request   []byte
-	response  []byte
+	buffer    *boundedWriter
 	commitErr error
 	readPos   int
 	committed bool
@@ -116,8 +94,7 @@ type halfDuplexFile struct {
 // Returns an error if the commit function is not provided.
 func New(opts ...Option) (fs.File, error) {
 	cfg := halfDuplexConfig{
-		modTime:         time.Now(),
-		emptyRequestErr: ErrInvalidRequest,
+		modTime: time.Now(),
 	}
 
 	for _, opt := range opts {
@@ -128,7 +105,10 @@ func New(opts ...Option) (fs.File, error) {
 		return nil, ErrMissingCommit
 	}
 
-	return &halfDuplexFile{cfg: cfg}, nil
+	return &halfDuplexFile{
+		cfg:    cfg,
+		buffer: newBoundedWriter(cfg.maxRequestBytes),
+	}, nil
 }
 
 func (f *halfDuplexFile) Stat() (fs.FileInfo, error) {
@@ -148,11 +128,12 @@ func (f *halfDuplexFile) Read(p []byte) (int, error) {
 		return 0, f.pathError("read", f.commitErr)
 	}
 
-	if f.readPos >= len(f.response) {
+	responseBytes := f.buffer.Bytes()
+	if f.readPos >= len(responseBytes) {
 		return 0, io.EOF
 	}
 
-	n := copy(p, f.response[f.readPos:])
+	n := copy(p, responseBytes[f.readPos:])
 	f.readPos += n
 
 	return n, nil
@@ -161,19 +142,15 @@ func (f *halfDuplexFile) Read(p []byte) (int, error) {
 func (f *halfDuplexFile) commit() {
 	f.committed = true
 
-	if !f.cfg.allowEmptyRequest && len(f.request) == 0 {
-		f.commitErr = f.cfg.emptyRequestErr
-		return
-	}
+	// Read request from buffer
+	reader := bytes.NewReader(f.buffer.Bytes())
 
-	response, err := f.cfg.commit(append([]byte(nil), f.request...))
-	switch {
-	case err != nil:
+	// Reset buffer to reuse for response (half-duplex: write → commit → read)
+	f.buffer.Reset()
+	f.buffer.maxBytes = f.cfg.maxResponseBytes
+
+	if err := f.cfg.commit(reader, f.buffer); err != nil {
 		f.commitErr = err
-	case f.cfg.maxResponseBytes > 0 && len(response) > f.cfg.maxResponseBytes:
-		f.commitErr = ErrResponseTooLarge
-	default:
-		f.response = response
 	}
 }
 
@@ -186,12 +163,11 @@ func (f *halfDuplexFile) Write(p []byte) (int, error) {
 		return 0, f.pathError("write", fs.ErrPermission)
 	}
 
-	if f.cfg.maxRequestBytes > 0 && len(f.request)+len(p) > f.cfg.maxRequestBytes {
-		return 0, f.pathError("write", fs.ErrPermission)
+	n, err := f.buffer.Write(p)
+	if err != nil {
+		return n, f.pathError("write", err)
 	}
-
-	f.request = append(f.request, p...)
-	return len(p), nil
+	return n, nil
 }
 
 func (f *halfDuplexFile) Close() error {

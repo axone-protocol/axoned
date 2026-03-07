@@ -3,6 +3,7 @@ package wasm
 import (
 	"context"
 	"errors"
+	"io"
 	"io/fs"
 	"os"
 	"strings"
@@ -15,6 +16,8 @@ import (
 	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
+
+var errWasmQueryFailed = errors.New("wasm_query_failed")
 
 const (
 	queryPath        = "query"
@@ -30,12 +33,9 @@ type vfs struct {
 var (
 	_ fs.FS            = (*vfs)(nil)
 	_ iface.OpenFileFS = (*vfs)(nil)
-
-	errInvalidRequest  = devfile.ErrInvalidRequest
-	errWasmQueryFailed = errors.New("wasm_query_failed")
 )
 
-// NewFS creates the /v1/dev/wasm transactional device filesystem.
+// NewFS creates the dev/wasm transactional device filesystem.
 func NewFS(ctx context.Context, wasmKeeper types.WasmKeeper) fs.FS {
 	return &vfs{ctx: ctx, wasmKeeper: wasmKeeper}
 }
@@ -65,14 +65,22 @@ func (f *vfs) OpenFile(name string, flag int, _ fs.FileMode) (fs.File, error) {
 		devfile.WithModTime(prolog.ResolveHeaderInfo(sdkCtx).Time),
 		devfile.WithMaxRequestBytes(maxRequestBytes),
 		devfile.WithMaxResponseBytes(maxResponseBytes),
-		devfile.WithAllowEmptyRequest(false),
-		devfile.WithCommit(func(request []byte) ([]byte, error) {
-			response, err := f.wasmKeeper.QuerySmart(sdkCtx, contractAddr, request)
-			if err != nil {
-				return nil, errWasmQueryFailed
+		devfile.WithCommit(func(r io.Reader, w io.Writer) error {
+			// devfile always commits from an in-memory bytes.Reader, so ReadAll
+			// cannot fail at this call site.
+			request, _ := io.ReadAll(r)
+
+			if len(request) == 0 {
+				return devfile.ErrInvalidRequest
 			}
 
-			return response, nil
+			response, err := f.wasmKeeper.QuerySmart(sdkCtx, contractAddr, request)
+			if err != nil {
+				return errWasmQueryFailed
+			}
+
+			_, err = w.Write(response)
+			return err
 		}),
 	)
 }
@@ -84,10 +92,6 @@ func validateQueryPath(subpath string) (sdk.AccAddress, error) {
 	}
 
 	address := segments[0]
-	if address == "" {
-		return nil, fs.ErrNotExist
-	}
-
 	addr, err := sdk.AccAddressFromBech32(address)
 	if err != nil {
 		return nil, fs.ErrNotExist

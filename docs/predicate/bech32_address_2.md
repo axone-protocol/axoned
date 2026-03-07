@@ -5,37 +5,36 @@ sidebar_position: 21
 
 # bech32_address/2
 
+## Module
+
+This predicate is provided by `bech32.pl`.
+
+Load this module before using the predicate:
+
+```prolog
+:- consult('/v1/lib/bech32.pl').
+```
+
 ## Description
 
-`bech32_address/2` is a predicate that converts a Bech32\-encoded string into a prefix \(HRP\) and Base64\-encoded bytes, or constructs a Bech32\-encoded string from a prefix and Base64 bytes.
+Converts between a Bech32 atom and its Address pair representation.
 
-This predicate handles Bech32 address encoding and decoding as per the Cosmos specification. In the Cosmos ecosystem, most chains \(e.g., Cosmos Hub, Akash\) share the BIP\-44 coin type 118', allowing HRP conversion \(e.g., 'cosmos' to 'akash'\) to produce valid addresses from the same underlying key.
+The predicate follows a functional direction:
+
+- when Address is ground, it encodes Address into Bech32;
+- otherwise, when Bech32 is ground, it decodes Bech32 into Address;
+- otherwise, it throws instantiation_error.
+
+Address is represented as Hrp-Bytes where:
+
+- Hrp is an atom
+- Bytes is a proper list of byte integers in [0,255]
 
 ## Signature
 
 ```text
-bech32_address(-Address, +Bech32) is det
-bech32_address(+Address, -Bech32) is det
+bech32_address(?Address, ?Bech32) is det
 ```
-
-where:
-
-- Address: A pair \`HRP\-Base64Bytes\`, where: HRP is an atom representing the Human\-Readable Part \(e.g. 'cosmos', 'akash', 'axone'\), and Base64Bytes is a list of integers \(0\-255\) representing the Base64\-encoded bytes git statof the address.
-- Bech32: An atom or string representing the Bech32\-encoded address \(e.g., 'cosmos17sc02mcgjzdv5l4jwnzffxw7g60y5ta4pggcp4'\).
-
-## Limitations
-
-Conversion between HRPs is only valid for chains sharing the same BIP\-44 coin type \(e.g., 118'\). For chains with distinct coin types \(e.g., Secret: 529', Bitsong: 639'\), this predicate cannot derive the correct address from another chain’s Bech32 string.
-
-## References
-
-- [Bech32 on Cosmos](<https://docs.cosmos.network/main/build/spec/addresses/bech32>)
-
-- [Base64 Encoding](<https://fr.wikipedia.org/wiki/Base64>)
-
-- [Cosmos Chain Registry](<https://github.com/cosmos/chain-registry>)
-
-- [BIP 44](<https://github.com/bitcoin/bips/blob/master/bip-0044.mediawiki>)
 
 ## Examples
 
@@ -51,6 +50,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/bech32.pl'),
 bech32_address(Address, 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
 ```
 
@@ -59,7 +59,7 @@ bech32_address(Address, 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
 
 ```  yaml
 height: 42
-gas_used: 3993
+gas_used: 8333
 answer:
   has_more: false
   variables: ["Address"]
@@ -80,6 +80,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/bech32.pl'),
 bech32_address(-(Hrp, Address), 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
 ```
 
@@ -88,7 +89,7 @@ bech32_address(-(Hrp, Address), 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
 
 ```  yaml
 height: 42
-gas_used: 4008
+gas_used: 8355
 answer:
   has_more: false
   variables: ["Hrp", "Address"]
@@ -110,6 +111,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/bech32.pl'),
 bech32_address(-(axone, Address), 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4').
 ```
 
@@ -118,7 +120,7 @@ bech32_address(-(axone, Address), 'axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4'
 
 ```  yaml
 height: 42
-gas_used: 4008
+gas_used: 8355
 answer:
   has_more: false
   variables: ["Address"]
@@ -137,6 +139,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/bech32.pl'),
 bech32_address(-('axone', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30]), Bech32).
 ```
 
@@ -145,7 +148,7 @@ bech32_address(-('axone', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,1
 
 ```  yaml
 height: 42
-gas_used: 4058
+gas_used: 33793
 answer:
   has_more: false
   variables: ["Bech32"]
@@ -170,6 +173,7 @@ axone_addr(Addr) :- bech32_address(-('axone', _), Addr).
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/bech32.pl'),
 axone_addr('axone1p8u47en82gmzfm259y6z93r9qe63l25d858vqu').
 ```
 
@@ -178,7 +182,7 @@ axone_addr('axone1p8u47en82gmzfm259y6z93r9qe63l25d858vqu').
 
 ```  yaml
 height: 42
-gas_used: 4027
+gas_used: 8374
 answer:
   has_more: false
   results:
@@ -196,6 +200,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/bech32.pl'),
 bech32_address(Address, axoneincorrect).
 ```
 
@@ -204,12 +209,12 @@ bech32_address(Address, axoneincorrect).
 
 ```  yaml
 height: 42
-gas_used: 3947
+gas_used: 8707
 answer:
   has_more: false
   variables: ["Address"]
   results:
-  - error: "error(domain_error(encoding(bech32),axoneincorrect),[d,e,c,o,d,i,n,g, ,b,e,c,h,3,2, ,f,a,i,l,e,d,:, ,i,n,v,a,l,i,d, ,s,e,p,a,r,a,t,o,r, ,i,n,d,e,x, ,-,1],bech32_address/2)"
+  - error: "error(domain_error(valid_encoding(bech32),axoneincorrect),bech32_address/2)"
 ```
 
 ### Error on Incorrect Bech32 Address type
@@ -223,6 +228,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/bech32.pl'),
 bech32_address(-('axone', X), foo(bar)).
 ```
 
@@ -231,7 +237,7 @@ bech32_address(-('axone', X), foo(bar)).
 
 ```  yaml
 height: 42
-gas_used: 3947
+gas_used: 4529
 answer:
   has_more: false
   variables: ["X"]

@@ -16,11 +16,13 @@ func TestHalfDuplexLifecycle(t *testing.T) {
 		file, err := New(
 			WithPath("/v1/dev/echo"),
 			WithModTime(time.Unix(0, 0).UTC()),
-			WithAllowEmptyRequest(false),
-			WithCommit(func(request []byte) ([]byte, error) {
+
+			WithCommit(func(r io.Reader, w io.Writer) error {
 				commitCalls++
+				request, _ := io.ReadAll(r)
 				So(string(request), ShouldEqual, "ping")
-				return []byte("pong"), nil
+				_, err := w.Write([]byte("pong"))
+				return err
 			}),
 		)
 		So(err, ShouldBeNil)
@@ -50,52 +52,31 @@ func TestHalfDuplexLifecycle(t *testing.T) {
 }
 
 func TestHalfDuplexEmptyRequestValidation(t *testing.T) {
-	Convey("Given a half-duplex file that rejects empty requests", t, func() {
+	Convey("Given a half-duplex file with empty request", t, func() {
 		commitCalled := false
 		file, err := New(
 			WithPath("/v1/dev/test"),
 			WithModTime(time.Unix(0, 0).UTC()),
-			WithAllowEmptyRequest(false),
-			WithCommit(func(_ []byte) ([]byte, error) {
+			WithCommit(func(r io.Reader, _ io.Writer) error {
 				commitCalled = true
-				return nil, nil
+				request, _ := io.ReadAll(r)
+				So(len(request), ShouldEqual, 0)
+				return nil
 			}),
 		)
 		So(err, ShouldBeNil)
 
-		_, err = file.Read(make([]byte, 1))
-		So(errors.Is(err, ErrInvalidRequest), ShouldBeTrue)
-
-		_, err = file.Read(make([]byte, 1))
-		So(errors.Is(err, ErrInvalidRequest), ShouldBeTrue)
+		n, err := file.Read(make([]byte, 1))
+		So(n, ShouldEqual, 0)
+		So(errors.Is(err, io.EOF), ShouldBeTrue)
+		So(commitCalled, ShouldBeTrue)
 
 		writer, ok := file.(interface{ Write([]byte) (int, error) })
 		So(ok, ShouldBeTrue)
 
-		n, err := writer.Write([]byte("x"))
+		n, err = writer.Write([]byte("x"))
 		So(n, ShouldEqual, 0)
 		So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
-		So(commitCalled, ShouldBeFalse)
-	})
-}
-
-func TestHalfDuplexAllowEmptyRequest(t *testing.T) {
-	Convey("Given a half-duplex file that allows empty requests", t, func() {
-		file, err := New(
-			WithPath("/v1/dev/test"),
-			WithModTime(time.Unix(0, 0).UTC()),
-			WithAllowEmptyRequest(true),
-			WithCommit(func(request []byte) ([]byte, error) {
-				So(len(request), ShouldEqual, 0)
-				return []byte("ok"), nil
-			}),
-		)
-		So(err, ShouldBeNil)
-
-		buf := make([]byte, 2)
-		n, err := file.Read(buf)
-		So(err, ShouldBeNil)
-		So(string(buf[:n]), ShouldEqual, "ok")
 	})
 }
 
@@ -105,9 +86,14 @@ func TestHalfDuplexMaxRequestBytes(t *testing.T) {
 			WithPath("/v1/dev/test"),
 			WithModTime(time.Unix(0, 0).UTC()),
 			WithMaxRequestBytes(4),
-			WithAllowEmptyRequest(false),
-			WithCommit(func(request []byte) ([]byte, error) {
-				return request, nil
+
+			WithCommit(func(r io.Reader, w io.Writer) error {
+				request, err := io.ReadAll(r)
+				if err != nil {
+					return err
+				}
+				_, err = w.Write(request)
+				return err
 			}),
 		)
 		So(err, ShouldBeNil)
@@ -117,7 +103,7 @@ func TestHalfDuplexMaxRequestBytes(t *testing.T) {
 
 		n, err := writer.Write([]byte("12345"))
 		So(n, ShouldEqual, 0)
-		So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
+		So(errors.Is(err, ErrWriteLimit), ShouldBeTrue)
 	})
 }
 
@@ -126,9 +112,14 @@ func TestHalfDuplexClosed(t *testing.T) {
 		file, err := New(
 			WithPath("/v1/dev/test"),
 			WithModTime(time.Unix(0, 0).UTC()),
-			WithAllowEmptyRequest(false),
-			WithCommit(func(request []byte) ([]byte, error) {
-				return request, nil
+
+			WithCommit(func(r io.Reader, w io.Writer) error {
+				request, err := io.ReadAll(r)
+				if err != nil {
+					return err
+				}
+				_, err = w.Write(request)
+				return err
 			}),
 		)
 		So(err, ShouldBeNil)
@@ -154,10 +145,10 @@ func TestHalfDuplexCommitErrorPropagation(t *testing.T) {
 		file, err := New(
 			WithPath("/v1/dev/test"),
 			WithModTime(time.Unix(0, 0).UTC()),
-			WithAllowEmptyRequest(false),
-			WithCommit(func(_ []byte) ([]byte, error) {
+
+			WithCommit(func(_ io.Reader, _ io.Writer) error {
 				commitCalls++
-				return nil, expected
+				return expected
 			}),
 		)
 		So(err, ShouldBeNil)
@@ -191,11 +182,12 @@ func TestHalfDuplexMaxResponseBytes(t *testing.T) {
 		file, err := New(
 			WithPath("/v1/dev/test"),
 			WithModTime(time.Unix(0, 0).UTC()),
-			WithAllowEmptyRequest(false),
+
 			WithMaxResponseBytes(2),
-			WithCommit(func(_ []byte) ([]byte, error) {
+			WithCommit(func(_ io.Reader, w io.Writer) error {
 				commitCalls++
-				return []byte("too-big"), nil
+				_, err := w.Write([]byte("too-big"))
+				return err
 			}),
 		)
 		So(err, ShouldBeNil)
@@ -209,7 +201,7 @@ func TestHalfDuplexMaxResponseBytes(t *testing.T) {
 
 		n, err = file.Read(make([]byte, 16))
 		So(n, ShouldEqual, 0)
-		So(errors.Is(err, ErrResponseTooLarge), ShouldBeTrue)
+		So(errors.Is(err, ErrWriteLimit), ShouldBeTrue)
 
 		n, err = writer.Write([]byte("y"))
 		So(n, ShouldEqual, 0)
@@ -217,7 +209,7 @@ func TestHalfDuplexMaxResponseBytes(t *testing.T) {
 
 		n, err = file.Read(make([]byte, 16))
 		So(n, ShouldEqual, 0)
-		So(errors.Is(err, ErrResponseTooLarge), ShouldBeTrue)
+		So(errors.Is(err, ErrWriteLimit), ShouldBeTrue)
 
 		So(commitCalls, ShouldEqual, 1)
 	})
@@ -235,38 +227,14 @@ func TestHalfDuplexMissingCommit(t *testing.T) {
 	})
 }
 
-func TestHalfDuplexEmptyRequestCustomError(t *testing.T) {
-	Convey("Given a half-duplex file with custom empty request error", t, func() {
-		customErr := errors.New("custom-empty-request")
-		commitCalled := false
-
-		file, err := New(
-			WithPath("/v1/dev/test"),
-			WithAllowEmptyRequest(false),
-			WithEmptyRequestError(customErr),
-			WithCommit(func(_ []byte) ([]byte, error) {
-				commitCalled = true
-				return nil, nil
-			}),
-		)
-		So(err, ShouldBeNil)
-
-		n, err := file.Read(make([]byte, 1))
-		So(n, ShouldEqual, 0)
-		So(errors.Is(err, customErr), ShouldBeTrue)
-		So(commitCalled, ShouldBeFalse)
-	})
-}
-
 func TestHalfDuplexStat(t *testing.T) {
 	Convey("Given a half-duplex file", t, func() {
 		modTime := time.Unix(123, 0).UTC()
 		file, err := New(
 			WithPath("/v1/dev/echo"),
 			WithModTime(modTime),
-			WithAllowEmptyRequest(true),
-			WithCommit(func(_ []byte) ([]byte, error) {
-				return nil, nil
+			WithCommit(func(_ io.Reader, _ io.Writer) error {
+				return nil
 			}),
 		)
 		So(err, ShouldBeNil)
