@@ -196,21 +196,31 @@ func TestSplitRequestLine(t *testing.T) {
 
 func TestCodecDeviceFSFunctional(t *testing.T) {
 	vfs := NewFS(newSDKContext())
-	ofs := vfs.(fsiface.OpenFileFS)
+	ofs, ok := vfs.(fsiface.OpenFileFS)
+	if !ok {
+		t.Fatal("codec fs should implement OpenFileFS")
+	}
 
 	readAll := func(codecName string, request []byte) ([]byte, error) {
+		t.Helper()
+
 		file, err := ofs.OpenFile(codecName, os.O_RDWR, 0)
 		if err != nil {
 			return nil, err
 		}
+		defer file.Close()
 
 		if len(request) > 0 {
-			if _, err := file.(interface{ Write([]byte) (int, error) }).Write(request); err != nil {
+			writer, ok := file.(interface{ Write([]byte) (int, error) })
+			if !ok {
+				t.Fatal("codec file should implement Write")
+			}
+
+			if _, err := writer.Write(request); err != nil {
 				return nil, err
 			}
 		}
 
-		defer file.Close()
 		return io.ReadAll(file)
 	}
 
