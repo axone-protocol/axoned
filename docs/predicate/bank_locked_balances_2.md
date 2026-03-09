@@ -81,7 +81,7 @@ bank_locked_balances('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', Balances).
 
 ```  yaml
 height: 42
-gas_used: 9023
+gas_used: 9160
 answer:
   has_more: false
   variables: ["Balances"]
@@ -120,7 +120,7 @@ bank_locked_balances('axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep', Balances).
 
 ```  yaml
 height: 42
-gas_used: 8782
+gas_used: 8921
 answer:
   has_more: false
   variables: ["Balances"]
@@ -165,7 +165,7 @@ locked_has_coin('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', uaxone, Amount).
 
 ```  yaml
 height: 42
-gas_used: 9250
+gas_used: 9387
 answer:
   has_more: false
   variables: ["Amount"]
@@ -229,7 +229,7 @@ bank_locked_balances('invalid_address', Balances).
 
 ```  yaml
 height: 42
-gas_used: 9180
+gas_used: 9272
 answer:
   has_more: false
   variables: ["Balances"]

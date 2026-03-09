@@ -69,7 +69,7 @@ wasm_query(
 
 ```  yaml
 height: 42
-gas_used: 16085
+gas_used: 16286
 answer:
   has_more: false
   variables: ["ResponseBytes"]
@@ -102,7 +102,7 @@ wasm_query('invalid-address', [123,125], ResponseBytes).
 
 ```  yaml
 height: 42
-gas_used: 9193
+gas_used: 9285
 answer:
   has_more: false
   variables: ["ResponseBytes"]
@@ -137,7 +137,7 @@ wasm_query(
 
 ```  yaml
 height: 42
-gas_used: 11151
+gas_used: 11352
 answer:
   has_more: false
   variables: ["ResponseBytes"]
@@ -180,7 +180,7 @@ wasm_query(
 
 ```  yaml
 height: 42
-gas_used: 15041
+gas_used: 15242
 answer:
   has_more: false
   variables: ["ResponseBytes"]
