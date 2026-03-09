@@ -172,7 +172,7 @@ func loadGoPredicates(wd string) ([]*lang.Func, error) {
 		return nil, err
 	}
 
-	log := logger.New(logger.DebugLevel)
+	log := logger.New(logger.ErrorLevel)
 	pkg, err := lang.NewPackageFromBuild(log, buildPkg)
 	if err != nil {
 		return nil, err
