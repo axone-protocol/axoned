@@ -238,7 +238,7 @@ GasPolicy defines the coefficients used to translate VM metering units into SDK 
 | `compute_coeff` | [uint64](#uint64) |  | compute_coeff applies to Instruction, ArithNode, and CompareStep VM meter kinds. If set to 0, the value considered is 1. |
 | `memory_coeff` | [uint64](#uint64) |  | memory_coeff applies to CopyNode and ListCell VM meter kinds. If set to 0, the value considered is 1. |
 | `unify_coeff` | [uint64](#uint64) |  | unify_coeff applies to UnifyStep VM meter kind. If set to 0, the value considered is 1. |
-| `source_coeff` | [uint64](#uint64) |  | source_coeff applies to the total size in bytes of the user-supplied program and query sources. If set to 0, the value considered is 1. |
+| `io_coeff` | [uint64](#uint64) |  | io_coeff applies to the total size in bytes of the user-supplied program and query sources, and to codec device I/O buffered by the VFS. If set to 0, the value considered is 1. |
 
 <a name="logic.v1beta3.Limits"></a>
 
