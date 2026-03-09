@@ -198,7 +198,7 @@ bank_locked_balances(Address, Balances).
 
 ```  yaml
 height: 42
-gas_used: 4475
+gas_used: 4473
 answer:
   has_more: false
   variables: ["Address", "Balances"]
@@ -260,7 +260,7 @@ bank_locked_balances(42, _).
 
 ```  yaml
 height: 42
-gas_used: 4822
+gas_used: 4820
 answer:
   has_more: false
   results:

@@ -43,7 +43,7 @@ Feature: with_context/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4381
+      gas_used: 4379
       answer:
         has_more: false
         results:

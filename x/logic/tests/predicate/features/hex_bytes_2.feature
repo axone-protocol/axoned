@@ -59,7 +59,7 @@ Feature: hex_bytes/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6097
+      gas_used: 6091
       answer:
         has_more: false
         variables: ["Bytes"]

@@ -38,7 +38,83 @@ Feature: has_type/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4488
+      gas_used: 4480
+      answer:
+        has_more: false
+        variables: ["Result"]
+        results:
+        - substitutions:
+          - variable: Result
+            expression: ok
+      """
+
+  @great_for_documentation
+  Scenario: has_type/2 validates integer in integer-bounded between range
+    This scenario demonstrates that has_type/2 succeeds for an integer within an integer-bounded range (semidet).
+
+    Given the program:
+      """ prolog
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/type.pl'),
+      has_type(between(1, 3), 2),
+      Result = ok.
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4142
+      answer:
+        has_more: false
+        variables: ["Result"]
+        results:
+        - substitutions:
+          - variable: Result
+            expression: ok
+      """
+
+  @great_for_documentation
+  Scenario: has_type/2 rejects float in integer-bounded between range
+    This scenario demonstrates that has_type/2 fails when a float is checked against an integer-bounded range.
+
+    Given the program:
+      """ prolog
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/type.pl'),
+      has_type(between(1, 3), 2.5).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4111
+      answer:
+        has_more: false
+        results:
+      """
+
+  @great_for_documentation
+  Scenario: has_type/2 validates float in float-bounded between range
+    This scenario demonstrates that has_type/2 succeeds when a float is within a float-bounded range.
+
+    Given the program:
+      """ prolog
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/type.pl'),
+      has_type(between(1.0, 3.0), 2.5),
+      Result = ok.
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4175
       answer:
         has_more: false
         variables: ["Result"]
@@ -64,7 +140,7 @@ Feature: has_type/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4019
+      gas_used: 4017
       answer:
         has_more: false
         results:

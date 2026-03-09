@@ -91,7 +91,7 @@ must_be(atom, X).
 
 ```  yaml
 height: 42
-gas_used: 4269
+gas_used: 4267
 answer:
   has_more: false
   variables: ["X"]
