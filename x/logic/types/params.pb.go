@@ -169,9 +169,10 @@ type GasPolicy struct {
 	// unify_coeff applies to UnifyStep VM meter kind.
 	// If set to 0, the value considered is 1.
 	UnifyCoeff uint64 `protobuf:"varint,6,opt,name=unify_coeff,json=unifyCoeff,proto3" json:"unify_coeff,omitempty" yaml:"unify_coeff"`
-	// source_coeff applies to the total size in bytes of the user-supplied program and query sources.
+	// io_coeff applies to the total size in bytes of the user-supplied program and query sources,
+	// and to codec device I/O buffered by the VFS.
 	// If set to 0, the value considered is 1.
-	SourceCoeff uint64 `protobuf:"varint,7,opt,name=source_coeff,json=sourceCoeff,proto3" json:"source_coeff,omitempty" yaml:"source_coeff"`
+	IoCoeff uint64 `protobuf:"varint,7,opt,name=io_coeff,json=ioCoeff,proto3" json:"io_coeff,omitempty" yaml:"io_coeff"`
 }
 
 func (m *GasPolicy) Reset()         { *m = GasPolicy{} }
@@ -228,9 +229,9 @@ func (m *GasPolicy) GetUnifyCoeff() uint64 {
 	return 0
 }
 
-func (m *GasPolicy) GetSourceCoeff() uint64 {
+func (m *GasPolicy) GetIoCoeff() uint64 {
 	if m != nil {
-		return m.SourceCoeff
+		return m.IoCoeff
 	}
 	return 0
 }
@@ -388,8 +389,8 @@ func (m *GasPolicy) MarshalToSizedBuffer(dAtA []byte) (int, error) {
 	_ = i
 	var l int
 	_ = l
-	if m.SourceCoeff != 0 {
-		i = encodeVarintParams(dAtA, i, uint64(m.SourceCoeff))
+	if m.IoCoeff != 0 {
+		i = encodeVarintParams(dAtA, i, uint64(m.IoCoeff))
 		i--
 		dAtA[i] = 0x38
 	}
@@ -471,8 +472,8 @@ func (m *GasPolicy) Size() (n int) {
 	if m.UnifyCoeff != 0 {
 		n += 1 + sovParams(uint64(m.UnifyCoeff))
 	}
-	if m.SourceCoeff != 0 {
-		n += 1 + sovParams(uint64(m.SourceCoeff))
+	if m.IoCoeff != 0 {
+		n += 1 + sovParams(uint64(m.IoCoeff))
 	}
 	return n
 }
@@ -813,9 +814,9 @@ func (m *GasPolicy) Unmarshal(dAtA []byte) error {
 			}
 		case 7:
 			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field SourceCoeff", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field IoCoeff", wireType)
 			}
-			m.SourceCoeff = 0
+			m.IoCoeff = 0
 			for shift := uint(0); ; shift += 7 {
 				if shift >= 64 {
 					return ErrIntOverflowParams
@@ -825,7 +826,7 @@ func (m *GasPolicy) Unmarshal(dAtA []byte) error {
 				}
 				b := dAtA[iNdEx]
 				iNdEx++
-				m.SourceCoeff |= uint64(b&0x7F) << shift
+				m.IoCoeff |= uint64(b&0x7F) << shift
 				if b < 0x80 {
 					break
 				}

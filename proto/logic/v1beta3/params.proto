@@ -67,7 +67,8 @@ message GasPolicy {
   // If set to 0, the value considered is 1.
   uint64 unify_coeff = 6 [(gogoproto.moretags) = "yaml:\"unify_coeff\""];
 
-  // source_coeff applies to the total size in bytes of the user-supplied program and query sources.
+  // io_coeff applies to the total size in bytes of the user-supplied program and query sources,
+  // and to codec device I/O buffered by the VFS.
   // If set to 0, the value considered is 1.
-  uint64 source_coeff = 7 [(gogoproto.moretags) = "yaml:\"source_coeff\""];
+  uint64 io_coeff = 7 [(gogoproto.moretags) = "yaml:\"io_coeff\""];
 }
