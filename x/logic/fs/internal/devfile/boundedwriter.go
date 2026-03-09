@@ -34,7 +34,10 @@ func newBoundedWriter(maxBytes int) *boundedWriter {
 	return w
 }
 
-// Write appends data to the buffer, returning ErrWriteLimit if the write would exceed the limit.
+// Write appends data to the buffer.
+//
+// Writes are all-or-nothing: if writing p would exceed the configured limit,
+// no bytes are written and ErrWriteLimit is returned.
 func (w *boundedWriter) Write(p []byte) (int, error) {
 	if w.maxBytes > 0 && w.buf.Len()+len(p) > w.maxBytes {
 		return 0, ErrWriteLimit

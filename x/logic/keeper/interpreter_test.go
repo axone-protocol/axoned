@@ -68,32 +68,32 @@ func TestNewInterpreterBootstrapIsFree(t *testing.T) {
 	})
 }
 
-func TestConsumeSourceGas(t *testing.T) {
+func TestConsumeRequestIOGas(t *testing.T) {
 	Convey("Given a user source request", t, func() {
 		request := &types.QueryServiceAskRequest{
 			Program: "foo. bar.",
 			Query:   "foo.",
 		}
 
-		Convey("When consuming source gas with a zero coefficient", func() {
+		Convey("When consuming request I/O gas with a zero coefficient", func() {
 			gasMeter := storetypes.NewGasMeter(100)
-			consumeSourceGas(gasMeter, request, 0)
+			consumeRequestIOGas(gasMeter, request, 0)
 
-			Convey("Then the source coefficient should default to one", func() {
+			Convey("Then the I/O coefficient should default to one", func() {
 				So(gasMeter.GasConsumed(), ShouldEqual, 13)
 			})
 		})
 
-		Convey("When consuming source gas for an empty request", func() {
+		Convey("When consuming request I/O gas for an empty request", func() {
 			gasMeter := storetypes.NewGasMeter(100)
-			consumeSourceGas(gasMeter, &types.QueryServiceAskRequest{}, 1)
+			consumeRequestIOGas(gasMeter, &types.QueryServiceAskRequest{}, 1)
 
 			Convey("Then no gas should be consumed", func() {
 				So(gasMeter.GasConsumed(), ShouldEqual, 0)
 			})
 		})
 
-		Convey("When consuming source gas beyond the available limit", func() {
+		Convey("When consuming request I/O gas beyond the available limit", func() {
 			gasMeter := storetypes.NewGasMeter(1010)
 			var recovered any
 
@@ -101,22 +101,22 @@ func TestConsumeSourceGas(t *testing.T) {
 				defer func() {
 					recovered = recover()
 				}()
-				consumeSourceGas(gasMeter, request, 100)
+				consumeRequestIOGas(gasMeter, request, 100)
 			}()
 
-			Convey("Then it should fail as source gas consumption", func() {
+			Convey("Then it should fail as I/O gas consumption", func() {
 				So(recovered, ShouldNotBeNil)
 				gasErr, ok := recovered.(storetypes.ErrorOutOfGas)
 				So(ok, ShouldBeTrue)
-				So(gasErr.Descriptor, ShouldEqual, "Source")
+				So(gasErr.Descriptor, ShouldEqual, "IO")
 			})
 		})
 
-		Convey("When source gas multiplication overflows uint64", func() {
+		Convey("When request I/O gas multiplication overflows uint64", func() {
 			gasMeter := storetypes.NewInfiniteGasMeter()
 			overflowRequest := &types.QueryServiceAskRequest{Program: "ab"}
 
-			consumeSourceGas(gasMeter, overflowRequest, math.MaxUint64/2+1)
+			consumeRequestIOGas(gasMeter, overflowRequest, math.MaxUint64/2+1)
 
 			Convey("Then the charge should saturate to MaxUint64", func() {
 				So(gasMeter.GasConsumed(), ShouldEqual, uint64(math.MaxUint64))

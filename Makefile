@@ -449,8 +449,7 @@ doc-predicate: ## Generate markdown documentation for all the predicates (module
 	@OUT_FOLDER="docs/predicate"; \
 	rm -rf $$OUT_FOLDER; \
 	mkdir -p $$OUT_FOLDER; \
-	go get ./scripts; \
-	go run ./scripts/. predicate; \
+	go run -mod=readonly ./scripts/. predicate; \
 	docker run --rm \
 		-v `pwd`:/usr/src/docs \
 		-w /usr/src/docs \

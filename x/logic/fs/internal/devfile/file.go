@@ -21,6 +21,24 @@ var ErrMissingCommit = errors.New("missing_commit_function")
 // and writes the response to the provided Writer (bounded by maxResponseBytes).
 type CommitFunc func(io.Reader, io.Writer) error
 
+// TransferDirection identifies which side of the half-duplex transport carried bytes.
+type TransferDirection uint8
+
+const (
+	// TransferRequest denotes bytes written by the caller into the request buffer.
+	TransferRequest TransferDirection = iota
+	// TransferResponse denotes bytes produced by the device into the response buffer.
+	TransferResponse
+)
+
+// TransferHook observes bytes successfully transferred through the device transport.
+//
+// The hook is invoked after a write succeeds, with the actual byte count returned by
+// the underlying writer, so it reflects the real transferred volume even on partial
+// writes. The direction indicates whether the bytes were appended to the request
+// buffer or buffered as device response data during commit.
+type TransferHook func(dir TransferDirection, n int)
+
 // halfDuplexConfig defines a half-duplex transactional protocol:
 //   - Request phase: zero or more writes append request bytes.
 //   - Commit phase: first read commits the request via Commit.
@@ -37,6 +55,7 @@ type halfDuplexConfig struct {
 	maxRequestBytes  int
 	maxResponseBytes int
 	commit           CommitFunc
+	onTransfer       TransferHook
 }
 
 // Option is a functional option for configuring a half-duplex file.
@@ -80,14 +99,21 @@ func WithCommit(commit CommitFunc) Option {
 	}
 }
 
-type halfDuplexFile struct {
-	cfg halfDuplexConfig
+// WithTransferHook sets a hook invoked after bytes are transferred through the device transport.
+func WithTransferHook(hook TransferHook) Option {
+	return func(cfg *halfDuplexConfig) {
+		cfg.onTransfer = hook
+	}
+}
 
-	buffer    *boundedWriter
-	commitErr error
-	readPos   int
-	committed bool
-	closed    bool
+type halfDuplexFile struct {
+	cfg             halfDuplexConfig
+	transportBuffer *boundedWriter
+	w               *hookedWriter
+	commitErr       error
+	readPos         int
+	committed       bool
+	closed          bool
 }
 
 // New creates an fs.File implementing the half-duplex protocol.
@@ -105,10 +131,14 @@ func New(opts ...Option) (fs.File, error) {
 		return nil, ErrMissingCommit
 	}
 
-	return &halfDuplexFile{
-		cfg:    cfg,
-		buffer: newBoundedWriter(cfg.maxRequestBytes),
-	}, nil
+	transportBuffer := newBoundedWriter(cfg.maxRequestBytes)
+	f := &halfDuplexFile{
+		cfg:             cfg,
+		transportBuffer: transportBuffer,
+	}
+	f.installHookedWriter(TransferRequest)
+
+	return f, nil
 }
 
 func (f *halfDuplexFile) Stat() (fs.FileInfo, error) {
@@ -116,8 +146,28 @@ func (f *halfDuplexFile) Stat() (fs.FileInfo, error) {
 }
 
 func (f *halfDuplexFile) Read(p []byte) (int, error) {
+	if err := f.ensureReadable(); err != nil {
+		return 0, err
+	}
+
+	return f.readResponse(p)
+}
+
+func (f *halfDuplexFile) commit() {
+	f.committed = true
+
+	request := f.transportBuffer.Bytes()
+	reader := bytes.NewReader(request)
+	f.beginResponsePhase()
+
+	if err := f.cfg.commit(reader, f.w); err != nil {
+		f.commitErr = err
+	}
+}
+
+func (f *halfDuplexFile) ensureReadable() error {
 	if f.closed {
-		return 0, f.pathError("read", fs.ErrClosed)
+		return f.pathError("read", fs.ErrClosed)
 	}
 
 	if !f.committed {
@@ -125,10 +175,32 @@ func (f *halfDuplexFile) Read(p []byte) (int, error) {
 	}
 
 	if f.commitErr != nil {
-		return 0, f.pathError("read", f.commitErr)
+		return f.pathError("read", f.commitErr)
 	}
 
-	responseBytes := f.buffer.Bytes()
+	return nil
+}
+
+func (f *halfDuplexFile) ensureWritable() error {
+	if f.closed {
+		return f.pathError("write", fs.ErrClosed)
+	}
+
+	if f.committed {
+		return f.pathError("write", fs.ErrPermission)
+	}
+
+	return nil
+}
+
+func (f *halfDuplexFile) beginResponsePhase() {
+	f.transportBuffer.Reset()
+	f.transportBuffer.maxBytes = f.cfg.maxResponseBytes
+	f.installHookedWriter(TransferResponse)
+}
+
+func (f *halfDuplexFile) readResponse(p []byte) (int, error) {
+	responseBytes := f.transportBuffer.Bytes()
 	if f.readPos >= len(responseBytes) {
 		return 0, io.EOF
 	}
@@ -139,34 +211,27 @@ func (f *halfDuplexFile) Read(p []byte) (int, error) {
 	return n, nil
 }
 
-func (f *halfDuplexFile) commit() {
-	f.committed = true
-
-	// Read request from buffer
-	reader := bytes.NewReader(f.buffer.Bytes())
-
-	// Reset buffer to reuse for response (half-duplex: write → commit → read)
-	f.buffer.Reset()
-	f.buffer.maxBytes = f.cfg.maxResponseBytes
-
-	if err := f.cfg.commit(reader, f.buffer); err != nil {
-		f.commitErr = err
+func (f *halfDuplexFile) installHookedWriter(dir TransferDirection) {
+	f.w = &hookedWriter{
+		writer: f.transportBuffer,
+		hook: func(n int) {
+			if f.cfg.onTransfer != nil {
+				f.cfg.onTransfer(dir, n)
+			}
+		},
 	}
 }
 
 func (f *halfDuplexFile) Write(p []byte) (int, error) {
-	if f.closed {
-		return 0, f.pathError("write", fs.ErrClosed)
+	if err := f.ensureWritable(); err != nil {
+		return 0, err
 	}
 
-	if f.committed {
-		return 0, f.pathError("write", fs.ErrPermission)
-	}
-
-	n, err := f.buffer.Write(p)
+	n, err := f.w.Write(p)
 	if err != nil {
 		return n, f.pathError("write", err)
 	}
+
 	return n, nil
 }
 

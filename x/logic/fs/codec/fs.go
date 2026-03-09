@@ -5,10 +5,13 @@ import (
 	"context"
 	"io"
 	"io/fs"
+	"math"
 	"os"
 	"unicode/utf8"
 
 	"github.com/axone-protocol/prolog/v3/engine"
+
+	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -17,6 +20,7 @@ import (
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/pathutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/prologterm"
 	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
 // These are protocol response terms serialized by the device.
@@ -83,12 +87,16 @@ func (f *vfs) OpenFile(name string, flag int, _ fs.FileMode) (fs.File, error) {
 	}
 
 	sdkCtx := sdk.UnwrapSDKContext(f.ctx)
+	ioCoeff := ioCoeffFromContext(f.ctx)
 	return devfile.New(
 		devfile.WithPath(name),
 		devfile.WithModTime(prolog.ResolveHeaderInfo(sdkCtx).Time),
 		devfile.WithMaxRequestBytes(maxRequestBytes),
 		devfile.WithMaxResponseBytes(maxResponseBytes),
 		devfile.WithCommit(makeCommitFunc(codec)),
+		devfile.WithTransferHook(func(_ devfile.TransferDirection, n int) {
+			consumeTransferredIOGas(sdkCtx.GasMeter(), n, ioCoeff)
+		}),
 	)
 }
 
@@ -209,4 +217,47 @@ func splitRequestLine(line []byte) [][]byte {
 	}
 
 	return tokens
+}
+
+func ioCoeffFromContext(ctx context.Context) uint64 {
+	coeff, _ := ctx.Value(types.IOCoeffContextKey).(uint64)
+	return coeff
+}
+
+func consumeTransferredIOGas(gasMeter storetypes.GasMeter, transferred int, coeff uint64) {
+	if transferred <= 0 {
+		return
+	}
+
+	consumeIOGas(gasMeter, uint64(transferred), coeff)
+}
+
+func consumeIOGas(gasMeter storetypes.GasMeter, units, coeff uint64) {
+	if units == 0 {
+		return
+	}
+	if coeff == 0 {
+		coeff = 1
+	}
+
+	consumed, overflow := multiplyUint64Overflow(units, coeff)
+	if overflow {
+		gasMeter.ConsumeGas(math.MaxUint64, "IO")
+		return
+	}
+
+	gasMeter.ConsumeGas(consumed, "IO")
+}
+
+func multiplyUint64Overflow(a, b uint64) (uint64, bool) {
+	if a == 0 || b == 0 {
+		return 0, false
+	}
+
+	c := a * b
+	if c/a != b || c/b != a {
+		return 0, true
+	}
+
+	return c, false
 }

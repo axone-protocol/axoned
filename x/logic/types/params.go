@@ -113,10 +113,10 @@ func WithUnifyCoeff(unifyCoeff uint64) GasPolicyOption {
 	}
 }
 
-// WithSourceCoeff sets the coefficient applied to user source bytes.
-func WithSourceCoeff(sourceCoeff uint64) GasPolicyOption {
+// WithIoCoeff sets the coefficient applied to I/O bytes.
+func WithIoCoeff(ioCoeff uint64) GasPolicyOption {
 	return func(i *GasPolicy) {
-		i.SourceCoeff = sourceCoeff
+		i.IoCoeff = ioCoeff
 	}
 }
 
@@ -126,7 +126,7 @@ func DefaultGasPolicy() GasPolicy {
 		WithComputeCoeff(1),
 		WithMemoryCoeff(1),
 		WithUnifyCoeff(1),
-		WithSourceCoeff(1),
+		WithIoCoeff(1),
 	)
 }
 
@@ -136,7 +136,7 @@ func CanonicalGasPolicy(policy GasPolicy) GasPolicy {
 		WithComputeCoeff(nonZeroOrOneUint64(policy.ComputeCoeff)),
 		WithMemoryCoeff(nonZeroOrOneUint64(policy.MemoryCoeff)),
 		WithUnifyCoeff(nonZeroOrOneUint64(policy.UnifyCoeff)),
-		WithSourceCoeff(nonZeroOrOneUint64(policy.SourceCoeff)),
+		WithIoCoeff(nonZeroOrOneUint64(policy.IoCoeff)),
 	)
 }
 

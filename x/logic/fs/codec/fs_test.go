@@ -5,6 +5,7 @@ import (
 	"errors"
 	"io"
 	"io/fs"
+	"math"
 	"os"
 	"slices"
 	"sync"
@@ -22,10 +23,12 @@ import (
 	"cosmossdk.io/log"
 	"cosmossdk.io/store"
 	"cosmossdk.io/store/metrics"
+	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	fsiface "github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
+	logictypes "github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
 func TestAll(t *testing.T) {
@@ -327,6 +330,127 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 				response, err := readAll(tc.codecName, tc.request)
 				So(err, ShouldBeNil)
 				So(string(response), ShouldEqual, tc.expectedOutput)
+			})
+		}
+	})
+}
+
+func TestCodecDeviceFSGasMetering(t *testing.T) {
+	request := []byte("decode bad")
+	expectedOutput := "error(invalid_bech32).\n"
+
+	ctx := newSDKContext().
+		WithGasMeter(storetypes.NewGasMeter(1_000)).
+		WithValue(logictypes.IOCoeffContextKey, uint64(2))
+
+	vfs := NewFS(ctx)
+	ofs, ok := vfs.(fsiface.OpenFileFS)
+	if !ok {
+		t.Fatal("codec fs should implement OpenFileFS")
+	}
+
+	Convey("Given a codec device filesystem with I/O gas metering", t, func() {
+		file, err := ofs.OpenFile("bech32", os.O_RDWR, 0)
+		So(err, ShouldBeNil)
+		defer file.Close()
+
+		writer, ok := file.(interface{ Write([]byte) (int, error) })
+		if !ok {
+			t.Fatal("codec file should implement Write")
+		}
+
+		_, err = writer.Write(request)
+		So(err, ShouldBeNil)
+
+		response, err := io.ReadAll(file)
+		So(err, ShouldBeNil)
+		So(string(response), ShouldEqual, expectedOutput)
+		So(ctx.GasMeter().GasConsumed(), ShouldEqual, uint64(len(request)+len(expectedOutput))*2)
+	})
+}
+
+func TestCodecDeviceFSIOGasHelpers(t *testing.T) {
+	Convey("Given codec I/O gas helper functions", t, func() {
+		Convey("when transferred bytes are non-positive", func() {
+			gasMeter := storetypes.NewInfiniteGasMeter()
+
+			consumeTransferredIOGas(gasMeter, 0, 2)
+			consumeTransferredIOGas(gasMeter, -5, 2)
+
+			So(gasMeter.GasConsumed(), ShouldEqual, uint64(0))
+		})
+
+		Convey("when transferred bytes are positive", func() {
+			gasMeter := storetypes.NewInfiniteGasMeter()
+
+			consumeTransferredIOGas(gasMeter, 4, 2)
+
+			So(gasMeter.GasConsumed(), ShouldEqual, uint64(8))
+		})
+
+		Convey("when units are zero", func() {
+			gasMeter := storetypes.NewInfiniteGasMeter()
+
+			consumeIOGas(gasMeter, 0, 3)
+
+			So(gasMeter.GasConsumed(), ShouldEqual, uint64(0))
+		})
+
+		Convey("when coefficient is zero", func() {
+			gasMeter := storetypes.NewInfiniteGasMeter()
+
+			consumeIOGas(gasMeter, 7, 0)
+
+			So(gasMeter.GasConsumed(), ShouldEqual, uint64(7))
+		})
+
+		Convey("when multiplication overflows", func() {
+			gasMeter := storetypes.NewInfiniteGasMeter()
+
+			consumeIOGas(gasMeter, 2, math.MaxUint64)
+
+			So(gasMeter.GasConsumed(), ShouldEqual, uint64(math.MaxUint64))
+		})
+	})
+}
+
+func TestMultiplyUint64Overflow(t *testing.T) {
+	testCases := []struct {
+		name             string
+		a                uint64
+		b                uint64
+		expected         uint64
+		expectedOverflow bool
+	}{
+		{
+			name:             "zero operand does not overflow",
+			a:                0,
+			b:                42,
+			expected:         0,
+			expectedOverflow: false,
+		},
+		{
+			name:             "regular multiplication",
+			a:                6,
+			b:                7,
+			expected:         42,
+			expectedOverflow: false,
+		},
+		{
+			name:             "overflow",
+			a:                2,
+			b:                math.MaxUint64,
+			expected:         0,
+			expectedOverflow: true,
+		},
+	}
+
+	Convey("Given uint64 multiplication overflow detection", t, func() {
+		for _, tc := range testCases {
+			Convey(tc.name, func() {
+				got, overflow := multiplyUint64Overflow(tc.a, tc.b)
+				So(got, ShouldEqual, tc.expected)
+				So(overflow, ShouldEqual, tc.expectedOverflow)
 			})
 		}
 	})

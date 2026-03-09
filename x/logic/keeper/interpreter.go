@@ -76,7 +76,8 @@ func (k Keeper) queryInterpreter(
 
 // newInterpreter creates a new interpreter properly configured.
 func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolog.Interpreter, fmt.Stringer, error) {
-	sdkctx := sdk.UnwrapSDKContext(ctx)
+	sdkctx := sdk.UnwrapSDKContext(ctx).WithValue(types.IOCoeffContextKey, params.GetGasPolicy().IoCoeff)
+	ctx = sdkctx
 
 	var userOutputBuffer writerStringer
 	limits := params.GetLimits()
