@@ -12,4 +12,6 @@ const (
 	AuthQueryServiceContextKey = ContextKey("authQueryService")
 	// BankKeeperContextKey is the context key for the bank keeper.
 	BankKeeperContextKey = ContextKey("bankKeeper")
+	// IOCoeffContextKey is the context key for the I/O gas coefficient used by devices.
+	IOCoeffContextKey = ContextKey("ioCoeff")
 )

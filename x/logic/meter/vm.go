@@ -13,9 +13,9 @@ const defaultCoeff = uint64(1)
 
 // NewVMMeter returns a Prolog VM meter backed by an SDK gas meter.
 func NewVMMeter(gasMeter storetypes.GasMeter, computeCoeff, memoryCoeff, unifyCoeff uint64) engine.MeterFunc {
-	computeCoeff = nonZeroOrDefault(computeCoeff, defaultCoeff)
-	memoryCoeff = nonZeroOrDefault(memoryCoeff, defaultCoeff)
-	unifyCoeff = nonZeroOrDefault(unifyCoeff, defaultCoeff)
+	computeCoeff = nonZeroOrOne(computeCoeff)
+	memoryCoeff = nonZeroOrOne(memoryCoeff)
+	unifyCoeff = nonZeroOrOne(unifyCoeff)
 
 	return func(kind engine.MeterKind, units uint64) (formal engine.Term) {
 		coeff, descriptor, resource := coeffForKind(kind, computeCoeff, memoryCoeff, unifyCoeff)
@@ -60,9 +60,9 @@ func coeffForKind(kind engine.MeterKind, computeCoeff, memoryCoeff, unifyCoeff u
 	}
 }
 
-func nonZeroOrDefault(v, defaultValue uint64) uint64 {
+func nonZeroOrOne(v uint64) uint64 {
 	if v == 0 {
-		return defaultValue
+		return defaultCoeff
 	}
 
 	return v

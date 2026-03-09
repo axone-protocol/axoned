@@ -22,10 +22,12 @@ import (
 	"cosmossdk.io/log"
 	"cosmossdk.io/store"
 	"cosmossdk.io/store/metrics"
+	storetypes "cosmossdk.io/store/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	fsiface "github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
+	logictypes "github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
 func TestAll(t *testing.T) {
@@ -329,6 +331,40 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 				So(string(response), ShouldEqual, tc.expectedOutput)
 			})
 		}
+	})
+}
+
+func TestCodecDeviceFSGasMetering(t *testing.T) {
+	request := []byte("decode bad")
+	expectedOutput := "error(invalid_bech32).\n"
+
+	ctx := newSDKContext().
+		WithGasMeter(storetypes.NewGasMeter(1_000)).
+		WithValue(logictypes.IOCoeffContextKey, uint64(2))
+
+	vfs := NewFS(ctx)
+	ofs, ok := vfs.(fsiface.OpenFileFS)
+	if !ok {
+		t.Fatal("codec fs should implement OpenFileFS")
+	}
+
+	Convey("Given a codec device filesystem with I/O gas metering", t, func() {
+		file, err := ofs.OpenFile("bech32", os.O_RDWR, 0)
+		So(err, ShouldBeNil)
+		defer file.Close()
+
+		writer, ok := file.(interface{ Write([]byte) (int, error) })
+		if !ok {
+			t.Fatal("codec file should implement Write")
+		}
+
+		_, err = writer.Write(request)
+		So(err, ShouldBeNil)
+
+		response, err := io.ReadAll(file)
+		So(err, ShouldBeNil)
+		So(string(response), ShouldEqual, expectedOutput)
+		So(ctx.GasMeter().GasConsumed(), ShouldEqual, uint64(len(request)+len(expectedOutput))*2)
 	})
 }
 

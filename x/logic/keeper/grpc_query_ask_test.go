@@ -44,7 +44,7 @@ func TestGRPCAsk(t *testing.T) {
 			computeCoeff   uint64
 			memoryCoeff    uint64
 			unifyCoeff     uint64
-			sourceCoeff    uint64
+			ioCoeff        uint64
 			expectedAnswer *types.Answer
 			expectedError  string
 		}{
@@ -412,7 +412,7 @@ func TestGRPCAsk(t *testing.T) {
 					params.GasPolicy.ComputeCoeff = tc.computeCoeff
 					params.GasPolicy.MemoryCoeff = tc.memoryCoeff
 					params.GasPolicy.UnifyCoeff = tc.unifyCoeff
-					params.GasPolicy.SourceCoeff = tc.sourceCoeff
+					params.GasPolicy.IoCoeff = tc.ioCoeff
 					err := logicKeeper.SetParams(testCtx.Ctx, params)
 
 					So(err, ShouldBeNil)

@@ -215,6 +215,53 @@ func TestHalfDuplexMaxResponseBytes(t *testing.T) {
 	})
 }
 
+func TestHalfDuplexTransferHook(t *testing.T) {
+	Convey("Given a half-duplex file with transfer instrumentation", t, func() {
+		var transfers []struct {
+			dir TransferDirection
+			n   int
+		}
+
+		file, err := New(
+			WithPath("/v1/dev/test"),
+			WithModTime(time.Unix(0, 0).UTC()),
+			WithTransferHook(func(dir TransferDirection, n int) {
+				transfers = append(transfers, struct {
+					dir TransferDirection
+					n   int
+				}{dir: dir, n: n})
+			}),
+			WithCommit(func(r io.Reader, w io.Writer) error {
+				request, err := io.ReadAll(r)
+				if err != nil {
+					return err
+				}
+				_, err = w.Write(append([]byte("ok:"), request...))
+				return err
+			}),
+		)
+		So(err, ShouldBeNil)
+
+		writer, ok := file.(interface{ Write([]byte) (int, error) })
+		So(ok, ShouldBeTrue)
+
+		n, err := writer.Write([]byte("ping"))
+		So(err, ShouldBeNil)
+		So(n, ShouldEqual, 4)
+
+		response, err := io.ReadAll(file)
+		So(err, ShouldBeNil)
+		So(string(response), ShouldEqual, "ok:ping")
+		So(transfers, ShouldResemble, []struct {
+			dir TransferDirection
+			n   int
+		}{
+			{dir: TransferRequest, n: 4},
+			{dir: TransferResponse, n: 7},
+		})
+	})
+}
+
 func TestHalfDuplexMissingCommit(t *testing.T) {
 	Convey("Given a half-duplex file without commit function", t, func() {
 		file, err := New(
