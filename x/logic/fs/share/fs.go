@@ -18,6 +18,8 @@ import (
 
 const programFileExt = ".pl"
 
+var errVFSUnavailable = errors.New("vfs_unavailable")
+
 type programKeeper interface {
 	GetStoredProgram(ctx sdk.Context, programID []byte) (logictypes.StoredProgram, bool, error)
 	GetProgramPublication(ctx sdk.Context, publisher, programID []byte) (logictypes.ProgramPublication, bool, error)
@@ -31,8 +33,6 @@ type vfs struct {
 var (
 	_ fs.FS         = (*vfs)(nil)
 	_ fs.ReadFileFS = (*vfs)(nil)
-
-	errVFSUnavailable = errors.New("vfs_unavailable")
 )
 
 // NewFS creates a read-only filesystem backed by stored program artifacts.

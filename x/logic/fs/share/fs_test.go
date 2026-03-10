@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"io/fs"
+	"strings"
 	"testing"
 	"time"
 
@@ -19,11 +20,17 @@ import (
 )
 
 type testKeeper struct {
-	programs     map[string]logictypes.StoredProgram
-	publications map[string]logictypes.ProgramPublication
+	programs       map[string]logictypes.StoredProgram
+	publications   map[string]logictypes.ProgramPublication
+	programErr     error
+	publicationErr error
 }
 
 func (k *testKeeper) GetStoredProgram(_ sdk.Context, programID []byte) (logictypes.StoredProgram, bool, error) {
+	if k.programErr != nil {
+		return logictypes.StoredProgram{}, false, k.programErr
+	}
+
 	p, found := k.programs[string(programID)]
 	return p, found, nil
 }
@@ -31,6 +38,10 @@ func (k *testKeeper) GetStoredProgram(_ sdk.Context, programID []byte) (logictyp
 func (k *testKeeper) GetProgramPublication(
 	_ sdk.Context, publisher, programID []byte,
 ) (logictypes.ProgramPublication, bool, error) {
+	if k.publicationErr != nil {
+		return logictypes.ProgramPublication{}, false, k.publicationErr
+	}
+
 	p, found := k.publications[string(publisher)+":"+string(programID)]
 	return p, found, nil
 }
@@ -104,8 +115,23 @@ func TestUserFSReadFile(t *testing.T) {
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
 		})
 
+		Convey("when reading without a publisher separator", func() {
+			_, err := fsys.ReadFile(publisher.String())
+
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+		})
+
 		Convey("when reading with invalid id format", func() {
 			_, err := fsys.ReadFile(publisher.String() + "/zzzz.pl")
+
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+		})
+
+		Convey("when reading with invalid hexadecimal id content", func() {
+			invalidID := strings.Repeat("z", sha256.Size*2)
+			_, err := fsys.ReadFile(publisher.String() + "/" + invalidID + ".pl")
 
 			So(err, ShouldNotBeNil)
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
@@ -156,6 +182,76 @@ func TestUserFSOpen(t *testing.T) {
 			So(info.Name(), ShouldEqual, path)
 			So(info.Size(), ShouldEqual, int64(len(source)))
 			So(info.ModTime(), ShouldEqual, modTime)
+		})
+	})
+}
+
+func TestShareFSErrors(t *testing.T) {
+	Convey("Given a shared logic filesystem", t, func() {
+		key := storetypes.NewKVStoreKey("test")
+		testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+		publisher := sdk.AccAddress([]byte("publisher-address-04"))
+		source := "bar."
+		id := sha256.Sum256([]byte(source))
+		path := publishedPath(publisher.String(), id)
+
+		Convey("when the filesystem has no keeper", func() {
+			fsys := NewFS(testCtx.Ctx, nil)
+			_, err := fsys.ReadFile(path)
+
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, errVFSUnavailable), ShouldBeTrue)
+		})
+
+		Convey("when opening an invalid path", func() {
+			fsys := NewFS(testCtx.Ctx, nil)
+			_, err := fsys.Open(path)
+
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, errVFSUnavailable), ShouldBeTrue)
+		})
+
+		Convey("when reading the root path", func() {
+			fsys := NewFS(testCtx.Ctx, &testKeeper{})
+			_, err := fsys.ReadFile(".")
+
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+		})
+
+		Convey("when publication lookup fails", func() {
+			publicationErr := errors.New("publication lookup failed")
+			fsys := NewFS(testCtx.Ctx, &testKeeper{publicationErr: publicationErr})
+			_, err := fsys.ReadFile(path)
+
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, publicationErr), ShouldBeTrue)
+		})
+
+		Convey("when stored program lookup fails", func() {
+			programErr := errors.New("program lookup failed")
+			fsys := NewFS(testCtx.Ctx, &testKeeper{
+				publications: map[string]logictypes.ProgramPublication{
+					string(publisher) + ":" + string(id[:]): {PublishedAt: 1},
+				},
+				programErr: programErr,
+			})
+			_, err := fsys.ReadFile(path)
+
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, programErr), ShouldBeTrue)
+		})
+
+		Convey("when a publication exists without the stored artifact", func() {
+			fsys := NewFS(testCtx.Ctx, &testKeeper{
+				publications: map[string]logictypes.ProgramPublication{
+					string(publisher) + ":" + string(id[:]): {PublishedAt: 1},
+				},
+			})
+			_, err := fsys.ReadFile(path)
+
+			So(err, ShouldNotBeNil)
+			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
 		})
 	})
 }
