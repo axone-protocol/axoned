@@ -2,9 +2,12 @@ package keeper_test
 
 import (
 	gocontext "context"
+	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"io/fs"
 	"testing"
+	"time"
 
 	"go.uber.org/mock/gomock"
 
@@ -13,11 +16,13 @@ import (
 	storetypes "cosmossdk.io/store/types"
 
 	"github.com/cosmos/cosmos-sdk/testutil"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
+	logicfs "github.com/axone-protocol/axoned/v14/x/logic/fs"
 	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
 	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
@@ -91,5 +96,196 @@ func TestUpdateParams(t *testing.T) {
 					})
 				})
 		}
+	})
+}
+
+func TestStoreProgram(t *testing.T) {
+	Convey("Given a msg server", t, func() {
+		encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
+		key := storetypes.NewKVStoreKey(types.StoreKey)
+		testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+		testCtx.Ctx = testCtx.Ctx.WithBlockTime(time.Date(2026, time.March, 9, 12, 0, 0, 0, time.UTC))
+
+		// gomock initializations
+		ctrl := gomock.NewController(t)
+		accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
+		authQueryService := logictestutil.NewMockAuthQueryService(ctrl)
+		bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
+		fsProvider := logictestutil.NewMockFS(ctrl)
+
+		logicKeeper := keeper.NewKeeper(
+			encCfg.Codec,
+			encCfg.InterfaceRegistry,
+			key,
+			key,
+			authtypes.NewModuleAddress(govtypes.ModuleName),
+			accountKeeper,
+			authQueryService,
+			bankKeeper,
+			func(_ gocontext.Context) (fs.FS, error) {
+				return fsProvider, nil
+			},
+		)
+		if err := logicKeeper.SetParams(testCtx.Ctx, types.DefaultParams()); err != nil {
+			t.Fatal(err)
+		}
+		msgServer := keeper.NewMsgServerImpl(*logicKeeper)
+
+		source := "father(bob, alice)."
+		sourceHash := sha256.Sum256([]byte(source))
+		expectedProgramID := hex.EncodeToString(sourceHash[:])
+
+		publisherA := authtypes.NewModuleAddress("publisher-a").String()
+		publisherB := authtypes.NewModuleAddress("publisher-b").String()
+		publisherAAddr, err := sdk.AccAddressFromBech32(publisherA)
+		if err != nil {
+			t.Fatal(err)
+		}
+		publisherBAddr, err := sdk.AccAddressFromBech32(publisherB)
+		if err != nil {
+			t.Fatal(err)
+		}
+
+		Convey("when publisher is invalid", func() {
+			res, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+				Publisher: "foo",
+				Source:    source,
+			})
+
+			Convey("then it should fail", func() {
+				So(err, ShouldNotBeNil)
+				So(res, ShouldBeNil)
+			})
+		})
+
+		Convey("when source is invalid", func() {
+			res, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+				Publisher: publisherA,
+				Source:    "father(bob, alice)",
+			})
+
+			Convey("then it should fail", func() {
+				So(err, ShouldNotBeNil)
+				So(res, ShouldBeNil)
+			})
+		})
+
+		Convey("when source is valid", func() {
+			res, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+				Publisher: publisherA,
+				Source:    source,
+			})
+
+			Convey("then it should store canonical artifact and publisher publication", func() {
+				So(err, ShouldBeNil)
+				So(res, ShouldNotBeNil)
+				So(res.ProgramId, ShouldEqual, expectedProgramID)
+
+				bz := testCtx.Ctx.KVStore(key).Get(types.StoredProgramKey(sourceHash[:]))
+				So(bz, ShouldNotBeNil)
+
+				var stored types.StoredProgram
+				err = encCfg.Codec.Unmarshal(bz, &stored)
+				So(err, ShouldBeNil)
+				So(stored.Source, ShouldEqual, source)
+				So(stored.CreatedAt, ShouldEqual, testCtx.Ctx.BlockTime().Unix())
+				So(stored.SourceSize, ShouldEqual, uint64(len(source)))
+
+				pubAKey := types.ProgramPublicationKey(publisherAAddr, sourceHash[:])
+				pubABz := testCtx.Ctx.KVStore(key).Get(pubAKey)
+				So(pubABz, ShouldNotBeNil)
+
+				var pubA types.ProgramPublication
+				err = encCfg.Codec.Unmarshal(pubABz, &pubA)
+				So(err, ShouldBeNil)
+				So(pubA.PublishedAt, ShouldEqual, testCtx.Ctx.BlockTime().Unix())
+
+				vfs, err := logicfs.NewVFS(testCtx.Ctx, nil, logicKeeper)
+				So(err, ShouldBeNil)
+				content, err := fs.ReadFile(vfs, "/v1/usr/share/logic/"+publisherA+"/"+expectedProgramID+".pl")
+				So(err, ShouldBeNil)
+				So(string(content), ShouldEqual, source)
+			})
+
+			Convey("and storing the same source with another publisher", func() {
+				testCtx.Ctx = testCtx.Ctx.WithBlockTime(testCtx.Ctx.BlockTime().Add(1 * time.Minute))
+				res2, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+					Publisher: publisherB,
+					Source:    source,
+				})
+
+				Convey("then it should keep a single artifact and add publisher publication", func() {
+					So(err, ShouldBeNil)
+					So(res2, ShouldNotBeNil)
+					So(res2.ProgramId, ShouldEqual, expectedProgramID)
+
+					bz := testCtx.Ctx.KVStore(key).Get(types.StoredProgramKey(sourceHash[:]))
+					So(bz, ShouldNotBeNil)
+
+					var stored types.StoredProgram
+					err = encCfg.Codec.Unmarshal(bz, &stored)
+					So(err, ShouldBeNil)
+					So(stored.Source, ShouldEqual, source)
+
+					pubAKey := types.ProgramPublicationKey(publisherAAddr, sourceHash[:])
+					pubABz := testCtx.Ctx.KVStore(key).Get(pubAKey)
+					So(pubABz, ShouldNotBeNil)
+					var pubA types.ProgramPublication
+					err = encCfg.Codec.Unmarshal(pubABz, &pubA)
+					So(err, ShouldBeNil)
+					So(pubA.PublishedAt, ShouldEqual, testCtx.Ctx.BlockTime().Add(-1*time.Minute).Unix())
+
+					pubBKey := types.ProgramPublicationKey(publisherBAddr, sourceHash[:])
+					pubBBz := testCtx.Ctx.KVStore(key).Get(pubBKey)
+					So(pubBBz, ShouldNotBeNil)
+					var pubB types.ProgramPublication
+					err = encCfg.Codec.Unmarshal(pubBBz, &pubB)
+					So(err, ShouldBeNil)
+					So(pubB.PublishedAt, ShouldEqual, testCtx.Ctx.BlockTime().Unix())
+				})
+
+				Convey("and publishing again from the same publisher", func() {
+					testCtx.Ctx = testCtx.Ctx.WithBlockTime(testCtx.Ctx.BlockTime().Add(1 * time.Minute))
+					res3, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+						Publisher: publisherB,
+						Source:    source,
+					})
+
+					Convey("then it should be idempotent for publication too", func() {
+						So(err, ShouldBeNil)
+						So(res3, ShouldNotBeNil)
+						So(res3.ProgramId, ShouldEqual, expectedProgramID)
+
+						pubBKey := types.ProgramPublicationKey(publisherBAddr, sourceHash[:])
+						pubBBz := testCtx.Ctx.KVStore(key).Get(pubBKey)
+						So(pubBBz, ShouldNotBeNil)
+
+						var pubB types.ProgramPublication
+						err = encCfg.Codec.Unmarshal(pubBBz, &pubB)
+						So(err, ShouldBeNil)
+						So(pubB.PublishedAt, ShouldEqual, testCtx.Ctx.BlockTime().Add(-1*time.Minute).Unix())
+					})
+				})
+			})
+
+			Convey("and republishing after tightening limits", func() {
+				params := types.DefaultParams()
+				params.Limits.MaxSize = uint64(len(source)) - 1
+				err := logicKeeper.SetParams(testCtx.Ctx, params)
+				So(err, ShouldBeNil)
+
+				testCtx.Ctx = testCtx.Ctx.WithBlockTime(testCtx.Ctx.BlockTime().Add(2 * time.Minute))
+				res4, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+					Publisher: publisherA,
+					Source:    source,
+				})
+
+				Convey("then it should remain idempotent for an already stored artifact", func() {
+					So(err, ShouldBeNil)
+					So(res4, ShouldNotBeNil)
+					So(res4.ProgramId, ShouldEqual, expectedProgramID)
+				})
+			})
+		})
 	})
 }

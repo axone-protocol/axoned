@@ -47,3 +47,23 @@ message Answer {
     (gogoproto.moretags) = "yaml:\"results\",omitempty"
   ];
 }
+
+// StoredProgram represents a program source with its storage metadata.
+message StoredProgram {
+  option (gogoproto.goproto_stringer) = true;
+
+  // source is the original Prolog source.
+  string source = 1 [(gogoproto.moretags) = "yaml:\"source\",omitempty"];
+  // created_at is the block timestamp (Unix seconds) of artifact creation.
+  int64 created_at = 2 [(gogoproto.moretags) = "yaml:\"created_at\",omitempty"];
+  // source_size is the source size in bytes.
+  uint64 source_size = 3 [(gogoproto.moretags) = "yaml:\"source_size\",omitempty"];
+}
+
+// ProgramPublication represents the publication metadata of a program by a publisher.
+message ProgramPublication {
+  option (gogoproto.goproto_stringer) = true;
+
+  // published_at is the block timestamp (Unix seconds) of publication for this publisher.
+  int64 published_at = 1 [(gogoproto.moretags) = "yaml:\"published_at\",omitempty"];
+}

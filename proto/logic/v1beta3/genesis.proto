@@ -4,6 +4,7 @@ package logic.v1beta3;
 
 import "gogoproto/gogo.proto";
 import "logic/v1beta3/params.proto";
+import "logic/v1beta3/types.proto";
 
 option go_package = "github.com/axone-protocol/axoned/x/logic/types";
 
@@ -11,4 +12,26 @@ option go_package = "github.com/axone-protocol/axoned/x/logic/types";
 message GenesisState {
   // The state parameters for the logic module.
   Params params = 1 [(gogoproto.nullable) = false];
+  // stored_programs are the canonical immutable program artifacts keyed by program_id.
+  repeated GenesisStoredProgram stored_programs = 2 [(gogoproto.nullable) = false];
+  // program_publications are the publisher-scoped immutable publications pointing to stored artifacts.
+  repeated GenesisProgramPublication program_publications = 3 [(gogoproto.nullable) = false];
+}
+
+// GenesisStoredProgram associates a program_id with its canonical stored artifact.
+message GenesisStoredProgram {
+  // program_id is the SHA-256 hash of the program source encoded as lowercase hexadecimal.
+  string program_id = 1 [(gogoproto.moretags) = "yaml:\"program_id\",omitempty"];
+  // program is the canonical immutable stored program artifact.
+  StoredProgram program = 2 [(gogoproto.nullable) = false];
+}
+
+// GenesisProgramPublication associates a publisher and program_id with publication metadata.
+message GenesisProgramPublication {
+  // publisher is the bech32 account address that published the program.
+  string publisher = 1 [(gogoproto.moretags) = "yaml:\"publisher\",omitempty"];
+  // program_id is the SHA-256 hash of the published program source encoded as lowercase hexadecimal.
+  string program_id = 2 [(gogoproto.moretags) = "yaml:\"program_id\",omitempty"];
+  // publication is the publication metadata for this publisher/program pair.
+  ProgramPublication publication = 3 [(gogoproto.nullable) = false];
 }

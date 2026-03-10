@@ -33,8 +33,6 @@ import (
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
 	logicfs "github.com/axone-protocol/axoned/v14/x/logic/fs"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
 	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
@@ -350,8 +348,8 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		func(ctx context.Context) (fs.FS, error) {
 			return logicfs.NewVFS(
 				ctx,
-				bank.NewFS(ctx),
-				wasm.NewFS(ctx, tc.wasmKeeper),
+				tc.wasmKeeper,
+				nil,
 				logicfs.Mount{
 					Path: "/v1/dev/echo",
 					FS:   newEchoDeviceFS(),
