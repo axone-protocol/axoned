@@ -51,3 +51,49 @@ Feature: consult/1
         results:
         - substitutions:
       """
+
+  @great_for_documentation
+  Scenario: Consult a published user Prolog library from the logic virtual file system
+  This scenario demonstrates how to load a user Prolog library published under the publisher-scoped immutable path.
+
+    Given the user Prolog library published by "axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st" is:
+      """ prolog
+      member_lib(alice).
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/usr/share/logic/axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st/42f889e07ab07b4764f19207799046cb603b954659b601d1a1238aaeac111d5d.pl'),
+      member_lib(Who).
+      """
+    When the query is run (limited to 1 solutions)
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 14059
+      answer:
+        has_more: false
+        variables: ["Who"]
+        results:
+        - substitutions:
+          - variable: Who
+            expression: "alice"
+      """
+
+  @great_for_documentation
+  Scenario: Consult a non published user Prolog library
+  This scenario demonstrates the error returned when the publisher-scoped immutable path does not point to a published user Prolog library.
+
+    Given the query:
+      """ prolog
+      consult('/v1/usr/share/logic/axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st/42f889e07ab07b4764f19207799046cb603b954659b601d1a1238aaeac111d5d.pl').
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 5206
+      answer:
+        has_more: false
+        results:
+        - error: "error(existence_error(source_sink,/v1/usr/share/logic/axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st/42f889e07ab07b4764f19207799046cb603b954659b601d1a1238aaeac111d5d.pl),consult/1)"
+      """
