@@ -41,7 +41,7 @@ var (
 	errVFSUnavailable = errors.New("vfs_unavailable")
 )
 
-// NewFS creates the /v1/state/bank filesystem.
+// NewFS creates a read-only filesystem exposing account bank balances.
 func NewFS(ctx context.Context) fs.ReadFileFS {
 	return &vfs{ctx: ctx}
 }

@@ -51,7 +51,7 @@ var (
 	_ fs.ReadFileFS = (*vfs)(nil)
 )
 
-// NewFS creates the /v1/sys/header snapshot filesystem.
+// NewFS creates a read-only snapshot filesystem for header data.
 func NewFS(ctx context.Context) fs.ReadFileFS {
 	return &vfs{ctx: ctx}
 }
