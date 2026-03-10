@@ -4,17 +4,20 @@ import (
 	gocontext "context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"io/fs"
 	"testing"
 	"time"
 
+	"github.com/cosmos/gogoproto/proto"
 	"go.uber.org/mock/gomock"
 
 	. "github.com/smartystreets/goconvey/convey"
 
 	storetypes "cosmossdk.io/store/types"
 
+	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
@@ -27,6 +30,18 @@ import (
 	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
+
+type failingMarshalCodec struct {
+	codec.BinaryCodec
+}
+
+func (f failingMarshalCodec) Marshal(msg proto.Message) ([]byte, error) {
+	if _, ok := msg.(*types.StoredProgram); ok {
+		return nil, errors.New("marshal failed")
+	}
+
+	return f.BinaryCodec.Marshal(msg)
+}
 
 func TestUpdateParams(t *testing.T) {
 	Convey("Given a test cases", t, func() {
@@ -146,9 +161,90 @@ func TestStoreProgram(t *testing.T) {
 			t.Fatal(err)
 		}
 
+		Convey("when request is nil", func() {
+			res, err := msgServer.StoreProgram(testCtx.Ctx, nil)
+
+			Convey("then it should fail", func() {
+				So(err, ShouldNotBeNil)
+				So(res, ShouldBeNil)
+			})
+		})
+
 		Convey("when publisher is invalid", func() {
 			res, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
 				Publisher: "foo",
+				Source:    source,
+			})
+
+			Convey("then it should fail", func() {
+				So(err, ShouldNotBeNil)
+				So(res, ShouldBeNil)
+			})
+		})
+
+		Convey("when a new source exceeds MaxSize", func() {
+			params := types.DefaultParams()
+			params.Limits.MaxSize = uint64(len(source)) - 1
+			err := logicKeeper.SetParams(testCtx.Ctx, params)
+			So(err, ShouldBeNil)
+
+			res, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+				Publisher: publisherA,
+				Source:    source,
+			})
+
+			Convey("then it should fail before storing", func() {
+				So(err, ShouldNotBeNil)
+				So(res, ShouldBeNil)
+				So(testCtx.Ctx.KVStore(key).Get(types.StoredProgramKey(sourceHash[:])),
+					ShouldBeNil)
+			})
+		})
+
+		Convey("when the stored artifact bytes are invalid", func() {
+			testCtx.Ctx.KVStore(key).Set(types.StoredProgramKey(sourceHash[:]), []byte("invalid"))
+
+			res, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+				Publisher: publisherA,
+				Source:    source,
+			})
+
+			Convey("then it should fail", func() {
+				So(err, ShouldNotBeNil)
+				So(res, ShouldBeNil)
+			})
+		})
+
+		Convey("when an existing artifact under the same id has a different source", func() {
+			err := logicKeeper.SetStoredProgram(testCtx.Ctx, sourceHash[:], types.StoredProgram{
+				Source:     "different_source.",
+				CreatedAt:  testCtx.Ctx.BlockTime().Unix(),
+				SourceSize: uint64(len("different_source.")),
+			})
+			So(err, ShouldBeNil)
+
+			res, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+				Publisher: publisherA,
+				Source:    source,
+			})
+
+			Convey("then it should fail with a hash collision", func() {
+				So(err, ShouldNotBeNil)
+				So(res, ShouldBeNil)
+			})
+		})
+
+		Convey("when publication bytes are invalid", func() {
+			err := logicKeeper.SetStoredProgram(testCtx.Ctx, sourceHash[:], types.StoredProgram{
+				Source:     source,
+				CreatedAt:  testCtx.Ctx.BlockTime().Unix(),
+				SourceSize: uint64(len(source)),
+			})
+			So(err, ShouldBeNil)
+			testCtx.Ctx.KVStore(key).Set(types.ProgramPublicationKey(publisherAAddr, sourceHash[:]), []byte("invalid"))
+
+			res, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+				Publisher: publisherA,
 				Source:    source,
 			})
 
@@ -285,6 +381,51 @@ func TestStoreProgram(t *testing.T) {
 					So(res4, ShouldNotBeNil)
 					So(res4.ProgramId, ShouldEqual, expectedProgramID)
 				})
+			})
+		})
+	})
+}
+
+func TestStoreProgramMarshalFailure(t *testing.T) {
+	Convey("Given a msg server with a codec failing on marshal", t, func() {
+		encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
+		key := storetypes.NewKVStoreKey(types.StoreKey)
+		testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+
+		ctrl := gomock.NewController(t)
+		accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
+		authQueryService := logictestutil.NewMockAuthQueryService(ctrl)
+		bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
+		fsProvider := logictestutil.NewMockFS(ctrl)
+
+		logicKeeper := keeper.NewKeeper(
+			failingMarshalCodec{BinaryCodec: encCfg.Codec},
+			encCfg.InterfaceRegistry,
+			key,
+			key,
+			authtypes.NewModuleAddress(govtypes.ModuleName),
+			accountKeeper,
+			authQueryService,
+			bankKeeper,
+			func(_ gocontext.Context) (fs.FS, error) {
+				return fsProvider, nil
+			},
+		)
+		err := logicKeeper.SetParams(testCtx.Ctx, types.DefaultParams())
+		So(err, ShouldBeNil)
+
+		msgServer := keeper.NewMsgServerImpl(*logicKeeper)
+		publisher := authtypes.NewModuleAddress("publisher-a").String()
+
+		Convey("when storing a valid source", func() {
+			res, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
+				Publisher: publisher,
+				Source:    "father(bob, alice).",
+			})
+
+			Convey("then it should surface the storage error", func() {
+				So(err, ShouldNotBeNil)
+				So(res, ShouldBeNil)
 			})
 		})
 	})
