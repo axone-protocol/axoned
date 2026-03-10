@@ -198,13 +198,17 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
   - [Limits](#logic.v1beta3.Limits)
   - [Params](#logic.v1beta3.Params)
   
-- [logic/v1beta3/genesis.proto](#logic/v1beta3/genesis.proto)
-  - [GenesisState](#logic.v1beta3.GenesisState)
-  
 - [logic/v1beta3/types.proto](#logic/v1beta3/types.proto)
   - [Answer](#logic.v1beta3.Answer)
+  - [ProgramPublication](#logic.v1beta3.ProgramPublication)
   - [Result](#logic.v1beta3.Result)
+  - [StoredProgram](#logic.v1beta3.StoredProgram)
   - [Substitution](#logic.v1beta3.Substitution)
+  
+- [logic/v1beta3/genesis.proto](#logic/v1beta3/genesis.proto)
+  - [GenesisProgramPublication](#logic.v1beta3.GenesisProgramPublication)
+  - [GenesisState](#logic.v1beta3.GenesisState)
+  - [GenesisStoredProgram](#logic.v1beta3.GenesisStoredProgram)
   
 - [logic/v1beta3/query.proto](#logic/v1beta3/query.proto)
   - [QueryServiceAskRequest](#logic.v1beta3.QueryServiceAskRequest)
@@ -215,6 +219,8 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
   - [QueryService](#logic.v1beta3.QueryService)
   
 - [logic/v1beta3/tx.proto](#logic/v1beta3/tx.proto)
+  - [MsgStoreProgram](#logic.v1beta3.MsgStoreProgram)
+  - [MsgStoreProgramResponse](#logic.v1beta3.MsgStoreProgramResponse)
   - [MsgUpdateParams](#logic.v1beta3.MsgUpdateParams)
   - [MsgUpdateParamsResponse](#logic.v1beta3.MsgUpdateParamsResponse)
   
@@ -272,29 +278,6 @@ Params defines all the configuration parameters of the "logic" module.
 
  [//]: # (end services)
 
-<a name="logic/v1beta3/genesis.proto"></a>
-<p align="right"><a href="#top">Top</a></p>
-
-## logic/v1beta3/genesis.proto
-
-<a name="logic.v1beta3.GenesisState"></a>
-
-### GenesisState
-
-GenesisState defines the logic module's genesis state.
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| `params` | [Params](#logic.v1beta3.Params) |  | The state parameters for the logic module. |
-
- [//]: # (end messages)
-
- [//]: # (end enums)
-
- [//]: # (end HasExtensions)
-
- [//]: # (end services)
-
 <a name="logic/v1beta3/types.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
@@ -312,6 +295,16 @@ Answer represents the answer to a logic query.
 | `variables` | [string](#string) | repeated | variables represent all the variables in the query. |
 | `results` | [Result](#logic.v1beta3.Result) | repeated | results represent all the results of the query. |
 
+<a name="logic.v1beta3.ProgramPublication"></a>
+
+### ProgramPublication
+
+ProgramPublication represents the publication metadata of a program by a publisher.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `published_at` | [int64](#int64) |  | published_at is the block timestamp (Unix seconds) of publication for this publisher. |
+
 <a name="logic.v1beta3.Result"></a>
 
 ### Result
@@ -323,6 +316,18 @@ Result represents the result of a query.
 | `error` | [string](#string) |  | error specifies the error message if the query caused an error. |
 | `substitutions` | [Substitution](#logic.v1beta3.Substitution) | repeated | substitutions represent all the substitutions made to the variables in the query to obtain the answer. |
 
+<a name="logic.v1beta3.StoredProgram"></a>
+
+### StoredProgram
+
+StoredProgram represents a program source with its storage metadata.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `source` | [string](#string) |  | source is the original Prolog source. |
+| `created_at` | [int64](#int64) |  | created_at is the block timestamp (Unix seconds) of artifact creation. |
+| `source_size` | [uint64](#uint64) |  | source_size is the source size in bytes. |
+
 <a name="logic.v1beta3.Substitution"></a>
 
 ### Substitution
@@ -333,6 +338,54 @@ Substitution represents a substitution made to the variables in the query to obt
 | ----- | ---- | ----- | ----------- |
 | `variable` | [string](#string) |  | variable is the name of the variable. |
 | `expression` | [string](#string) |  | expression is the value substituted for the variable, represented directly as a Prolog term (e.g., atom, number, compound). |
+
+ [//]: # (end messages)
+
+ [//]: # (end enums)
+
+ [//]: # (end HasExtensions)
+
+ [//]: # (end services)
+
+<a name="logic/v1beta3/genesis.proto"></a>
+<p align="right"><a href="#top">Top</a></p>
+
+## logic/v1beta3/genesis.proto
+
+<a name="logic.v1beta3.GenesisProgramPublication"></a>
+
+### GenesisProgramPublication
+
+GenesisProgramPublication associates a publisher and program_id with publication metadata.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `publisher` | [string](#string) |  | publisher is the bech32 account address that published the program. |
+| `program_id` | [string](#string) |  | program_id is the SHA-256 hash of the published program source encoded as lowercase hexadecimal. |
+| `publication` | [ProgramPublication](#logic.v1beta3.ProgramPublication) |  | publication is the publication metadata for this publisher/program pair. |
+
+<a name="logic.v1beta3.GenesisState"></a>
+
+### GenesisState
+
+GenesisState defines the logic module's genesis state.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `params` | [Params](#logic.v1beta3.Params) |  | The state parameters for the logic module. |
+| `stored_programs` | [GenesisStoredProgram](#logic.v1beta3.GenesisStoredProgram) | repeated | stored_programs are the canonical immutable program artifacts keyed by program_id. |
+| `program_publications` | [GenesisProgramPublication](#logic.v1beta3.GenesisProgramPublication) | repeated | program_publications are the publisher-scoped immutable publications pointing to stored artifacts. |
+
+<a name="logic.v1beta3.GenesisStoredProgram"></a>
+
+### GenesisStoredProgram
+
+GenesisStoredProgram associates a program_id with its canonical stored artifact.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `program_id` | [string](#string) |  | program_id is the SHA-256 hash of the program source encoded as lowercase hexadecimal. |
+| `program` | [StoredProgram](#logic.v1beta3.StoredProgram) |  | program is the canonical immutable stored program artifact. |
 
  [//]: # (end messages)
 
@@ -412,6 +465,27 @@ QueryService defines the gRPC querier service.
 
 ## logic/v1beta3/tx.proto
 
+<a name="logic.v1beta3.MsgStoreProgram"></a>
+
+### MsgStoreProgram
+
+MsgStoreProgram defines a Msg for storing a Prolog program source as a user library.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `publisher` | [string](#string) |  | publisher is the bech32 account address publishing the program artifact. After publication, this exact address is used as the <publisher> path segment in the logic module virtual file system path /v1/usr/share/logic/<publisher>/<program_id>.pl. This is the path that Prolog code can load through consult/1. |
+| `source` | [string](#string) |  | source is the Prolog program source to parse and store. |
+
+<a name="logic.v1beta3.MsgStoreProgramResponse"></a>
+
+### MsgStoreProgramResponse
+
+MsgStoreProgramResponse defines the response for executing a MsgStoreProgram.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `program_id` | [string](#string) |  | program_id is the SHA-256 hash of the program source (lowercase hexadecimal). After publication, this exact identifier is used as the <program_id> path segment in the logic module virtual file system path /v1/usr/share/logic/<publisher>/<program_id>.pl. This is the path that Prolog code can load through consult/1. |
+
 <a name="logic.v1beta3.MsgUpdateParams"></a>
 
 ### MsgUpdateParams
@@ -440,12 +514,12 @@ MsgUpdateParams message.
 
 ### MsgService
 
-MsgService defines the service for the logic module.
-Do nothing for now as the service is without any side effects.
+MsgService defines the transaction service for the logic module.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
 | `UpdateParams` | [MsgUpdateParams](#logic.v1beta3.MsgUpdateParams) | [MsgUpdateParamsResponse](#logic.v1beta3.MsgUpdateParamsResponse) | UpdateParams defined a governance operation for updating the x/logic module parameters. The authority is hard-coded to the Cosmos SDK x/gov module account | |
+| `StoreProgram` | [MsgStoreProgram](#logic.v1beta3.MsgStoreProgram) | [MsgStoreProgramResponse](#logic.v1beta3.MsgStoreProgramResponse) | StoreProgram validates a Prolog user library source and stores its canonical artifact if needed. Artifact identity is content-addressed: program_id = sha256(source). The endpoint is idempotent for the same publisher + same source, and also when different publishers submit the same source. After a successful call, the published program is exposed through the logic module virtual file system at the immutable path /v1/usr/share/logic/<publisher>/<program_id>.pl. This path is intended to be loaded from Prolog, for example with consult/1. | |
 
  [//]: # (end services)
 
