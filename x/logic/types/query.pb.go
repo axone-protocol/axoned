@@ -189,7 +189,7 @@ type QueryAskResponse struct {
 	// answer is the answer to the query.
 	Answer *Answer `protobuf:"bytes,3,opt,name=answer,proto3" json:"answer,omitempty" yaml:"answer",omitempty`
 	// user_output is the output of the query execution, if any.
-	// the length of the output is limited by the max_query_output_size parameter.
+	// the length of the output is limited by the max_user_output_size parameter.
 	UserOutput string `protobuf:"bytes,4,opt,name=user_output,json=userOutput,proto3" json:"user_output,omitempty" yaml:"user_output",omitempty`
 }
 

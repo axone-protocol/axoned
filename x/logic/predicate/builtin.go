@@ -504,7 +504,7 @@ func CurrentInput(vm *engine.VM, input engine.Term, cont engine.Cont, env *engin
 //
 // The outcome of the stream's content throughout the execution of a query is provided as a string within the
 // user_output field in the query's response. However, it's important to note that the maximum length of the output
-// is constrained by the max_query_output_size setting, meaning only the final max_query_output_size bytes (not characters)
+// is constrained by the max_user_output_size setting, meaning only the final max_user_output_size bytes (not characters)
 // of the output are included in the response.
 func CurrentOutput(vm *engine.VM, output engine.Term, cont engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.CurrentOutput(vm, output, cont, env)
