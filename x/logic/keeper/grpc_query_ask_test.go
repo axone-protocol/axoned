@@ -389,7 +389,7 @@ func TestGRPCAsk(t *testing.T) {
 					bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 					pathFS := logicvfs.New()
 					So(pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)), ShouldBeNil)
-					So(pathFS.Mount("/v1/sys/header", logicsysheader.NewFS(testCtx.Ctx)), ShouldBeNil)
+					So(pathFS.Mount("/v1/run/header", logicsysheader.NewFS(testCtx.Ctx)), ShouldBeNil)
 
 					logicKeeper := keeper.NewKeeper(
 						encCfg.Codec,

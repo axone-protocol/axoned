@@ -33,7 +33,7 @@
 % - Empty lists are returned when data is unavailable.
 comet_info(CometInfo) :-
   setup_call_cleanup(
-    open('/v1/sys/comet/@', read, Stream, [type(text)]),
+    open('/v1/run/comet/@', read, Stream, [type(text)]),
     read_term(Stream, CometInfo, []),
     close(Stream)
   ).
@@ -60,7 +60,7 @@ comet_info(CometInfo) :-
 % - Byte is an integer in [0,255].
 header_info(HeaderInfo) :-
   setup_call_cleanup(
-    open('/v1/sys/header/@', read, Stream, [type(text)]),
+    open('/v1/run/header/@', read, Stream, [type(text)]),
     read_term(Stream, HeaderInfo, []),
     close(Stream)
   ).

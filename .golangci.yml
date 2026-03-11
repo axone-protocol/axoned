@@ -123,6 +123,10 @@ linters:
         path: "types/*"
         text: "var-naming: avoid meaningless package names"
       - linters:
+          - revive
+        path: "x/logic/fs/[^/]+\\.go$"
+        text: "var-naming: avoid package names that conflict with Go standard library package names"
+      - linters:
           - cyclop
         path: (.+)_test\.go
     paths:

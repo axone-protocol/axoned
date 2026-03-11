@@ -14,7 +14,7 @@ message GenesisState {
   Params params = 1 [(gogoproto.nullable) = false];
   // stored_programs are the canonical immutable program artifacts keyed by program_id.
   repeated GenesisStoredProgram stored_programs = 2 [(gogoproto.nullable) = false];
-  // program_publications are the publisher-scoped immutable publications pointing to stored artifacts.
+  // program_publications are the user-scoped immutable publication views pointing to stored artifacts.
   repeated GenesisProgramPublication program_publications = 3 [(gogoproto.nullable) = false];
 }
 

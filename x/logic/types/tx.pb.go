@@ -127,9 +127,9 @@ var xxx_messageInfo_MsgUpdateParamsResponse proto.InternalMessageInfo
 // MsgStoreProgram defines a Msg for storing a Prolog program source as a user library.
 type MsgStoreProgram struct {
 	// publisher is the bech32 account address publishing the program artifact.
-	// After publication, this exact address is used as the <publisher> path
+	// After publication, this exact address is used as the <identity> path
 	// segment in the logic module virtual file system path
-	// /v1/usr/share/logic/<publisher>/<program_id>.pl.
+	// /v1/var/lib/logic/users/<identity>/programs/<program_id>.pl.
 	// This is the path that Prolog code can load through consult/1.
 	Publisher string `protobuf:"bytes,1,opt,name=publisher,proto3" json:"publisher,omitempty"`
 	// source is the Prolog program source to parse and store.
@@ -188,7 +188,7 @@ type MsgStoreProgramResponse struct {
 	// program_id is the SHA-256 hash of the program source (lowercase hexadecimal).
 	// After publication, this exact identifier is used as the <program_id> path
 	// segment in the logic module virtual file system path
-	// /v1/usr/share/logic/<publisher>/<program_id>.pl.
+	// /v1/var/lib/logic/users/<identity>/programs/<program_id>.pl.
 	// This is the path that Prolog code can load through consult/1.
 	ProgramId string `protobuf:"bytes,1,opt,name=program_id,json=programId,proto3" json:"program_id,omitempty" yaml:"program_id",omitempty`
 }
@@ -296,7 +296,7 @@ type MsgServiceClient interface {
 	// different publishers submit the same source.
 	// After a successful call, the published program is exposed through the logic
 	// module virtual file system at the immutable path
-	// /v1/usr/share/logic/<publisher>/<program_id>.pl.
+	// /v1/var/lib/logic/users/<identity>/programs/<program_id>.pl.
 	// This path is intended to be loaded from Prolog, for example with consult/1.
 	StoreProgram(ctx context.Context, in *MsgStoreProgram, opts ...grpc.CallOption) (*MsgStoreProgramResponse, error)
 }
@@ -339,7 +339,7 @@ type MsgServiceServer interface {
 	// different publishers submit the same source.
 	// After a successful call, the published program is exposed through the logic
 	// module virtual file system at the immutable path
-	// /v1/usr/share/logic/<publisher>/<program_id>.pl.
+	// /v1/var/lib/logic/users/<identity>/programs/<program_id>.pl.
 	// This path is intended to be loaded from Prolog, for example with consult/1.
 	StoreProgram(context.Context, *MsgStoreProgram) (*MsgStoreProgramResponse, error)
 }

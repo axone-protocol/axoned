@@ -8,7 +8,7 @@ Feature: open/4
     Given the program:
       """ prolog
       resource_path(Path) :-
-        atomic_list_concat(['/v1', 'sys', 'header', 'height'], '/', Path).
+        atomic_list_concat(['/v1', 'run', 'header', 'height'], '/', Path).
       """
     Given the query:
       """ prolog
@@ -26,7 +26,7 @@ Feature: open/4
         results:
         - substitutions:
           - variable: Path
-            expression: "'/v1/sys/header/height'"
+            expression: "'/v1/run/header/height'"
       """
 
   @great_for_documentation
@@ -42,7 +42,7 @@ Feature: open/4
       """
     Given the query:
       """ prolog
-      read_height('/v1/sys/header/height', Height).
+      read_height('/v1/run/header/height', Height).
       """
     When the query is run
     Then the answer we get is:
@@ -132,7 +132,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('/v1/sys/header/height', write, Stream, []).
+      open('/v1/run/header/height', write, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -143,7 +143,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(permission_error(open,source_sink,/v1/sys/header/height),open/4)"
+        - error: "error(permission_error(open,source_sink,/v1/run/header/height),open/4)"
       """
 
   @great_for_documentation
@@ -152,7 +152,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('/v1/sys/header/height', append, Stream, []).
+      open('/v1/run/header/height', append, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -163,7 +163,7 @@ Feature: open/4
         has_more: false
         variables: ["Stream"]
         results:
-        - error: "error(permission_error(open,source_sink,/v1/sys/header/height),open/4)"
+        - error: "error(permission_error(open,source_sink,/v1/run/header/height),open/4)"
       """
 
   @great_for_documentation
@@ -172,7 +172,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('/v1/sys/header/height', read, Stream, [non_existing_option]).
+      open('/v1/run/header/height', read, Stream, [non_existing_option]).
       """
     When the query is run
     Then the answer we get is:
@@ -191,7 +191,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('/v1/sys/header/height', incorrect_mode, Stream, []).
+      open('/v1/run/header/height', incorrect_mode, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -210,7 +210,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('/v1/sys/header/height', 666, Stream, []).
+      open('/v1/run/header/height', 666, Stream, []).
       """
     When the query is run
     Then the answer we get is:
@@ -248,7 +248,7 @@ Feature: open/4
 
     Given the query:
       """ prolog
-      open('/v1/sys/header/height', Mode, Stream, []).
+      open('/v1/run/header/height', Mode, Stream, []).
       """
     When the query is run
     Then the answer we get is:

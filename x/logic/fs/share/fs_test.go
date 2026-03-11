@@ -93,7 +93,7 @@ func TestUserFSReadFile(t *testing.T) {
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
 		})
 
-		Convey("when reading an unpublished program for a publisher", func() {
+		Convey("when reading an unpublished program for a user", func() {
 			otherPublisher := sdk.AccAddress([]byte("publisher-address-02"))
 			_, err := fsys.ReadFile(publishedPath(otherPublisher.String(), id))
 
@@ -102,20 +102,20 @@ func TestUserFSReadFile(t *testing.T) {
 		})
 
 		Convey("when reading with invalid file extension", func() {
-			_, err := fsys.ReadFile(publisher.String() + "/abc")
+			_, err := fsys.ReadFile(publisher.String() + "/programs/abc")
 
 			So(err, ShouldNotBeNil)
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
 		})
 
-		Convey("when reading with invalid publisher", func() {
-			_, err := fsys.ReadFile("not-a-bech32/" + idToPath(id))
+		Convey("when reading with invalid user identity", func() {
+			_, err := fsys.ReadFile("not-a-bech32/programs/" + idToPath(id))
 
 			So(err, ShouldNotBeNil)
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
 		})
 
-		Convey("when reading without a publisher separator", func() {
+		Convey("when reading without a user separator", func() {
 			_, err := fsys.ReadFile(publisher.String())
 
 			So(err, ShouldNotBeNil)
@@ -123,7 +123,7 @@ func TestUserFSReadFile(t *testing.T) {
 		})
 
 		Convey("when reading with invalid id format", func() {
-			_, err := fsys.ReadFile(publisher.String() + "/zzzz.pl")
+			_, err := fsys.ReadFile(publisher.String() + "/programs/zzzz.pl")
 
 			So(err, ShouldNotBeNil)
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
@@ -131,7 +131,7 @@ func TestUserFSReadFile(t *testing.T) {
 
 		Convey("when reading with invalid hexadecimal id content", func() {
 			invalidID := strings.Repeat("z", sha256.Size*2)
-			_, err := fsys.ReadFile(publisher.String() + "/" + invalidID + ".pl")
+			_, err := fsys.ReadFile(publisher.String() + "/programs/" + invalidID + ".pl")
 
 			So(err, ShouldNotBeNil)
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
@@ -261,5 +261,5 @@ func idToPath(id [sha256.Size]byte) string {
 }
 
 func publishedPath(publisher string, id [sha256.Size]byte) string {
-	return publisher + "/" + idToPath(id)
+	return publisher + "/programs/" + idToPath(id)
 }

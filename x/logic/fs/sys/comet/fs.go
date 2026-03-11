@@ -18,6 +18,7 @@ import (
 )
 
 const (
+	// "@" denotes the canonical synthetic view of the Comet block capability.
 	atPath              = "@"
 	validatorsHashPath  = "validators_hash"
 	proposerAddressPath = "proposer_address"

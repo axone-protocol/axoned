@@ -163,11 +163,11 @@ func TestNewInterpreterConsultsPublishedUserProgram(t *testing.T) {
 		})
 		So(err, ShouldBeNil)
 
-		Convey("when consulting it from the publisher-scoped path", func() {
+		Convey("when consulting it from the user-scoped path", func() {
 			interpreter, _, err := logicKeeper.newInterpreter(testCtx.Ctx, types.DefaultParams())
 			So(err, ShouldBeNil)
 
-			path := "/v1/usr/share/logic/" + publisher.String() + "/" + hex.EncodeToString(programID[:]) + ".pl"
+			path := "/v1/var/lib/logic/users/" + publisher.String() + "/programs/" + hex.EncodeToString(programID[:]) + ".pl"
 			err = interpreter.ExecContext(testCtx.Ctx, ":- consult('"+path+"').")
 			answer, queryErr := util.QueryInterpreter(testCtx.Ctx, interpreter, "published_fact(Who).", 1)
 

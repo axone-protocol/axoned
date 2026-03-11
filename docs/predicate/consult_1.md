@@ -88,7 +88,7 @@ answer:
 
 ### Consult a published user Prolog library from the logic virtual file system
 
-This scenario demonstrates how to load a user Prolog library published under the publisher-scoped immutable path.
+This scenario demonstrates how to load a user Prolog library through the user-scoped publication view.
 
 Here are the steps of the scenario:
 
@@ -101,7 +101,7 @@ member_lib(alice).
 - **Given** the query:
 
 ```  prolog
-consult('/v1/usr/share/logic/axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st/42f889e07ab07b4764f19207799046cb603b954659b601d1a1238aaeac111d5d.pl'),
+consult('/v1/var/lib/logic/users/axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st/programs/42f889e07ab07b4764f19207799046cb603b954659b601d1a1238aaeac111d5d.pl'),
 member_lib(Who).
 ```
 
@@ -110,7 +110,7 @@ member_lib(Who).
 
 ```  yaml
 height: 42
-gas_used: 14059
+gas_used: 14072
 answer:
   has_more: false
   variables: ["Who"]
@@ -122,14 +122,14 @@ answer:
 
 ### Consult a non published user Prolog library
 
-This scenario demonstrates the error returned when the publisher-scoped immutable path does not point to a published user Prolog library.
+This scenario demonstrates the error returned when the user-scoped publication view does not point to a published user Prolog library.
 
 Here are the steps of the scenario:
 
 - **Given** the query:
 
 ```  prolog
-consult('/v1/usr/share/logic/axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st/42f889e07ab07b4764f19207799046cb603b954659b601d1a1238aaeac111d5d.pl').
+consult('/v1/var/lib/logic/users/axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st/programs/42f889e07ab07b4764f19207799046cb603b954659b601d1a1238aaeac111d5d.pl').
 ```
 
 - **When** the query is run
@@ -137,9 +137,9 @@ consult('/v1/usr/share/logic/axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st/42f889
 
 ```  yaml
 height: 42
-gas_used: 5206
+gas_used: 5219
 answer:
   has_more: false
   results:
-  - error: "error(existence_error(source_sink,/v1/usr/share/logic/axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st/42f889e07ab07b4764f19207799046cb603b954659b601d1a1238aaeac111d5d.pl),consult/1)"
+  - error: "error(existence_error(source_sink,/v1/var/lib/logic/users/axone15mefcxeleeefp2ga8yrax9tdzw7jkecjxeg7st/programs/42f889e07ab07b4764f19207799046cb603b954659b601d1a1238aaeac111d5d.pl),consult/1)"
 ```
