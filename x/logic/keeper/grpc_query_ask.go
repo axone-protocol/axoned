@@ -13,7 +13,7 @@ import (
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
-func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (response *types.QueryServiceAskResponse, err error) {
+func (k Keeper) Ask(ctx goctx.Context, req *types.QueryAskRequest) (response *types.QueryAskResponse, err error) {
 	if req == nil {
 		return nil, errorsmod.Wrap(types.ErrInvalidArgument, "request is nil")
 	}
@@ -47,7 +47,7 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryServiceAskRequest) (respo
 		req.Limit)
 }
 
-func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) error {
+func checkLimits(request *types.QueryAskRequest, limits types.Limits) error {
 	size := sourceSize(request)
 
 	if limits.MaxSize != 0 && size > limits.MaxSize {
@@ -57,11 +57,11 @@ func checkLimits(request *types.QueryServiceAskRequest, limits types.Limits) err
 	return nil
 }
 
-func consumeRequestIOGas(gasMeter storetypes.GasMeter, request *types.QueryServiceAskRequest, coeff uint64) {
+func consumeRequestIOGas(gasMeter storetypes.GasMeter, request *types.QueryAskRequest, coeff uint64) {
 	consumeIOGas(gasMeter, sourceSize(request), coeff)
 }
 
-func sourceSize(request *types.QueryServiceAskRequest) uint64 {
+func sourceSize(request *types.QueryAskRequest) uint64 {
 	return uint64(len(request.GetProgram()) + len(request.GetQuery()))
 }
 

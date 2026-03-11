@@ -95,7 +95,7 @@ func TestGRPCParams(t *testing.T) {
 						queryClient := types.NewQueryServiceClient(queryHelper)
 
 						Convey("when the grpc query params is called", func() {
-							params, err := queryClient.Params(gocontext.Background(), &types.QueryServiceParamsRequest{})
+							params, err := queryClient.Params(gocontext.Background(), &types.QueryParamsRequest{})
 
 							Convey("Then it should return the expected params set to the keeper", func() {
 								So(err, ShouldBeNil)

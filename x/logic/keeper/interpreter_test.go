@@ -73,7 +73,7 @@ func TestNewInterpreterBootstrapIsFree(t *testing.T) {
 
 func TestConsumeRequestIOGas(t *testing.T) {
 	Convey("Given a user source request", t, func() {
-		request := &types.QueryServiceAskRequest{
+		request := &types.QueryAskRequest{
 			Program: "foo. bar.",
 			Query:   "foo.",
 		}
@@ -89,7 +89,7 @@ func TestConsumeRequestIOGas(t *testing.T) {
 
 		Convey("When consuming request I/O gas for an empty request", func() {
 			gasMeter := storetypes.NewGasMeter(100)
-			consumeRequestIOGas(gasMeter, &types.QueryServiceAskRequest{}, 1)
+			consumeRequestIOGas(gasMeter, &types.QueryAskRequest{}, 1)
 
 			Convey("Then no gas should be consumed", func() {
 				So(gasMeter.GasConsumed(), ShouldEqual, 0)
@@ -117,7 +117,7 @@ func TestConsumeRequestIOGas(t *testing.T) {
 
 		Convey("When request I/O gas multiplication overflows uint64", func() {
 			gasMeter := storetypes.NewInfiniteGasMeter()
-			overflowRequest := &types.QueryServiceAskRequest{Program: "ab"}
+			overflowRequest := &types.QueryAskRequest{Program: "ab"}
 
 			consumeRequestIOGas(gasMeter, overflowRequest, math.MaxUint64/2+1)
 

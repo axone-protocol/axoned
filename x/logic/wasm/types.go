@@ -22,7 +22,7 @@ type AskResponse struct {
 	UserOutput string  `json:"user_output,omitempty"`
 }
 
-func (to *AskResponse) from(from types.QueryServiceAskResponse) {
+func (to *AskResponse) from(from types.QueryAskResponse) {
 	to.Height = from.Height
 	to.GasUsed = from.GasUsed
 	to.Answer = nil
