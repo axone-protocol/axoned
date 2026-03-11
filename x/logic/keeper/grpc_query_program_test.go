@@ -178,12 +178,35 @@ func TestQueryProgramsByPublisher(t *testing.T) {
 				So(res.Pagination.Total, ShouldEqual, 2)
 			})
 		})
+
+		Convey("When querying programs by publisher with pagination", func() {
+			res, err := logicKeeper.ProgramsByPublisher(sdkCtx, &types.QueryProgramsByPublisherRequest{
+				Publisher:  publisher,
+				Pagination: &querytypes.PageRequest{Limit: 1, CountTotal: true},
+			})
+
+			Convey("Then it should return pagination info for the next page", func() {
+				So(err, ShouldBeNil)
+				So(len(res.Programs), ShouldEqual, 1)
+				So(res.Programs[0], ShouldResemble, types.PublishedProgram{
+					Program: types.ProgramMetadata{
+						ProgramId:  "01",
+						CreatedAt:  10,
+						SourceSize: 6,
+					},
+					Publication: types.ProgramPublication{PublishedAt: 100},
+				})
+				So(res.Pagination, ShouldNotBeNil)
+				So(res.Pagination.Total, ShouldEqual, 2)
+				So(len(res.Pagination.NextKey), ShouldBeGreaterThan, 0)
+			})
+		})
 	})
 }
 
 func TestQueryProgramErrors(t *testing.T) {
 	Convey("Given a query keeper", t, func() {
-		logicKeeper, sdkCtx := newQueryKeeper(t)
+		logicKeeper, sdkCtx, key := newQueryKeeperWithStoreKey(t)
 
 		Convey("When querying with nil request", func() {
 			_, err := logicKeeper.Program(sdkCtx, nil)
@@ -212,6 +235,25 @@ func TestQueryProgramErrors(t *testing.T) {
 			})
 		})
 
+		Convey("When querying with an empty program ID", func() {
+			_, err := logicKeeper.Program(sdkCtx, &types.QueryProgramRequest{ProgramId: ""})
+
+			Convey("Then it should return InvalidArgument error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.InvalidArgument)
+			})
+		})
+
+		Convey("When querying a program with corrupted stored bytes", func() {
+			sdkCtx.KVStore(key).Set(types.StoredProgramKey(mustDecodeHex(t, "01")), []byte("invalid"))
+			_, err := logicKeeper.Program(sdkCtx, &types.QueryProgramRequest{ProgramId: "01"})
+
+			Convey("Then it should return Internal error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.Internal)
+			})
+		})
+
 		Convey("When querying programs by invalid publisher", func() {
 			_, err := logicKeeper.ProgramsByPublisher(sdkCtx, &types.QueryProgramsByPublisherRequest{Publisher: "invalid"})
 
@@ -223,7 +265,156 @@ func TestQueryProgramErrors(t *testing.T) {
 	})
 }
 
+func TestQueryProgramSourceErrors(t *testing.T) {
+	Convey("Given a query keeper", t, func() {
+		logicKeeper, sdkCtx, key := newQueryKeeperWithStoreKey(t)
+
+		Convey("When querying the program source with nil request", func() {
+			_, err := logicKeeper.ProgramSource(sdkCtx, nil)
+
+			Convey("Then it should return InvalidArgument error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.InvalidArgument)
+			})
+		})
+
+		Convey("When querying the program source with an empty program ID", func() {
+			_, err := logicKeeper.ProgramSource(sdkCtx, &types.QueryProgramSourceRequest{ProgramId: ""})
+
+			Convey("Then it should return InvalidArgument error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.InvalidArgument)
+			})
+		})
+
+		Convey("When querying the source of a non-existent program", func() {
+			_, err := logicKeeper.ProgramSource(sdkCtx, &types.QueryProgramSourceRequest{ProgramId: "02"})
+
+			Convey("Then it should return NotFound error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.NotFound)
+			})
+		})
+
+		Convey("When querying a program source with corrupted stored bytes", func() {
+			sdkCtx.KVStore(key).Set(types.StoredProgramKey(mustDecodeHex(t, "02")), []byte("invalid"))
+			_, err := logicKeeper.ProgramSource(sdkCtx, &types.QueryProgramSourceRequest{ProgramId: "02"})
+
+			Convey("Then it should return Internal error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.Internal)
+			})
+		})
+	})
+}
+
+func TestQueryProgramsErrors(t *testing.T) {
+	Convey("Given a query keeper", t, func() {
+		logicKeeper, sdkCtx, key := newQueryKeeperWithStoreKey(t)
+
+		Convey("When querying programs with nil request", func() {
+			_, err := logicKeeper.Programs(sdkCtx, nil)
+
+			Convey("Then it should return InvalidArgument error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.InvalidArgument)
+			})
+		})
+
+		Convey("When querying programs with corrupted stored bytes", func() {
+			sdkCtx.KVStore(key).Set(types.StoredProgramKey(mustDecodeHex(t, "03")), []byte("invalid"))
+			_, err := logicKeeper.Programs(sdkCtx, &types.QueryProgramsRequest{
+				Pagination: &querytypes.PageRequest{Limit: 10},
+			})
+
+			Convey("Then it should return Internal error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.Internal)
+			})
+		})
+	})
+}
+
+func TestQueryProgramsByPublisherErrors(t *testing.T) {
+	Convey("Given a query keeper", t, func() {
+		logicKeeper, sdkCtx, key := newQueryKeeperWithStoreKey(t)
+		publisher := sdk.AccAddress([]byte("publisher-address-01")).String()
+		publisherAddr, err := sdk.AccAddressFromBech32(publisher)
+		So(err, ShouldBeNil)
+
+		Convey("When querying programs by publisher with nil request", func() {
+			_, err := logicKeeper.ProgramsByPublisher(sdkCtx, nil)
+
+			Convey("Then it should return InvalidArgument error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.InvalidArgument)
+			})
+		})
+
+		Convey("When querying programs by publisher with empty publisher", func() {
+			_, err := logicKeeper.ProgramsByPublisher(sdkCtx, &types.QueryProgramsByPublisherRequest{})
+
+			Convey("Then it should return InvalidArgument error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.InvalidArgument)
+			})
+		})
+
+		Convey("When a publication contains corrupted bytes", func() {
+			sdkCtx.KVStore(key).Set(types.ProgramPublicationKey(publisherAddr, mustDecodeHex(t, "04")), []byte("invalid"))
+			_, err := logicKeeper.ProgramsByPublisher(sdkCtx, &types.QueryProgramsByPublisherRequest{
+				Publisher:  publisher,
+				Pagination: &querytypes.PageRequest{Limit: 10},
+			})
+
+			Convey("Then it should return Internal error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.Internal)
+			})
+		})
+
+		Convey("When a publication references a missing stored program", func() {
+			err := logicKeeper.SetProgramPublication(sdkCtx, publisherAddr, mustDecodeHex(t, "05"), types.ProgramPublication{
+				PublishedAt: 100,
+			})
+			So(err, ShouldBeNil)
+			_, err = logicKeeper.ProgramsByPublisher(sdkCtx, &types.QueryProgramsByPublisherRequest{
+				Publisher:  publisher,
+				Pagination: &querytypes.PageRequest{Limit: 10},
+			})
+
+			Convey("Then it should return Internal error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.Internal)
+			})
+		})
+
+		Convey("When a referenced stored program contains corrupted bytes", func() {
+			err := logicKeeper.SetProgramPublication(sdkCtx, publisherAddr, mustDecodeHex(t, "06"), types.ProgramPublication{
+				PublishedAt: 200,
+			})
+			So(err, ShouldBeNil)
+			sdkCtx.KVStore(key).Set(types.StoredProgramKey(mustDecodeHex(t, "06")), []byte("invalid"))
+			_, err = logicKeeper.ProgramsByPublisher(sdkCtx, &types.QueryProgramsByPublisherRequest{
+				Publisher:  publisher,
+				Pagination: &querytypes.PageRequest{Limit: 10},
+			})
+
+			Convey("Then it should return Internal error", func() {
+				So(err, ShouldNotBeNil)
+				So(status.Code(err), ShouldEqual, codes.Internal)
+			})
+		})
+	})
+}
+
 func newQueryKeeper(t *testing.T) (*keeper.Keeper, sdk.Context) {
+	logicKeeper, sdkCtx, _ := newQueryKeeperWithStoreKey(t)
+
+	return logicKeeper, sdkCtx
+}
+
+func newQueryKeeperWithStoreKey(t *testing.T) (*keeper.Keeper, sdk.Context, *storetypes.KVStoreKey) {
 	t.Helper()
 
 	encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
@@ -242,7 +433,7 @@ func newQueryKeeper(t *testing.T) (*keeper.Keeper, sdk.Context) {
 		nil,
 	)
 
-	return logicKeeper, testCtx.Ctx
+	return logicKeeper, testCtx.Ctx, key
 }
 
 func mustDecodeHex(t *testing.T, value string) []byte {
