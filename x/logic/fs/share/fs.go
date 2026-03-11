@@ -103,12 +103,17 @@ func decodePublicationPath(subpath string) ([]byte, []byte, error) {
 		return nil, nil, fs.ErrNotExist
 	}
 
-	publisherText, programName, found := strings.Cut(subpath, "/")
-	if !found || publisherText == "" || programName == "" || strings.Contains(programName, "/") {
+	userText, rest, found := strings.Cut(subpath, "/")
+	if !found || userText == "" {
 		return nil, nil, fs.ErrNotExist
 	}
 
-	publisher, err := sdk.AccAddressFromBech32(publisherText)
+	programsRoot, programName, found := strings.Cut(rest, "/")
+	if !found || programsRoot != "programs" || programName == "" || strings.Contains(programName, "/") {
+		return nil, nil, fs.ErrNotExist
+	}
+
+	publisher, err := sdk.AccAddressFromBech32(userText)
 	if err != nil {
 		return nil, nil, fs.ErrNotExist
 	}

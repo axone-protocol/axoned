@@ -7,7 +7,7 @@ Feature: open/3
 
     Given the query:
       """ prolog
-      open('/v1/sys/header/height', read, _).
+      open('/v1/run/header/height', read, _).
       """
     When the query is run
     Then the answer we get is:

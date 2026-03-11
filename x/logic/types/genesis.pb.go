@@ -29,7 +29,7 @@ type GenesisState struct {
 	Params Params `protobuf:"bytes,1,opt,name=params,proto3" json:"params"`
 	// stored_programs are the canonical immutable program artifacts keyed by program_id.
 	StoredPrograms []GenesisStoredProgram `protobuf:"bytes,2,rep,name=stored_programs,json=storedPrograms,proto3" json:"stored_programs"`
-	// program_publications are the publisher-scoped immutable publications pointing to stored artifacts.
+	// program_publications are the user-scoped immutable publication views pointing to stored artifacts.
 	ProgramPublications []GenesisProgramPublication `protobuf:"bytes,3,rep,name=program_publications,json=programPublications,proto3" json:"program_publications"`
 }
 

@@ -550,13 +550,21 @@ func SetOutput(vm *engine.VM, output engine.Term, cont engine.Cont, env *engine.
 //
 // # Virtual File System (VFS)
 //
-// The logical module interprets on-chain Prolog programs, relying on a Virtual Machine that isolates execution from the
-// external environment. Consequently, the open/4 predicate doesn't access the physical file system as one might expect.
-// Instead, it operates with a Virtual File System (VFS), a conceptual layer that abstracts the file system. This abstraction
-// offers a unified view across various storage systems, adhering to the constraints imposed by blockchain technology.
+// The Prolog VM is embedded in a host system and evaluates relations against a
+// Virtual File System (VFS) rather than the physical file system.
 //
-// This VFS extends the file concept to module-provided resources and devices exposed as paths, for example:
-//   - immutable snapshots under /v1/sys/*
+// The VFS is the capability surface between logical evaluation and the host
+// environment:
+//   - the host exposes capabilities as addressable resources;
+//   - Prolog libraries expose the logical relations that operate over them.
+//
+// The capability hierarchy is exposed through a versioned canonical namespace
+// rooted at /v1.
+//
+// The namespace follows a Unix-inspired organization of resources and
+// capabilities, for example:
+//   - immutable runtime snapshots under /v1/run/*
+//   - durable chain-backed data under /v1/var/lib/*
 //   - transactional devices under /v1/dev/*
 func Open(vm *engine.VM, sourceSink, mode, stream, options engine.Term, k engine.Cont, env *engine.Env) *engine.Promise {
 	return engine.Open(vm, sourceSink, mode, stream, options, k, env)

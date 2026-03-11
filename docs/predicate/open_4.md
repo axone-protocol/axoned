@@ -26,11 +26,19 @@ open/4 gives True when SourceSink can be opened in Mode with the given Options.
 
 ## Virtual File System \\\(VFS\\\)
 
-The logical module interprets on\-chain Prolog programs, relying on a Virtual Machine that isolates execution from the external environment. Consequently, the open/4 predicate doesn't access the physical file system as one might expect. Instead, it operates with a Virtual File System \(VFS\), a conceptual layer that abstracts the file system. This abstraction offers a unified view across various storage systems, adhering to the constraints imposed by blockchain technology.
+The Prolog VM is embedded in a host system and evaluates relations against a Virtual File System \(VFS\) rather than the physical file system.
 
-This VFS extends the file concept to module\-provided resources and devices exposed as paths, for example:
+The VFS is the capability surface between logical evaluation and the host environment:
 
-- immutable snapshots under /v1/sys/\*
+- the host exposes capabilities as addressable resources;
+- Prolog libraries expose the logical relations that operate over them.
+
+The capability hierarchy is exposed through a versioned canonical namespace rooted at /v1.
+
+The namespace follows a Unix\-inspired organization of resources and capabilities, for example:
+
+- immutable runtime snapshots under /v1/run/\*
+- durable chain\-backed data under /v1/var/lib/\*
 - transactional devices under /v1/dev/\*
 
 ## Examples
@@ -45,7 +53,7 @@ Here are the steps of the scenario:
 
 ```  prolog
 resource_path(Path) :-
-  atomic_list_concat(['/v1', 'sys', 'header', 'height'], '/', Path).
+  atomic_list_concat(['/v1', 'run', 'header', 'height'], '/', Path).
 ```
 
 - **Given** the query:
@@ -67,7 +75,7 @@ answer:
   results:
   - substitutions:
     - variable: Path
-      expression: "'/v1/sys/header/height'"
+      expression: "'/v1/run/header/height'"
 ```
 
 ### Open an existing resource and read its Prolog term
@@ -88,7 +96,7 @@ read_height(Path, Height) :-
 - **Given** the query:
 
 ```  prolog
-read_height('/v1/sys/header/height', Height).
+read_height('/v1/run/header/height', Height).
 ```
 
 - **When** the query is run
@@ -197,7 +205,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
-open('/v1/sys/header/height', write, Stream, []).
+open('/v1/run/header/height', write, Stream, []).
 ```
 
 - **When** the query is run
@@ -210,7 +218,7 @@ answer:
   has_more: false
   variables: ["Stream"]
   results:
-  - error: "error(permission_error(open,source_sink,/v1/sys/header/height),open/4)"
+  - error: "error(permission_error(open,source_sink,/v1/run/header/height),open/4)"
 ```
 
 ### Try to open a read-only resource for appending
@@ -222,7 +230,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
-open('/v1/sys/header/height', append, Stream, []).
+open('/v1/run/header/height', append, Stream, []).
 ```
 
 - **When** the query is run
@@ -235,7 +243,7 @@ answer:
   has_more: false
   variables: ["Stream"]
   results:
-  - error: "error(permission_error(open,source_sink,/v1/sys/header/height),open/4)"
+  - error: "error(permission_error(open,source_sink,/v1/run/header/height),open/4)"
 ```
 
 ### Pass incorrect options to open/4
@@ -247,7 +255,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
-open('/v1/sys/header/height', read, Stream, [non_existing_option]).
+open('/v1/run/header/height', read, Stream, [non_existing_option]).
 ```
 
 - **When** the query is run

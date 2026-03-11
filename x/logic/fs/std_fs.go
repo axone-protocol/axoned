@@ -20,6 +20,19 @@ import (
 	logictypes "github.com/axone-protocol/axoned/v14/x/logic/types"
 )
 
+const (
+	v1Root = "/v1"
+
+	// Canonical host namespace paths.
+	libPath         = v1Root + "/lib"
+	runHeaderPath   = v1Root + "/run/header"
+	runCometPath    = v1Root + "/run/comet"
+	varLibBankPath  = v1Root + "/var/lib/bank"
+	varLibLogicPath = v1Root + "/var/lib/logic/users"
+	devCodecPath    = v1Root + "/dev/codec"
+	devWasmPath     = v1Root + "/dev/wasm"
+)
+
 // Mount defines a filesystem mounted at an absolute path in the logic VFS.
 type Mount struct {
 	Path string
@@ -32,20 +45,47 @@ type ProgramKeeper interface {
 	GetProgramPublication(ctx sdk.Context, publisher, programID []byte) (logictypes.ProgramPublication, bool, error)
 }
 
-// StandardMounts returns the common logic runtime mounts shared across app and tests.
+// StandardMounts returns the canonical capability mounts shared across app and tests.
+//
+// The virtual filesystem is the boundary between logical evaluation and the host
+// environment.
+//
+// The host exposes capabilities as addressable resources.
+// Prolog libraries expose the logical relations that operate over them.
+//
+// The capability hierarchy is exposed through a versioned canonical namespace
+// rooted at /v1.
+//
+// Within this namespace, the path segment "@" denotes the canonical,
+// host-defined synthetic view of the addressed capability, intended as its
+// primary complete representation.
+//
+// The hierarchy follows a stable Unix-inspired discipline:
+//   - /v1/lib contains immutable host-provided libraries and reference programs.
+//   - /v1/run contains invocation-scoped runtime resources supplied by the host.
+//   - /v1/var/lib contains persistent host-managed resources exposed as files.
+//   - /v1/dev contains interactive device-like capabilities.
+//
+// Concrete mounts depend on the host environment. Different hosts may expose
+// different resources while preserving the same organizing principles.
 func StandardMounts(ctx goctx.Context, wasmKeeper logictypes.WasmKeeper, programKeeper ProgramKeeper) []Mount {
+	libFS := logicembeddedfs.NewFS(logiclib.Files)
+	headerFS := logicsysheader.NewFS(ctx)
+	cometFS := logicsyscomet.NewFS(ctx)
+	bankFS := logicbank.NewFS(ctx)
+	codecFS := logiccodec.NewFS(ctx)
+	wasmFS := logicwasm.NewFS(ctx, wasmKeeper)
+	shareFS := logicshare.NewFS(ctx, programKeeper)
+
 	mounts := make([]Mount, 0, 7)
 	mounts = append(mounts,
-		Mount{Path: "/v1/lib", FS: logicembeddedfs.NewFS(logiclib.Files)},
-		Mount{Path: "/v1/sys/header", FS: logicsysheader.NewFS(ctx)},
-		Mount{Path: "/v1/sys/comet", FS: logicsyscomet.NewFS(ctx)},
-		Mount{Path: "/v1/state/bank", FS: logicbank.NewFS(ctx)},
-		Mount{Path: "/v1/dev/codec", FS: logiccodec.NewFS(ctx)},
-		Mount{Path: "/v1/dev/wasm", FS: logicwasm.NewFS(ctx, wasmKeeper)},
-		Mount{
-			Path: "/v1/usr/share/logic",
-			FS:   logicshare.NewFS(ctx, programKeeper),
-		},
+		Mount{Path: libPath, FS: libFS},
+		Mount{Path: runHeaderPath, FS: headerFS},
+		Mount{Path: runCometPath, FS: cometFS},
+		Mount{Path: varLibBankPath, FS: bankFS},
+		Mount{Path: devCodecPath, FS: codecFS},
+		Mount{Path: devWasmPath, FS: wasmFS},
+		Mount{Path: varLibLogicPath, FS: shareFS},
 	)
 
 	return mounts

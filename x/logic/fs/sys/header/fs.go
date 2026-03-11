@@ -17,6 +17,7 @@ import (
 )
 
 const (
+	// "@" denotes the canonical synthetic view of the header capability.
 	atPath      = "@"
 	heightPath  = "height"
 	hashPath    = "hash"

@@ -25,7 +25,8 @@ const (
 	balancesPath  = "balances"
 	spendablePath = "spendable"
 	lockedPath    = "locked"
-	atPath        = "@"
+	// "@" denotes the canonical synthetic view of a balance collection capability.
+	atPath = "@"
 )
 
 type balancesFetcher func(context.Context, types.BankKeeper, sdk.AccAddress) sdk.Coins

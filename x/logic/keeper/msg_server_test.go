@@ -298,7 +298,7 @@ func TestStoreProgram(t *testing.T) {
 
 				vfs, err := logicfs.NewVFS(testCtx.Ctx, nil, logicKeeper)
 				So(err, ShouldBeNil)
-				content, err := fs.ReadFile(vfs, "/v1/usr/share/logic/"+publisherA+"/"+expectedProgramID+".pl")
+				content, err := fs.ReadFile(vfs, "/v1/var/lib/logic/users/"+publisherA+"/programs/"+expectedProgramID+".pl")
 				So(err, ShouldBeNil)
 				So(string(content), ShouldEqual, source)
 			})

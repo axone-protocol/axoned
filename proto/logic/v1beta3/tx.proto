@@ -21,7 +21,7 @@ service MsgService {
   // different publishers submit the same source.
   // After a successful call, the published program is exposed through the logic
   // module virtual file system at the immutable path
-  // /v1/usr/share/logic/<publisher>/<program_id>.pl.
+  // /v1/var/lib/logic/users/<identity>/programs/<program_id>.pl.
   // This path is intended to be loaded from Prolog, for example with consult/1.
   rpc StoreProgram(MsgStoreProgram) returns (MsgStoreProgramResponse);
 }
@@ -44,9 +44,9 @@ message MsgUpdateParamsResponse {}
 message MsgStoreProgram {
   option (cosmos.msg.v1.signer) = "publisher";
   // publisher is the bech32 account address publishing the program artifact.
-  // After publication, this exact address is used as the <publisher> path
+  // After publication, this exact address is used as the <identity> path
   // segment in the logic module virtual file system path
-  // /v1/usr/share/logic/<publisher>/<program_id>.pl.
+  // /v1/var/lib/logic/users/<identity>/programs/<program_id>.pl.
   // This is the path that Prolog code can load through consult/1.
   string publisher = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
   // source is the Prolog program source to parse and store.
@@ -58,7 +58,7 @@ message MsgStoreProgramResponse {
   // program_id is the SHA-256 hash of the program source (lowercase hexadecimal).
   // After publication, this exact identifier is used as the <program_id> path
   // segment in the logic module virtual file system path
-  // /v1/usr/share/logic/<publisher>/<program_id>.pl.
+  // /v1/var/lib/logic/users/<identity>/programs/<program_id>.pl.
   // This is the path that Prolog code can load through consult/1.
   string program_id = 1 [(gogoproto.moretags) = "yaml:\"program_id\",omitempty"];
 }
