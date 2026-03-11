@@ -64,8 +64,8 @@ type testCase struct {
 	wasmKeeper       *logictestutil.MockWasmKeeper
 	publishedLibs    []publishedLib
 	params           types.Params
-	request          types.QueryServiceAskRequest
-	got              *types.QueryServiceAskResponse
+	request          types.QueryAskRequest
+	got              *types.QueryAskResponse
 }
 
 type publishedLib struct {
@@ -283,7 +283,7 @@ func whenTheQueryIsRunLimitedToNSolutions(ctx context.Context, n int) error {
 
 func theAnswerWeGetIs(ctx context.Context, want *godog.DocString) error {
 	got := testCaseFromContext(ctx).got
-	wantAnswer := &types.QueryServiceAskResponse{}
+	wantAnswer := &types.QueryAskResponse{}
 	if err := parseDocStringYaml(want, wantAnswer); err != nil {
 		return err
 	}

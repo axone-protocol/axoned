@@ -2,7 +2,9 @@ syntax = "proto3";
 
 package logic.v1beta3;
 
+import "cosmos/base/query/v1beta1/pagination.proto";
 import "cosmos/query/v1/query.proto";
+import "cosmos_proto/cosmos.proto";
 import "gogoproto/gogo.proto";
 import "google/api/annotations.proto";
 import "logic/v1beta3/params.proto";
@@ -13,7 +15,7 @@ option go_package = "github.com/axone-protocol/axoned/x/logic/types";
 // QueryService defines the gRPC querier service.
 service QueryService {
   // Params queries all parameters for the logic module.
-  rpc Params(QueryServiceParamsRequest) returns (QueryServiceParamsResponse) {
+  rpc Params(QueryParamsRequest) returns (QueryParamsResponse) {
     option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/axone-protocol/axoned/logic/params";
   }
@@ -21,17 +23,41 @@ service QueryService {
   // Ask executes a logic query and returns the solutions found.
   // Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee
   // is charged for this, but the execution is constrained by the current limits configured in the module.
-  rpc Ask(QueryServiceAskRequest) returns (QueryServiceAskResponse) {
+  rpc Ask(QueryAskRequest) returns (QueryAskResponse) {
     option (cosmos.query.v1.module_query_safe) = true;
     option (google.api.http).get = "/axone-protocol/axoned/logic/ask";
   }
+
+  // Program queries the metadata of a stored program by its immutable identifier.
+  rpc Program(QueryProgramRequest) returns (QueryProgramResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
+    option (google.api.http).get = "/axone-protocol/axoned/logic/programs/{program_id}";
+  }
+
+  // ProgramSource queries the source of a stored program by its immutable identifier.
+  rpc ProgramSource(QueryProgramSourceRequest) returns (QueryProgramSourceResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
+    option (google.api.http).get = "/axone-protocol/axoned/logic/programs/{program_id}/source";
+  }
+
+  // Programs lists stored programs.
+  rpc Programs(QueryProgramsRequest) returns (QueryProgramsResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
+    option (google.api.http).get = "/axone-protocol/axoned/logic/programs";
+  }
+
+  // ProgramsByPublisher lists stored programs published by a given publisher.
+  rpc ProgramsByPublisher(QueryProgramsByPublisherRequest) returns (QueryProgramsByPublisherResponse) {
+    option (cosmos.query.v1.module_query_safe) = true;
+    option (google.api.http).get = "/axone-protocol/axoned/logic/publishers/{publisher}/programs";
+  }
 }
 
-// QueryServiceParamsRequest is request type for the QueryService/Params RPC method.
-message QueryServiceParamsRequest {}
+// QueryParamsRequest is request type for the QueryService/Params RPC method.
+message QueryParamsRequest {}
 
-// QueryServiceParamsResponse is response type for the QueryService/Params RPC method.
-message QueryServiceParamsResponse {
+// QueryParamsResponse is response type for the QueryService/Params RPC method.
+message QueryParamsResponse {
   // params holds all the parameters of this module.
   Params params = 1 [
     (gogoproto.nullable) = false,
@@ -39,8 +65,8 @@ message QueryServiceParamsResponse {
   ];
 }
 
-// QueryServiceAskRequest is request type for the QueryService/Ask RPC method.
-message QueryServiceAskRequest {
+// QueryAskRequest is request type for the QueryService/Ask RPC method.
+message QueryAskRequest {
   option (gogoproto.goproto_stringer) = true;
 
   // program is the logic program to be queried.
@@ -53,8 +79,8 @@ message QueryServiceAskRequest {
   uint64 limit = 3 [(gogoproto.moretags) = "yaml:\"limit\",omitempty"];
 }
 
-// QueryServiceAskResponse is response type for the QueryService/Ask RPC method.
-message QueryServiceAskResponse {
+// QueryAskResponse is response type for the QueryService/Ask RPC method.
+message QueryAskResponse {
   option (gogoproto.goproto_stringer) = true;
 
   // height is the block height at which the query was executed.
@@ -66,4 +92,66 @@ message QueryServiceAskResponse {
   // user_output is the output of the query execution, if any.
   // the length of the output is limited by the max_query_output_size parameter.
   string user_output = 4 [(gogoproto.moretags) = "yaml:\"user_output\",omitempty"];
+}
+
+// QueryProgramRequest is request type for the QueryService/Program RPC method.
+message QueryProgramRequest {
+  // program_id is the immutable identifier of the stored program.
+  string program_id = 1 [(gogoproto.moretags) = "yaml:\"program_id,omitempty\""];
+}
+
+// QueryProgramResponse is response type for the QueryService/Program RPC method.
+message QueryProgramResponse {
+  // program is the metadata of the stored program.
+  ProgramMetadata program = 1 [(gogoproto.nullable) = false];
+}
+
+// QueryProgramSourceRequest is request type for the QueryService/ProgramSource RPC method.
+message QueryProgramSourceRequest {
+  // program_id is the immutable identifier of the stored program.
+  string program_id = 1 [(gogoproto.moretags) = "yaml:\"program_id,omitempty\""];
+}
+
+// QueryProgramSourceResponse is response type for the QueryService/ProgramSource RPC method.
+message QueryProgramSourceResponse {
+  // source is the original Prolog source of the stored program.
+  string source = 1 [(gogoproto.moretags) = "yaml:\"source,omitempty\""];
+}
+
+// QueryProgramsRequest is request type for the QueryService/Programs RPC method.
+message QueryProgramsRequest {
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 1;
+}
+
+// QueryProgramsResponse is response type for the QueryService/Programs RPC method.
+message QueryProgramsResponse {
+  // programs is the metadata list of stored programs.
+  repeated ProgramMetadata programs = 1 [(gogoproto.nullable) = false];
+  // pagination defines the pagination in the response.
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
+}
+
+// QueryProgramsByPublisherRequest is request type for the QueryService/ProgramsByPublisher RPC method.
+message QueryProgramsByPublisherRequest {
+  // publisher is the bech32 account address that published the programs.
+  string publisher = 1 [(cosmos_proto.scalar) = "cosmos.AddressString"];
+  // pagination defines an optional pagination for the request.
+  cosmos.base.query.v1beta1.PageRequest pagination = 2;
+}
+
+// PublishedProgram represents a publisher-scoped program view.
+message PublishedProgram {
+  // program is the metadata of the stored program.
+  ProgramMetadata program = 1 [(gogoproto.nullable) = false];
+  // publication is the publication metadata for this publisher/program pair.
+  ProgramPublication publication = 2 [(gogoproto.nullable) = false];
+}
+
+// QueryProgramsByPublisherResponse is response type for the QueryService/ProgramsByPublisher RPC method.
+message QueryProgramsByPublisherResponse {
+  // programs is the list of programs published by the requested publisher.
+  repeated PublishedProgram programs = 1 [(gogoproto.nullable) = false];
+  // pagination defines the pagination in the response.
+  cosmos.base.query.v1beta1.PageResponse pagination = 2;
 }

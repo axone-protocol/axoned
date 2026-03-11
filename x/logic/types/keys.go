@@ -49,6 +49,16 @@ func ProgramPublicationKey(publisher, programID []byte) []byte {
 	return key[:offset]
 }
 
+// ProgramPublicationByPublisherPrefix returns the store prefix for all publications of a publisher.
+func ProgramPublicationByPublisherPrefix(publisher []byte) []byte {
+	key := make([]byte, len(ProgramPublicationKeyPrefix)+binary.MaxVarintLen64+len(publisher))
+	offset := copy(key, ProgramPublicationKeyPrefix)
+	offset += binary.PutUvarint(key[offset:], uint64(len(publisher)))
+	offset += copy(key[offset:], publisher)
+
+	return key[:offset]
+}
+
 // ParseStoredProgramKey extracts the raw program_id bytes from a stored program key.
 func ParseStoredProgramKey(key []byte) ([]byte, error) {
 	if len(key) < len(StoredProgramKeyPrefix) || !hasPrefix(key, StoredProgramKeyPrefix) {

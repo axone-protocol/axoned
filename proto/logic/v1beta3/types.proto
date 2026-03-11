@@ -48,6 +48,18 @@ message Answer {
   ];
 }
 
+// ProgramMetadata represents the metadata of a stored program.
+message ProgramMetadata {
+  option (gogoproto.goproto_stringer) = true;
+
+  // program_id is the SHA-256 hash of the program source encoded as lowercase hexadecimal.
+  string program_id = 1 [(gogoproto.moretags) = "yaml:\"program_id,omitempty\""];
+  // created_at is the block timestamp (Unix seconds) of artifact creation.
+  int64 created_at = 2 [(gogoproto.moretags) = "yaml:\"created_at,omitempty\""];
+  // source_size is the source size in bytes.
+  uint64 source_size = 3 [(gogoproto.moretags) = "yaml:\"source_size,omitempty\""];
+}
+
 // StoredProgram represents a program source with its storage metadata.
 message StoredProgram {
   option (gogoproto.goproto_stringer) = true;
@@ -65,5 +77,5 @@ message ProgramPublication {
   option (gogoproto.goproto_stringer) = true;
 
   // published_at is the block timestamp (Unix seconds) of publication for this publisher.
-  int64 published_at = 1 [(gogoproto.moretags) = "yaml:\"published_at\",omitempty"];
+  int64 published_at = 1 [(gogoproto.moretags) = "yaml:\"published_at,omitempty\""];
 }

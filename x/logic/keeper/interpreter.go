@@ -36,7 +36,7 @@ func (k Keeper) enhanceContext(ctx context.Context) context.Context {
 
 func (k Keeper) execute(
 	ctx context.Context, params types.Params, program, query string, solutionsLimit uint64,
-) (*types.QueryServiceAskResponse, error) {
+) (*types.QueryAskResponse, error) {
 	ctx = k.enhanceContext(ctx)
 	sdkCtx := sdk.UnwrapSDKContext(ctx)
 
@@ -59,7 +59,7 @@ func (k Keeper) execute(
 		return nil, err
 	}
 
-	return &types.QueryServiceAskResponse{
+	return &types.QueryAskResponse{
 		Height:     uint64(prolog2.ResolveHeaderInfo(sdkCtx).Height), //nolint:gosec // disable G115
 		GasUsed:    sdkCtx.GasMeter().GasConsumed(),
 		Answer:     answer,

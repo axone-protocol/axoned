@@ -24,7 +24,7 @@ func MakeLogicQuerier(keeper *keeper.Keeper) LogicQuerier {
 
 // Ask is a proxy method with the gRPC request, returning the result in the json format.
 func (querier LogicQuerier) Ask(ctx sdk.Context, query AskQuery) ([]byte, error) {
-	grpcResp, err := querier.k.Ask(ctx, &types.QueryServiceAskRequest{
+	grpcResp, err := querier.k.Ask(ctx, &types.QueryAskRequest{
 		Program: query.Program,
 		Query:   query.Query,
 		Limit:   query.Limit,

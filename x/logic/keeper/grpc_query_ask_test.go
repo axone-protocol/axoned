@@ -429,7 +429,7 @@ func TestGRPCAsk(t *testing.T) {
 
 						queryClient := types.NewQueryServiceClient(queryHelper)
 
-						query := types.QueryServiceAskRequest{
+						query := types.QueryAskRequest{
 							Program: tc.program,
 							Query:   tc.query,
 							Limit:   tc.limit,
