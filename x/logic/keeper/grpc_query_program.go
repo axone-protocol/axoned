@@ -2,6 +2,7 @@ package keeper
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/hex"
 
 	"google.golang.org/grpc/codes"
@@ -77,6 +78,9 @@ func decodeProgramID(programID string) ([]byte, error) {
 	}
 	if len(decoded) == 0 {
 		return nil, status.Error(codes.InvalidArgument, "program_id is required")
+	}
+	if len(decoded) != sha256.Size {
+		return nil, status.Errorf(codes.InvalidArgument, "invalid program_id %q: expected %d-byte SHA-256 digest", programID, sha256.Size)
 	}
 
 	return decoded, nil
