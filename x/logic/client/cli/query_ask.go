@@ -36,7 +36,7 @@ func CmdQueryAsk() *cobra.Command {
 			query := args[0]
 			queryClient := types.NewQueryServiceClient(clientCtx)
 
-			res, err := queryClient.Ask(context.Background(), &types.QueryServiceAskRequest{
+			res, err := queryClient.Ask(context.Background(), &types.QueryAskRequest{
 				Program: program,
 				Query:   query,
 				Limit:   limit,

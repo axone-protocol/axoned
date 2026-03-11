@@ -23,6 +23,10 @@ func GetQueryCmd() *cobra.Command {
 
 	cmd.AddCommand(CmdQueryParams())
 	cmd.AddCommand(CmdQueryAsk())
+	cmd.AddCommand(CmdQueryProgram())
+	cmd.AddCommand(CmdQueryProgramSource())
+	cmd.AddCommand(CmdQueryPrograms())
+	cmd.AddCommand(CmdQueryProgramsByPublisher())
 
 	return cmd
 }
