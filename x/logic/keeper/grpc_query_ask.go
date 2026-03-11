@@ -51,7 +51,7 @@ func checkLimits(request *types.QueryAskRequest, limits types.Limits) error {
 	size := sourceSize(request)
 
 	if limits.MaxSize != 0 && size > limits.MaxSize {
-		return errorsmod.Wrapf(types.ErrLimitExceeded, "source: %d > MaxSize: %d", size, limits.MaxSize)
+		return errorsmod.Wrapf(types.ErrLimitExceeded, "request size: %d > MaxSize: %d", size, limits.MaxSize)
 	}
 
 	return nil

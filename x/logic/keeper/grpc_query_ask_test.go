@@ -134,7 +134,7 @@ func TestGRPCAsk(t *testing.T) {
 				program:       "father(bob, alice). father(bob, john).",
 				query:         "father(bob, X).",
 				maxSize:       5,
-				expectedError: "source: 53 > MaxSize: 5: limit exceeded",
+				expectedError: "request size: 53 > MaxSize: 5: limit exceeded",
 			},
 			{
 				program: "father(bob, alice). father(bob, john).",
