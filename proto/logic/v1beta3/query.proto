@@ -90,7 +90,7 @@ message QueryAskResponse {
   // answer is the answer to the query.
   Answer answer = 3 [(gogoproto.moretags) = "yaml:\"answer\",omitempty"];
   // user_output is the output of the query execution, if any.
-  // the length of the output is limited by the max_query_output_size parameter.
+  // the length of the output is limited by the max_user_output_size parameter.
   string user_output = 4 [(gogoproto.moretags) = "yaml:\"user_output\",omitempty"];
 }
 

@@ -456,7 +456,7 @@ QueryAskResponse is response type for the QueryService/Ask RPC method.
 | `height` | [uint64](#uint64) |  | height is the block height at which the query was executed. |
 | `gas_used` | [uint64](#uint64) |  | gas_used is the amount of gas used to execute the query. |
 | `answer` | [Answer](#logic.v1beta3.Answer) |  | answer is the answer to the query. |
-| `user_output` | [string](#string) |  | user_output is the output of the query execution, if any. the length of the output is limited by the max_query_output_size parameter. |
+| `user_output` | [string](#string) |  | user_output is the output of the query execution, if any. the length of the output is limited by the max_user_output_size parameter. |
 
 <a name="logic.v1beta3.QueryParamsRequest"></a>
 

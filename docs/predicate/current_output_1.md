@@ -21,7 +21,7 @@ where:
 
 This predicate connects to the default output stream available for user interactions, allowing the user to perform write operations.
 
-The outcome of the stream's content throughout the execution of a query is provided as a string within the user\_output field in the query's response. However, it's important to note that the maximum length of the output is constrained by the max\_query\_output\_size setting, meaning only the final max\_query\_output\_size bytes \(not characters\) of the output are included in the response.
+The outcome of the stream's content throughout the execution of a query is provided as a string within the user\_output field in the query's response. However, it's important to note that the maximum length of the output is constrained by the max\_user\_output\_size setting, meaning only the final max\_user\_output\_size bytes \(not characters\) of the output are included in the response.
 
 ## Examples
 
