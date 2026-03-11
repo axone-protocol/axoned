@@ -200,6 +200,7 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
   
 - [logic/v1beta3/types.proto](#logic/v1beta3/types.proto)
   - [Answer](#logic.v1beta3.Answer)
+  - [ProgramMetadata](#logic.v1beta3.ProgramMetadata)
   - [ProgramPublication](#logic.v1beta3.ProgramPublication)
   - [Result](#logic.v1beta3.Result)
   - [StoredProgram](#logic.v1beta3.StoredProgram)
@@ -211,10 +212,19 @@ utilized within a query, or limiting the depth of the backtracking algorithm.
   - [GenesisStoredProgram](#logic.v1beta3.GenesisStoredProgram)
   
 - [logic/v1beta3/query.proto](#logic/v1beta3/query.proto)
-  - [QueryServiceAskRequest](#logic.v1beta3.QueryServiceAskRequest)
-  - [QueryServiceAskResponse](#logic.v1beta3.QueryServiceAskResponse)
-  - [QueryServiceParamsRequest](#logic.v1beta3.QueryServiceParamsRequest)
-  - [QueryServiceParamsResponse](#logic.v1beta3.QueryServiceParamsResponse)
+  - [PublishedProgram](#logic.v1beta3.PublishedProgram)
+  - [QueryAskRequest](#logic.v1beta3.QueryAskRequest)
+  - [QueryAskResponse](#logic.v1beta3.QueryAskResponse)
+  - [QueryParamsRequest](#logic.v1beta3.QueryParamsRequest)
+  - [QueryParamsResponse](#logic.v1beta3.QueryParamsResponse)
+  - [QueryProgramRequest](#logic.v1beta3.QueryProgramRequest)
+  - [QueryProgramResponse](#logic.v1beta3.QueryProgramResponse)
+  - [QueryProgramSourceRequest](#logic.v1beta3.QueryProgramSourceRequest)
+  - [QueryProgramSourceResponse](#logic.v1beta3.QueryProgramSourceResponse)
+  - [QueryProgramsByPublisherRequest](#logic.v1beta3.QueryProgramsByPublisherRequest)
+  - [QueryProgramsByPublisherResponse](#logic.v1beta3.QueryProgramsByPublisherResponse)
+  - [QueryProgramsRequest](#logic.v1beta3.QueryProgramsRequest)
+  - [QueryProgramsResponse](#logic.v1beta3.QueryProgramsResponse)
   
   - [QueryService](#logic.v1beta3.QueryService)
   
@@ -294,6 +304,18 @@ Answer represents the answer to a logic query.
 | `has_more` | [bool](#bool) |  | has_more specifies if there are more solutions than the ones returned. |
 | `variables` | [string](#string) | repeated | variables represent all the variables in the query. |
 | `results` | [Result](#logic.v1beta3.Result) | repeated | results represent all the results of the query. |
+
+<a name="logic.v1beta3.ProgramMetadata"></a>
+
+### ProgramMetadata
+
+ProgramMetadata represents the metadata of a stored program.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `program_id` | [string](#string) |  | program_id is the SHA-256 hash of the program source encoded as lowercase hexadecimal. |
+| `created_at` | [int64](#int64) |  | created_at is the block timestamp (Unix seconds) of artifact creation. |
+| `source_size` | [uint64](#uint64) |  | source_size is the source size in bytes. |
 
 <a name="logic.v1beta3.ProgramPublication"></a>
 
@@ -400,11 +422,22 @@ GenesisStoredProgram associates a program_id with its canonical stored artifact.
 
 ## logic/v1beta3/query.proto
 
-<a name="logic.v1beta3.QueryServiceAskRequest"></a>
+<a name="logic.v1beta3.PublishedProgram"></a>
 
-### QueryServiceAskRequest
+### PublishedProgram
 
-QueryServiceAskRequest is request type for the QueryService/Ask RPC method.
+PublishedProgram represents a publisher-scoped program view.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `program` | [ProgramMetadata](#logic.v1beta3.ProgramMetadata) |  | program is the metadata of the stored program. |
+| `publication` | [ProgramPublication](#logic.v1beta3.ProgramPublication) |  | publication is the publication metadata for this publisher/program pair. |
+
+<a name="logic.v1beta3.QueryAskRequest"></a>
+
+### QueryAskRequest
+
+QueryAskRequest is request type for the QueryService/Ask RPC method.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -412,11 +445,11 @@ QueryServiceAskRequest is request type for the QueryService/Ask RPC method.
 | `query` | [string](#string) |  | query is the query string to be executed. |
 | `limit` | [uint64](#uint64) |  | limit specifies the maximum number of solutions to be returned. This field is governed by max_result_count, which defines the upper limit of results that may be requested per query. If this field is not explicitly set, a default value of 1 is applied. |
 
-<a name="logic.v1beta3.QueryServiceAskResponse"></a>
+<a name="logic.v1beta3.QueryAskResponse"></a>
 
-### QueryServiceAskResponse
+### QueryAskResponse
 
-QueryServiceAskResponse is response type for the QueryService/Ask RPC method.
+QueryAskResponse is response type for the QueryService/Ask RPC method.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -425,21 +458,104 @@ QueryServiceAskResponse is response type for the QueryService/Ask RPC method.
 | `answer` | [Answer](#logic.v1beta3.Answer) |  | answer is the answer to the query. |
 | `user_output` | [string](#string) |  | user_output is the output of the query execution, if any. the length of the output is limited by the max_query_output_size parameter. |
 
-<a name="logic.v1beta3.QueryServiceParamsRequest"></a>
+<a name="logic.v1beta3.QueryParamsRequest"></a>
 
-### QueryServiceParamsRequest
+### QueryParamsRequest
 
-QueryServiceParamsRequest is request type for the QueryService/Params RPC method.
+QueryParamsRequest is request type for the QueryService/Params RPC method.
 
-<a name="logic.v1beta3.QueryServiceParamsResponse"></a>
+<a name="logic.v1beta3.QueryParamsResponse"></a>
 
-### QueryServiceParamsResponse
+### QueryParamsResponse
 
-QueryServiceParamsResponse is response type for the QueryService/Params RPC method.
+QueryParamsResponse is response type for the QueryService/Params RPC method.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | `params` | [Params](#logic.v1beta3.Params) |  | params holds all the parameters of this module. |
+
+<a name="logic.v1beta3.QueryProgramRequest"></a>
+
+### QueryProgramRequest
+
+QueryProgramRequest is request type for the QueryService/Program RPC method.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `program_id` | [string](#string) |  | program_id is the immutable identifier of the stored program. |
+
+<a name="logic.v1beta3.QueryProgramResponse"></a>
+
+### QueryProgramResponse
+
+QueryProgramResponse is response type for the QueryService/Program RPC method.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `program` | [ProgramMetadata](#logic.v1beta3.ProgramMetadata) |  | program is the metadata of the stored program. |
+
+<a name="logic.v1beta3.QueryProgramSourceRequest"></a>
+
+### QueryProgramSourceRequest
+
+QueryProgramSourceRequest is request type for the QueryService/ProgramSource RPC method.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `program_id` | [string](#string) |  | program_id is the immutable identifier of the stored program. |
+
+<a name="logic.v1beta3.QueryProgramSourceResponse"></a>
+
+### QueryProgramSourceResponse
+
+QueryProgramSourceResponse is response type for the QueryService/ProgramSource RPC method.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `source` | [string](#string) |  | source is the original Prolog source of the stored program. |
+
+<a name="logic.v1beta3.QueryProgramsByPublisherRequest"></a>
+
+### QueryProgramsByPublisherRequest
+
+QueryProgramsByPublisherRequest is request type for the QueryService/ProgramsByPublisher RPC method.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `publisher` | [string](#string) |  | publisher is the bech32 account address that published the programs. |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
+
+<a name="logic.v1beta3.QueryProgramsByPublisherResponse"></a>
+
+### QueryProgramsByPublisherResponse
+
+QueryProgramsByPublisherResponse is response type for the QueryService/ProgramsByPublisher RPC method.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `programs` | [PublishedProgram](#logic.v1beta3.PublishedProgram) | repeated | programs is the list of programs published by the requested publisher. |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  | pagination defines the pagination in the response. |
+
+<a name="logic.v1beta3.QueryProgramsRequest"></a>
+
+### QueryProgramsRequest
+
+QueryProgramsRequest is request type for the QueryService/Programs RPC method.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `pagination` | [cosmos.base.query.v1beta1.PageRequest](#cosmos.base.query.v1beta1.PageRequest) |  | pagination defines an optional pagination for the request. |
+
+<a name="logic.v1beta3.QueryProgramsResponse"></a>
+
+### QueryProgramsResponse
+
+QueryProgramsResponse is response type for the QueryService/Programs RPC method.
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| `programs` | [ProgramMetadata](#logic.v1beta3.ProgramMetadata) | repeated | programs is the metadata list of stored programs. |
+| `pagination` | [cosmos.base.query.v1beta1.PageResponse](#cosmos.base.query.v1beta1.PageResponse) |  | pagination defines the pagination in the response. |
 
  [//]: # (end messages)
 
@@ -455,8 +571,12 @@ QueryService defines the gRPC querier service.
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
 | ----------- | ------------ | ------------- | ------------| ------- | -------- |
-| `Params` | [QueryServiceParamsRequest](#logic.v1beta3.QueryServiceParamsRequest) | [QueryServiceParamsResponse](#logic.v1beta3.QueryServiceParamsResponse) | Params queries all parameters for the logic module. | GET|/axone-protocol/axoned/logic/params|
-| `Ask` | [QueryServiceAskRequest](#logic.v1beta3.QueryServiceAskRequest) | [QueryServiceAskResponse](#logic.v1beta3.QueryServiceAskResponse) | Ask executes a logic query and returns the solutions found. Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee is charged for this, but the execution is constrained by the current limits configured in the module. | GET|/axone-protocol/axoned/logic/ask|
+| `Params` | [QueryParamsRequest](#logic.v1beta3.QueryParamsRequest) | [QueryParamsResponse](#logic.v1beta3.QueryParamsResponse) | Params queries all parameters for the logic module. | GET|/axone-protocol/axoned/logic/params|
+| `Ask` | [QueryAskRequest](#logic.v1beta3.QueryAskRequest) | [QueryAskResponse](#logic.v1beta3.QueryAskResponse) | Ask executes a logic query and returns the solutions found. Since the query is without any side-effect, the query is not executed in the context of a transaction and no fee is charged for this, but the execution is constrained by the current limits configured in the module. | GET|/axone-protocol/axoned/logic/ask|
+| `Program` | [QueryProgramRequest](#logic.v1beta3.QueryProgramRequest) | [QueryProgramResponse](#logic.v1beta3.QueryProgramResponse) | Program queries the metadata of a stored program by its immutable identifier. | GET|/axone-protocol/axoned/logic/programs/{program_id}|
+| `ProgramSource` | [QueryProgramSourceRequest](#logic.v1beta3.QueryProgramSourceRequest) | [QueryProgramSourceResponse](#logic.v1beta3.QueryProgramSourceResponse) | ProgramSource queries the source of a stored program by its immutable identifier. | GET|/axone-protocol/axoned/logic/programs/{program_id}/source|
+| `Programs` | [QueryProgramsRequest](#logic.v1beta3.QueryProgramsRequest) | [QueryProgramsResponse](#logic.v1beta3.QueryProgramsResponse) | Programs lists stored programs. | GET|/axone-protocol/axoned/logic/programs|
+| `ProgramsByPublisher` | [QueryProgramsByPublisherRequest](#logic.v1beta3.QueryProgramsByPublisherRequest) | [QueryProgramsByPublisherResponse](#logic.v1beta3.QueryProgramsByPublisherResponse) | ProgramsByPublisher lists stored programs published by a given publisher. | GET|/axone-protocol/axoned/logic/publishers/{publisher}/programs|
 
  [//]: # (end services)
 
