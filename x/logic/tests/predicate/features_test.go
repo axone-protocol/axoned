@@ -2,6 +2,7 @@ package predicate_test
 
 import (
 	"context"
+	"crypto/sha256"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -33,8 +34,6 @@ import (
 
 	"github.com/axone-protocol/axoned/v14/x/logic"
 	logicfs "github.com/axone-protocol/axoned/v14/x/logic/fs"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
 	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
@@ -63,9 +62,16 @@ type testCase struct {
 	authQueryService *logictestutil.MockAuthQueryService
 	bankKeeper       *logictestutil.MockBankKeeper
 	wasmKeeper       *logictestutil.MockWasmKeeper
+	publishedLibs    []publishedLib
 	params           types.Params
 	request          types.QueryServiceAskRequest
 	got              *types.QueryServiceAskResponse
+}
+
+type publishedLib struct {
+	publisher sdk.AccAddress
+	programID []byte
+	program   types.StoredProgram
 }
 
 type SmartContractConfiguration struct {
@@ -125,6 +131,28 @@ func givenTheModuleConfiguration(ctx context.Context, configuration *godog.DocSt
 
 func givenTheProgram(ctx context.Context, program *godog.DocString) error {
 	testCaseFromContext(ctx).request.Program = program.Content
+
+	return nil
+}
+
+func givenTheUserPrologLibraryPublishedBy(ctx context.Context, publisher string, program *godog.DocString) error {
+	publisherAddr, err := sdk.AccAddressFromBech32(publisher)
+	if err != nil {
+		return err
+	}
+
+	source := program.Content
+	programID := sha256.Sum256([]byte(source))
+	tc := testCaseFromContext(ctx)
+	tc.publishedLibs = append(tc.publishedLibs, publishedLib{
+		publisher: publisherAddr,
+		programID: programID[:],
+		program: types.StoredProgram{
+			Source:     source,
+			CreatedAt:  tc.ctx.Ctx.BlockTime().Unix(),
+			SourceSize: uint64(len(source)),
+		},
+	})
 
 	return nil
 }
@@ -328,6 +356,7 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 		ctx.Given(`the account "([^"]+)" has the following locked balances:`, givenTheAccountHasTheFollowingLockedBalances)
 		ctx.Given(`the query:`, givenTheQuery)
 		ctx.Given(`the program:`, givenTheProgram)
+		ctx.Given(`the user Prolog library published by "([^"]+)" is:`, givenTheUserPrologLibraryPublishedBy)
 		ctx.When(`^the query is run$`, whenTheQueryIsRun)
 		ctx.When(`^the query is run \(limited to (\d+) solutions\)$`, whenTheQueryIsRunLimitedToNSolutions)
 		ctx.Then(`the answer we get is:`, theAnswerWeGetIs)
@@ -338,7 +367,8 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 	tc := testCaseFromContext(ctx)
 
 	encCfg := moduletestutil.MakeTestEncodingConfig(logic.AppModuleBasic{})
-	logicKeeper := keeper.NewKeeper(
+	var logicKeeper *keeper.Keeper
+	logicKeeper = keeper.NewKeeper(
 		encCfg.Codec,
 		encCfg.InterfaceRegistry,
 		key,
@@ -350,8 +380,8 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		func(ctx context.Context) (fs.FS, error) {
 			return logicfs.NewVFS(
 				ctx,
-				bank.NewFS(ctx),
-				wasm.NewFS(ctx, tc.wasmKeeper),
+				tc.wasmKeeper,
+				logicKeeper,
 				logicfs.Mount{
 					Path: "/v1/dev/echo",
 					FS:   newEchoDeviceFS(),
@@ -361,6 +391,16 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 
 	if err := logicKeeper.SetParams(tc.ctx.Ctx, tc.params); err != nil {
 		return nil, err
+	}
+	for _, lib := range tc.publishedLibs {
+		if err := logicKeeper.SetStoredProgram(tc.ctx.Ctx, lib.programID, lib.program); err != nil {
+			return nil, err
+		}
+		if err := logicKeeper.SetProgramPublication(tc.ctx.Ctx, lib.publisher, lib.programID, types.ProgramPublication{
+			PublishedAt: tc.ctx.Ctx.BlockTime().Unix(),
+		}); err != nil {
+			return nil, err
+		}
 	}
 
 	queryHelper := baseapp.NewQueryServerTestHelper(tc.ctx.Ctx, encCfg.InterfaceRegistry)

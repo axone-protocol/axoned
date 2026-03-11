@@ -35,7 +35,7 @@ var (
 	_ iface.OpenFileFS = (*vfs)(nil)
 )
 
-// NewFS creates the dev/wasm transactional device filesystem.
+// NewFS creates a transactional device filesystem for wasm smart-contract queries.
 func NewFS(ctx context.Context, wasmKeeper types.WasmKeeper) fs.FS {
 	return &vfs{ctx: ctx, wasmKeeper: wasmKeeper}
 }

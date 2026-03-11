@@ -134,8 +134,6 @@ import (
 	"github.com/axone-protocol/axoned/v14/docs"
 	logicmodule "github.com/axone-protocol/axoned/v14/x/logic"
 	logicfs "github.com/axone-protocol/axoned/v14/x/logic/fs"
-	logicbank "github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
-	logicwasm "github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
 	logicmodulekeeper "github.com/axone-protocol/axoned/v14/x/logic/keeper"
 	logicmoduletypes "github.com/axone-protocol/axoned/v14/x/logic/types"
 	"github.com/axone-protocol/axoned/v14/x/mint"
@@ -1170,7 +1168,7 @@ func (app *App) SimulationManager() *module.SimulationManager {
 func (app *App) provideFS(ctx context.Context) (iofs.FS, error) {
 	return logicfs.NewVFS(
 		ctx,
-		logicbank.NewFS(ctx),
-		logicwasm.NewFS(ctx, app.WasmKeeper),
+		app.WasmKeeper,
+		app.LogicKeeper,
 	)
 }

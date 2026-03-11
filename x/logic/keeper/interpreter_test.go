@@ -2,6 +2,8 @@ package keeper
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"io/fs"
 	"math"
 	"testing"
@@ -16,6 +18,7 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
+	logicfs "github.com/axone-protocol/axoned/v14/x/logic/fs"
 	"github.com/axone-protocol/axoned/v14/x/logic/types"
 	"github.com/axone-protocol/axoned/v14/x/logic/util"
 )
@@ -120,6 +123,61 @@ func TestConsumeRequestIOGas(t *testing.T) {
 
 			Convey("Then the charge should saturate to MaxUint64", func() {
 				So(gasMeter.GasConsumed(), ShouldEqual, uint64(math.MaxUint64))
+			})
+		})
+	})
+}
+
+func TestNewInterpreterConsultsPublishedUserProgram(t *testing.T) {
+	Convey("Given a keeper with a published user program", t, func() {
+		encCfg := moduletestutil.MakeTestEncodingConfig()
+		key := storetypes.NewKVStoreKey(types.StoreKey)
+		testCtx := testutil.DefaultContextWithDB(t, key, storetypes.NewTransientStoreKey("transient_test"))
+
+		var logicKeeper *Keeper
+		logicKeeper = NewKeeper(
+			encCfg.Codec,
+			encCfg.InterfaceRegistry,
+			key,
+			key,
+			authtypes.NewModuleAddress(govtypes.ModuleName),
+			nil,
+			nil,
+			nil,
+			func(ctx context.Context) (fs.FS, error) {
+				return logicfs.NewVFS(ctx, nil, logicKeeper)
+			},
+		)
+
+		source := "published_fact(alice)."
+		programID := sha256.Sum256([]byte(source))
+		publisher := authtypes.NewModuleAddress("publisher-a")
+		err := logicKeeper.SetStoredProgram(testCtx.Ctx, programID[:], types.StoredProgram{
+			Source:     source,
+			CreatedAt:  10,
+			SourceSize: uint64(len(source)),
+		})
+		So(err, ShouldBeNil)
+		err = logicKeeper.SetProgramPublication(testCtx.Ctx, publisher, programID[:], types.ProgramPublication{
+			PublishedAt: 11,
+		})
+		So(err, ShouldBeNil)
+
+		Convey("when consulting it from the publisher-scoped path", func() {
+			interpreter, _, err := logicKeeper.newInterpreter(testCtx.Ctx, types.DefaultParams())
+			So(err, ShouldBeNil)
+
+			path := "/v1/usr/share/logic/" + publisher.String() + "/" + hex.EncodeToString(programID[:]) + ".pl"
+			err = interpreter.ExecContext(testCtx.Ctx, ":- consult('"+path+"').")
+			answer, queryErr := util.QueryInterpreter(testCtx.Ctx, interpreter, "published_fact(Who).", 1)
+
+			Convey("then the consulted predicates should be available", func() {
+				So(err, ShouldBeNil)
+				So(queryErr, ShouldBeNil)
+				So(answer.Results, ShouldHaveLength, 1)
+				So(answer.Results[0].Substitutions, ShouldHaveLength, 1)
+				So(answer.Results[0].Substitutions[0].Variable, ShouldEqual, "Who")
+				So(answer.Results[0].Substitutions[0].Expression, ShouldEqual, "alice")
 			})
 		})
 	})

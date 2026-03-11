@@ -12,6 +12,7 @@ import (
 func RegisterLegacyAminoCodec(cdc *codec.LegacyAmino) {
 	cdc.RegisterConcrete(Params{}, "axone/logic/Params", nil)
 	legacy.RegisterAminoMsg(cdc, &MsgUpdateParams{}, "axone/logic/MsgUpdateParams")
+	legacy.RegisterAminoMsg(cdc, &MsgStoreProgram{}, "axone/logic/MsgStoreProgram")
 }
 
 // RegisterInterfaces registers the interfaces types with the interface registry.
@@ -19,6 +20,7 @@ func RegisterInterfaces(registry types.InterfaceRegistry) {
 	registry.RegisterImplementations(
 		(*sdk.Msg)(nil),
 		&MsgUpdateParams{},
+		&MsgStoreProgram{},
 	)
 
 	msgservice.RegisterMsgServiceDesc(registry, &_MsgService_serviceDesc)

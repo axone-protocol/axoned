@@ -51,7 +51,7 @@ var (
 	_ iface.OpenFileFS = (*vfs)(nil)
 )
 
-// NewFS creates the codec transactional device filesystem.
+// NewFS creates a transactional device filesystem for codec utilities.
 //
 // The device follows a half-duplex request/response protocol:
 //  1. writes build a request buffer;
