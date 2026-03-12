@@ -61,11 +61,13 @@ has_type(var, X) :- var(X).
 has_type(list, X) :- proper_list(X).
 has_type(list(Type), X) :- proper_list(X), element_types(X, Type).
 has_type(between(L, U), X) :-
-  integer(L), integer(U), integer(X),
-  X >= L, X =< U.
-has_type(between(L, U), X) :-
-  number(L), number(U), number(X),
-  X >= L, X =< U.
+  number(L), number(U),
+  ( integer(L), integer(U) ->
+      integer(X)
+  ; number(X)
+  ),
+  X >= L,
+  X =< U.
 
 element_types([], _).
 element_types([H|T], Type) :-

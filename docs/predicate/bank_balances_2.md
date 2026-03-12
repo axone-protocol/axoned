@@ -244,7 +244,7 @@ bank_balances(Address, Balances).
 
 ```  yaml
 height: 42
-gas_used: 4468
+gas_used: 4466
 answer:
   has_more: false
   variables: ["Address", "Balances"]
@@ -306,7 +306,7 @@ bank_balances(42, _).
 
 ```  yaml
 height: 42
-gas_used: 4815
+gas_used: 4813
 answer:
   has_more: false
   results:

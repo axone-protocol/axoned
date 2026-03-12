@@ -54,7 +54,7 @@ with_context(example/1, must_be(atom, 42)).
 
 ```  yaml
 height: 42
-gas_used: 4381
+gas_used: 4379
 answer:
   has_more: false
   results:

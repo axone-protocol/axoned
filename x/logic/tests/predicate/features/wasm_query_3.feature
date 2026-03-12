@@ -82,7 +82,7 @@ Feature: wasm_query/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 11352
+      gas_used: 11346
       answer:
         has_more: false
         variables: ["ResponseBytes"]

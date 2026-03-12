@@ -237,7 +237,7 @@ bech32_address(-('axone', X), foo(bar)).
 
 ```  yaml
 height: 42
-gas_used: 4529
+gas_used: 4527
 answer:
   has_more: false
   variables: ["X"]

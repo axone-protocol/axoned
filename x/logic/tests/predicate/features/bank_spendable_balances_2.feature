@@ -134,7 +134,7 @@ Feature: bank_spendable_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4478
+      gas_used: 4476
       answer:
         has_more: false
         variables: ["Address", "Balances"]
@@ -182,7 +182,7 @@ Feature: bank_spendable_balances/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4825
+      gas_used: 4823
       answer:
         has_more: false
         results:
