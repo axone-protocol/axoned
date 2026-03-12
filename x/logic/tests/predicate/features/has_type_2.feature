@@ -38,7 +38,7 @@ Feature: has_type/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4480
+      gas_used: 4824
       answer:
         has_more: false
         variables: ["Result"]
@@ -141,6 +141,119 @@ Feature: has_type/2
       """ yaml
       height: 42
       gas_used: 4017
+      answer:
+        has_more: false
+        results:
+      """
+
+  Scenario: has_type/2 fails with unknown nested type in empty list
+    This scenario verifies that has_type/2 fails when checking a list with an unknown type,
+    even if the list is empty. This prevents silent acceptance of unknown types.
+
+    Given the program:
+      """ prolog
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/type.pl'),
+      has_type(list(foo), []).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4358
+      answer:
+        has_more: false
+        results:
+      """
+
+  Scenario: has_type/2 fails with unbound nested type variable
+    This scenario verifies that has_type/2 fails when the nested type is an unbound variable,
+    preventing it from acting as a type generator.
+
+    Given the program:
+      """ prolog
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/type.pl'),
+      has_type(list(T), [1]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4042
+      answer:
+        has_more: false
+        variables: ["T"]
+        results:
+      """
+
+  Scenario: has_type/2 succeeds with valid nested list types
+    This scenario verifies that has_type/2 correctly validates nested list types.
+
+    Given the program:
+      """ prolog
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/type.pl'),
+      has_type(list(list(integer)), [[1,2],[3,4]]),
+      Result = ok.
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 6031
+      answer:
+        has_more: false
+        variables: ["Result"]
+        results:
+        - substitutions:
+          - variable: Result
+            expression: ok
+      """
+
+  Scenario: has_type/2 fails with unknown nested type in non-empty list
+    This scenario verifies that has_type/2 fails with unknown nested types even when the list is non-empty.
+
+    Given the program:
+      """ prolog
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/type.pl'),
+      has_type(list(unknowntype), [1,2,3]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4375
+      answer:
+        has_more: false
+        results:
+      """
+
+  Scenario: has_type/2 fails with deeply nested unknown types
+    This scenario verifies that valid_type/1 recursively validates nested type specifications.
+
+    Given the program:
+      """ prolog
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/type.pl'),
+      has_type(list(list(unknowntype)), [[1]]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4487
       answer:
         has_more: false
         results:
