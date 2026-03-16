@@ -148,7 +148,7 @@ bech32_address(-('axone', [163,167,23,244,162,175,49,162,170,15,181,141,68,134,1
 
 ```  yaml
 height: 42
-gas_used: 33897
+gas_used: 34209
 answer:
   has_more: false
   variables: ["Bech32"]

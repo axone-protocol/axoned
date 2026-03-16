@@ -1,5 +1,5 @@
 ---
-sidebar_position: 129
+sidebar_position: 130
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -69,7 +69,7 @@ wasm_query(
 
 ```  yaml
 height: 42
-gas_used: 16286
+gas_used: 16910
 answer:
   has_more: false
   variables: ["ResponseBytes"]
@@ -137,7 +137,7 @@ wasm_query(
 
 ```  yaml
 height: 42
-gas_used: 11346
+gas_used: 11690
 answer:
   has_more: false
   variables: ["ResponseBytes"]
@@ -180,7 +180,7 @@ wasm_query(
 
 ```  yaml
 height: 42
-gas_used: 15242
+gas_used: 15866
 answer:
   has_more: false
   variables: ["ResponseBytes"]

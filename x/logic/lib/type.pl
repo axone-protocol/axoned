@@ -75,7 +75,7 @@ has_type(oneof(Choices), X) :- ground(X), memberchk(X, Choices).
 has_type(pair, X) :- nonvar(X), X = _-_.
 has_type(var, X) :- var(X).
 has_type(list, X) :- proper_list(X).
-has_type(list(Type), X) :- proper_list(X), element_types(X, Type).
+has_type(list(Type), X) :- valid_type(Type), proper_list(X), element_types(X, Type).
 has_type(between(L, U), X) :-
   number(L), number(U),
   ( integer(L), integer(U) ->

@@ -37,7 +37,7 @@ Feature: hex_bytes/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 7861
+      gas_used: 8173
       answer:
         has_more: false
         variables: ["Hex"]

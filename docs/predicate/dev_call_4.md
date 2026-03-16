@@ -101,7 +101,7 @@ echo([0,1,2,255], Echoed).
 
 ```  yaml
 height: 42
-gas_used: 6277
+gas_used: 6589
 answer:
   has_more: false
   variables: ["Echoed"]
@@ -192,7 +192,7 @@ catch(
 
 ```  yaml
 height: 42
-gas_used: 6422
+gas_used: 7046
 answer:
   has_more: false
   results:
@@ -234,7 +234,7 @@ echo_partial(Result).
 
 ```  yaml
 height: 42
-gas_used: 5810
+gas_used: 6122
 answer:
   has_more: false
   variables: ["Result"]

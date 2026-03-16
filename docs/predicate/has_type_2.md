@@ -53,7 +53,7 @@ Result = ok.
 
 ```  yaml
 height: 42
-gas_used: 4480
+gas_used: 4824
 answer:
   has_more: false
   variables: ["Result"]
