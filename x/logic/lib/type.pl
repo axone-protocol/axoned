@@ -28,6 +28,22 @@ known_type(list).
 known_type(list(_)).
 known_type(between(_, _)).
 
+%! valid_type(+Type) is semidet.
+%
+% Succeeds when Type is a valid, concrete type specification.
+% Recursively validates parameterized types (e.g., list(integer), list(list(byte))).
+% Fails when Type is unbound or contains unbound type parameters.
+valid_type(Type) :-
+  nonvar(Type),
+  ( Type = list(InnerType) ->
+      valid_type(InnerType)
+  ; Type = oneof(Choices) ->
+      ground(Choices)
+  ; Type = between(L, U) ->
+      number(L), number(U)
+  ; known_type(Type)
+  ).
+
 %! has_type(+Type, @Term) is semidet.
 %
 % Succeeds when Term satisfies Type without throwing.
