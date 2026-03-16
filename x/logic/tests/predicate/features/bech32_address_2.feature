@@ -88,7 +88,7 @@ Feature: bech32_address/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 33897
+      gas_used: 34209
       answer:
         has_more: false
         variables: ["Bech32"]
@@ -153,7 +153,7 @@ Feature: bech32_address/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 33935
+      gas_used: 34247
       answer:
         has_more: false
         results:
@@ -280,7 +280,7 @@ Feature: bech32_address/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 9638
+      gas_used: 9982
       answer:
         has_more: false
         variables: ["Bech32"]
@@ -301,7 +301,7 @@ Feature: bech32_address/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 9799
+      gas_used: 10143
       answer:
         has_more: false
         variables: ["Bech32"]
@@ -322,7 +322,7 @@ Feature: bech32_address/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5868
+      gas_used: 6212
       answer:
         has_more: false
         variables: ["Bech32"]

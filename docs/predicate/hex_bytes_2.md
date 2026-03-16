@@ -78,7 +78,7 @@ hex_bytes(Hex, [80,26,206]).
 
 ```  yaml
 height: 42
-gas_used: 7861
+gas_used: 8173
 answer:
   has_more: false
   variables: ["Hex"]
