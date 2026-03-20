@@ -2,6 +2,7 @@ package main
 
 import (
 	"embed"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"go/build"
@@ -33,6 +34,7 @@ const (
 	bootstrapPredicatesPath = "x/logic/interpreter/bootstrap"
 	featuresPath            = "x/logic"
 	outputPath              = "docs/predicate"
+	stdlibSection           = "stdlib"
 )
 
 var (
@@ -51,8 +53,15 @@ type prologPredicateDocumentation struct {
 
 type predicateEntry struct {
 	name      string
+	section   string
 	goFunc    *lang.Func
 	prologDoc *prologPredicateDocumentation
+}
+
+type predicateSection struct {
+	name       string
+	label      string
+	predicates []predicateEntry
 }
 
 func generatePredicateDocumentation() error {
@@ -81,10 +90,17 @@ func generatePredicateDocumentation() error {
 	}
 
 	predicates := buildUnifiedPredicateList(funcs, builtinPredicates, libPredicates)
+	sections := buildPredicateSections(predicates)
 
-	for idx, pred := range predicates {
-		if err := writePredicateDoc(pred, idx+1, features); err != nil {
+	for idx, section := range sections {
+		if err := writePredicateCategory(section, idx+1); err != nil {
 			return err
+		}
+
+		for position, pred := range section.predicates {
+			if err := writePredicateDoc(pred, position+1, features); err != nil {
+				return err
+			}
 		}
 	}
 
@@ -100,8 +116,9 @@ func buildUnifiedPredicateList(
 	for _, f := range funcs {
 		name := functorName(f)
 		predicateMap[name] = predicateEntry{
-			name:   name,
-			goFunc: f,
+			name:    name,
+			section: stdlibSection,
+			goFunc:  f,
 		}
 	}
 
@@ -111,30 +128,81 @@ func buildUnifiedPredicateList(
 		if _, exists := predicateMap[name]; !exists {
 			predicateMap[name] = predicateEntry{
 				name:      name,
+				section:   predicateSectionName(builtinPredicates[idx]),
 				prologDoc: &builtinPredicates[idx],
 			}
 		}
 	}
 
-	allPredicates := lo.Values(predicateMap)
-	slices.SortFunc(allPredicates, func(a, b predicateEntry) int {
-		return strings.Compare(a.name, b.name)
-	})
-
-	return allPredicates
+	return lo.Values(predicateMap)
 }
 
 func writePredicateDoc(pred predicateEntry, position int, features map[string]*messages.Feature) error {
 	if pred.goFunc != nil {
-		return writeGoPredicateDoc(pred.goFunc, position, features)
+		return writeGoPredicateDoc(pred.goFunc, pred.section, position, features)
 	}
 	if pred.prologDoc != nil {
-		return writePrologPredicateDoc(*pred.prologDoc, position, features)
+		return writePrologPredicateDoc(*pred.prologDoc, pred.section, position, features)
 	}
 	return nil
 }
 
-func writeGoPredicateDoc(f *lang.Func, position int, features map[string]*messages.Feature) error {
+func buildPredicateSections(predicates []predicateEntry) []predicateSection {
+	bySection := make(map[string][]predicateEntry)
+	for _, pred := range predicates {
+		section := pred.section
+		if section == "" {
+			section = stdlibSection
+		}
+		pred.section = section
+		bySection[section] = append(bySection[section], pred)
+	}
+
+	sectionNames := lo.Keys(bySection)
+	slices.SortFunc(sectionNames, comparePredicateSections)
+
+	sections := make([]predicateSection, 0, len(sectionNames))
+	for _, name := range sectionNames {
+		sectionPredicates := bySection[name]
+		slices.SortFunc(sectionPredicates, func(a, b predicateEntry) int {
+			return strings.Compare(a.name, b.name)
+		})
+
+		sections = append(sections, predicateSection{
+			name:       name,
+			label:      predicateSectionLabel(name),
+			predicates: sectionPredicates,
+		})
+	}
+
+	return sections
+}
+
+func writePredicateCategory(section predicateSection, position int) error {
+	content, err := renderPredicateCategory(section.label, position)
+	if err != nil {
+		return err
+	}
+
+	return writeToFile(path.Join(outputPath, section.name, "_category_.json"), content)
+}
+
+func renderPredicateCategory(label string, position int) (string, error) {
+	content, err := json.MarshalIndent(struct {
+		Label    string `json:"label"`
+		Position int    `json:"position"`
+	}{
+		Label:    label,
+		Position: position,
+	}, "", "  ")
+	if err != nil {
+		return "", err
+	}
+
+	return string(content) + "\n", nil
+}
+
+func writeGoPredicateDoc(f *lang.Func, section string, position int, features map[string]*messages.Feature) error {
 	name := predicateFileName(functorName(f))
 
 	globalCtx := make(map[string]any)
@@ -153,17 +221,18 @@ func writeGoPredicateDoc(f *lang.Func, position int, features map[string]*messag
 		return err
 	}
 
-	return writeToFile(fmt.Sprintf("%s/%s.md", outputPath, name), content)
+	return writeToFile(predicateDocPath(section, name), content)
 }
 
 func writePrologPredicateDoc(
 	doc prologPredicateDocumentation,
+	section string,
 	position int,
 	features map[string]*messages.Feature,
 ) error {
 	name := predicateFileName(doc.Predicate)
 	content := renderPrologPredicateMarkdown(doc, position, features[name])
-	return writeToFile(fmt.Sprintf("%s/%s.md", outputPath, name), content)
+	return writeToFile(predicateDocPath(section, name), content)
 }
 
 func loadGoPredicates(wd string) ([]*lang.Func, error) {
@@ -495,6 +564,53 @@ func (s *prologArityState) consumeDepth(char rune) {
 
 func predicateFileName(predicate string) string {
 	return strings.Replace(predicate, "/", "_", 1)
+}
+
+func predicateDocPath(section, name string) string {
+	return path.Join(outputPath, section, name+".md")
+}
+
+func predicateSectionName(doc prologPredicateDocumentation) string {
+	if doc.IsBuiltin {
+		return stdlibSection
+	}
+
+	moduleName := path.Base(doc.ModulePath)
+	section := strings.TrimSuffix(moduleName, path.Ext(moduleName))
+	if section == "" {
+		return stdlibSection
+	}
+
+	return section
+}
+
+func predicateSectionLabel(section string) string {
+	if section == stdlibSection {
+		return "Standard library"
+	}
+
+	return humanizeSectionName(section) + " library"
+}
+
+func comparePredicateSections(a, b string) int {
+	switch {
+	case a == b:
+		return 0
+	case a == stdlibSection:
+		return -1
+	case b == stdlibSection:
+		return 1
+	default:
+		return strings.Compare(a, b)
+	}
+}
+
+func humanizeSectionName(section string) string {
+	if section == "" {
+		return ""
+	}
+
+	return strings.ToUpper(section[:1]) + section[1:]
 }
 
 func renderPrologPredicateMarkdown(

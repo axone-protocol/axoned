@@ -11,6 +11,10 @@ import (
 )
 
 func writeToFile(filePath string, content string) error {
+	if err := os.MkdirAll(filepath.Dir(filePath), 0o755); err != nil {
+		return fmt.Errorf("failed to create directory %s: %w", filepath.Dir(filePath), err)
+	}
+
 	file, err := os.Create(filePath)
 	if err != nil {
 		return fmt.Errorf("failed to create file %s: %w", filePath, err)
