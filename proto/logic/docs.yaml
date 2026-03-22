@@ -1,188 +1,481 @@
 description: |
+  ## Function
 
-  ## 📝 Description
+  The `logic` module lets users execute Prolog queries against the current blockchain state and against reusable Prolog
+  sources, without deploying a smart contract and without mutating chain state.
 
-  This module implements a [Prolog](https://en.wikipedia.org/wiki/Prolog) logic interpreter (go-native) and
-  its [unification](https://en.wikipedia.org/wiki/Unification_(computer_science))
-  algorithm to evaluate logical expressions against the current state of the blockchain.
+  From a user perspective, the module combines four things:
 
-  This distinctive module allows for the creation of advanced, goal-oriented queries and logical systems that can be
-  applied
-  to a wide range of use cases, while still maintaining the determinism and predictability of blockchain technology. It
-  also features a collection of predefined, blockchain-specific predicates that can be used to access information about
-  the state of the blockchain.
+  - the [Axone Prolog VM](https://github.com/axone-protocol/prolog), adapted for deterministic blockchain execution;
+  - a versioned virtual file system (VFS) exposed under `/v1`;
+  - a set of host-provided Prolog libraries mounted in that VFS;
+  - an on-chain registry for immutable user programs that can later be loaded as libraries.
 
-  ## Concepts
+  This page focuses on how to use the module. Predicate-by-predicate documentation is maintained elsewhere.
 
-  ### Program
+  ## What You Can Do With This Module
 
-  A program is a text that is parsed and compiled by the interpreter. A program is composed of a set of predicates, which
-  are defined by the user and can be used to express the desired query logic.
+  In practice, the module is useful when you want to:
 
-  #### Predicate
+  - evaluate a Prolog query against an inline program;
+  - query chain data through Prolog instead of stitching multiple RPC calls together client-side;
+  - reuse built-in Axone libraries such as chain helpers, bank helpers, codec helpers, and WASM query helpers;
+  - publish a Prolog source on-chain once and load it later from other queries with `consult/1`;
+  - compose reusable rule libraries that remain immutable and content-addressed.
 
-  A predicate is a statement that describes a relationship between one or more variables or constants. A predicate
-  consists of a name followed by zero or more arguments.
+  The module is intentionally query-oriented. It is designed to help users express logic, data traversal, and rule-based
+  reasoning in a deterministic environment.
 
-  #### Rule & Fact
+  ## User Model
 
-  A rule is a statement that describes a relationship between one or more variables or constants, similar to a predicate.
-  However, unlike a predicate, a rule also specifies one or more conditions that must be true in order for the
-  relationship described by the rule to hold.
+  The module revolves around two main user actions:
 
-  A rule has the following format:
+  1. `Ask`: execute a query.
+  2. `StoreProgram`: publish a reusable Prolog source on-chain.
 
-  ```prolog
-  head :- body.
-  ```
+  A typical flow is:
 
-  The symbol `:-` is called the "if-then" operator, and it means that the relationship described in the head of the rule
-  holds only if the conditions in the body are true.
+  1. write a small Prolog program or library;
+  2. optionally publish it with `StoreProgram`;
+  3. run `Ask` with an inline program and a query;
+  4. load built-in libraries or previously published programs with `consult/1`.
 
-  For example:
+  ## Programs, Queries, and Execution
 
-  ```prolog
-  grandfather(X,Y) :- father(X,Z), father(Z,Y). # X is the grandfather of Y if X is the father of Z and Z is the father of Y.
-  ```
+  A program is the Prolog source compiled before the query runs. It may contain:
 
-  A fact is a special type of rule that has no body (with no `:-` and no conditions). A fact has the following format:
+  - facts;
+  - rules;
+  - directives such as `:- consult('/v1/lib/chain.pl').`;
+  - helper predicates that structure the final query.
 
-  ```prolog
-  head.
-  ```
+  The query is the goal executed after the program has been loaded.
 
-  For instance:
-
-  ```prolog
-  father(john, mary). # john is the father of mary.
-  ```
-
-  #### Variable
-
-  A variable is a predicate argument that is used as a placeholder for a value. It can represent any type of data, such as
-  numbers, strings, or lists.
-
-  Variables are denoted by a name that starts with an uppercase letter, for example `X` or `Foo`.
-
-  For instance:
-
-  ```prolog
-  father(X, mary). # ask for all X that are the father of mary.
-  ```
-
-  ### Query
-
-  A query is a statement used to retrieve information from the blockchain. It can be sent against a program, but this
-  is optional. The interpreter evaluates the query and returns the result to the caller. Queries can be submitted to a
-  module using the `Ask` message.
-
-  #### `Ask`
-
-  The `Ask` message is used to submit a query to the module. It has the following format:
+  The `Ask` endpoint accepts:
 
   ```text
   {
-    string Program
-    string Query
+    string program
+    string query
+    uint64 limit
   }
   ```
 
-  The `Program` field is optional. If it is not specified, the query is just evaluated against the current state of the
-  blockchain.
-  If it is specified, the query is evaluated against the program that is passed as an argument.
+  Notes:
 
-  For instance:
+  - `program` is optional;
+  - `query` is the goal to solve;
+  - `limit` is the requested number of solutions, capped by the module parameters.
+
+  Example:
 
   ```text
   {
-    Program: "father(john, mary)."
-    Query: "father(X, mary)."
+    program: "parent(john, mary).",
+    query: "parent(X, mary).",
+    limit: 1
   }
   ```
 
-  Gives:
+  The module first compiles `program`, then evaluates `query` in the resulting Prolog environment.
 
-  ```json
-  {
-    "height": "7235",
-    "gas_used": "9085",
-    "answer": {
-      "has_more": false,
-      "variables": [
-        "X"
-      ],
-      "results": [
-        {
-          "substitutions": [
-            {
-              "variable": "X",
-              "expression": "john"
-            }
-          ]
-        }
-      ]
-    }
-  }
-  ```
+  ## Query Semantics
 
-  The logic module supports chain-specific predicates that can be used to query the state of the blockchain. For example,
-  the `chain_id` predicate can be used to retrieve the chain ID of the current blockchain. Several other predicates are
-  available, such as `block_height`, `block_time`... Please refer to the go documentation for the full list of available
-  predicates.
+  `Ask` is a blockchain query, not a transaction:
 
-  For instance:
+  - it has no side effect on chain state;
+  - it does not publish code;
+  - it does not write to the blockchain;
+  - it is still bounded by metering, gas, and module limits.
+
+  This matters because the module can expose rich capabilities through the VFS, but those capabilities are still
+  constrained to deterministic, query-safe operations. For example, smart-contract interaction is exposed as query-only
+  devices, not as transaction submission.
+
+  ## Query Response
+
+  `Ask` returns:
+
+  - `height`: the block height used for evaluation;
+  - `gas_used`: the SDK gas consumed by the evaluation;
+  - `answer`: the logical result set;
+  - `user_output`: text written by the program to the current output stream.
+
+  The `answer` field contains:
+
+  - `variables`: the variables found in the query;
+  - `results`: the returned solutions;
+  - `has_more`: whether more solutions existed beyond the returned slice.
+
+  Each result may contain:
+
+  - `substitutions`: bindings such as `X = john`;
+  - `error`: an error message for that solution when relevant.
+
+  Substitution values are returned as Prolog terms encoded as strings. For example, atoms, lists, compounds, pairs, and
+  dicts are returned in Prolog syntax rather than being remapped into ad hoc JSON structures.
+
+  ## User Output
+
+  The default Prolog output stream is captured by the module and returned in `user_output`.
+
+  This is useful for:
+
+  - debugging a query;
+  - emitting an explanatory text rendering;
+  - producing a human-readable report alongside logical substitutions.
+
+  The output is bounded by `max_user_output_size`. When the limit is reached, the oldest bytes are discarded and only
+  the last bytes are kept.
+
+  ## Virtual File System (VFS)
+
+  A key concept of the module is the VFS exposed to the Prolog VM through `open/4` and `consult/1`.
+
+  Prolog code does not access the node's real file system. It only sees the capabilities explicitly mounted by the
+  host under a canonical namespace rooted at `/v1`.
+
+  This makes the module easier to understand:
+
+  - if a resource is visible through the VFS, Prolog can use it;
+  - if it is not mounted in the VFS, it does not exist from the program's perspective.
+
+  The namespace follows a stable layout:
+
+  - `/v1/lib`: immutable host-provided Prolog libraries;
+  - `/v1/run`: invocation-scoped runtime snapshots;
+  - `/v1/var/lib`: persistent chain-backed data exposed as files;
+  - `/v1/dev`: transactional device-like capabilities.
+
+  In several mounts, the special path segment `@` denotes the canonical aggregate representation of a resource.
+
+  ## `/v1/lib`: Built-In Prolog Libraries
+
+  The module ships with reusable Prolog libraries that can be loaded explicitly with `consult/1`.
+
+  Available libraries include:
+
+  - `/v1/lib/apply.pl`: higher-order helpers such as `maplist/2..7` and `foldl/4..7`;
+  - `/v1/lib/bank.pl`: helpers for account balances;
+  - `/v1/lib/bech32.pl`: Bech32 encode/decode helpers;
+  - `/v1/lib/chain.pl`: helpers exposing header and Comet block information;
+  - `/v1/lib/crypto.pl`: small crypto-adjacent helpers such as hexadecimal conversions;
+  - `/v1/lib/dev.pl`: low-level helpers for transactional VFS devices;
+  - `/v1/lib/error.pl`: error and type-checking helpers;
+  - `/v1/lib/lists.pl`: list processing helpers;
+  - `/v1/lib/type.pl`: type predicates used by the other libraries;
+  - `/v1/lib/wasm.pl`: helpers for CosmWasm smart queries.
+
+  Example:
 
   ```prolog
-  chain_id(X). # ask for the chain ID.
+  :- consult('/v1/lib/chain.pl').
+
+  current_chain(ChainID) :-
+    header_info(Header),
+    ChainID = Header.chain_id.
   ```
 
-  #### Response
+  These libraries are regular Prolog sources. They are not magical special forms: users load them explicitly and can
+  combine them with their own predicates.
 
-  The response is an object that contains the following fields:
+  ## `/v1/run`: Runtime Snapshots
 
-  - `height`: the height of the block at which the query was evaluated.
-  - `gas_used`: the amount of gas used to evaluate the query.
-  - `answer`: the result of the query. It is an object that contains the following fields:
-    - `has_more`: a boolean that indicates whether there are more results to be retrieved. It's just informative since no
-      more results can be retrieved.
-    - `variables`: an array of strings that contains the names of the variables that were used in the query.
-    - `results`: an array of objects that contains the solutions of the query. Each result is an object that contains the
-      following fields:
-      - `error`: an optional string that contains an error message if the query failed for the current solution.
-      - `substitutions`: an array of objects that contains the substitutions that were made to satisfy the query. A
-        substitution is a set of variable-value pairs that is used to replace variables with constants. A substitution
-        is the result of unification. A substitution is used to replace variables with constants when evaluating a rule.
+  `/v1/run` exposes information tied to the current query execution context.
 
-  ## Performance
+  The standard mounts are:
 
-  The performance of the logic module is closely tied to the complexity of the query and the size of the program. To
-  optimize performance, especially in a constrained environment like the blockchain, it is important to minimize the size of the
-  program.
-  Keep in mind that he module uses [backtracking](https://en.wikipedia.org/wiki/Backtracking) to search for solutions,
-  making it most effective when used for queries that are satisfiable. Indeed, if the query is not satisfiable, the module will
-  attempt to find a solution by [backtracking](https://en.wikipedia.org/wiki/Backtracking) and searching through possible
-  solutions for an extended period before ultimately being canceled.
+  - `/v1/run/header`
+  - `/v1/run/comet`
 
-  ## Gas
+  Examples of readable paths include:
 
-  The `Ask` message incurs gas consumption, which is calculated as the sum of the gas used to evaluate each predicate during
-  the query evaluation process. Each predicate has a fixed gas cost that is based on its complexity.
+  - `/v1/run/header/@`
+  - `/v1/run/header/height`
+  - `/v1/run/header/hash`
+  - `/v1/run/header/time`
+  - `/v1/run/header/chain_id`
+  - `/v1/run/header/app_hash`
+  - `/v1/run/comet/@`
+  - `/v1/run/comet/validators_hash`
+  - `/v1/run/comet/proposer_address`
+  - `/v1/run/comet/evidence`
+  - `/v1/run/comet/last_commit`
 
-  While querying the module does not require any fees, the use of gas serves as a mechanism to limit the size and
-  complexity of the query, ensuring optimal performance and fairness.
+  These files are read-only snapshots. They are intended for logical inspection, not mutation.
 
-  ## Security
+  Example:
 
-  The logic module is a deterministic program that is executed in a sandboxed environment and does not have the ability
-  to submit transactions or make changes to the blockchain's state. It is therefore safe to use.
+  ```prolog
+  :- consult('/v1/lib/chain.pl').
 
-  To control the cpu and memory usage of the module, the module is limited by several different mechanisms:
+  block_height(Height) :-
+    header_info(Header),
+    Height = Header.height.
+  ```
 
-  - `max_size`: the maximum size of the program that can be evaluated.
-  - `max_result_count`: the maximum number of results that can be returned by a query.
+  ## `/v1/var/lib`: Persistent Chain-Backed Data
 
-  The existing `query-gas-limit` configuration present in the `app.toml` can be used to constraint gas usage when not used
-  in the context of a transaction.
+  `/v1/var/lib` exposes data backed by blockchain state, still through file-like paths.
 
-  Additional limitations are being considered for the future, such as restricting the number of variables that can be
-  utilized within a query, or limiting the depth of the backtracking algorithm.
+  The standard mounts currently include:
+
+  - `/v1/var/lib/bank`
+  - `/v1/var/lib/logic/users`
+
+  ### Bank Data
+
+  Bank balances are exposed under paths such as:
+
+  - `/v1/var/lib/bank/<address>/balances/@`
+  - `/v1/var/lib/bank/<address>/spendable/@`
+  - `/v1/var/lib/bank/<address>/locked/@`
+
+  The `bank.pl` library wraps those paths into higher-level predicates:
+
+  - `bank_balances/2`
+  - `bank_spendable_balances/2`
+  - `bank_locked_balances/2`
+
+  Example:
+
+  ```prolog
+  :- consult('/v1/lib/bank.pl').
+
+  rich_account(Address) :-
+    bank_spendable_balances(Address, Balances),
+    member(uaxone-Amount, Balances),
+    Amount > 1000000.
+  ```
+
+  ### Published User Programs
+
+  User-published programs are exposed under:
+
+  ```text
+  /v1/var/lib/logic/users/<publisher>/programs/<program_id>.pl
+  ```
+
+  This is the bridge between on-chain publication and program reuse inside `Ask`.
+
+  A stored source can therefore be loaded like any other Prolog file:
+
+  ```prolog
+  :- consult('/v1/var/lib/logic/users/axone1.../programs/<program_id>.pl').
+  ```
+
+  ## `/v1/dev`: Transactional Devices
+
+  `/v1/dev` exposes interactive capabilities through file-like request/response devices.
+
+  This is where the Axone Prolog VM extension for `read_write` streams becomes important. In Axone, `open/4` can open a
+  resource in `read_write` mode, which allows half-duplex transactional I/O:
+
+  1. write a request;
+  2. trigger the device on first read;
+  3. read back the response.
+
+  This pattern is used for deterministic host capabilities that are easier to model as devices than as plain predicates.
+
+  Standard device mounts include:
+
+  - `/v1/dev/codec/<codec>`
+  - `/v1/dev/wasm/<contract_address>/query`
+
+  In most cases, users should prefer the provided helper libraries rather than interact with devices directly.
+
+  ### Codec Devices
+
+  Codec devices are mounted under `/v1/dev/codec`. For example, the Bech32 helper library delegates encoding and
+  decoding to the `bech32` codec device.
+
+  Users typically do not open those devices themselves. Instead they use predicates such as:
+
+  - `bech32_address/2`
+  - `hex_bytes/2`
+
+  ### WASM Query Devices
+
+  CosmWasm smart queries are exposed through:
+
+  ```text
+  /v1/dev/wasm/<contract_address>/query
+  ```
+
+  The recommended user-facing helper is `wasm_query/3` from `/v1/lib/wasm.pl`.
+
+  Example:
+
+  ```prolog
+  :- consult('/v1/lib/wasm.pl').
+
+  contract_query(Address, RequestBytes, ResponseBytes) :-
+    wasm_query(Address, RequestBytes, ResponseBytes).
+  ```
+
+  The device is query-only. It lets users ask a contract for data, not execute transactions.
+
+  ## `consult/1` and Reuse
+
+  `consult/1` is the main mechanism for composing logic from multiple sources.
+
+  Users can consult:
+
+  - built-in libraries from `/v1/lib`;
+  - chain-backed published programs from `/v1/var/lib/logic/users/...`;
+  - lists of files, just as in regular Prolog.
+
+  This is the idiomatic way to build reusable logic on top of the module. In other words, `StoreProgram` does not create
+  a new query endpoint by itself; it publishes a source file that later queries can load with `consult/1`.
+
+  ## Publishing Programs With `StoreProgram`
+
+  `StoreProgram` is the transaction endpoint of the module.
+
+  It validates a Prolog source and stores it as an immutable program artifact.
+
+  The important properties are:
+
+  - the identifier is content-addressed: `program_id = sha256(source)`;
+  - the same source always yields the same `program_id`;
+  - the artifact is immutable;
+  - publication is recorded per publisher address;
+  - the endpoint is idempotent for repeated publication of the same source.
+
+  This means two different publishers may publish the same source:
+
+  - the artifact is shared by content;
+  - each publisher still gets their own publication path in `/v1/var/lib/logic/users/<publisher>/programs/...`.
+
+  The response contains:
+
+  - `program_id`: the SHA-256 digest of the source, encoded as lowercase hexadecimal.
+
+  ## Program Lifecycle
+
+  From a user perspective, a stored program behaves like an immutable published library:
+
+  1. write the source;
+  2. publish it with `StoreProgram`;
+  3. keep the returned `program_id`;
+  4. load it later through its VFS path;
+  5. compose it with inline logic inside `Ask`.
+
+  Example usage pattern:
+
+  ```prolog
+  :- consult('/v1/lib/bank.pl').
+  :- consult('/v1/var/lib/logic/users/axone1.../programs/<program_id>.pl').
+
+  eligible(Address) :-
+    shared_rule(Address),
+    bank_spendable_balances(Address, Balances),
+    member(uaxone-Amount, Balances),
+    Amount >= 500000.
+  ```
+
+  If the source changes, the hash changes too. Updating a library therefore means publishing a new source, which yields a
+  new immutable `program_id`.
+
+  ## Discovering Published Programs
+
+  The module exposes query endpoints to inspect published artifacts:
+
+  - `Program`: fetch metadata for a `program_id`;
+  - `ProgramSource`: fetch the original source for a `program_id`;
+  - `Programs`: list stored programs;
+  - `ProgramsByPublisher`: list the programs published by a given address.
+
+  The metadata includes:
+
+  - `program_id`;
+  - `created_at`;
+  - `source_size`;
+
+  Publisher-scoped results also include publication metadata such as `published_at`.
+
+  ## Execution Limits
+
+  The module is intentionally constrained. The main parameters users should understand are:
+
+  - `max_size`: maximum accepted size, in bytes, for the user-supplied program and query in `Ask`; it also bounds source
+    size when publishing a new program;
+  - `max_result_count`: maximum number of solutions that can be requested;
+  - `max_user_output_size`: maximum number of bytes retained in `user_output`;
+  - `max_variables`: maximum number of variables the interpreter may allocate.
+
+  Those limits exist because Prolog evaluation may involve recursion, unification, backtracking, file I/O through the
+  VFS, and device interactions. Users should expect the module to reject overly large or overly expensive evaluations.
+
+  ## Gas and Metering
+
+  Even though `Ask` is a query, execution is still metered.
+
+  The gas policy translates VM activity into SDK gas with separate coefficients for:
+
+  - compute;
+  - memory;
+  - unification;
+  - I/O.
+
+  In practice, gas usage grows with:
+
+  - the size of the supplied program and query;
+  - the amount of backtracking required;
+  - the number and size of terms being unified or copied;
+  - VFS and device I/O.
+
+  Users should therefore:
+
+  - keep programs focused;
+  - bind variables early when possible;
+  - request only the number of solutions they need;
+  - avoid broad search spaces when a more selective query can be written.
+
+  ## Determinism and Safety
+
+  The module is built on top of the Axone Prolog VM, which is adapted for blockchain use. From a user standpoint, the
+  important consequences are:
+
+  - execution is deterministic;
+  - resource consumption is metered;
+  - variable allocation can be capped;
+  - the visible environment is restricted to the mounted VFS;
+  - there is no arbitrary operating-system file access;
+  - there is no ability to submit transactions or mutate chain state from Prolog.
+
+  This is what makes the module suitable for chain queries while still supporting rich logic, reusable libraries, and
+  controlled access to chain capabilities.
+
+  ## When To Use Inline Programs vs Stored Programs
+
+  Use an inline program when:
+
+  - the logic is short-lived;
+  - the query is one-off;
+  - you do not need reuse by other users or clients.
+
+  Use `StoreProgram` when:
+
+  - the source should be reused across many queries;
+  - the source should be referenced as a library through `consult/1`;
+  - you want an immutable, content-addressed artifact;
+  - you want other users or applications to rely on the exact same source.
+
+  ## Summary
+
+  The `logic` module should be understood as a user-facing Prolog query engine for blockchain data, backed by:
+
+  - a deterministic Axone Prolog VM;
+  - a capability-oriented VFS;
+  - built-in Prolog libraries;
+  - query-only devices for advanced integrations;
+  - immutable, on-chain published user programs that can be reused as libraries.
+
+  If you want to understand how to use the module, the central ideas are simple:
+
+  - write Prolog;
+  - load libraries with `consult/1`;
+  - inspect chain capabilities through `/v1`;
+  - publish reusable sources with `StoreProgram`;
+  - execute logic with `Ask`.
