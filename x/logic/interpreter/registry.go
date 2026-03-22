@@ -101,7 +101,6 @@ var registry = orderedmap.New[string, any](
 		{Key: "nth1/3", Value: predicate.Nth1},
 		{Key: "call_nth/2", Value: predicate.CallNth},
 		{Key: "./3", Value: predicate.Op3},
-		{Key: "did_components/2", Value: predicate.DIDComponents},
 		{Key: "crypto_data_hash/3", Value: predicate.CryptoDataHash},
 		{Key: "source_file/1", Value: predicate.SourceFile},
 		{Key: "json_prolog/2", Value: predicate.JSONProlog},
