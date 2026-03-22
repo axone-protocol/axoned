@@ -69,7 +69,7 @@ did_components(
 
 ```  yaml
 height: 42
-gas_used: 11918
+gas_used: 11932
 answer:
   has_more: false
   variables: ["Method", "MethodSpecificId", "Path", "Query", "Fragment"]
@@ -105,7 +105,7 @@ did_components(DID, did(example, '123456', '/foo/bar', 'versionId=1', test)).
 
 ```  yaml
 height: 42
-gas_used: 10800
+gas_used: 10814
 answer:
   has_more: false
   variables: ["DID"]
@@ -133,7 +133,7 @@ did_components(foo, Parsed).
 
 ```  yaml
 height: 42
-gas_used: 4301
+gas_used: 4315
 answer:
   has_more: false
   variables: ["Parsed"]
@@ -159,7 +159,7 @@ did_components(DID, did(example, '123456', 'path with/space', _, _)).
 
 ```  yaml
 height: 42
-gas_used: 6377
+gas_used: 6391
 answer:
   has_more: false
   variables: ["DID"]
