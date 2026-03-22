@@ -127,6 +127,7 @@ Feature: did_components/2
             expression: "ok"
       """
 
+  @great_for_documentation
   Scenario: Error on invalid DID encoding
     This scenario demonstrates the error returned when the DID text does not comply with DID Core syntax.
 
@@ -147,6 +148,7 @@ Feature: did_components/2
         - error: "error(domain_error(encoding(did),foo),did_components/2)"
       """
 
+  @great_for_documentation
   Scenario: Error on invalid raw path when reconstructing
     This scenario demonstrates the error returned when a parsed DID term contains a path that is not encoded according to the selected raw representation.
 

@@ -6,11 +6,16 @@
 %! did_components(+DID:atom, -Parsed) is det.
 %
 % Also supports the reverse mode:
+%
+% ```prolog
 % did_components(-DID:atom, +Parsed) is det.
+% ```
 %
 % Parse or reconstruct a DID / DID URL compliant with W3C DID Core.
 %
+% ```prolog
 % Parsed = did(Method, MethodSpecificId, Path, Query, Fragment)
+% ```
 %
 % where:
 % - Method is an atom.
