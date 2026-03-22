@@ -1,6 +1,6 @@
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
-# Protobuf Documentation
+# Logic Module
 
 <a name="top"></a>
 
@@ -485,61 +485,16 @@ If you want to understand how to use the module, the central ideas are simple:
 - publish reusable sources with `StoreProgram`;
 - execute logic with `Ask`.
 
-## Table of Contents
-
-- [logic/v1beta3/params.proto](#logic/v1beta3/params.proto)
-  - [GasPolicy](#logic.v1beta3.GasPolicy)
-  - [Limits](#logic.v1beta3.Limits)
-  - [Params](#logic.v1beta3.Params)
-  
-- [logic/v1beta3/types.proto](#logic/v1beta3/types.proto)
-  - [Answer](#logic.v1beta3.Answer)
-  - [ProgramMetadata](#logic.v1beta3.ProgramMetadata)
-  - [ProgramPublication](#logic.v1beta3.ProgramPublication)
-  - [Result](#logic.v1beta3.Result)
-  - [StoredProgram](#logic.v1beta3.StoredProgram)
-  - [Substitution](#logic.v1beta3.Substitution)
-  
-- [logic/v1beta3/genesis.proto](#logic/v1beta3/genesis.proto)
-  - [GenesisProgramPublication](#logic.v1beta3.GenesisProgramPublication)
-  - [GenesisState](#logic.v1beta3.GenesisState)
-  - [GenesisStoredProgram](#logic.v1beta3.GenesisStoredProgram)
-  
-- [logic/v1beta3/query.proto](#logic/v1beta3/query.proto)
-  - [PublishedProgram](#logic.v1beta3.PublishedProgram)
-  - [QueryAskRequest](#logic.v1beta3.QueryAskRequest)
-  - [QueryAskResponse](#logic.v1beta3.QueryAskResponse)
-  - [QueryParamsRequest](#logic.v1beta3.QueryParamsRequest)
-  - [QueryParamsResponse](#logic.v1beta3.QueryParamsResponse)
-  - [QueryProgramRequest](#logic.v1beta3.QueryProgramRequest)
-  - [QueryProgramResponse](#logic.v1beta3.QueryProgramResponse)
-  - [QueryProgramSourceRequest](#logic.v1beta3.QueryProgramSourceRequest)
-  - [QueryProgramSourceResponse](#logic.v1beta3.QueryProgramSourceResponse)
-  - [QueryProgramsByPublisherRequest](#logic.v1beta3.QueryProgramsByPublisherRequest)
-  - [QueryProgramsByPublisherResponse](#logic.v1beta3.QueryProgramsByPublisherResponse)
-  - [QueryProgramsRequest](#logic.v1beta3.QueryProgramsRequest)
-  - [QueryProgramsResponse](#logic.v1beta3.QueryProgramsResponse)
-  
-  - [QueryService](#logic.v1beta3.QueryService)
-  
-- [logic/v1beta3/tx.proto](#logic/v1beta3/tx.proto)
-  - [MsgStoreProgram](#logic.v1beta3.MsgStoreProgram)
-  - [MsgStoreProgramResponse](#logic.v1beta3.MsgStoreProgramResponse)
-  - [MsgUpdateParams](#logic.v1beta3.MsgUpdateParams)
-  - [MsgUpdateParamsResponse](#logic.v1beta3.MsgUpdateParamsResponse)
-  
-  - [MsgService](#logic.v1beta3.MsgService)
-  
-- [Scalar Value Types](#scalar-value-types)
+## API
 
 <a name="logic/v1beta3/params.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta3/params.proto
+### logic/v1beta3/params.proto
 
 <a name="logic.v1beta3.GasPolicy"></a>
 
-### GasPolicy
+#### GasPolicy
 
 GasPolicy defines the coefficients used to translate VM metering units into SDK gas.
 
@@ -552,7 +507,7 @@ GasPolicy defines the coefficients used to translate VM metering units into SDK 
 
 <a name="logic.v1beta3.Limits"></a>
 
-### Limits
+#### Limits
 
 Limits defines the limits of the logic module.
 
@@ -565,7 +520,7 @@ Limits defines the limits of the logic module.
 
 <a name="logic.v1beta3.Params"></a>
 
-### Params
+#### Params
 
 Params defines all the configuration parameters of the "logic" module.
 
@@ -585,11 +540,11 @@ Params defines all the configuration parameters of the "logic" module.
 <a name="logic/v1beta3/types.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta3/types.proto
+### logic/v1beta3/types.proto
 
 <a name="logic.v1beta3.Answer"></a>
 
-### Answer
+#### Answer
 
 Answer represents the answer to a logic query.
 
@@ -601,7 +556,7 @@ Answer represents the answer to a logic query.
 
 <a name="logic.v1beta3.ProgramMetadata"></a>
 
-### ProgramMetadata
+#### ProgramMetadata
 
 ProgramMetadata represents the metadata of a stored program.
 
@@ -613,7 +568,7 @@ ProgramMetadata represents the metadata of a stored program.
 
 <a name="logic.v1beta3.ProgramPublication"></a>
 
-### ProgramPublication
+#### ProgramPublication
 
 ProgramPublication represents the publication metadata of a program by a publisher.
 
@@ -623,7 +578,7 @@ ProgramPublication represents the publication metadata of a program by a publish
 
 <a name="logic.v1beta3.Result"></a>
 
-### Result
+#### Result
 
 Result represents the result of a query.
 
@@ -634,7 +589,7 @@ Result represents the result of a query.
 
 <a name="logic.v1beta3.StoredProgram"></a>
 
-### StoredProgram
+#### StoredProgram
 
 StoredProgram represents a program source with its storage metadata.
 
@@ -646,7 +601,7 @@ StoredProgram represents a program source with its storage metadata.
 
 <a name="logic.v1beta3.Substitution"></a>
 
-### Substitution
+#### Substitution
 
 Substitution represents a substitution made to the variables in the query to obtain the answer.
 
@@ -666,11 +621,11 @@ Substitution represents a substitution made to the variables in the query to obt
 <a name="logic/v1beta3/genesis.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta3/genesis.proto
+### logic/v1beta3/genesis.proto
 
 <a name="logic.v1beta3.GenesisProgramPublication"></a>
 
-### GenesisProgramPublication
+#### GenesisProgramPublication
 
 GenesisProgramPublication associates a publisher and program_id with publication metadata.
 
@@ -682,7 +637,7 @@ GenesisProgramPublication associates a publisher and program_id with publication
 
 <a name="logic.v1beta3.GenesisState"></a>
 
-### GenesisState
+#### GenesisState
 
 GenesisState defines the logic module's genesis state.
 
@@ -694,7 +649,7 @@ GenesisState defines the logic module's genesis state.
 
 <a name="logic.v1beta3.GenesisStoredProgram"></a>
 
-### GenesisStoredProgram
+#### GenesisStoredProgram
 
 GenesisStoredProgram associates a program_id with its canonical stored artifact.
 
@@ -714,11 +669,11 @@ GenesisStoredProgram associates a program_id with its canonical stored artifact.
 <a name="logic/v1beta3/query.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta3/query.proto
+### logic/v1beta3/query.proto
 
 <a name="logic.v1beta3.PublishedProgram"></a>
 
-### PublishedProgram
+#### PublishedProgram
 
 PublishedProgram represents a publisher-scoped program view.
 
@@ -729,7 +684,7 @@ PublishedProgram represents a publisher-scoped program view.
 
 <a name="logic.v1beta3.QueryAskRequest"></a>
 
-### QueryAskRequest
+#### QueryAskRequest
 
 QueryAskRequest is request type for the QueryService/Ask RPC method.
 
@@ -741,7 +696,7 @@ QueryAskRequest is request type for the QueryService/Ask RPC method.
 
 <a name="logic.v1beta3.QueryAskResponse"></a>
 
-### QueryAskResponse
+#### QueryAskResponse
 
 QueryAskResponse is response type for the QueryService/Ask RPC method.
 
@@ -754,13 +709,13 @@ QueryAskResponse is response type for the QueryService/Ask RPC method.
 
 <a name="logic.v1beta3.QueryParamsRequest"></a>
 
-### QueryParamsRequest
+#### QueryParamsRequest
 
 QueryParamsRequest is request type for the QueryService/Params RPC method.
 
 <a name="logic.v1beta3.QueryParamsResponse"></a>
 
-### QueryParamsResponse
+#### QueryParamsResponse
 
 QueryParamsResponse is response type for the QueryService/Params RPC method.
 
@@ -770,7 +725,7 @@ QueryParamsResponse is response type for the QueryService/Params RPC method.
 
 <a name="logic.v1beta3.QueryProgramRequest"></a>
 
-### QueryProgramRequest
+#### QueryProgramRequest
 
 QueryProgramRequest is request type for the QueryService/Program RPC method.
 
@@ -780,7 +735,7 @@ QueryProgramRequest is request type for the QueryService/Program RPC method.
 
 <a name="logic.v1beta3.QueryProgramResponse"></a>
 
-### QueryProgramResponse
+#### QueryProgramResponse
 
 QueryProgramResponse is response type for the QueryService/Program RPC method.
 
@@ -790,7 +745,7 @@ QueryProgramResponse is response type for the QueryService/Program RPC method.
 
 <a name="logic.v1beta3.QueryProgramSourceRequest"></a>
 
-### QueryProgramSourceRequest
+#### QueryProgramSourceRequest
 
 QueryProgramSourceRequest is request type for the QueryService/ProgramSource RPC method.
 
@@ -800,7 +755,7 @@ QueryProgramSourceRequest is request type for the QueryService/ProgramSource RPC
 
 <a name="logic.v1beta3.QueryProgramSourceResponse"></a>
 
-### QueryProgramSourceResponse
+#### QueryProgramSourceResponse
 
 QueryProgramSourceResponse is response type for the QueryService/ProgramSource RPC method.
 
@@ -810,7 +765,7 @@ QueryProgramSourceResponse is response type for the QueryService/ProgramSource R
 
 <a name="logic.v1beta3.QueryProgramsByPublisherRequest"></a>
 
-### QueryProgramsByPublisherRequest
+#### QueryProgramsByPublisherRequest
 
 QueryProgramsByPublisherRequest is request type for the QueryService/ProgramsByPublisher RPC method.
 
@@ -821,7 +776,7 @@ QueryProgramsByPublisherRequest is request type for the QueryService/ProgramsByP
 
 <a name="logic.v1beta3.QueryProgramsByPublisherResponse"></a>
 
-### QueryProgramsByPublisherResponse
+#### QueryProgramsByPublisherResponse
 
 QueryProgramsByPublisherResponse is response type for the QueryService/ProgramsByPublisher RPC method.
 
@@ -832,7 +787,7 @@ QueryProgramsByPublisherResponse is response type for the QueryService/ProgramsB
 
 <a name="logic.v1beta3.QueryProgramsRequest"></a>
 
-### QueryProgramsRequest
+#### QueryProgramsRequest
 
 QueryProgramsRequest is request type for the QueryService/Programs RPC method.
 
@@ -842,7 +797,7 @@ QueryProgramsRequest is request type for the QueryService/Programs RPC method.
 
 <a name="logic.v1beta3.QueryProgramsResponse"></a>
 
-### QueryProgramsResponse
+#### QueryProgramsResponse
 
 QueryProgramsResponse is response type for the QueryService/Programs RPC method.
 
@@ -859,7 +814,7 @@ QueryProgramsResponse is response type for the QueryService/Programs RPC method.
 
 <a name="logic.v1beta3.QueryService"></a>
 
-### QueryService
+#### QueryService
 
 QueryService defines the gRPC querier service.
 
@@ -877,11 +832,11 @@ QueryService defines the gRPC querier service.
 <a name="logic/v1beta3/tx.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## logic/v1beta3/tx.proto
+### logic/v1beta3/tx.proto
 
 <a name="logic.v1beta3.MsgStoreProgram"></a>
 
-### MsgStoreProgram
+#### MsgStoreProgram
 
 MsgStoreProgram defines a Msg for storing a Prolog program source as a user library.
 
@@ -892,7 +847,7 @@ MsgStoreProgram defines a Msg for storing a Prolog program source as a user libr
 
 <a name="logic.v1beta3.MsgStoreProgramResponse"></a>
 
-### MsgStoreProgramResponse
+#### MsgStoreProgramResponse
 
 MsgStoreProgramResponse defines the response for executing a MsgStoreProgram.
 
@@ -902,7 +857,7 @@ MsgStoreProgramResponse defines the response for executing a MsgStoreProgram.
 
 <a name="logic.v1beta3.MsgUpdateParams"></a>
 
-### MsgUpdateParams
+#### MsgUpdateParams
 
 MsgUpdateParams defines a Msg for updating the x/logic module parameters.
 
@@ -913,7 +868,7 @@ MsgUpdateParams defines a Msg for updating the x/logic module parameters.
 
 <a name="logic.v1beta3.MsgUpdateParamsResponse"></a>
 
-### MsgUpdateParamsResponse
+#### MsgUpdateParamsResponse
 
 MsgUpdateParamsResponse defines the response structure for executing a
 MsgUpdateParams message.
@@ -926,7 +881,7 @@ MsgUpdateParams message.
 
 <a name="logic.v1beta3.MsgService"></a>
 
-### MsgService
+#### MsgService
 
 MsgService defines the transaction service for the logic module.
 
@@ -937,7 +892,7 @@ MsgService defines the transaction service for the logic module.
 
  [//]: # (end services)
 
-## Scalar Value Types
+### Scalar Value Types
 
 | .proto Type | Notes | C++ | Java | Python | Go | C# | PHP | Ruby |
 | ----------- | ----- | --- | ---- | ------ | -- | -- | --- | ---- |

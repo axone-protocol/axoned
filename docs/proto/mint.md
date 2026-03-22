@@ -1,6 +1,6 @@
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
-# Protobuf Documentation
+# Mint Module
 
 <a name="top"></a>
 
@@ -20,41 +20,16 @@ The method for determining the inflation rate is outlined in the
 Given the annual inflation rate, the Minting Module calculates the exact amount of tokens to be generated for each
 block, based on the total number of blocks in a year.
 
-## Table of Contents
-
-- [mint/v1beta1/mint.proto](#mint/v1beta1/mint.proto)
-  - [Minter](#mint.v1beta1.Minter)
-  - [Params](#mint.v1beta1.Params)
-  
-- [mint/v1beta1/genesis.proto](#mint/v1beta1/genesis.proto)
-  - [GenesisState](#mint.v1beta1.GenesisState)
-  
-- [mint/v1beta1/query.proto](#mint/v1beta1/query.proto)
-  - [QueryAnnualProvisionsRequest](#mint.v1beta1.QueryAnnualProvisionsRequest)
-  - [QueryAnnualProvisionsResponse](#mint.v1beta1.QueryAnnualProvisionsResponse)
-  - [QueryInflationRequest](#mint.v1beta1.QueryInflationRequest)
-  - [QueryInflationResponse](#mint.v1beta1.QueryInflationResponse)
-  - [QueryParamsRequest](#mint.v1beta1.QueryParamsRequest)
-  - [QueryParamsResponse](#mint.v1beta1.QueryParamsResponse)
-  
-  - [Query](#mint.v1beta1.Query)
-  
-- [mint/v1beta1/tx.proto](#mint/v1beta1/tx.proto)
-  - [MsgUpdateParams](#mint.v1beta1.MsgUpdateParams)
-  - [MsgUpdateParamsResponse](#mint.v1beta1.MsgUpdateParamsResponse)
-  
-  - [Msg](#mint.v1beta1.Msg)
-  
-- [Scalar Value Types](#scalar-value-types)
+## API
 
 <a name="mint/v1beta1/mint.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## mint/v1beta1/mint.proto
+### mint/v1beta1/mint.proto
 
 <a name="mint.v1beta1.Minter"></a>
 
-### Minter
+#### Minter
 
 Minter holds the state of minting within the blockchain.
 
@@ -65,7 +40,7 @@ Minter holds the state of minting within the blockchain.
 
 <a name="mint.v1beta1.Params"></a>
 
-### Params
+#### Params
 
 Params defines the parameters for the mint module.
 
@@ -88,11 +63,11 @@ Params defines the parameters for the mint module.
 <a name="mint/v1beta1/genesis.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## mint/v1beta1/genesis.proto
+### mint/v1beta1/genesis.proto
 
 <a name="mint.v1beta1.GenesisState"></a>
 
-### GenesisState
+#### GenesisState
 
 GenesisState defines the mint module's genesis state.
 
@@ -112,18 +87,18 @@ GenesisState defines the mint module's genesis state.
 <a name="mint/v1beta1/query.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## mint/v1beta1/query.proto
+### mint/v1beta1/query.proto
 
 <a name="mint.v1beta1.QueryAnnualProvisionsRequest"></a>
 
-### QueryAnnualProvisionsRequest
+#### QueryAnnualProvisionsRequest
 
 QueryAnnualProvisionsRequest is the request type for the
 Query/AnnualProvisions RPC method.
 
 <a name="mint.v1beta1.QueryAnnualProvisionsResponse"></a>
 
-### QueryAnnualProvisionsResponse
+#### QueryAnnualProvisionsResponse
 
 QueryAnnualProvisionsResponse is the response type for the
 Query/AnnualProvisions RPC method.
@@ -134,13 +109,13 @@ Query/AnnualProvisions RPC method.
 
 <a name="mint.v1beta1.QueryInflationRequest"></a>
 
-### QueryInflationRequest
+#### QueryInflationRequest
 
 QueryInflationRequest is the request type for the Query/Inflation RPC method.
 
 <a name="mint.v1beta1.QueryInflationResponse"></a>
 
-### QueryInflationResponse
+#### QueryInflationResponse
 
 QueryInflationResponse is the response type for the Query/Inflation RPC
 method.
@@ -151,13 +126,13 @@ method.
 
 <a name="mint.v1beta1.QueryParamsRequest"></a>
 
-### QueryParamsRequest
+#### QueryParamsRequest
 
 QueryParamsRequest is the request type for the Query/Params RPC method.
 
 <a name="mint.v1beta1.QueryParamsResponse"></a>
 
-### QueryParamsResponse
+#### QueryParamsResponse
 
 QueryParamsResponse is the response type for the Query/Params RPC method.
 
@@ -173,7 +148,7 @@ QueryParamsResponse is the response type for the Query/Params RPC method.
 
 <a name="mint.v1beta1.Query"></a>
 
-### Query
+#### Query
 
 Query provides defines the gRPC querier service.
 
@@ -188,11 +163,11 @@ Query provides defines the gRPC querier service.
 <a name="mint/v1beta1/tx.proto"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## mint/v1beta1/tx.proto
+### mint/v1beta1/tx.proto
 
 <a name="mint.v1beta1.MsgUpdateParams"></a>
 
-### MsgUpdateParams
+#### MsgUpdateParams
 
 MsgUpdateParams is the Msg/UpdateParams request type.
 
@@ -207,7 +182,7 @@ NOTE: All parameters must be supplied. |
 
 <a name="mint.v1beta1.MsgUpdateParamsResponse"></a>
 
-### MsgUpdateParamsResponse
+#### MsgUpdateParamsResponse
 
 MsgUpdateParamsResponse defines the response structure for executing a
 MsgUpdateParams message.
@@ -222,7 +197,7 @@ Since: cosmos-sdk 0.47
 
 <a name="mint.v1beta1.Msg"></a>
 
-### Msg
+#### Msg
 
 Msg defines the x/mint Msg service.
 
@@ -234,7 +209,7 @@ Since: cosmos-sdk 0.47 |   |   |
 
  [//]: # (end services)
 
-## Scalar Value Types
+### Scalar Value Types
 
 | .proto Type | Notes | C++ | Java | Python | Go | C# | PHP | Ruby |
 | ----------- | ----- | --- | ---- | ------ | -- | -- | --- | ---- |
