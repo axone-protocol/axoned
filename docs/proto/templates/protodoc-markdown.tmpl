@@ -1,43 +1,23 @@
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
-# Protobuf Documentation
+# {{ `{{ if (datasource "docs").title }}{{ (datasource "docs").title }}{{ else }}Protobuf Documentation{{ end }}` }}
 <a name="top"></a>
 
 {{ `{{ if (datasource "docs").description }}{{ (datasource "docs").description }}{{ end }}` }}
 
-## Table of Contents
-{{range .Files}}
-{{$file_name := .Name}}- [{{.Name}}](#{{.Name}})
-  {{- if .Messages }}
-  {{range .Messages}}  - [{{.LongName}}](#{{.FullName}})
-  {{end}}
-  {{- end -}}
-  {{- if .Enums }}
-  {{range .Enums}}  - [{{.LongName}}](#{{.FullName}})
-  {{end}}
-  {{- end -}}
-  {{- if .Extensions }}
-  {{range .Extensions}}  - [File-level Extensions](#{{$file_name}}-extensions)
-  {{end}}
-  {{- end -}}
-  {{- if .Services }}
-  {{range .Services}}  - [{{.Name}}](#{{.FullName}})
-  {{end}}
-  {{- end -}}
-{{end}}
-- [Scalar Value Types](#scalar-value-types)
+## API
 
 {{range .Files}}
 {{$file_name := .Name}}
 <a name="{{.Name}}"></a>
 <p align="right"><a href="#top">Top</a></p>
 
-## {{.Name}}
+### {{.Name}}
 {{.Description}}
 
 {{range .Messages}}
 <a name="{{.FullName}}"></a>
 
-### {{.LongName}}
+#### {{.LongName}}
 {{.Description}}
 
 {{if .HasFields}}
@@ -61,7 +41,7 @@
 {{range .Enums}}
 <a name="{{.FullName}}"></a>
 
-### {{.LongName}}
+#### {{.LongName}}
 {{.Description}}
 
 | Name | Number | Description |
@@ -75,7 +55,7 @@
 {{if .HasExtensions}}
 <a name="{{$file_name}}-extensions"></a>
 
-### File-level Extensions
+#### File-level Extensions
 | Extension | Type | Base | Number | Description |
 | --------- | ---- | ---- | ------ | ----------- |
 {{range .Extensions -}}
@@ -86,7 +66,7 @@
 {{range .Services}}
 <a name="{{.FullName}}"></a>
 
-### {{.Name}}
+#### {{.Name}}
 {{.Description}}
 
 | Method Name | Request Type | Response Type | Description | HTTP Verb | Endpoint |
@@ -98,7 +78,7 @@
 
 {{end}}
 
-## Scalar Value Types
+### Scalar Value Types
 
 | .proto Type | Notes | C++ | Java | Python | Go | C# | PHP | Ruby |
 | ----------- | ----- | --- | ---- | ------ | -- | -- | --- | ---- |
