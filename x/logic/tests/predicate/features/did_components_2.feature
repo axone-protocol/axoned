@@ -18,7 +18,7 @@ Feature: did_components/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 11918
+      gas_used: 11932
       answer:
         has_more: false
         variables: ["Method", "MethodSpecificId", "Path", "Query", "Fragment"]
@@ -49,7 +49,7 @@ Feature: did_components/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 10800
+      gas_used: 10814
       answer:
         has_more: false
         variables: ["DID"]
@@ -78,7 +78,7 @@ Feature: did_components/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 7382
+      gas_used: 7396
       answer:
         has_more: false
         variables: ["Query", "Fragment", "Status"]
@@ -113,7 +113,7 @@ Feature: did_components/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 7176
+      gas_used: 7190
       answer:
         has_more: false
         variables: ["Method", "MethodSpecificId", "Status"]
@@ -140,7 +140,7 @@ Feature: did_components/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4301
+      gas_used: 4315
       answer:
         has_more: false
         variables: ["Parsed"]
@@ -161,7 +161,7 @@ Feature: did_components/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6377
+      gas_used: 6391
       answer:
         has_more: false
         variables: ["DID"]
@@ -181,7 +181,7 @@ Feature: did_components/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5073
+      gas_used: 5087
       answer:
         has_more: false
         variables: ["DID"]
@@ -201,7 +201,7 @@ Feature: did_components/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5963
+      gas_used: 5977
       answer:
         has_more: false
         variables: ["DID"]
@@ -221,7 +221,7 @@ Feature: did_components/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 7207
+      gas_used: 7221
       answer:
         has_more: false
         variables: ["DID"]
