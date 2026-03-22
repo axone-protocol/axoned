@@ -104,7 +104,6 @@ var registry = orderedmap.New[string, any](
 		{Key: "crypto_data_hash/3", Value: predicate.CryptoDataHash},
 		{Key: "source_file/1", Value: predicate.SourceFile},
 		{Key: "json_prolog/2", Value: predicate.JSONProlog},
-		{Key: "uri_encoded/3", Value: predicate.URIEncoded},
 		{Key: "read_string/3", Value: predicate.ReadString},
 		{Key: "eddsa_verify/4", Value: predicate.EDDSAVerify},
 		{Key: "ecdsa_verify/4", Value: predicate.ECDSAVerify},

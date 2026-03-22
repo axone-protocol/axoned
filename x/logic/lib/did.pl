@@ -2,6 +2,7 @@
 % DID Core helpers.
 
 :- consult('/v1/lib/error.pl').
+:- consult('/v1/lib/uri.pl').
 
 %! did_components(+DID:atom, -Parsed) is det.
 %
@@ -134,13 +135,13 @@ did_validate_method_specific_id_chars(MethodSpecificId, MethodSpecificIdChars) :
   ).
 
 did_validate_path_chars(Path, PathChars) :-
-  ( did_path_chars_raw(PathChars)
+  ( uri_path_chars_raw(PathChars)
   -> true
   ;  throw(error(domain_error(encoding(did), Path), did_components/2))
   ).
 
 did_validate_query_or_fragment_chars(Value, Chars) :-
-  ( did_query_or_fragment_chars_raw(Chars)
+  ( uri_query_or_fragment_chars_raw(Chars)
   -> true
   ;  throw(error(domain_error(encoding(did), Value), did_components/2))
   ).
@@ -159,7 +160,7 @@ did_parse_chars(['d', 'i', 'd', ':' | Rest], Method, MethodSpecificId, Path, Que
 did_parse_suffix([], absent, absent, absent).
 did_parse_suffix(['/' | Rest], Path, Query, Fragment) :-
   did_take_until_delimiters(Rest, [63, 35], PathTailChars, AfterPath),
-  did_path_chars_raw(PathTailChars),
+  uri_path_chars_raw(PathTailChars),
   atom_chars(PathAtom, ['/' | PathTailChars]),
   Path = present(PathAtom),
   did_parse_query_and_fragment(AfterPath, Query, Fragment).
@@ -170,7 +171,7 @@ did_parse_query_and_fragment([], absent, absent).
 did_parse_query_and_fragment([QuestionMark | Rest], Query, Fragment) :-
   did_question_mark_char(QuestionMark),
   did_take_until_delimiters(Rest, [35], QueryChars, AfterQuery),
-  did_query_or_fragment_chars_raw(QueryChars),
+  uri_query_or_fragment_chars_raw(QueryChars),
   atom_chars(QueryAtom, QueryChars),
   Query = present(QueryAtom),
   did_parse_fragment(AfterQuery, Fragment).
@@ -180,7 +181,7 @@ did_parse_query_and_fragment(Rest, absent, Fragment) :-
 did_parse_fragment([], absent).
 did_parse_fragment([Hash | FragmentChars], Fragment) :-
   did_hash_char(Hash),
-  did_query_or_fragment_chars_raw(FragmentChars),
+  uri_query_or_fragment_chars_raw(FragmentChars),
   atom_chars(FragmentAtom, FragmentChars),
   Fragment = present(FragmentAtom).
 
@@ -243,8 +244,8 @@ did_method_specific_id_segment_rest(Rest, Rest) :-
 ; Rest = [':' | _].
 
 did_method_specific_id_unit(['%', Hi, Lo | Rest], Rest) :-
-  did_hex_char(Hi),
-  did_hex_char(Lo).
+  uri_hex_char(Hi),
+  uri_hex_char(Lo).
 did_method_specific_id_unit([Char | Rest], Rest) :-
   did_method_specific_id_plain_char(Char).
 
@@ -255,60 +256,6 @@ did_method_specific_id_plain_char(Char) :-
 did_method_specific_id_plain_char('.').
 did_method_specific_id_plain_char('-').
 did_method_specific_id_plain_char('_').
-
-did_path_chars_raw([]).
-did_path_chars_raw(Chars) :-
-  did_path_unit(Chars, Rest),
-  did_path_chars_raw(Rest).
-
-did_path_unit(['%', Hi, Lo | Rest], Rest) :-
-  did_hex_char(Hi),
-  did_hex_char(Lo).
-did_path_unit(['/' | Rest], Rest).
-did_path_unit([Char | Rest], Rest) :-
-  did_uri_pchar_plain_char(Char).
-
-did_query_or_fragment_chars_raw([]).
-did_query_or_fragment_chars_raw(Chars) :-
-  did_query_or_fragment_unit(Chars, Rest),
-  did_query_or_fragment_chars_raw(Rest).
-
-did_query_or_fragment_unit(['%', Hi, Lo | Rest], Rest) :-
-  did_hex_char(Hi),
-  did_hex_char(Lo).
-did_query_or_fragment_unit(['/' | Rest], Rest).
-did_query_or_fragment_unit([QuestionMark | Rest], Rest) :-
-  did_question_mark_char(QuestionMark).
-did_query_or_fragment_unit([Char | Rest], Rest) :-
-  did_uri_pchar_plain_char(Char).
-
-did_uri_pchar_plain_char(Char) :-
-  did_uri_unreserved_char(Char).
-did_uri_pchar_plain_char(Char) :-
-  did_uri_sub_delim_char(Char).
-did_uri_pchar_plain_char(':').
-did_uri_pchar_plain_char('@').
-
-did_uri_unreserved_char(Char) :-
-  did_alpha_char(Char).
-did_uri_unreserved_char(Char) :-
-  did_digit_char(Char).
-did_uri_unreserved_char('-').
-did_uri_unreserved_char('.').
-did_uri_unreserved_char('_').
-did_uri_unreserved_char('~').
-
-did_uri_sub_delim_char('!').
-did_uri_sub_delim_char('$').
-did_uri_sub_delim_char('&').
-did_uri_sub_delim_char('''').
-did_uri_sub_delim_char('(').
-did_uri_sub_delim_char(')').
-did_uri_sub_delim_char('*').
-did_uri_sub_delim_char('+').
-did_uri_sub_delim_char(',').
-did_uri_sub_delim_char(';').
-did_uri_sub_delim_char('=').
 
 did_alpha_char(Char) :-
   did_lower_alpha_char(Char).
@@ -329,17 +276,6 @@ did_digit_char(Char) :-
   char_code(Char, Code),
   Code >= 0'0,
   Code =< 0'9.
-
-did_hex_char(Char) :-
-  did_digit_char(Char).
-did_hex_char(Char) :-
-  char_code(Char, Code),
-  Code >= 0'a,
-  Code =< 0'f.
-did_hex_char(Char) :-
-  char_code(Char, Code),
-  Code >= 0'A,
-  Code =< 0'F.
 
 did_question_mark_char(Char) :-
   char_code(Char, 63).
