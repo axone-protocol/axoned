@@ -23,19 +23,15 @@ uri_encoded(Component, Value, Encoded) :-
   ).
 
 uri_component(Component, query_value) :-
-  nonvar(Component),
   Component == query_value,
   !.
 uri_component(Component, fragment) :-
-  nonvar(Component),
   Component == fragment,
   !.
 uri_component(Component, path) :-
-  nonvar(Component),
   Component == path,
   !.
 uri_component(Component, segment) :-
-  nonvar(Component),
   Component == segment,
   !.
 uri_component(Component, _) :-
