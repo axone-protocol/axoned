@@ -59,7 +59,7 @@ jobs:
           make test-go
 
       - name: Upload coverage
-        uses: codecov/codecov-action@v5
+        uses: codecov/codecov-action@v6
         if: github.actor != 'dependabot[bot]'
         with:
           files: ./target/coverage.txt
