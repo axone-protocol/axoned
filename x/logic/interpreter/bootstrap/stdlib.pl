@@ -113,14 +113,14 @@ peek_code(Stream, Code) :-
   peek_char(Stream, Char),
   (Char = end_of_file -> Code = -1; char_code(Char, Code)).
 
-% put_char(+Char) is det.
+%! put_char(+Char) is det.
 %
 % Writes Char to the current output stream.
 put_char(Char) :-
   current_output(S),
   put_char(S, Char).
 
-% put_code(+Code) is det.
+%! put_code(+Code) is det.
 %
 % Writes the character represented by Code to the current output stream.
 put_code(Code) :-
@@ -134,7 +134,7 @@ put_code(S, Code) :-
   char_code(Char, Code),
   put_char(S, Char).
 
-% nl is det.
+%! nl is det.
 %
 % Writes a newline to the current output stream.
 nl :-
@@ -195,7 +195,7 @@ write_term(Term, Options) :-
   current_output(S),
   write_term(S, Term, Options).
 
-% write(+Term) is det.
+%! write(+Term) is det.
 %
 % Writes Term to the current output stream.
 write(Term) :-
@@ -208,7 +208,7 @@ write(Term) :-
 write(Stream, Term) :-
   write_term(Stream, Term, [numbervars(true)]).
 
-% writeq(+Term) is det.
+%! writeq(+Term) is det.
 %
 % Writes Term to the current output stream using quoted syntax.
 writeq(Term) :-
@@ -221,7 +221,7 @@ writeq(Term) :-
 writeq(Stream, Term) :-
   write_term(Stream, Term, [quoted(true), numbervars(true)]).
 
-% write_canonical(+Term) is det.
+%! write_canonical(+Term) is det.
 %
 % Writes Term to the current output stream in canonical form.
 write_canonical(Term) :-
