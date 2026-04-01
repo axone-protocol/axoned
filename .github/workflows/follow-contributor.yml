@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-22.04
     steps:
       - name: Follow user
-        uses: okp4/follow-contributor-action@v1.1.0
+        uses: okp4/follow-contributor-action@d4a06d354ac63b2176649f7a13348d838cac4616 # v1.1.0
         with:
           username: ${{ github.event.pull_request.user.login }}
           token: ${{ secrets.OPS_TOKEN }}
