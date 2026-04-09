@@ -26,10 +26,10 @@ jobs:
           else
             TAG=$(gh release view --json tagName -q '.tagName')
           fi
-          echo "tag=$TAG" >> $GITHUB_OUTPUT
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
 
-          REPO_NAME=${GITHUB_REPOSITORY#${GITHUB_REPOSITORY_OWNER}/}
-          echo "repo_name=$REPO_NAME" >> $GITHUB_OUTPUT
+          REPO_NAME=${GITHUB_REPOSITORY#"${GITHUB_REPOSITORY_OWNER}/"}
+          echo "repo_name=$REPO_NAME" >> "$GITHUB_OUTPUT"
         env:
           INPUT_TAG: ${{ github.event.inputs.tag }}
           GH_TOKEN: ${{ secrets.OPS_TOKEN }}

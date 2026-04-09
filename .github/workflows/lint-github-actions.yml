@@ -1,0 +1,30 @@
+name: Lint GitHub Actions
+
+on:
+  workflow_call:
+
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/*.yml
+
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/*.yml
+
+concurrency:
+  group: lint-github-actions-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-github-actions:
+    runs-on: ubuntu-22.04
+    permissions:
+      contents: read
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Lint GitHub Actions workflows
+        uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # v2.1.2

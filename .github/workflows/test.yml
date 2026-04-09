@@ -109,12 +109,12 @@ jobs:
       - name: Verify blockchain startup
         run: |
           STATUS=$(curl http://0.0.0.0:26657/status)
-          CHECK=$(echo $STATUS | jq '.result.validator_info | has("address")')
+          CHECK=$(echo "$STATUS" | jq '.result.validator_info | has("address")')
 
-          if [ $CHECK != "true" ]; then
+          if [ "$CHECK" != "true" ]; then
             echo "❌ Blockchain test failed"
             echo "$STATUS"
-            exit -1
+            exit 1
           fi
 
       - name: Stop the blockchain
