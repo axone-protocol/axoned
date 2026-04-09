@@ -8,8 +8,8 @@ on:
       - synchronize
 
 permissions:
-  pull-requests: write
-  contents: write
+  contents: read
+  pull-requests: read
 
 concurrency:
   group: dependabot-auto-merge-pr-${{ github.event.pull_request.number }}

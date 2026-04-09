@@ -5,6 +5,9 @@ on:
     types:
       - opened
 
+permissions:
+  contents: read
+
 jobs:
   project-add-issue:
     runs-on: ubuntu-latest

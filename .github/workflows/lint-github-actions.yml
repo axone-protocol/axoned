@@ -13,6 +13,9 @@ on:
     paths:
       - .github/workflows/*.yml
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -20,8 +23,6 @@ concurrency:
 jobs:
   lint-github-actions:
     runs-on: ubuntu-22.04
-    permissions:
-      contents: read
     steps:
       - name: Check out repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6

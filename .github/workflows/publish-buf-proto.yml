@@ -13,6 +13,9 @@ on:
       - 'scripts/protocgen-code.sh'
       - 'scripts/protocgen-doc.sh'
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

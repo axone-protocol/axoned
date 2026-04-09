@@ -25,6 +25,9 @@ on:
       - 'proto/buf.yaml'
       - 'scripts/protocgen-code.sh'
 
+permissions:
+  contents: read
+
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true

@@ -9,6 +9,9 @@ on:
       tag:
         description: 'Release tag (leave empty for last one)'
 
+permissions:
+  contents: read
+
 jobs:
   release-notify:
     runs-on: ubuntu-22.04
