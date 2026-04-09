@@ -1,12 +1,27 @@
-name: Publish
+name: Publish / Docker Images
 
 on:
   push:
     branches: [main]
-    tags: ["v*"]
+    tags:
+      - 'v*'
+    paths:
+      - '.github/workflows/publish-docker-images.yml'
+      - '.dockerignore'
+      - 'Dockerfile'
+      - '.heighliner/**'
+      - 'app/**'
+      - 'cmd/**'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'proto/**'
+      - 'scripts/**'
+      - 'version'
+      - 'x/**'
 
 concurrency:
-  group: publish-${{ github.ref }}
+  group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -55,44 +70,3 @@ jobs:
           push: true
           tags: ${{ steps.docker_metadata.outputs.tags }}
           labels: ${{ steps.docker_metadata.outputs.labels }}
-
-  dockerhub-description:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-        with:
-          fetch-depth: 2
-
-      - name: Find change in readme file
-        id: readme-change
-        uses: tj-actions/changed-files@22103cc46bda19c2b464ffe86db46df6922fd323 # v47.0.5
-        with:
-          files: |
-            README.md
-
-      - name: Docker Hub Description
-        if: steps.readme-change.outputs.any_changed == 'true'
-        uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5
-        with:
-          username: ${{ secrets.DOCKER_HUB_REGISTRY_ID }}
-          description: Docker image for https://github.com/{{ .repository }}
-          password: ${{ secrets.DOCKER_HUB_REGISTRY_TOKEN }}
-          repository: axoneprotocol/axoned
-          readme-filepath: README.md
-
-  publish-buf-proto:
-    runs-on: ubuntu-22.04
-    steps:
-      - name: Check out repository
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
-
-      - name: Setup buf
-        uses: bufbuild/buf-setup-action@a47c93e0b1648d5651a065437926377d060baa99 # v1.50.0
-
-      - name: Push axoned proto on buf registry
-        run:
-          buf push proto --tag ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
-
-        env:
-          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}

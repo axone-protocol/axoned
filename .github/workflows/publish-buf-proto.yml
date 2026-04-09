@@ -1,0 +1,34 @@
+name: Publish / Buf Proto
+
+on:
+  push:
+    branches: [main]
+    tags:
+      - 'v*'
+    paths:
+      - '.github/workflows/publish-buf-proto.yml'
+      - 'buf.work.yaml'
+      - 'Makefile'
+      - 'proto/**'
+      - 'scripts/protocgen-code.sh'
+      - 'scripts/protocgen-doc.sh'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish-buf-proto:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup buf
+        uses: bufbuild/buf-setup-action@a47c93e0b1648d5651a065437926377d060baa99 # v1.50.0
+
+      - name: Push axoned proto on buf registry
+        run: |
+          buf push proto --tag ${{ github.ref_type == 'tag' && github.ref_name || github.sha }}
+        env:
+          BUF_TOKEN: ${{ secrets.BUF_TOKEN }}

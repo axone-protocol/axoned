@@ -1,11 +1,18 @@
-name: Follow contributor
+name: Social / Follow Contributor
 
 on:
   pull_request:
     branches: [main]
+    types:
+      - opened
+      - reopened
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
-  follow-user:
+  social-follow-contributor:
     runs-on: ubuntu-22.04
     steps:
       - name: Follow user

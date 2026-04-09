@@ -1,0 +1,49 @@
+name: Build / Docker Local
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-docker-local.yml'
+      - '.dockerignore'
+      - 'Dockerfile'
+      - 'app/**'
+      - 'cmd/**'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'proto/**'
+      - 'scripts/**'
+      - 'version'
+      - 'x/**'
+
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/build-docker-local.yml'
+      - '.dockerignore'
+      - 'Dockerfile'
+      - 'app/**'
+      - 'cmd/**'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'proto/**'
+      - 'scripts/**'
+      - 'version'
+      - 'x/**'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-docker-local:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Build docker image
+        run: |
+          docker build .

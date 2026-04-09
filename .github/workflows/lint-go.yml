@@ -1,0 +1,63 @@
+name: Lint / Go
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lint-go.yml'
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - '.golangci.yml'
+
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lint-go.yml'
+      - '**/*.go'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - '.golangci.yml'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-go:
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+
+      - name: Setup Go environment
+        uses: actions/setup-go@4a3601121dd01d1626a1e23e37211e3254c1c06c # v6.4.0
+        with:
+          go-version-file: 'go.mod'
+          cache: true
+          cache-dependency-path: |
+            go.sum
+
+      - name: Lint go code (golangci-lint)
+        uses: golangci/golangci-lint-action@1e7e51e771db61008b38414a730f564565cf7c20 # v9
+        with:
+          version: v2.10.1
+
+      - name: Verify Go modules are tidy
+        run: |
+          go mod tidy
+          if ! git diff --quiet -- go.mod go.sum; then
+            echo "❌ go.mod or go.sum are out of date"
+            git --no-pager diff -- go.mod go.sum
+            exit 1
+          fi
+          echo "✅ go.mod and go.sum are tidy"
+
+      - name: Lint go code (gofumpt)
+        run: |
+          make lint-go-gofumpt

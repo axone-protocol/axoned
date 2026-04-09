@@ -1,0 +1,28 @@
+name: Publish / Docker Hub Description
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/publish-dockerhub-description.yml'
+      - 'README.md'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  publish-dockerhub-description:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Docker Hub Description
+        uses: peter-evans/dockerhub-description@1b9a80c056b620d92cedb9d9b5a223409c68ddfa # v5
+        with:
+          username: ${{ secrets.DOCKER_HUB_REGISTRY_ID }}
+          description: Docker image for https://github.com/{{ .repository }}
+          password: ${{ secrets.DOCKER_HUB_REGISTRY_TOKEN }}
+          repository: axoneprotocol/axoned
+          readme-filepath: README.md

@@ -1,0 +1,32 @@
+name: Social / Thank GoDeps
+
+on:
+  workflow_dispatch:
+
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/social-thank-godeps.yml'
+      - 'go.mod'
+      - 'go.sum'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  social-thank-godeps:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+        with:
+          fetch-depth: 0
+
+      - name: Give thanks!
+        run: |
+          docker run --rm \
+            -v "$(pwd):/home" \
+            psampaz/gothanks:v0.4.0 \
+            -y \
+            -github-token=${{ secrets.OPS_TOKEN }}
