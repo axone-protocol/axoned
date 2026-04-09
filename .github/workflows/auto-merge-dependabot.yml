@@ -29,9 +29,9 @@ jobs:
         run: |
           if [[ "$UPDATE_TYPE" == "version-update:semver-patch" ]] || \
              [[ "$UPDATE_TYPE" == "version-update:semver-minor" ]]; then
-            echo "should_merge=true" >> $GITHUB_OUTPUT
+            echo "should_merge=true" >> "$GITHUB_OUTPUT"
           else
-            echo "should_merge=false" >> $GITHUB_OUTPUT
+            echo "should_merge=false" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Approve dependabot PR
