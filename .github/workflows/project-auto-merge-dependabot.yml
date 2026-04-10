@@ -31,8 +31,7 @@ jobs:
         env:
           UPDATE_TYPE: ${{ steps.meta.outputs.update-type }}
         run: |
-          if [[ "$UPDATE_TYPE" == "version-update:semver-patch" ]] || \
-             [[ "$UPDATE_TYPE" == "version-update:semver-minor" ]]; then
+          if [[ "$UPDATE_TYPE" == "version-update:semver-patch" ]]; then
             echo "should_merge=true" >> "$GITHUB_OUTPUT"
           else
             echo "should_merge=false" >> "$GITHUB_OUTPUT"
