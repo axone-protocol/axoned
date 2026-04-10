@@ -18,10 +18,10 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/axone-protocol/axoned/v14/x/mint"
-	"github.com/axone-protocol/axoned/v14/x/mint/keeper"
-	minttestutil "github.com/axone-protocol/axoned/v14/x/mint/testutil"
-	"github.com/axone-protocol/axoned/v14/x/mint/types"
+	"github.com/axone-protocol/axoned/v15/x/mint"
+	"github.com/axone-protocol/axoned/v15/x/mint/keeper"
+	minttestutil "github.com/axone-protocol/axoned/v15/x/mint/testutil"
+	"github.com/axone-protocol/axoned/v15/x/mint/types"
 )
 
 type grpcQueryTestContext struct {

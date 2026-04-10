@@ -9,7 +9,7 @@ import (
 
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 func TestGenesisState_Validate(t *testing.T) {

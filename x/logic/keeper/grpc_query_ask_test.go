@@ -20,14 +20,14 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic"
-	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
-	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
-	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
-	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
-	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
-	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic"
+	logicembeddedfs "github.com/axone-protocol/axoned/v15/x/logic/fs/embedded"
+	logicsysheader "github.com/axone-protocol/axoned/v15/x/logic/fs/sys/header"
+	logicvfs "github.com/axone-protocol/axoned/v15/x/logic/fs/vfs"
+	"github.com/axone-protocol/axoned/v15/x/logic/keeper"
+	logiclib "github.com/axone-protocol/axoned/v15/x/logic/lib"
+	logictestutil "github.com/axone-protocol/axoned/v15/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 func TestGRPCAsk(t *testing.T) {

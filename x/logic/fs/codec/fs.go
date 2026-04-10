@@ -15,12 +15,12 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/devfile"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/pathutil"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/prologterm"
-	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/devfile"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/iface"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/pathutil"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/prologterm"
+	"github.com/axone-protocol/axoned/v15/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 // These are protocol response terms serialized by the device.

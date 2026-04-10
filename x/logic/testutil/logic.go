@@ -8,10 +8,10 @@ import (
 	"github.com/axone-protocol/prolog/v3"
 	"github.com/axone-protocol/prolog/v3/engine"
 
-	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
-	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
-	"github.com/axone-protocol/axoned/v14/x/logic/interpreter/bootstrap"
-	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
+	logicembeddedfs "github.com/axone-protocol/axoned/v15/x/logic/fs/embedded"
+	logicvfs "github.com/axone-protocol/axoned/v15/x/logic/fs/vfs"
+	"github.com/axone-protocol/axoned/v15/x/logic/interpreter/bootstrap"
+	logiclib "github.com/axone-protocol/axoned/v15/x/logic/lib"
 )
 
 type TermResults map[string]prolog.TermString

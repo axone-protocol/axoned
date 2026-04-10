@@ -9,7 +9,7 @@ import (
 
 	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 
-	"github.com/axone-protocol/axoned/v14/app/params"
+	"github.com/axone-protocol/axoned/v15/app/params"
 )
 
 // makeEncodingConfig creates an EncodingConfig test configuration.

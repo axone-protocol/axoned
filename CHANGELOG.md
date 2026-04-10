@@ -1,5 +1,79 @@
 # AXONE protocol changelog
 
+## [15.0.0](https://github.com/axone-protocol/axoned/compare/v14.0.0...v15.0.0) (2026-04-10)
+
+
+### ⚠ BREAKING CHANGES
+
+* **logic:** canonicalize the Prolog VM capability namespace
+* **logic:** rename gas policy field source_coeff
+* **logic:** port hex_bytes/2 to Prolog over VFS in crypto.pl lib
+* **logic:** remove legacy cosmwasm URI source-sinks and enforce path-based VFS
+* **logic:** charge gas for user source bytes
+* **logic:** meter prolog vm gas with grouped coefficients
+* **logic:** remove predicate and VFS allow/deny filters from x/logic params
+* **logic:** migrate bank_locked_balances/2 to VFS-based implementation
+* **logic:** migrate bank_spendable_balances/2 to VFS-based implementation
+* **logic:** migrate bank_balances/2 to VFS-based implementation
+* **logic:** move member/select/maplist out of bootstrap into lists/apply libraries
+* **logic:** remove block_header/1 and migrate usage to consult + header_info/1
+
+### Features
+
+* **logic:** add /v1/sys/header snapshot devices and mount sys FS in path-based VFS ([a4680d0](https://github.com/axone-protocol/axoned/commit/a4680d04d897ffd00d2db0318b39cd4a0e45fc64))
+* **logic:** add auto-loaded Prolog stdlib with setup_call_cleanup/3 ([876207a](https://github.com/axone-protocol/axoned/commit/876207a164b184837493d32707c42ac735da17e8))
+* **logic:** add CLI commands for stored program queries ([2967f17](https://github.com/axone-protocol/axoned/commit/2967f1782a8f6f026801a368b9e09731d75a7d36))
+* **logic:** add comet_info/1 predicate in chain module ([8ac3b73](https://github.com/axone-protocol/axoned/commit/8ac3b733852acf4fff4653dfab8ab796a28824a5))
+* **logic:** add dev_call/3 predicate to library dev.pl ([438a5c2](https://github.com/axone-protocol/axoned/commit/438a5c20ddaf162f755af02c6b6e128c85ec283d))
+* **logic:** add dual-stack VFS wrapper for path and legacy URI source-sinks ([7f010b0](https://github.com/axone-protocol/axoned/commit/7f010b055350dcac37f451cb4e8d2a841f9f3c40))
+* **logic:** add foldl/4,5,6,7  to apply library ([0e66ab2](https://github.com/axone-protocol/axoned/commit/0e66ab2ab686a7ef2691468db6aa60d13199733a)), closes [#788](https://github.com/axone-protocol/axoned/issues/788)
+* **logic:** add header_info/1 predicate in chain module ([fb99eeb](https://github.com/axone-protocol/axoned/commit/fb99eeb5bdeb2a6da47601352c30838b71a78d66))
+* **logic:** add memberchk/2 predicate ([347b22d](https://github.com/axone-protocol/axoned/commit/347b22dd2c275f8e986c46b623ec66a4e357d509))
+* **logic:** add must_be/2 predicate to apply library ([e77b3dc](https://github.com/axone-protocol/axoned/commit/e77b3dcc50158ed134857498952522f527ae9453))
+* **logic:** add policy-free path-based VFS core with mount routing and OpenFile dispatch ([2c1141e](https://github.com/axone-protocol/axoned/commit/2c1141e668ce00e99e49d612d22dc631dcb63bcd))
+* **logic:** add stored program gRPC query API ([d0e76b8](https://github.com/axone-protocol/axoned/commit/d0e76b8d3c514f4dffbfa187713320ed806f9a1e))
+* **logic:** add StoreProgram API for user Prolog libraries ([a7b31b5](https://github.com/axone-protocol/axoned/commit/a7b31b5b9683d48d3ef18f5feda10a0a74086517))
+* **logic:** add valid_type/1 predicate ([ead9c02](https://github.com/axone-protocol/axoned/commit/ead9c020990aacd1e44c1a230e9018d264c960f4))
+* **logic:** add wasm_query/3 predicate to wasm library ([e90983a](https://github.com/axone-protocol/axoned/commit/e90983a77d65f90144144f1e866bf33f4707fa96))
+* **logic:** add with_context/2 in error.pl lib for predicate error recontextualization ([746fdc0](https://github.com/axone-protocol/axoned/commit/746fdc0d8c4b917070163d046725abf42652f0a1))
+* **logic:** charge gas for user source bytes ([5f47b44](https://github.com/axone-protocol/axoned/commit/5f47b44292bd73300e6ba108952e1393ed04de1a))
+* **logic:** expose published user Prolog libs under /v1/usr/share/logic ([8afad11](https://github.com/axone-protocol/axoned/commit/8afad119556d9ccd8d6f6126ffd0cd993b2b6093))
+* **logic:** expose sdk CometInfo through /v1/sys/comet device ([5fe1007](https://github.com/axone-protocol/axoned/commit/5fe1007177f7773a746c5772a526b968652d7888))
+* **logic:** extend lists.pl with append/2, prefix/2, suffix/2 and sublist/2 ([c0f4879](https://github.com/axone-protocol/axoned/commit/c0f4879307a5f936591ff34bef48e85f9d7fcd00))
+* **logic:** extract type predicates from error.pl into new type.pl ([f5f8730](https://github.com/axone-protocol/axoned/commit/f5f8730d91ab65b17062858e31754183ec267c6b))
+* **logic:** implement path-based wasm query FS under /v1/dev/wasm ([1be6dd4](https://github.com/axone-protocol/axoned/commit/1be6dd44d133c88bad669ab678feb052e0ba4362))
+* **logic:** meter codec device I/O ([3aa7c5c](https://github.com/axone-protocol/axoned/commit/3aa7c5c80b65f888f2c4d1c0c80d5ca82d8a9b52))
+* **logic:** mount embedded read-only FS prolog lib under /v1/lib ([cd25aad](https://github.com/axone-protocol/axoned/commit/cd25aad5a64283b3196f551612135b7da3b7eb8c))
+* **logic:** optimize atomic_list_concat/2,3 to avoid O(n²) allocations ([72b4f6a](https://github.com/axone-protocol/axoned/commit/72b4f6af963936d92beb9b57c9900cbc79e0bf52))
+* **logic:** port bech32_address/2 to Prolog over VFS-based device ([8b6fd27](https://github.com/axone-protocol/axoned/commit/8b6fd276fea15a725f972d9c26f4e08e8bf97027))
+* **logic:** propagate OpenFile support in filtered VFS ([9fb12c6](https://github.com/axone-protocol/axoned/commit/9fb12c6af503c95f7ffeb6ea5908ead55d480f36))
+
+
+### Bug Fixes
+
+* **logic:** fix overlapping has_type/2 clauses for between/2 to ensure semidet behaviour ([8f9e784](https://github.com/axone-protocol/axoned/commit/8f9e784181ff9a1000f2a99ef95b5817b9f4ca19))
+* **logic:** fix type validation in has_type/2 for parameterized list types ([03c2fb4](https://github.com/axone-protocol/axoned/commit/03c2fb4d05bab7c594611c0e6baec1b130401bc5))
+* **logic:** normalize vm gas overflow as resource error ([3769116](https://github.com/axone-protocol/axoned/commit/37691165cc5c65274c8bb41db470e0c22084e331))
+* **logic:** only normalize known vm resource errors ([f3ef5fe](https://github.com/axone-protocol/axoned/commit/f3ef5fe280a363ad8f5f5a420e2370ad9be60379))
+* **logic:** report regular read-only mode for virtual files ([d0d51e3](https://github.com/axone-protocol/axoned/commit/d0d51e33feb0e23c81c68000094ff0e8bbdbe648))
+* **logic:** tighten query validation ([ee1884b](https://github.com/axone-protocol/axoned/commit/ee1884b89ce3c73a1a25dd01125d4ab3f0d3425a))
+* **logic:** validate query program IDs as full SHA-256 digests ([f1be3e5](https://github.com/axone-protocol/axoned/commit/f1be3e5cb1f856967ed16626803045cebcb93071))
+
+
+### Code Refactoring
+
+* **logic:** canonicalize the Prolog VM capability namespace ([5f39686](https://github.com/axone-protocol/axoned/commit/5f396869b725825b130ad86b9f9aea8299cfcc8d))
+* **logic:** meter prolog vm gas with grouped coefficients ([f2fa8d0](https://github.com/axone-protocol/axoned/commit/f2fa8d061f2aa288eff258fa745464a822f673bf))
+* **logic:** migrate bank_balances/2 to VFS-based implementation ([0a74abd](https://github.com/axone-protocol/axoned/commit/0a74abd67da21c023716c573aa8990b65dfbed58))
+* **logic:** migrate bank_locked_balances/2 to VFS-based implementation ([2c6531d](https://github.com/axone-protocol/axoned/commit/2c6531dd081fd27276a86b4fb1cd2d45907d50b4))
+* **logic:** migrate bank_spendable_balances/2 to VFS-based implementation ([2dee8d6](https://github.com/axone-protocol/axoned/commit/2dee8d6d876b62ff20b345a6cb9b4eff582dffa7))
+* **logic:** move member/select/maplist out of bootstrap into lists/apply libraries ([8ef0a1b](https://github.com/axone-protocol/axoned/commit/8ef0a1be11bfe14acf0b4c0f8ac4be9bae974858))
+* **logic:** port hex_bytes/2 to Prolog over VFS in crypto.pl lib ([ddef739](https://github.com/axone-protocol/axoned/commit/ddef739f19747e59a9af753ec87a7cad6059e19d))
+* **logic:** remove block_header/1 and migrate usage to consult + header_info/1 ([3d5899d](https://github.com/axone-protocol/axoned/commit/3d5899db20508e18ce5491076978835b204a680a))
+* **logic:** remove legacy cosmwasm URI source-sinks and enforce path-based VFS ([6ce8eee](https://github.com/axone-protocol/axoned/commit/6ce8eee392145bf6407e4563ccbb6ef845ad972a))
+* **logic:** remove predicate and VFS allow/deny filters from x/logic params ([9df002e](https://github.com/axone-protocol/axoned/commit/9df002ead194edcc3fa771b586776aaa69d17ca1))
+* **logic:** rename gas policy field source_coeff ([bbf06ca](https://github.com/axone-protocol/axoned/commit/bbf06ca0f0da12b167718cc5d634308680907a58))
+
 ## [14.0.0](https://github.com/axone-protocol/axoned/compare/v13.0.1...v14.0.0) (2026-02-17)
 
 

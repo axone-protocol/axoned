@@ -10,7 +10,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 func (k Keeper) Program(c context.Context, req *types.QueryProgramRequest) (*types.QueryProgramResponse, error) {

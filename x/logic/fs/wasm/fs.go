@@ -10,11 +10,11 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/devfile"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/pathutil"
-	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/devfile"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/iface"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/pathutil"
+	"github.com/axone-protocol/axoned/v15/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 var errWasmQueryFailed = errors.New("wasm_query_failed")

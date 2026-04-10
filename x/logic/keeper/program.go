@@ -8,8 +8,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
-	"github.com/axone-protocol/axoned/v14/x/logic/util"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic/util"
 )
 
 func (k Keeper) validateProgram(ctx context.Context, params types.Params, source string) error {

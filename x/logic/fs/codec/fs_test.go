@@ -27,8 +27,8 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	fsiface "github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
-	logictypes "github.com/axone-protocol/axoned/v14/x/logic/types"
+	fsiface "github.com/axone-protocol/axoned/v15/x/logic/fs/internal/iface"
+	logictypes "github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 func TestAll(t *testing.T) {

@@ -24,11 +24,11 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic"
-	logicfs "github.com/axone-protocol/axoned/v14/x/logic/fs"
-	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
-	logictestutil "github.com/axone-protocol/axoned/v14/x/logic/testutil"
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic"
+	logicfs "github.com/axone-protocol/axoned/v15/x/logic/fs"
+	"github.com/axone-protocol/axoned/v15/x/logic/keeper"
+	logictestutil "github.com/axone-protocol/axoned/v15/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 type failingMarshalCodec struct {

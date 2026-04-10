@@ -12,12 +12,12 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/interpreter"
-	"github.com/axone-protocol/axoned/v14/x/logic/interpreter/bootstrap"
-	"github.com/axone-protocol/axoned/v14/x/logic/meter"
-	prolog2 "github.com/axone-protocol/axoned/v14/x/logic/prolog"
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
-	"github.com/axone-protocol/axoned/v14/x/logic/util"
+	"github.com/axone-protocol/axoned/v15/x/logic/interpreter"
+	"github.com/axone-protocol/axoned/v15/x/logic/interpreter/bootstrap"
+	"github.com/axone-protocol/axoned/v15/x/logic/meter"
+	prolog2 "github.com/axone-protocol/axoned/v15/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic/util"
 )
 
 // writerStringer is an interface that combines io.Writer with capabilities of fmt.Stringer.

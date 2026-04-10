@@ -18,9 +18,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	logicfs "github.com/axone-protocol/axoned/v14/x/logic/fs"
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
-	"github.com/axone-protocol/axoned/v14/x/logic/util"
+	logicfs "github.com/axone-protocol/axoned/v15/x/logic/fs"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic/util"
 )
 
 func TestNewInterpreterBootstrapIsFree(t *testing.T) {

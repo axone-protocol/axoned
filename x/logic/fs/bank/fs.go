@@ -14,11 +14,11 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/pathutil"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/prologterm"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/streamingfile"
-	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/pathutil"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/prologterm"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/streamingfile"
+	"github.com/axone-protocol/axoned/v15/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 const (

@@ -16,7 +16,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/testutil"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	logictypes "github.com/axone-protocol/axoned/v14/x/logic/types"
+	logictypes "github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 type testKeeper struct {

@@ -7,7 +7,7 @@ import (
 	"sort"
 	"strings"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/iface"
 )
 
 // OpenFileFS is implemented by file systems that support opening files with flags.

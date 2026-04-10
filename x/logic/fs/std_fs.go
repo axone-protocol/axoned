@@ -7,16 +7,16 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	logicbank "github.com/axone-protocol/axoned/v14/x/logic/fs/bank"
-	logiccodec "github.com/axone-protocol/axoned/v14/x/logic/fs/codec"
-	logicembeddedfs "github.com/axone-protocol/axoned/v14/x/logic/fs/embedded"
-	logicshare "github.com/axone-protocol/axoned/v14/x/logic/fs/share"
-	logicsyscomet "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/comet"
-	logicsysheader "github.com/axone-protocol/axoned/v14/x/logic/fs/sys/header"
-	logicvfs "github.com/axone-protocol/axoned/v14/x/logic/fs/vfs"
-	logicwasm "github.com/axone-protocol/axoned/v14/x/logic/fs/wasm"
-	logiclib "github.com/axone-protocol/axoned/v14/x/logic/lib"
-	logictypes "github.com/axone-protocol/axoned/v14/x/logic/types"
+	logicbank "github.com/axone-protocol/axoned/v15/x/logic/fs/bank"
+	logiccodec "github.com/axone-protocol/axoned/v15/x/logic/fs/codec"
+	logicembeddedfs "github.com/axone-protocol/axoned/v15/x/logic/fs/embedded"
+	logicshare "github.com/axone-protocol/axoned/v15/x/logic/fs/share"
+	logicsyscomet "github.com/axone-protocol/axoned/v15/x/logic/fs/sys/comet"
+	logicsysheader "github.com/axone-protocol/axoned/v15/x/logic/fs/sys/header"
+	logicvfs "github.com/axone-protocol/axoned/v15/x/logic/fs/vfs"
+	logicwasm "github.com/axone-protocol/axoned/v15/x/logic/fs/wasm"
+	logiclib "github.com/axone-protocol/axoned/v15/x/logic/lib"
+	logictypes "github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 const (

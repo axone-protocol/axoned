@@ -11,9 +11,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/pathutil"
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/virtualfile"
-	logictypes "github.com/axone-protocol/axoned/v14/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/pathutil"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/virtualfile"
+	logictypes "github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 const programFileExt = ".pl"

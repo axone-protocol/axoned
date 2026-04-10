@@ -6,7 +6,7 @@ import (
 
 	"github.com/axone-protocol/prolog/v3/engine"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v15/x/logic/prolog"
 )
 
 // Render serializes a Prolog term and appends ".\n" for file-based framing.

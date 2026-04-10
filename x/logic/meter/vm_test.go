@@ -11,7 +11,7 @@ import (
 
 	storetypes "cosmossdk.io/store/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v15/x/logic/testutil"
 )
 
 func TestVMMeter(t *testing.T) {

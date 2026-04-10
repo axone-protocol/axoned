@@ -7,7 +7,7 @@ import (
 
 	sdkbech32 "github.com/cosmos/cosmos-sdk/types/bech32"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/prolog"
+	"github.com/axone-protocol/axoned/v15/x/logic/prolog"
 )
 
 var (

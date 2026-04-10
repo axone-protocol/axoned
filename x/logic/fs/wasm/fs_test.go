@@ -24,9 +24,9 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/devfile"
-	fsiface "github.com/axone-protocol/axoned/v14/x/logic/fs/internal/iface"
-	"github.com/axone-protocol/axoned/v14/x/logic/testutil"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/devfile"
+	fsiface "github.com/axone-protocol/axoned/v15/x/logic/fs/internal/iface"
+	"github.com/axone-protocol/axoned/v15/x/logic/testutil"
 )
 
 const testContractAddress = "axone15ekvz3qdter33mdnk98v8whv5qdr53yusksnfgc08xd26fpdn3tsrhsdrk"

@@ -3,7 +3,7 @@ package embedded
 import (
 	"io/fs"
 
-	"github.com/axone-protocol/axoned/v14/x/logic/fs/internal/pathutil"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/pathutil"
 )
 
 type vfs struct {

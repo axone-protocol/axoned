@@ -130,15 +130,15 @@ import (
 	ibckeeper "github.com/cosmos/ibc-go/v10/modules/core/keeper"
 	ibctm "github.com/cosmos/ibc-go/v10/modules/light-clients/07-tendermint"
 
-	axonewasm "github.com/axone-protocol/axoned/v14/app/wasm"
-	"github.com/axone-protocol/axoned/v14/docs"
-	logicmodule "github.com/axone-protocol/axoned/v14/x/logic"
-	logicfs "github.com/axone-protocol/axoned/v14/x/logic/fs"
-	logicmodulekeeper "github.com/axone-protocol/axoned/v14/x/logic/keeper"
-	logicmoduletypes "github.com/axone-protocol/axoned/v14/x/logic/types"
-	"github.com/axone-protocol/axoned/v14/x/mint"
-	mintkeeper "github.com/axone-protocol/axoned/v14/x/mint/keeper"
-	minttypes "github.com/axone-protocol/axoned/v14/x/mint/types"
+	axonewasm "github.com/axone-protocol/axoned/v15/app/wasm"
+	"github.com/axone-protocol/axoned/v15/docs"
+	logicmodule "github.com/axone-protocol/axoned/v15/x/logic"
+	logicfs "github.com/axone-protocol/axoned/v15/x/logic/fs"
+	logicmodulekeeper "github.com/axone-protocol/axoned/v15/x/logic/keeper"
+	logicmoduletypes "github.com/axone-protocol/axoned/v15/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/mint"
+	mintkeeper "github.com/axone-protocol/axoned/v15/x/mint/keeper"
+	minttypes "github.com/axone-protocol/axoned/v15/x/mint/types"
 )
 
 const (

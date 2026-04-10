@@ -17,9 +17,9 @@ import (
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
 
-	"github.com/axone-protocol/axoned/v14/x/logic"
-	"github.com/axone-protocol/axoned/v14/x/logic/keeper"
-	"github.com/axone-protocol/axoned/v14/x/logic/types"
+	"github.com/axone-protocol/axoned/v15/x/logic"
+	"github.com/axone-protocol/axoned/v15/x/logic/keeper"
+	"github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 func TestGenesisRoundTripStoredPrograms(t *testing.T) {
