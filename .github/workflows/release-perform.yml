@@ -1,6 +1,15 @@
 name: Release / Perform
 
 on:
+  workflow_run:
+    workflows:
+      - 'Test / Go'
+      - 'Test / Blockchain'
+      - 'Lint / Go'
+      - 'Build / Go'
+    types: [completed]
+    branches: [main]
+
   workflow_dispatch:
 
 permissions:
@@ -8,11 +17,14 @@ permissions:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
+  cancel-in-progress: false
 
 jobs:
   release-perform:
-    if: github.ref == 'refs/heads/main' && github.actor == 'bot-anik'
+    if: |
+      github.ref == 'refs/heads/main' &&
+      github.actor == 'bot-anik' &&
+      (github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success')
     runs-on: ubuntu-22.04
     steps:
       - name: Check out repository

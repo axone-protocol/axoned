@@ -21,7 +21,9 @@ jobs:
 
       - name: Resolve release context
         run: |
-          if [ -n "$INPUT_TAG" ]; then
+          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
+            TAG="$EVENT_TAG"
+          elif [ -n "$INPUT_TAG" ]; then
             TAG="$INPUT_TAG"
           else
             TAG=$(gh release view --json tagName -q '.tagName')
@@ -32,15 +34,17 @@ jobs:
           REPO_NAME="${GITHUB_REPOSITORY#"$OWNER_PREFIX"}"
           echo "REPO_NAME=$REPO_NAME" >> "$GITHUB_ENV"
         env:
+          EVENT_TAG: ${{ github.event.release.tag_name }}
           INPUT_TAG: ${{ github.event.inputs.tag }}
           GH_TOKEN: ${{ secrets.OPS_TOKEN }}
 
       - name: Extract changelog for tag
         run: |
+          DELIM="EOF_$(uuidgen)"
           {
-            echo 'CHANGELOG<<EOF'
+            echo "CHANGELOG<<$DELIM"
             gh release view "$RELEASE_TAG" --json body -q '.body'
-            echo 'EOF'
+            echo "$DELIM"
           } >> "$GITHUB_ENV"
         env:
           GH_TOKEN: ${{ secrets.OPS_TOKEN }}

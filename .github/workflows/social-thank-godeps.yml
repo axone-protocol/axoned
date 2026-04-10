@@ -30,6 +30,6 @@ jobs:
         run: |
           docker run --rm \
             -v "$(pwd):/home" \
-            psampaz/gothanks:v0.4.0 \
+            psampaz/gothanks@sha256:ea5e1c8a9bbb5e3d0c621b01249f8f462e765e6b3b701f2ca0624436641c597a \
             -y \
             -github-token=${{ secrets.OPS_TOKEN }}
