@@ -1,0 +1,46 @@
+name: Lint / Generated MDX
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lint-generated-mdx.yml'
+      - '.github/scripts/check-generated-mdx.mjs'
+      - 'docs/command/**/*.md'
+      - 'docs/predicate/**/*.md'
+      - 'docs/proto/**/*.md'
+
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lint-generated-mdx.yml'
+      - '.github/scripts/check-generated-mdx.mjs'
+      - 'docs/command/**/*.md'
+      - 'docs/predicate/**/*.md'
+      - 'docs/proto/**/*.md'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-generated-mdx:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Setup Node environment
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6
+        with:
+          node-version: '20'
+
+      - name: Validate committed generated markdown with MDX parser
+        run: |
+          TMPDIR=$(mktemp -d)
+          cp .github/scripts/check-generated-mdx.mjs "$TMPDIR/check-generated-mdx.mjs"
+          npm install --prefix "$TMPDIR" --no-save @mdx-js/mdx@3.1.1
+          node "$TMPDIR/check-generated-mdx.mjs"

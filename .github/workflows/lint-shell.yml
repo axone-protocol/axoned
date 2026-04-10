@@ -1,0 +1,36 @@
+name: Lint / Shell
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lint-shell.yml'
+      - '**/*.sh'
+
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lint-shell.yml'
+      - '**/*.sh'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-shell:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Lint shell scripts
+        uses: ludeeus/action-shellcheck@00cae500b08a931fb5698e11e79bfbd38e612a38 # 2.0.0
+        with:
+          scandir: .
+          version: 'v0.9.0'
+        env:
+          SHELLCHECK_OPTS: -e SC2034

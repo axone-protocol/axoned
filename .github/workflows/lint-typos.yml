@@ -1,0 +1,59 @@
+name: Lint / Typos
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/lint-typos.yml'
+      - '**/*.go'
+      - '**/*.json'
+      - '**/*.md'
+      - '**/*.proto'
+      - '**/*.sh'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '.codespellrc'
+      - 'Dockerfile'
+      - 'Makefile'
+      - 'README.md'
+      - 'version'
+
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/lint-typos.yml'
+      - '**/*.go'
+      - '**/*.json'
+      - '**/*.md'
+      - '**/*.proto'
+      - '**/*.sh'
+      - '**/*.yml'
+      - '**/*.yaml'
+      - '.codespellrc'
+      - 'Dockerfile'
+      - 'Makefile'
+      - 'README.md'
+      - 'version'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  lint-typos:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Install codespell
+        run: |
+          pip install codespell==2.3.0
+
+      - name: Check for spelling errors
+        run: |
+          codespell --config .codespellrc
+          exit $?

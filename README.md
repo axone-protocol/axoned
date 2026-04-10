@@ -10,9 +10,9 @@
 
 # Axone - Orchestration Layer for AI
 
-[![lint](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/lint.yml?label=lint&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/lint.yml)
-[![build](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/build.yml?label=build&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/build.yml)
-[![test](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/test.yml?label=test&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/test.yml)
+[![lint-go](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/lint-go.yml?label=lint-go&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/lint-go.yml)
+[![build-go](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/build-go.yml?label=build-go&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/build-go.yml)
+[![test-go](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/test-go.yml?label=test-go&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/test-go.yml)
 [![codecov](https://img.shields.io/codecov/c/github/axone-protocol/axoned?style=for-the-badge&token=O3FJO5QDCA&logo=codecov)](https://codecov.io/gh/axone-protocol/axoned)
 [![Go Report Card](https://goreportcard.com/badge/github.com/axone-protocol/axoned/v14?style=for-the-badge)](https://goreportcard.com/report/github.com/axone-protocol/axoned/v14)
 [![docker-pull](https://img.shields.io/docker/pulls/axoneprotocol/axoned?label=downloads&style=for-the-badge&logo=docker)](https://hub.docker.com/r/axoneprotocol/axoned)

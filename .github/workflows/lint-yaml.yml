@@ -1,17 +1,19 @@
-name: Lint GitHub Actions
+name: Lint / YAML
 
 on:
-  workflow_call:
-
   push:
     branches: [main]
     paths:
-      - .github/workflows/*.yml
+      - '.github/workflows/lint-yaml.yml'
+      - '**/*.yml'
+      - '**/*.yaml'
 
   pull_request:
     branches: [main]
     paths:
-      - .github/workflows/*.yml
+      - '.github/workflows/lint-yaml.yml'
+      - '**/*.yml'
+      - '**/*.yaml'
 
 permissions:
   contents: read
@@ -21,11 +23,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  lint-github-actions:
+  lint-yaml:
     runs-on: ubuntu-22.04
     steps:
       - name: Check out repository
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
 
-      - name: Lint GitHub Actions workflows
-        uses: raven-actions/actionlint@205b530c5d9fa8f44ae9ed59f341a0db994aa6f8 # v2.1.2
+      - name: Lint yaml files
+        uses: ibiqlik/action-yamllint@2576378a8e339169678f9939646ee3ee325e845c # v3.1.1

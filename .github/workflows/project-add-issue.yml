@@ -1,13 +1,15 @@
-name: Add to project
+name: Project / Add Issue
 
 on:
   issues:
     types:
       - opened
 
+permissions:
+  contents: read
+
 jobs:
-  add-to-project:
-    name: Add issue to project
+  project-add-issue:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/add-to-project@244f685bbc3b7adfa8466e08b698b5577571133e # v1.0.2

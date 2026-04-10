@@ -1,0 +1,74 @@
+name: Release / Notify
+
+on:
+  release:
+    types: [published]
+
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag (leave empty for last one)'
+
+permissions:
+  contents: read
+
+jobs:
+  release-notify:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6
+
+      - name: Resolve release context
+        run: |
+          if [ "$GITHUB_EVENT_NAME" = "release" ]; then
+            TAG="$EVENT_TAG"
+          elif [ -n "$INPUT_TAG" ]; then
+            TAG="$INPUT_TAG"
+          else
+            TAG=$(gh release view --json tagName -q '.tagName')
+          fi
+          echo "RELEASE_TAG=$TAG" >> "$GITHUB_ENV"
+
+          OWNER_PREFIX="${GITHUB_REPOSITORY_OWNER}/"
+          REPO_NAME="${GITHUB_REPOSITORY#"$OWNER_PREFIX"}"
+          echo "REPO_NAME=$REPO_NAME" >> "$GITHUB_ENV"
+        env:
+          EVENT_TAG: ${{ github.event.release.tag_name }}
+          INPUT_TAG: ${{ github.event.inputs.tag }}
+          GH_TOKEN: ${{ secrets.OPS_TOKEN }}
+
+      - name: Extract changelog for tag
+        run: |
+          DELIM="EOF_$(uuidgen)"
+          {
+            echo "CHANGELOG<<$DELIM"
+            gh release view "$RELEASE_TAG" --json body -q '.body'
+            echo "$DELIM"
+          } >> "$GITHUB_ENV"
+        env:
+          GH_TOKEN: ${{ secrets.OPS_TOKEN }}
+
+      - name: Create an announcement discussion for release
+        uses: abirismyname/create-discussion@c2b7c825241769dda523865ae444a879f6bbd0e0 # v2.1.0
+        with:
+          title: 🎉 ${{ env.REPO_NAME }} ${{ env.RELEASE_TAG }} released!
+          body: |
+            Hey frens! [${{ github.repository }}](https://github.com/${{ github.repository }}) `${{ env.RELEASE_TAG }}` just dropped! 🚀
+
+            Some fresh updates are here. Dive into the changelog and see what's cooking! 🔥
+
+            # Changelog
+
+            ${{ env.CHANGELOG }}
+
+            # Resources
+
+            📄 Changelog: <https://github.com/${{ github.repository }}/releases/tag/${{ env.RELEASE_TAG }}>
+            🛠️ Official repo: <https://github.com/${{ github.repository }}>
+            💬 Vibe with us on Discord: <${{ vars.DISCORD_URL }}>
+            🐦 Catch us on Twitter: <${{ vars.TWITTER_URL }}>
+          repository-id: ${{ vars.DISCUSSIONS_REPOSITORY_ID }}
+          category-id: ${{ vars.DISCUSSIONS_CATEGORY_ID }}
+        env:
+          GH_TOKEN: ${{ secrets.OPS_TOKEN }}
