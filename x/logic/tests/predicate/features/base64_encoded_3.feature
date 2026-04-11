@@ -43,7 +43,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 9408
+      gas_used: 9339
       answer:
         has_more: false
         variables: ["X"]
@@ -70,7 +70,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 10063
+      gas_used: 9944
       answer:
         has_more: false
         variables: ["X"]
@@ -98,7 +98,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 13901
+      gas_used: 13655
       answer:
         has_more: false
         variables: ["Classic", "UrlSafe"]
@@ -154,7 +154,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 11678
+      gas_used: 11609
       answer:
         has_more: false
         variables: ["X"]
@@ -178,7 +178,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 8016
+      gas_used: 7905
       answer:
         has_more: false
         variables: ["X"]
@@ -200,7 +200,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6595
+      gas_used: 6526
       answer:
         has_more: false
         variables: ["X"]
@@ -222,7 +222,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 8543
+      gas_used: 8424
       answer:
         has_more: false
         variables: ["X"]
@@ -312,7 +312,7 @@ Feature: base64_encoded/3
       Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 4801
+        gas_used: 4776
         answer:
           has_more: false
           variables: ["X"]
@@ -334,7 +334,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 4469
+        gas_used: 4441
         answer:
           has_more: false
           variables: ["X"]
@@ -357,7 +357,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 5253
+        gas_used: 5207
         answer:
           has_more: false
           variables: ["X"]
@@ -379,7 +379,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 4464
+        gas_used: 4436
         answer:
           has_more: false
           variables: ["X"]
@@ -421,7 +421,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6537
+      gas_used: 6468
       answer:
         has_more: false
         variables: ["X"]
@@ -465,7 +465,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 12449
+        gas_used: 12338
         answer:
           has_more: false
           variables: ["X"]
@@ -488,11 +488,34 @@ Feature: base64_encoded/3
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 4475
+        gas_used: 4447
         answer:
           has_more: false
           variables: ["X"]
           results:
           - error: "error(type_error(option,encoding(bad,very bad)),base64_encoded/3)"
+            substitutions:
+        """
+
+  @great_for_documentation
+  Scenario: Error on unknown option name
+  This scenario demonstrates how the `base64_encoded/3` predicate behaves when an unknown option name is provided.
+  This helps catch typos in option names (e.g., `chatset` instead of `charset`).
+
+    Given the query:
+        """ prolog
+        consult('/v1/lib/base64.pl'),
+        base64_encoded('Hello World', X, [chatset(classic)]).
+        """
+    When the query is run
+    Then the answer we get is:
+        """ yaml
+        height: 42
+        gas_used: 4423
+        answer:
+          has_more: false
+          variables: ["X"]
+          results:
+          - error: "error(type_error(option,chatset(classic)),base64_encoded/3)"
             substitutions:
         """
