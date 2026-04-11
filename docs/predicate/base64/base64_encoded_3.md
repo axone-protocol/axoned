@@ -1,47 +1,48 @@
 ---
-sidebar_position: 15
+sidebar_position: 1
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
 # base64_encoded/3
 
+## Module
+
+This predicate is provided by `base64.pl`.
+
+Load this module before using the predicate:
+
+```prolog
+:- consult('/v1/lib/base64.pl').
+```
+
 ## Description
 
-`base64_encoded/3` is a predicate that unifies a string to a Base64 encoded string as specified by [RFC 4648](<https://rfc-editor.org/rfc/rfc4648.html>).
+base64_encoded(-Plain, +Encoded, +Options) is det.
 
-The signature is as follows:
+Relates a text value to its Base64-encoded representation as specified by
+[RFC 4648](https://rfc-editor.org/rfc/rfc4648.html).
+
+The predicate follows a functional direction:
+
+- when `Plain` is instantiated, it encodes `Plain` into `Encoded`;
+- otherwise, when `Encoded` is instantiated, it decodes `Encoded` into `Plain`;
+- otherwise, it throws `instantiation_error`.
+
+`Plain` may be an atom, a list of characters, or a list of character codes.
+`Encoded` may be an atom, a list of characters, or a list of character codes.
+
+Supported options are:
+
+- `charset(+Charset)` where `Charset` is `classic` (default) or `url`;
+- `padding(+Boolean)` where `Boolean` is `true` (default) or `false`;
+- `as(+Type)` where `Type` is `string` (default) or `atom`;
+- `encoding(+Encoding)` to translate between text and bytes, defaulting to `utf8`.
+
+## Signature
 
 ```text
 base64_encoded(+Plain, -Encoded, +Options) is det
-base64_encoded(-Plain, +Encoded, +Options) is det
-base64_encoded(+Plain, +Encoded, +Options) is det
 ```
-
-Where:
-
-- Plain is an atom, a list of character codes, or list of characters containing the unencoded \(plain\) text.
-- Encoded is an atom or string containing the Base64 encoded text.
-- Options is a list of options that can be used to control the encoding process.
-
-## Options
-
-The following options are supported:
-
-- padding\(\+Boolean\)
-
-If true \(default\), the output is padded with = characters.
-
-- charset\(\+Charset\)
-
-Define the encoding character set to use. The \(default\) 'classic' uses the classical rfc2045 characters. The value 'url' uses URL and file name friendly characters.
-
-- as\(\+Type\)
-
-Defines the type of the output. One of string \(default\) or atom.
-
-- encoding\(\+Encoding\)
-
-Encoding to use for translation between \(Unicode\) text and bytes \(Base64 is an encoding for bytes\). Default is utf8.
 
 ## Examples
 
@@ -59,6 +60,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded('Hello World', X, []).
 ```
 
@@ -67,7 +69,7 @@ base64_encoded('Hello World', X, []).
 
 ```  yaml
 height: 42
-gas_used: 3956
+gas_used: 9043
 answer:
   has_more: false
   variables: ["X"]
@@ -88,6 +90,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded('Hello World', X, [as(atom)]).
 ```
 
@@ -96,7 +99,7 @@ base64_encoded('Hello World', X, [as(atom)]).
 
 ```  yaml
 height: 42
-gas_used: 3956
+gas_used: 9339
 answer:
   has_more: false
   variables: ["X"]
@@ -120,6 +123,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded('Hello World', X, [as(atom), padding(false)]).
 ```
 
@@ -128,7 +132,7 @@ base64_encoded('Hello World', X, [as(atom), padding(false)]).
 
 ```  yaml
 height: 42
-gas_used: 3977
+gas_used: 9944
 answer:
   has_more: false
   variables: ["X"]
@@ -152,6 +156,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded('<<???>>', Classic, [as(atom), charset(classic)]),
 base64_encoded('<<???>>', UrlSafe, [as(atom), charset(url)]).
 ```
@@ -161,7 +166,7 @@ base64_encoded('<<???>>', UrlSafe, [as(atom), charset(url)]).
 
 ```  yaml
 height: 42
-gas_used: 4066
+gas_used: 13655
 answer:
   has_more: false
   variables: ["Classic", "UrlSafe"]
@@ -186,6 +191,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded(X, 'SGVsbG8gV29ybGQ=', []).
 ```
 
@@ -194,7 +200,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', []).
 
 ```  yaml
 height: 42
-gas_used: 3955
+gas_used: 9283
 answer:
   has_more: false
   variables: ["X"]
@@ -218,6 +224,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom)]).
 ```
 
@@ -226,7 +233,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom)]).
 
 ```  yaml
 height: 42
-gas_used: 3961
+gas_used: 10083
 answer:
   has_more: false
   variables: ["X"]
@@ -234,6 +241,35 @@ answer:
   - substitutions:
     - variable: X
       expression: "'Hello World'"
+```
+
+### Encode text using a specific character encoding
+
+This scenario demonstrates how the `encoding/1` option changes the bytes that are Base64-encoded before rendering the
+final Base64 text.
+
+Here are the steps of the scenario:
+
+- **Given** the query:
+
+```  prolog
+consult('/v1/lib/base64.pl'),
+base64_encoded('café', X, [as(atom), encoding('iso-8859-1')]).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 7905
+answer:
+  has_more: false
+  variables: ["X"]
+  results:
+  - substitutions:
+    - variable: X
+      expression: "'Y2Fm6Q=='"
 ```
 
 ### Error on incorrect charset option
@@ -246,6 +282,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded('Hello World', X, [charset(bad)]).
 ```
 
@@ -254,7 +291,7 @@ base64_encoded('Hello World', X, [charset(bad)]).
 
 ```  yaml
 height: 42
-gas_used: 3954
+gas_used: 4445
 answer:
   has_more: false
   variables: ["X"]
@@ -273,6 +310,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded('Hello World', X, [padding(bad)]).
 ```
 
@@ -281,7 +319,7 @@ base64_encoded('Hello World', X, [padding(bad)]).
 
 ```  yaml
 height: 42
-gas_used: 3955
+gas_used: 4776
 answer:
   has_more: false
   variables: ["X"]
@@ -300,6 +338,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded('Hello World', X, [as(bad)]).
 ```
 
@@ -308,7 +347,7 @@ base64_encoded('Hello World', X, [as(bad)]).
 
 ```  yaml
 height: 42
-gas_used: 3953
+gas_used: 5207
 answer:
   has_more: false
   variables: ["X"]
@@ -327,6 +366,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom), encoding(unknown)]).
 ```
 
@@ -335,7 +375,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom), encoding(unknown)]).
 
 ```  yaml
 height: 42
-gas_used: 3985
+gas_used: 10812
 answer:
   has_more: false
   variables: ["X"]
@@ -354,6 +394,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64_encoded(X, 'SGVsbG8gV29ybGQ=', [encoding(bad, 'very bad')]).
 ```
 
@@ -362,11 +403,39 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [encoding(bad, 'very bad')]).
 
 ```  yaml
 height: 42
-gas_used: 3979
+gas_used: 4447
 answer:
   has_more: false
   variables: ["X"]
   results:
   - error: "error(type_error(option,encoding(bad,very bad)),base64_encoded/3)"
+    substitutions:
+```
+
+### Error on unknown option name
+
+This scenario demonstrates how the `base64_encoded/3` predicate behaves when an unknown option name is provided.
+This helps catch typos in option names (e.g., `chatset` instead of `charset`).
+
+Here are the steps of the scenario:
+
+- **Given** the query:
+
+```  prolog
+consult('/v1/lib/base64.pl'),
+base64_encoded('Hello World', X, [chatset(classic)]).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 4423
+answer:
+  has_more: false
+  variables: ["X"]
+  results:
+  - error: "error(type_error(option,chatset(classic)),base64_encoded/3)"
     substitutions:
 ```

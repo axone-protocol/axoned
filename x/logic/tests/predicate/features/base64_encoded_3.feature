@@ -11,13 +11,14 @@ Feature: base64_encoded/3
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded('Hello World', X, []).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3956
+      gas_used: 9043
       answer:
         has_more: false
         variables: ["X"]
@@ -35,13 +36,14 @@ Feature: base64_encoded/3
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded('Hello World', X, [as(atom)]).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3956
+      gas_used: 9339
       answer:
         has_more: false
         variables: ["X"]
@@ -61,13 +63,14 @@ Feature: base64_encoded/3
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded('Hello World', X, [as(atom), padding(false)]).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3977
+      gas_used: 9944
       answer:
         has_more: false
         variables: ["X"]
@@ -87,6 +90,7 @@ Feature: base64_encoded/3
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded('<<???>>', Classic, [as(atom), charset(classic)]),
       base64_encoded('<<???>>', UrlSafe, [as(atom), charset(url)]).
       """
@@ -94,7 +98,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4066
+      gas_used: 13655
       answer:
         has_more: false
         variables: ["Classic", "UrlSafe"]
@@ -116,13 +120,14 @@ Feature: base64_encoded/3
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded(X, 'SGVsbG8gV29ybGQ=', []).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3955
+      gas_used: 9283
       answer:
         has_more: false
         variables: ["X"]
@@ -142,13 +147,14 @@ Feature: base64_encoded/3
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom)]).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3961
+      gas_used: 10083
       answer:
         has_more: false
         variables: ["X"]
@@ -159,19 +165,109 @@ Feature: base64_encoded/3
       """
 
   @great_for_documentation
+  Scenario: Encode text using a specific character encoding
+  This scenario demonstrates how the `encoding/1` option changes the bytes that are Base64-encoded before rendering the
+  final Base64 text.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64_encoded('café', X, [as(atom), encoding('iso-8859-1')]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 7905
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - substitutions:
+          - variable: X
+            expression: "'Y2Fm6Q=='"
+      """
+
+  Scenario: Encode a list of character codes
+  This scenario demonstrates that `base64_encoded/3` accepts a list of character codes as plain text input.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64_encoded([72,105], X, [as(atom)]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 6526
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - substitutions:
+          - variable: X
+            expression: "'SGk='"
+      """
+
+  Scenario: Decode a Base64 encoded atom without padding
+  This scenario demonstrates that decoding also supports `padding(false)` when the input omits trailing `=` characters.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64_encoded(X, 'SGVsbG8', [as(atom), padding(false)]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 8451
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - substitutions:
+          - variable: X
+            expression: "'Hello'"
+      """
+
+  Scenario: Error when both arguments are variables
+  This scenario demonstrates that `base64_encoded/3` requires at least one of `Plain` or `Encoded` to be instantiated.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64_encoded(X, Y, []).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 5099
+      answer:
+        has_more: false
+        variables: ["X", "Y"]
+        results:
+        - error: "error(instantiation_error,base64_encoded/3)"
+          substitutions:
+      """
+
+  @great_for_documentation
   Scenario: Error on incorrect charset option
   This scenario demonstrates how the `base64_encoded/3` predicate behaves when an invalid value is provided for the
   `charset` option.
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded('Hello World', X, [charset(bad)]).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3954
+      gas_used: 4445
       answer:
         has_more: false
         variables: ["X"]
@@ -186,13 +282,14 @@ Feature: base64_encoded/3
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded('Hello World', X, [charset("bad")]).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3956
+      gas_used: 4653
       answer:
         has_more: false
         variables: ["X"]
@@ -208,13 +305,14 @@ Feature: base64_encoded/3
 
       Given the query:
         """ prolog
+        consult('/v1/lib/base64.pl'),
         base64_encoded('Hello World', X, [padding(bad)]).
         """
       When the query is run
       Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 3955
+        gas_used: 4776
         answer:
           has_more: false
           variables: ["X"]
@@ -229,13 +327,14 @@ Feature: base64_encoded/3
 
     Given the query:
         """ prolog
+        consult('/v1/lib/base64.pl'),
         base64_encoded('Hello World', X, [padding(bad, 'very bad')]).
         """
     When the query is run
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 3969
+        gas_used: 4441
         answer:
           has_more: false
           variables: ["X"]
@@ -251,13 +350,14 @@ Feature: base64_encoded/3
 
     Given the query:
         """ prolog
+        consult('/v1/lib/base64.pl'),
         base64_encoded('Hello World', X, [as(bad)]).
         """
     When the query is run
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 3953
+        gas_used: 5207
         answer:
           has_more: false
           variables: ["X"]
@@ -272,13 +372,14 @@ Feature: base64_encoded/3
 
     Given the query:
         """ prolog
+        consult('/v1/lib/base64.pl'),
         base64_encoded('Hello World', X, [as(bad, 'very bad')]).
         """
     When the query is run
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 3965
+        gas_used: 4436
         answer:
           has_more: false
           variables: ["X"]
@@ -292,13 +393,14 @@ Feature: base64_encoded/3
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded(wrong(input), X, []).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3945
+      gas_used: 5070
       answer:
         has_more: false
         variables: ["X"]
@@ -312,18 +414,82 @@ Feature: base64_encoded/3
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded(X, '!!!!', [as(atom)]).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3953
+      gas_used: 6716
       answer:
         has_more: false
         variables: ["X"]
         results:
-        - error: "error(domain_error(encoding(base64),!!!!),[i,l,l,e,g,a,l, ,b,a,s,e,6,4, ,d,a,t,a, ,a,t, ,i,n,p,u,t, ,b,y,t,e, ,0],base64_encoded/3)"
+        - error: "error(domain_error(encoding(base64),!!!!),base64_encoded/3)"
+          substitutions:
+      """
+
+  Scenario: Error on non-canonical 2-character tail without padding
+  This scenario demonstrates that `base64_encoded/3` rejects a malformed final quantum when discarded tail bits are not zero.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64_encoded(X, 'QR', [as(atom), padding(false)]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 7265
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - error: "error(domain_error(encoding(base64),QR),base64_encoded/3)"
+          substitutions:
+      """
+
+  Scenario: Error on non-canonical 3-character tail without padding
+  This scenario demonstrates that `base64_encoded/3` rejects a malformed 3-character tail when discarded tail bits are not zero.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64_encoded(X, 'SGl', [as(atom), padding(false)]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 7830
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - error: "error(domain_error(encoding(base64),SGl),base64_encoded/3)"
+          substitutions:
+      """
+
+  Scenario: Error on extra data after padded Base64 input
+  This scenario demonstrates that `base64_encoded/3` rejects additional data after a padded final quantum.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64_encoded(X, 'QQ==QQ==', [as(atom)]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 7962
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - error: "error(domain_error(encoding(base64),QQ==QQ==),base64_encoded/3)"
           substitutions:
       """
 
@@ -332,13 +498,14 @@ Feature: base64_encoded/3
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64_encoded(X, wrong(input), []).
       """
     When the query is run
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3945
+      gas_used: 5200
       answer:
         has_more: false
         variables: ["X"]
@@ -354,13 +521,14 @@ Feature: base64_encoded/3
 
     Given the query:
         """ prolog
+        consult('/v1/lib/base64.pl'),
         base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom), encoding(unknown)]).
         """
     When the query is run
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 3985
+        gas_used: 10812
         answer:
           has_more: false
           variables: ["X"]
@@ -376,17 +544,41 @@ Feature: base64_encoded/3
 
     Given the query:
         """ prolog
+        consult('/v1/lib/base64.pl'),
         base64_encoded(X, 'SGVsbG8gV29ybGQ=', [encoding(bad, 'very bad')]).
         """
     When the query is run
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 3979
+        gas_used: 4447
         answer:
           has_more: false
           variables: ["X"]
           results:
           - error: "error(type_error(option,encoding(bad,very bad)),base64_encoded/3)"
+            substitutions:
+        """
+
+  @great_for_documentation
+  Scenario: Error on unknown option name
+  This scenario demonstrates how the `base64_encoded/3` predicate behaves when an unknown option name is provided.
+  This helps catch typos in option names (e.g., `chatset` instead of `charset`).
+
+    Given the query:
+        """ prolog
+        consult('/v1/lib/base64.pl'),
+        base64_encoded('Hello World', X, [chatset(classic)]).
+        """
+    When the query is run
+    Then the answer we get is:
+        """ yaml
+        height: 42
+        gas_used: 4423
+        answer:
+          has_more: false
+          variables: ["X"]
+          results:
+          - error: "error(type_error(option,chatset(classic)),base64_encoded/3)"
             substitutions:
         """
