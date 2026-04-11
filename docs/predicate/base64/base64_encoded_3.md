@@ -99,7 +99,7 @@ base64_encoded('Hello World', X, [as(atom)]).
 
 ```  yaml
 height: 42
-gas_used: 9408
+gas_used: 9339
 answer:
   has_more: false
   variables: ["X"]
@@ -132,7 +132,7 @@ base64_encoded('Hello World', X, [as(atom), padding(false)]).
 
 ```  yaml
 height: 42
-gas_used: 10063
+gas_used: 9944
 answer:
   has_more: false
   variables: ["X"]
@@ -166,7 +166,7 @@ base64_encoded('<<???>>', UrlSafe, [as(atom), charset(url)]).
 
 ```  yaml
 height: 42
-gas_used: 13901
+gas_used: 13655
 answer:
   has_more: false
   variables: ["Classic", "UrlSafe"]
@@ -200,7 +200,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', []).
 
 ```  yaml
 height: 42
-gas_used: 10809
+gas_used: 9283
 answer:
   has_more: false
   variables: ["X"]
@@ -233,7 +233,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom)]).
 
 ```  yaml
 height: 42
-gas_used: 11678
+gas_used: 10083
 answer:
   has_more: false
   variables: ["X"]
@@ -262,7 +262,7 @@ base64_encoded('café', X, [as(atom), encoding('iso-8859-1')]).
 
 ```  yaml
 height: 42
-gas_used: 8016
+gas_used: 7905
 answer:
   has_more: false
   variables: ["X"]
@@ -319,7 +319,7 @@ base64_encoded('Hello World', X, [padding(bad)]).
 
 ```  yaml
 height: 42
-gas_used: 4801
+gas_used: 4776
 answer:
   has_more: false
   variables: ["X"]
@@ -347,7 +347,7 @@ base64_encoded('Hello World', X, [as(bad)]).
 
 ```  yaml
 height: 42
-gas_used: 5253
+gas_used: 5207
 answer:
   has_more: false
   variables: ["X"]
@@ -375,7 +375,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom), encoding(unknown)]).
 
 ```  yaml
 height: 42
-gas_used: 12449
+gas_used: 10812
 answer:
   has_more: false
   variables: ["X"]
@@ -403,11 +403,39 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [encoding(bad, 'very bad')]).
 
 ```  yaml
 height: 42
-gas_used: 4475
+gas_used: 4447
 answer:
   has_more: false
   variables: ["X"]
   results:
   - error: "error(type_error(option,encoding(bad,very bad)),base64_encoded/3)"
+    substitutions:
+```
+
+### Error on unknown option name
+
+This scenario demonstrates how the `base64_encoded/3` predicate behaves when an unknown option name is provided.
+This helps catch typos in option names (e.g., `chatset` instead of `charset`).
+
+Here are the steps of the scenario:
+
+- **Given** the query:
+
+```  prolog
+consult('/v1/lib/base64.pl'),
+base64_encoded('Hello World', X, [chatset(classic)]).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 4423
+answer:
+  has_more: false
+  variables: ["X"]
+  results:
+  - error: "error(type_error(option,chatset(classic)),base64_encoded/3)"
     substitutions:
 ```
