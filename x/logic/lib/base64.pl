@@ -90,10 +90,10 @@ base64_option_match(Name, Option, Value) :-
   compound(Option),
   Option =.. [Name, Value].
 
-base64_option_known(Option) :-
-  nonvar(Option),
-  compound(Option),
-  Option =.. [_Name, _Value].
+base64_option_known(charset(_)).
+base64_option_known(padding(_)).
+base64_option_known(as(_)).
+base64_option_known(encoding(_)).
 
 base64_charset(classic).
 base64_charset(url).
