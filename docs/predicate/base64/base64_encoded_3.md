@@ -1,5 +1,5 @@
 ---
-sidebar_position: 2
+sidebar_position: 1
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -16,6 +16,8 @@ Load this module before using the predicate:
 ```
 
 ## Description
+
+base64_encoded(-Plain, +Encoded, +Options) is det.
 
 Relates a text value to its Base64-encoded representation as specified by
 [RFC 4648](https://rfc-editor.org/rfc/rfc4648.html).
@@ -39,7 +41,7 @@ Supported options are:
 ## Signature
 
 ```text
-base64_encoded(?Plain, ?Encoded, +Options) is det
+base64_encoded(+Plain, -Encoded, +Options) is det
 ```
 
 ## Examples

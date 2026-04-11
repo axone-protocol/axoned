@@ -1,5 +1,5 @@
 ---
-sidebar_position: 3
+sidebar_position: 2
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -17,6 +17,8 @@ Load this module before using the predicate:
 
 ## Description
 
+base64url(-Plain, +Encoded) is det.
+
 Relates a text value to its URL-safe Base64 representation.
 
 The predicate is equivalent to `base64_encoded/3` with options
@@ -25,7 +27,7 @@ The predicate is equivalent to `base64_encoded/3` with options
 ## Signature
 
 ```text
-base64url(?Plain, ?Encoded) is det
+base64url(+Plain, -Encoded) is det
 ```
 
 ## Examples

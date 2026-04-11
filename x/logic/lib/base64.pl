@@ -3,7 +3,8 @@
 
 :- consult('/v1/lib/error.pl').
 
-%! base64_encoded(?Plain, ?Encoded, +Options) is det.
+%! base64_encoded(+Plain, -Encoded, +Options) is det.
+%! base64_encoded(-Plain, +Encoded, +Options) is det.
 %
 % Relates a text value to its Base64-encoded representation as specified by
 % [RFC 4648](https://rfc-editor.org/rfc/rfc4648.html).
@@ -37,7 +38,8 @@ base64_encoded(Plain, Encoded, Options) :-
   ),
   !.
 
-%! base64url(?Plain, ?Encoded) is det.
+%! base64url(+Plain, -Encoded) is det.
+%! base64url(-Plain, +Encoded) is det.
 %
 % Relates a text value to its URL-safe Base64 representation.
 %
@@ -45,15 +47,6 @@ base64_encoded(Plain, Encoded, Options) :-
 % `[as(atom), encoding(utf8), charset(url), padding(false)]`.
 base64url(Plain, Encoded) :-
   base64_encoded(Plain, Encoded, [as(atom), encoding(utf8), charset(url), padding(false)]).
-
-%! base64(?Plain, ?Encoded) is det.
-%
-% Relates a text value to its classic padded Base64 representation.
-%
-% The predicate is equivalent to `base64_encoded/3` with options
-% `[as(atom), encoding(utf8), charset(classic), padding(true)]`.
-base64(Plain, Encoded) :-
-  base64_encoded(Plain, Encoded, [as(atom), encoding(utf8), charset(classic), padding(true)]).
 
 base64_options(Options, Charset, Padding, As, Encoding) :-
   base64_option(charset, Options, classic, Charset),
