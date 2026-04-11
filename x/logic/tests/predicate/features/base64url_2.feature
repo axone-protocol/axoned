@@ -16,7 +16,7 @@ Feature: base64url/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 15171
+      gas_used: 15202
       answer:
         has_more: false
         variables: ["Encoded", "Decoded"]
@@ -40,11 +40,32 @@ Feature: base64url/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 8365
+      gas_used: 8387
       answer:
         has_more: false
         variables: ["X"]
         results:
         - error: "error(domain_error(encoding(base64),!!!!),base64_encoded/3)"
+          substitutions:
+      """
+
+  Scenario: Error on non-canonical URL-safe Base64 tail
+  This scenario demonstrates that `base64url/2` rejects malformed unpadded input when discarded tail bits are not zero.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64url(X, 'QR').
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 7809
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - error: "error(domain_error(encoding(base64),QR),base64_encoded/3)"
           substitutions:
       """

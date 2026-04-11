@@ -127,7 +127,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 10809
+      gas_used: 9283
       answer:
         has_more: false
         variables: ["X"]
@@ -154,7 +154,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 11609
+      gas_used: 10083
       answer:
         has_more: false
         variables: ["X"]
@@ -222,7 +222,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 8424
+      gas_used: 8451
       answer:
         has_more: false
         variables: ["X"]
@@ -421,12 +421,75 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6468
+      gas_used: 6716
       answer:
         has_more: false
         variables: ["X"]
         results:
         - error: "error(domain_error(encoding(base64),!!!!),base64_encoded/3)"
+          substitutions:
+      """
+
+  Scenario: Error on non-canonical 2-character tail without padding
+  This scenario demonstrates that `base64_encoded/3` rejects a malformed final quantum when discarded tail bits are not zero.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64_encoded(X, 'QR', [as(atom), padding(false)]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 7265
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - error: "error(domain_error(encoding(base64),QR),base64_encoded/3)"
+          substitutions:
+      """
+
+  Scenario: Error on non-canonical 3-character tail without padding
+  This scenario demonstrates that `base64_encoded/3` rejects a malformed 3-character tail when discarded tail bits are not zero.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64_encoded(X, 'SGl', [as(atom), padding(false)]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 7830
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - error: "error(domain_error(encoding(base64),SGl),base64_encoded/3)"
+          substitutions:
+      """
+
+  Scenario: Error on extra data after padded Base64 input
+  This scenario demonstrates that `base64_encoded/3` rejects additional data after a padded final quantum.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64_encoded(X, 'QQ==QQ==', [as(atom)]).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 7962
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - error: "error(domain_error(encoding(base64),QQ==QQ==),base64_encoded/3)"
           substitutions:
       """
 
@@ -465,7 +528,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 12338
+        gas_used: 10812
         answer:
           has_more: false
           variables: ["X"]
