@@ -195,34 +195,40 @@ base64_encode_bytes(false, [I0], Charset) -->
 base64_encode_bytes(_, [], _) -->
   [].
 
-base64_decode_bytes(true, Bytes, Charset) -->
+base64_decode_bytes(true, [I0], Charset) -->
+  [C0, C1, 61, 61],
+  !,
+  {
+    base64_char(Charset, B0, C0),
+    base64_char(Charset, B1, C1),
+    (B1 /\ 0x0F) =:= 0,  % verify tail bits are zero
+    A is (B0 << 18) + (B1 << 12),
+    I0 is (A >> 16) /\ 255
+  }.
+base64_decode_bytes(true, [I0, I1], Charset) -->
+  [C0, C1, C2, 61],
+  !,
+  {
+    base64_char(Charset, B0, C0),
+    base64_char(Charset, B1, C1),
+    base64_char(Charset, B2, C2),
+    (B2 /\ 0x03) =:= 0,  % verify tail bits are zero
+    A is (B0 << 18) + (B1 << 12) + (B2 << 6),
+    I0 is (A >> 16) /\ 255,
+    I1 is (A >> 8) /\ 255
+  }.
+base64_decode_bytes(true, [I0, I1, I2 | Rest], Charset) -->
   [C0, C1, C2, C3],
   !,
   {
     base64_char(Charset, B0, C0),
-    base64_char(Charset, B1, C1)
-  },
-  !,
-  {
-    ( C3 =:= 61
-    -> ( C2 =:= 61
-       -> A is (B0 << 18) + (B1 << 12),
-          I0 is (A >> 16) /\ 255,
-          Bytes = [I0 | Rest]
-       ;  base64_char(Charset, B2, C2),
-          A is (B0 << 18) + (B1 << 12) + (B2 << 6),
-          I0 is (A >> 16) /\ 255,
-          I1 is (A >> 8) /\ 255,
-          Bytes = [I0, I1 | Rest]
-       )
-    ;  base64_char(Charset, B2, C2),
-       base64_char(Charset, B3, C3),
-       A is (B0 << 18) + (B1 << 12) + (B2 << 6) + B3,
-       I0 is (A >> 16) /\ 255,
-       I1 is (A >> 8) /\ 255,
-       I2 is A /\ 255,
-       Bytes = [I0, I1, I2 | Rest]
-    )
+    base64_char(Charset, B1, C1),
+    base64_char(Charset, B2, C2),
+    base64_char(Charset, B3, C3),
+    A is (B0 << 18) + (B1 << 12) + (B2 << 6) + B3,
+    I0 is (A >> 16) /\ 255,
+    I1 is (A >> 8) /\ 255,
+    I2 is A /\ 255
   },
   base64_decode_bytes(true, Rest, Charset).
 base64_decode_bytes(false, Bytes, Charset) -->
@@ -247,6 +253,7 @@ base64_decode_bytes(false, [I0, I1], Charset) -->
     base64_char(Charset, B0, C0),
     base64_char(Charset, B1, C1),
     base64_char(Charset, B2, C2),
+    (B2 /\ 0x03) =:= 0,  % verify tail bits are zero
     A is (B0 << 18) + (B1 << 12) + (B2 << 6),
     I0 is (A >> 16) /\ 255,
     I1 is (A >> 8) /\ 255
@@ -257,6 +264,7 @@ base64_decode_bytes(false, [I0], Charset) -->
   {
     base64_char(Charset, B0, C0),
     base64_char(Charset, B1, C1),
+    (B1 /\ 0x0F) =:= 0,  % verify tail bits are zero
     A is (B0 << 18) + (B1 << 12),
     I0 is (A >> 16) /\ 255
   }.
