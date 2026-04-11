@@ -1,29 +1,32 @@
 ---
-sidebar_position: 14
+sidebar_position: 1
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
 # base64/2
 
-## Description
+## Module
 
-`base64/2` is a predicate that unifies a string to a `base64/2` encoded string.
+This predicate is provided by `base64.pl`.
 
-The output is returned as an atom with padding included.
+Load this module before using the predicate:
 
-The signature is as follows:
-
-```text
-base64(+Plain, -Encoded) is det
-base64(-Plain, +Encoded) is det
+```prolog
+:- consult('/v1/lib/base64.pl').
 ```
 
-Where:
+## Description
 
-- Plain is an atom, a list of characters, or character codes representing the unencoded text.
-- Encoded is an atom, a list of characters, or character codes representing the `base64/2` encoded form.
+Relates a text value to its classic padded Base64 representation.
 
-The predicate is equivalent to base64\_encoded/3 with options: \[as\(atom\), encoding\(utf8\), charset\(classic\), padding\(true\)\].
+The predicate is equivalent to `base64_encoded/3` with options
+`[as(atom), encoding(utf8), charset(classic), padding(true)]`.
+
+## Signature
+
+```text
+base64(?Plain, ?Encoded) is det
+```
 
 ## Examples
 
@@ -37,6 +40,7 @@ Here are the steps of the scenario:
 - **Given** the query:
 
 ```  prolog
+consult('/v1/lib/base64.pl'),
 base64('Hello world', Encoded),
 base64(Decoded, 'SGVsbG8gd29ybGQ=').
 ```
@@ -46,7 +50,7 @@ base64(Decoded, 'SGVsbG8gd29ybGQ=').
 
 ```  yaml
 height: 42
-gas_used: 3998
+gas_used: 19603
 answer:
   has_more: false
   variables: ["Encoded", "Decoded"]
