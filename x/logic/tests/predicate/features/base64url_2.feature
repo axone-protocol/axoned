@@ -8,6 +8,7 @@ Feature: base64url/2
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64url('<<???>>', Encoded),
       base64url(Decoded, 'PDw_Pz8-Pg').
       """
@@ -15,7 +16,7 @@ Feature: base64url/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3994
+      gas_used: 15447
       answer:
         has_more: false
         variables: ["Encoded", "Decoded"]
@@ -25,4 +26,25 @@ Feature: base64url/2
             expression: "'PDw_Pz8-Pg'"
           - variable: Decoded
             expression: "<<???>>"
+      """
+
+  Scenario: Error on incorrect URL-safe Base64 input
+  This scenario demonstrates how `base64url/2` behaves when the encoded input is not valid URL-safe Base64 text.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/base64.pl'),
+      base64url(X, '!!!!').
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 8503
+      answer:
+        has_more: false
+        variables: ["X"]
+        results:
+        - error: "error(domain_error(encoding(base64),!!!!),base64_encoded/3)"
+          substitutions:
       """

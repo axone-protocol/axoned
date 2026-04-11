@@ -8,6 +8,7 @@ Feature: base64/2
 
     Given the query:
       """ prolog
+      consult('/v1/lib/base64.pl'),
       base64('Hello world', Encoded),
       base64(Decoded, 'SGVsbG8gd29ybGQ=').
       """
@@ -15,7 +16,7 @@ Feature: base64/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 3998
+      gas_used: 19603
       answer:
         has_more: false
         variables: ["Encoded", "Decoded"]
