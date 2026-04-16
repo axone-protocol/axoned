@@ -4,6 +4,15 @@ import (
 	"fmt"
 )
 
+// Upper bounds for non-zero Limits fields. Proto uses 0 to mean "no limit" for several
+// fields; when a limit is set, it must stay within a range that cannot exhaust validator
+// memory (e.g. BoundedBuffer allocates MaxUserOutputSize bytes) or produce unusable query work.
+const (
+	maxLimitsBytes       uint64 = 512 << 20 // 512 MiB
+	maxLimitsResultCount uint64 = 1_000_000
+	maxLimitsVariables   uint64 = 10_000_000
+)
+
 // Parameter store keys.
 var (
 	ParamsKey = []byte("Params")
@@ -79,13 +88,32 @@ func NewLimits(opts ...LimitsOption) Limits {
 	return l
 }
 
-func validateLimits(i any) error {
-	_, ok := i.(Limits)
-	if !ok {
-		return fmt.Errorf("invalid parameter type: %T", i)
+func validateLimits(l Limits) error {
+	if l.MaxSize != 0 {
+		if err := validateUint64ByteLimit("max_size", l.MaxSize, maxLimitsBytes); err != nil {
+			return err
+		}
+	}
+	if l.MaxResultCount != 0 && l.MaxResultCount > maxLimitsResultCount {
+		return fmt.Errorf("limits.max_result_count exceeds maximum allowed (%d): %d", maxLimitsResultCount, l.MaxResultCount)
+	}
+	if l.MaxUserOutputSize != 0 {
+		if err := validateUint64ByteLimit("max_user_output_size", l.MaxUserOutputSize, maxLimitsBytes); err != nil {
+			return err
+		}
+	}
+	if l.MaxVariables != 0 && l.MaxVariables > maxLimitsVariables {
+		return fmt.Errorf("limits.max_variables exceeds maximum allowed (%d): %d", maxLimitsVariables, l.MaxVariables)
 	}
 
-	// TODO: Validate limits params.
+	return nil
+}
+
+func validateUint64ByteLimit(field string, v, limit uint64) error {
+	if v > limit {
+		return fmt.Errorf("limits.%s exceeds maximum allowed (%d bytes): %d", field, limit, v)
+	}
+
 	return nil
 }
 
