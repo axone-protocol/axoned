@@ -3,6 +3,108 @@
 
 :- consult('/v1/lib/error.pl').
 
+%! crypto_data_hash(+Data, ?Hash, +Options) is det.
+%
+% Computes the Hash of Data using a configured hashing algorithm.
+%
+% Options may be a single option term or a list of option terms:
+% - `algorithm(+Algorithm)` selects `sha256` (default), `sha512`, or `md5`;
+% - `encoding(+Encoding)` selects `utf8` (default), `text`, `hex`, or `octet`.
+%
+% Data is interpreted according to Encoding and Hash is unified with the
+% resulting digest as a list of bytes.
+crypto_data_hash(Data, Hash, Options) :-
+  crypto_hash_option(algorithm, Options, sha256, Algorithm),
+  crypto_hash_algorithm(Algorithm),
+  crypto_hash_option(encoding, Options, utf8, Encoding),
+  with_context(crypto_data_hash/3, crypto_hash_data_bytes(Encoding, Data, DataBytes)),
+  crypto_hash_path(Algorithm, Path),
+  crypto_hash_dev_call(Path, DataBytes, HashBytes),
+  Hash = HashBytes.
+
+crypto_hash_option(Name, Options, Default, Value) :-
+  ( crypto_hash_options_list(Options)
+  -> crypto_hash_option_list(Name, Options, Found),
+     crypto_hash_option_value(Found, Default, Value)
+  ; crypto_hash_valid_option_term(Options)
+  -> ( crypto_hash_option_term(Name, Options, Found)
+     -> Value = Found
+     ;  Value = Default
+     )
+  ;  throw(error(type_error(option, Options), crypto_data_hash/3))
+  ).
+
+crypto_hash_options_list(Options) :-
+  nonvar(Options),
+  ( Options = []
+  ; Options = [_|_]
+  ).
+
+crypto_hash_option_list(_, [], missing).
+crypto_hash_option_list(Name, [Option | Rest], Found) :-
+  crypto_hash_valid_option_term(Option),
+  ( crypto_hash_option_term(Name, Option, Value)
+  -> Found = found(Value)
+  ;  crypto_hash_option_list(Name, Rest, Found)
+  ).
+
+crypto_hash_valid_option_term(Option) :-
+  ( var(Option)
+  -> throw(error(instantiation_error, crypto_data_hash/3))
+  ; compound(Option)
+  -> true
+  ;  throw(error(type_error(option, Option), crypto_data_hash/3))
+  ).
+
+crypto_hash_option_term(Name, Option, Value) :-
+  compound(Option),
+  functor(Option, Name, 1),
+  arg(1, Option, Value).
+
+crypto_hash_option_value(found(Value), _, Value).
+crypto_hash_option_value(missing, Default, Default).
+
+crypto_hash_algorithm(Algorithm) :-
+  ( atom(Algorithm)
+  -> crypto_hash_algorithm_atom(Algorithm)
+  ;  throw(error(type_error(atom, Algorithm), crypto_data_hash/3))
+  ).
+
+crypto_hash_algorithm_atom(sha256) :- !.
+crypto_hash_algorithm_atom(sha512) :- !.
+crypto_hash_algorithm_atom(md5) :- !.
+crypto_hash_algorithm_atom(Algorithm) :-
+  throw(error(type_error(hash_algorithm, Algorithm), crypto_data_hash/3)).
+
+crypto_hash_data_bytes(hex, Data, Bytes) :-
+  !,
+  hex_bytes(Data, Bytes).
+crypto_hash_data_bytes(octet, Data, Bytes) :-
+  !,
+  must_be(list(byte), Data),
+  Bytes = Data.
+crypto_hash_data_bytes(utf8, Data, Bytes) :-
+  !,
+  string_bytes(Data, Bytes, utf8).
+crypto_hash_data_bytes(text, Data, Bytes) :-
+  !,
+  string_bytes(Data, Bytes, text).
+crypto_hash_data_bytes(Encoding, _, _) :-
+  ( atom(Encoding)
+  -> throw(error(domain_error(valid_encoding(Encoding), Encoding), crypto_data_hash/3))
+  ;  throw(error(type_error(atom, Encoding), crypto_data_hash/3))
+  ).
+
+crypto_hash_path(Algorithm, Path) :-
+  atom_concat('/v1/dev/crypto/hash/', Algorithm, Path).
+
+crypto_hash_dev_call(Path, DataBytes, HashBytes) :-
+  ( current_predicate(dev_call/4)
+  -> true
+  ;  consult('/v1/lib/dev.pl')
+  ),
+  dev_call(Path, binary, dev_write_bytes(DataBytes), dev_read_bytes(HashBytes)).
+
 %! hex_bytes(?Hex, ?Bytes) is det.
 %
 % Relates a hexadecimal text representation to a list of bytes.

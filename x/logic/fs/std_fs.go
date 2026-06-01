@@ -9,6 +9,7 @@ import (
 
 	logicbank "github.com/axone-protocol/axoned/v15/x/logic/fs/bank"
 	logiccodec "github.com/axone-protocol/axoned/v15/x/logic/fs/codec"
+	logiccrypto "github.com/axone-protocol/axoned/v15/x/logic/fs/crypto"
 	logicembeddedfs "github.com/axone-protocol/axoned/v15/x/logic/fs/embedded"
 	logicshare "github.com/axone-protocol/axoned/v15/x/logic/fs/share"
 	logicsyscomet "github.com/axone-protocol/axoned/v15/x/logic/fs/sys/comet"
@@ -29,6 +30,7 @@ const (
 	varLibBankPath  = v1Root + "/var/lib/bank"
 	varLibLogicPath = v1Root + "/var/lib/logic/users"
 	devCodecPath    = v1Root + "/dev/codec"
+	devCryptoPath   = v1Root + "/dev/crypto"
 	devWasmPath     = v1Root + "/dev/wasm"
 )
 
@@ -73,16 +75,18 @@ func StandardMounts(ctx goctx.Context, wasmKeeper logictypes.WasmKeeper, program
 	cometFS := logicsyscomet.NewFS(ctx)
 	bankFS := logicbank.NewFS(ctx)
 	codecFS := logiccodec.NewFS(ctx)
+	cryptoFS := logiccrypto.NewFS(ctx)
 	wasmFS := logicwasm.NewFS(ctx, wasmKeeper)
 	shareFS := logicshare.NewFS(ctx, programKeeper)
 
-	mounts := make([]Mount, 0, 7)
+	mounts := make([]Mount, 0, 8)
 	mounts = append(mounts,
 		Mount{Path: libPath, FS: libFS},
 		Mount{Path: runHeaderPath, FS: headerFS},
 		Mount{Path: runCometPath, FS: cometFS},
 		Mount{Path: varLibBankPath, FS: bankFS},
 		Mount{Path: devCodecPath, FS: codecFS},
+		Mount{Path: devCryptoPath, FS: cryptoFS},
 		Mount{Path: devWasmPath, FS: wasmFS},
 		Mount{Path: varLibLogicPath, FS: shareFS},
 	)
