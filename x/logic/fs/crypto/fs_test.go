@@ -59,6 +59,19 @@ func TestCryptoDeviceFSOpenFileValidation(t *testing.T) {
 			_, err := ofs.OpenFile("../hash/sha256", os.O_RDWR, 0)
 			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
 		})
+
+		Convey("when opening a path with wrong number of segments", func() {
+			_, err := ofs.OpenFile("hash", os.O_RDWR, 0)
+			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+
+			_, err = ofs.OpenFile("hash/sha256/extra", os.O_RDWR, 0)
+			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+		})
+
+		Convey("when opening a path with wrong first segment", func() {
+			_, err := ofs.OpenFile("foo/sha256", os.O_RDWR, 0)
+			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
+		})
 	})
 }
 
