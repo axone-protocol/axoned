@@ -96,7 +96,7 @@ crypto_hash_data_bytes(Encoding, _, _) :-
   ).
 
 crypto_hash_path(Algorithm, Path) :-
-  atom_concat('/v1/dev/crypto/hash/', Algorithm, Path).
+  atom_concat('/v1/dev/crypto/', Algorithm, Path).
 
 crypto_hash_dev_call(Path, DataBytes, HashBytes) :-
   ( current_predicate(dev_call/4)
