@@ -15,7 +15,7 @@ Feature: crypto_data_hash/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 64250
+      gas_used: 64284
       answer:
         has_more: false
         variables: ["Hash", "Hex"]
@@ -42,7 +42,7 @@ Feature: crypto_data_hash/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 144662
+      gas_used: 144730
       answer:
         has_more: false
         variables: ["Sha512Bytes", "Md5Bytes", "Sha512", "Md5"]
@@ -73,7 +73,7 @@ Feature: crypto_data_hash/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 129834
+      gas_used: 129902
       answer:
         has_more: false
         variables: ["HashFromHex", "HashFromOctet", "HexFromHex", "HexFromOctet"]
@@ -102,7 +102,7 @@ Feature: crypto_data_hash/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 16931
+      gas_used: 16965
       answer:
         has_more: false
         variables: ["Expected"]
