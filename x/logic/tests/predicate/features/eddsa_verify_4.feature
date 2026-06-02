@@ -63,6 +63,7 @@ Feature: eddsa_verify/4
             expression: true
       """
 
+  @great_for_documentation
   Scenario: Reject an invalid Ed25519 signature
     This scenario demonstrates that eddsa_verify/4 fails when the signature does not match the data.
 
@@ -89,6 +90,7 @@ Feature: eddsa_verify/4
         results:
       """
 
+  @great_for_documentation
   Scenario: Reject an unsupported EdDSA algorithm
     This scenario demonstrates that eddsa_verify/4 rejects algorithms outside the EdDSA family.
 
