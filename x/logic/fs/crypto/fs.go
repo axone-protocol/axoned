@@ -17,7 +17,6 @@ import (
 )
 
 const (
-	hashPath         = "hash"
 	maxRequestBytes  = 256 * 1024
 	maxResponseBytes = 64
 )
@@ -79,12 +78,11 @@ func (f *vfs) OpenFile(name string, flag int, _ fs.FileMode) (fs.File, error) {
 }
 
 func validateHashPath(subpath string) (util.HashAlg, error) {
-	segments := strings.Split(subpath, "/")
-	if len(segments) != 2 || segments[0] != hashPath {
+	if strings.Contains(subpath, "/") {
 		return util.HashAlg(0), fs.ErrNotExist
 	}
 
-	algorithm, err := util.ParseHashAlg(segments[1])
+	algorithm, err := util.ParseHashAlg(subpath)
 	if err != nil {
 		return util.HashAlg(0), fs.ErrNotExist
 	}

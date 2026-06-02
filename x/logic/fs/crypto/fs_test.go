@@ -32,7 +32,7 @@ func TestCryptoDeviceFSOpen(t *testing.T) {
 	vfs := NewFS(newSDKContext())
 
 	Convey("Given a crypto device filesystem", t, func() {
-		_, err := vfs.Open("hash/sha256")
+		_, err := vfs.Open("sha256")
 		So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
 	})
 }
@@ -46,30 +46,22 @@ func TestCryptoDeviceFSOpenFileValidation(t *testing.T) {
 
 	Convey("Given a crypto device filesystem", t, func() {
 		Convey("when opening with unsupported mode", func() {
-			_, err := ofs.OpenFile("hash/sha256", os.O_RDONLY, 0)
+			_, err := ofs.OpenFile("sha256", os.O_RDONLY, 0)
 			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
 		})
 
 		Convey("when opening an unknown path", func() {
-			_, err := ofs.OpenFile("hash/unknown", os.O_RDWR, 0)
+			_, err := ofs.OpenFile("unknown", os.O_RDWR, 0)
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
 		})
 
 		Convey("when opening an escaping path", func() {
-			_, err := ofs.OpenFile("../hash/sha256", os.O_RDWR, 0)
+			_, err := ofs.OpenFile("../sha256", os.O_RDWR, 0)
 			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
 		})
 
-		Convey("when opening a path with wrong number of segments", func() {
-			_, err := ofs.OpenFile("hash", os.O_RDWR, 0)
-			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
-
-			_, err = ofs.OpenFile("hash/sha256/extra", os.O_RDWR, 0)
-			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
-		})
-
-		Convey("when opening a path with wrong first segment", func() {
-			_, err := ofs.OpenFile("foo/sha256", os.O_RDWR, 0)
+		Convey("when opening a path with extra segments", func() {
+			_, err := ofs.OpenFile("sha256/extra", os.O_RDWR, 0)
 			So(errors.Is(err, fs.ErrNotExist), ShouldBeTrue)
 		})
 	})
@@ -110,28 +102,28 @@ func TestCryptoDeviceFSFunctional(t *testing.T) {
 
 		Convey("when hashing with sha256", func() {
 			expected := sha256.Sum256(request)
-			got, err := readAll("hash/sha256", request)
+			got, err := readAll("sha256", request)
 			So(err, ShouldBeNil)
 			So(got, ShouldResemble, expected[:])
 		})
 
 		Convey("when hashing with sha512", func() {
 			expected := sha512.Sum512(request)
-			got, err := readAll("hash/sha512", request)
+			got, err := readAll("sha512", request)
 			So(err, ShouldBeNil)
 			So(got, ShouldResemble, expected[:])
 		})
 
 		Convey("when hashing with md5", func() {
 			expected := []byte{94, 182, 59, 187, 224, 30, 238, 208, 147, 203, 34, 187, 143, 90, 205, 195}
-			got, err := readAll("hash/md5", request)
+			got, err := readAll("md5", request)
 			So(err, ShouldBeNil)
 			So(got, ShouldResemble, expected)
 		})
 
 		Convey("when hashing an empty request", func() {
 			expected := sha256.Sum256(nil)
-			got, err := readAll("hash/sha256", nil)
+			got, err := readAll("sha256", nil)
 			So(err, ShouldBeNil)
 			So(got, ShouldResemble, expected[:])
 		})
@@ -147,7 +139,7 @@ func TestCryptoDeviceFSErrors(t *testing.T) {
 
 	Convey("Given a crypto device filesystem", t, func() {
 		Convey("when request payload exceeds limit", func() {
-			file, err := ofs.OpenFile("hash/sha256", os.O_RDWR, 0)
+			file, err := ofs.OpenFile("sha256", os.O_RDWR, 0)
 			So(err, ShouldBeNil)
 
 			huge := bytes.Repeat([]byte("x"), maxRequestBytes+1)
