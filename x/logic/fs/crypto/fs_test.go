@@ -26,6 +26,7 @@ import (
 
 	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/devfile"
 	fsiface "github.com/axone-protocol/axoned/v15/x/logic/fs/internal/iface"
+	"github.com/axone-protocol/axoned/v15/x/logic/util"
 )
 
 const (
@@ -213,6 +214,97 @@ func TestCryptoDeviceFSSignatureProtocolErrors(t *testing.T) {
 	})
 }
 
+func TestCryptoDeviceFSSignatureRequestValidation(t *testing.T) {
+	Convey("Given signature request validation", t, func() {
+		cases := []struct {
+			name     string
+			request  []byte
+			expected string
+		}{
+			{
+				name:     "empty request",
+				request:  []byte{},
+				expected: "error(invalid_request).\n",
+			},
+			{
+				name:     "blank request",
+				request:  []byte("   \n"),
+				expected: "error(invalid_request).\n",
+			},
+			{
+				name:     "tab separator",
+				request:  []byte("verify\t00 00 00\n"),
+				expected: "error(invalid_request).\n",
+			},
+			{
+				name:     "control character",
+				request:  []byte{'v', 'e', 'r', 'i', 'f', 'y', ' ', 0x7f},
+				expected: "error(invalid_request).\n",
+			},
+			{
+				name:     "invalid utf8",
+				request:  []byte{0xff},
+				expected: "error(invalid_request).\n",
+			},
+			{
+				name:     "missing signature token",
+				request:  []byte("verify 00 00\n"),
+				expected: "error(invalid_request).\n",
+			},
+			{
+				name:     "invalid public key hex",
+				request:  []byte("verify gg 00 00\n"),
+				expected: "error(invalid_request).\n",
+			},
+			{
+				name:     "invalid message hex",
+				request:  []byte("verify 00 gg 00\n"),
+				expected: "error(invalid_request).\n",
+			},
+			{
+				name:     "invalid signature hex",
+				request:  []byte("verify 00 00 gg\n"),
+				expected: "error(invalid_request).\n",
+			},
+			{
+				name:     "odd-length signature hex",
+				request:  []byte("verify 00 00 0\n"),
+				expected: "error(invalid_request).\n",
+			},
+		}
+
+		for _, tc := range cases {
+			Convey("when handling "+tc.name, func() {
+				got, err := handleSignatureRequest(util.KeyAlgEd25519, tc.request)
+				So(err, ShouldBeNil)
+				So(string(got), ShouldEqual, tc.expected)
+			})
+		}
+	})
+}
+
+func TestCryptoDeviceCommitErrors(t *testing.T) {
+	Convey("Given a crypto device commit function", t, func() {
+		Convey("when request reading fails", func() {
+			commit := device{hashAlg: util.HashAlgSha256, kind: deviceKindHash}.makeCommitFunc()
+			err := commit(failingReader{}, bytes.NewBuffer(nil))
+			So(errors.Is(err, errRead), ShouldBeTrue)
+		})
+
+		Convey("when response writing fails", func() {
+			commit := device{hashAlg: util.HashAlgSha256, kind: deviceKindHash}.makeCommitFunc()
+			err := commit(bytes.NewReader([]byte("hello")), failingWriter{})
+			So(errors.Is(err, errWrite), ShouldBeTrue)
+		})
+
+		Convey("when device kind is unknown", func() {
+			commit := device{}.makeCommitFunc()
+			err := commit(bytes.NewReader([]byte("hello")), bytes.NewBuffer(nil))
+			So(errors.Is(err, fs.ErrInvalid), ShouldBeTrue)
+		})
+	})
+}
+
 func TestCryptoDeviceFSErrors(t *testing.T) {
 	vfs := NewFS(newSDKContext())
 	ofs, ok := vfs.(fsiface.OpenFileFS)
@@ -234,6 +326,23 @@ func TestCryptoDeviceFSErrors(t *testing.T) {
 
 func signatureRequest(pubKey, msg, sig string) []byte {
 	return []byte("verify " + pubKey + " " + msg + " " + sig + "\n")
+}
+
+var (
+	errRead  = errors.New("read failed")
+	errWrite = errors.New("write failed")
+)
+
+type failingReader struct{}
+
+func (failingReader) Read([]byte) (int, error) {
+	return 0, errRead
+}
+
+type failingWriter struct{}
+
+func (failingWriter) Write([]byte) (int, error) {
+	return 0, errWrite
 }
 
 func readAllFromCryptoDevice(t *testing.T, ofs fsiface.OpenFileFS, path string, request []byte) ([]byte, error) {
