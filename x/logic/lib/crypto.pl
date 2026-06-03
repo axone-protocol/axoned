@@ -189,7 +189,9 @@ crypto_verify_option_list(Context, Name, [Option | Rest], Found) :-
 crypto_verify_valid_option_term(Context, Option) :-
   ( var(Option)
   -> throw(error(instantiation_error, Context))
-  ; compound(Option)
+  ; ( Option = type(_)
+    ; Option = encoding(_)
+    )
   -> true
   ;  throw(error(type_error(option, Option), Context))
   ).
