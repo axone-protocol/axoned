@@ -122,95 +122,91 @@ func TestCryptoDeviceFSFunctional(t *testing.T) {
 	})
 }
 
-func TestCryptoDeviceFSSignatureVerification(t *testing.T) {
+func TestCryptoDeviceFSSignatureResponses(t *testing.T) {
 	vfs := NewFS(newSDKContext())
 	ofs, ok := vfs.(fsiface.OpenFileFS)
 	if !ok {
 		t.Fatal("crypto fs should implement OpenFileFS")
 	}
 
-	Convey("Given a crypto device filesystem", t, func() {
-		Convey("when verifying a valid ed25519 signature", func() {
-			request := signatureRequest(
+	cases := []struct {
+		name     string
+		path     string
+		request  []byte
+		expected string
+	}{
+		{
+			name: "valid ed25519 signature",
+			path: "ed25519",
+			request: signatureRequest(
 				ed25519PubKeyHex,
 				"9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d",
 				ed25519SigHex,
-			)
-
-			got, err := readAllFromCryptoDevice(t, ofs, "ed25519", request)
-			So(err, ShouldBeNil)
-			So(string(got), ShouldEqual, "ok(true).\n")
-		})
-
-		Convey("when verifying an invalid ed25519 signature", func() {
-			request := signatureRequest(
+			),
+			expected: "ok(true).\n",
+		},
+		{
+			name: "invalid ed25519 signature",
+			path: "ed25519",
+			request: signatureRequest(
 				ed25519PubKeyHex,
 				"9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9e",
 				ed25519SigHex,
-			)
-
-			got, err := readAllFromCryptoDevice(t, ofs, "ed25519", request)
-			So(err, ShouldBeNil)
-			So(string(got), ShouldEqual, "ok(false).\n")
-		})
-
-		Convey("when verifying a valid secp256r1 signature", func() {
-			request := signatureRequest(
+			),
+			expected: "ok(false).\n",
+		},
+		{
+			name: "valid secp256r1 signature",
+			path: "secp256r1",
+			request: signatureRequest(
 				secp256r1PubKeyHex,
 				"e50c26e89f734b2ee12041ff27874c901891f74a0f0cf470333312a3034ce3be",
 				secp256r1SigHex,
-			)
-
-			got, err := readAllFromCryptoDevice(t, ofs, "secp256r1", request)
-			So(err, ShouldBeNil)
-			So(string(got), ShouldEqual, "ok(true).\n")
-		})
-
-		Convey("when verifying a valid secp256k1 signature", func() {
-			request := signatureRequest(
+			),
+			expected: "ok(true).\n",
+		},
+		{
+			name: "valid secp256k1 signature",
+			path: "secp256k1",
+			request: signatureRequest(
 				secp256k1PubKeyHex,
 				"dece063885d3648078f903b6a3e8989f649dc3368cd9c8d69755ed9dcb6a0995",
 				secp256k1SigHex,
-			)
-
-			got, err := readAllFromCryptoDevice(t, ofs, "secp256k1", request)
-			So(err, ShouldBeNil)
-			So(string(got), ShouldEqual, "ok(true).\n")
-		})
-	})
-}
-
-func TestCryptoDeviceFSSignatureProtocolErrors(t *testing.T) {
-	vfs := NewFS(newSDKContext())
-	ofs, ok := vfs.(fsiface.OpenFileFS)
-	if !ok {
-		t.Fatal("crypto fs should implement OpenFileFS")
-	}
-
-	Convey("Given a crypto device filesystem", t, func() {
-		Convey("when the signature request is malformed", func() {
-			got, err := readAllFromCryptoDevice(t, ofs, "ed25519", []byte("verify bad\n"))
-			So(err, ShouldBeNil)
-			So(string(got), ShouldEqual, "error(invalid_request).\n")
-		})
-
-		Convey("when the signature operation is unsupported", func() {
-			got, err := readAllFromCryptoDevice(t, ofs, "ed25519", []byte("sign 00 00 00\n"))
-			So(err, ShouldBeNil)
-			So(string(got), ShouldEqual, "error(unsupported_operation).\n")
-		})
-
-		Convey("when the signature public key is invalid", func() {
-			request := signatureRequest(
+			),
+			expected: "ok(true).\n",
+		},
+		{
+			name:     "malformed signature request",
+			path:     "ed25519",
+			request:  []byte("verify bad\n"),
+			expected: "error(invalid_request).\n",
+		},
+		{
+			name:     "unsupported signature operation",
+			path:     "ed25519",
+			request:  []byte("sign 00 00 00\n"),
+			expected: "error(unsupported_operation).\n",
+		},
+		{
+			name: "invalid signature public key",
+			path: "ed25519",
+			request: signatureRequest(
 				"53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5b5b",
 				"9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d",
 				ed25519SigHex,
-			)
+			),
+			expected: "error(invalid_key).\n",
+		},
+	}
 
-			got, err := readAllFromCryptoDevice(t, ofs, "ed25519", request)
-			So(err, ShouldBeNil)
-			So(string(got), ShouldEqual, "error(invalid_key).\n")
-		})
+	Convey("Given a crypto device filesystem", t, func() {
+		for _, tc := range cases {
+			Convey("when handling "+tc.name, func() {
+				got, err := readAllFromCryptoDevice(t, ofs, tc.path, tc.request)
+				So(err, ShouldBeNil)
+				So(string(got), ShouldEqual, tc.expected)
+			})
+		}
 	})
 }
 
