@@ -7,7 +7,7 @@ import (
 // Codec defines the interface for encode/decode operations.
 //
 // Each codec implementation handles a specific encoding scheme (e.g., bech32, base64).
-// The codec is responsible for validating the request tokens and returning a
+// The codec is responsible for validating the request payload and returning a
 // serialized Prolog term response.
 type Codec interface {
 	// Name returns the codec identifier used in the device path.
@@ -15,20 +15,20 @@ type Codec interface {
 	Name() string
 
 	// Decode processes a decode request and returns a Prolog term response.
-	// The tokens slice contains the request tokens after the "decode" command.
+	// The input contains the complete payload after the "decode" command separator.
 	//
 	// Returns:
 	//   - ok(...) term on success
 	//   - error(...) term on validation failure
-	Decode(tokens [][]byte) engine.Term
+	Decode(input []byte) engine.Term
 
 	// Encode processes an encode request and returns a Prolog term response.
-	// The tokens slice contains the request tokens after the "encode" command.
+	// The input contains the complete payload after the "encode" command separator.
 	//
 	// Returns:
 	//   - ok(...) term on success
 	//   - error(...) term on validation failure
-	Encode(tokens [][]byte) engine.Term
+	Encode(input []byte) engine.Term
 }
 
 // registry holds all available codecs indexed by name.

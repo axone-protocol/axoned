@@ -1,7 +1,6 @@
 package codec
 
 import (
-	"bytes"
 	"context"
 	"io"
 	"io/fs"
@@ -119,20 +118,19 @@ func makeCommitFunc(codec Codec) func(io.Reader, io.Writer) error {
 	}
 }
 
-// commitRequest is the protocol boundary for the codec transactional device.
+// handleRequest is the protocol boundary for the codec transactional device.
 //
 // Text request framing:
-//   - decode <input>
-//   - encode <hrp> <hex>
+//   - decode <payload>
+//   - encode <payload>
 //
 // Whitespace rules:
-//   - leading and trailing ASCII spaces are ignored;
-//   - token separators are one or more ASCII spaces;
-//   - requests may terminate with EOF, LF, or CRLF;
-//   - TAB and any other control whitespace are invalid_request.
+//   - leading ASCII spaces before the command are ignored;
+//   - the command must be followed by a separator: SPACE, LF, or CRLF;
+//   - the payload is forwarded unchanged after the command separator;
+//   - TAB and any other control whitespace in the command are invalid_request.
 //
-// Commands and separators are ASCII. Tokens are UTF-8 text without embedded
-// ASCII spaces. The encode payload hex is lowercase/uppercase agnostic.
+// Commands and separators are ASCII. Payload syntax is codec-specific.
 //
 // Serialized Prolog response terms:
 //   - decode success: codec-specific (e.g., ok(HRP-Bytes) for bech32)
@@ -143,80 +141,71 @@ func makeCommitFunc(codec Codec) func(io.Reader, io.Writer) error {
 // error(invalid_request). Regular Go errors are reserved for VFS/runtime
 // failures such as an internal rendering problem.
 //
-// handleRequest normalizes the text line and dispatches on the parsed command.
+// handleRequest dispatches on the parsed command and leaves payload parsing to
+// the selected codec.
 //
-// Any malformed request line is mapped to the explicit protocol response term
+// Any malformed request is mapped to the explicit protocol response term
 // error(invalid_request), rather than escaping as a Go error.
 func handleRequest(codec Codec, request []byte) engine.Term {
-	line, ok := normalizeRequestLine(request)
+	command, payload, ok := splitRequestCommand(request)
 	if !ok {
 		return errInvalidRequest
 	}
 
-	tokens := splitRequestLine(line)
-	switch string(tokens[0]) {
+	switch string(command) {
 	case requestCommandDecode:
-		if len(tokens) != 2 {
-			return errInvalidRequest
-		}
-
-		return codec.Decode(tokens[1:])
+		return codec.Decode(payload)
 	case requestCommandEncode:
-		if len(tokens) != 3 {
-			return errInvalidRequest
-		}
-
-		return codec.Encode(tokens[1:])
+		return codec.Encode(payload)
 	default:
 		return errInvalidRequest
 	}
 }
 
-func normalizeRequestLine(request []byte) ([]byte, bool) {
-	if len(request) == 0 {
-		return nil, false
-	}
-
-	request = bytes.TrimRight(request, "\r\n")
-	request = bytes.Trim(request, " ")
+func splitRequestCommand(request []byte) ([]byte, []byte, bool) {
 	if len(request) == 0 || !utf8.Valid(request) {
-		return nil, false
+		return nil, nil, false
 	}
 
-	for _, b := range request {
-		switch {
-		case b == ' ':
-			continue
-		case b == '\t', b == '\n', b == '\r':
-			return nil, false
-		case b < 0x20 || b == 0x7f:
-			return nil, false
-		}
+	for len(request) > 0 && request[0] == ' ' {
+		request = request[1:]
+	}
+	if len(request) == 0 {
+		return nil, nil, false
 	}
 
-	return request, true
-}
-
-func splitRequestLine(line []byte) [][]byte {
-	tokens := make([][]byte, 0, 3)
-
-	for start := 0; start < len(line); {
-		for start < len(line) && line[start] == ' ' {
-			start++
-		}
-		if start >= len(line) {
+	commandEnd := 0
+	for commandEnd < len(request) {
+		switch request[commandEnd] {
+		case ' ', '\n', '\r':
 			break
+		case '\t':
+			return nil, nil, false
+		default:
+			if request[commandEnd] < 0x20 || request[commandEnd] == 0x7f {
+				return nil, nil, false
+			}
+			commandEnd++
+			continue
 		}
-
-		end := start
-		for end < len(line) && line[end] != ' ' {
-			end++
-		}
-		tokens = append(tokens, line[start:end])
-		start = end
+		break
+	}
+	if commandEnd == 0 || commandEnd == len(request) {
+		return nil, nil, false
 	}
 
-	return tokens
+	switch request[commandEnd] {
+	case ' ':
+		return request[:commandEnd], request[commandEnd+1:], true
+	case '\n':
+		return request[:commandEnd], request[commandEnd+1:], true
+	case '\r':
+		if commandEnd+1 < len(request) && request[commandEnd+1] == '\n' {
+			return request[:commandEnd], request[commandEnd+2:], true
+		}
+	}
+
+	return nil, nil, false
 }
 
 func ioCoeffFromContext(ctx context.Context) uint64 {

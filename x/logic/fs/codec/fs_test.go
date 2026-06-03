@@ -2,6 +2,7 @@ package codec
 
 import (
 	"bytes"
+	"encoding/json"
 	"errors"
 	"io"
 	"io/fs"
@@ -28,12 +29,14 @@ import (
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	fsiface "github.com/axone-protocol/axoned/v15/x/logic/fs/internal/iface"
+	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/prologterm"
 	logictypes "github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 func TestAll(t *testing.T) {
 	Convey("Given the codec registry", t, func() {
 		So(slices.Contains(All(), "bech32"), ShouldBeTrue)
+		So(slices.Contains(All(), "json"), ShouldBeTrue)
 	})
 }
 
@@ -74,19 +77,19 @@ func TestCodecDeviceFSOpenFileValidation(t *testing.T) {
 func TestMakeCommitFunc(t *testing.T) {
 	Convey("Given a codec commit function", t, func() {
 		Convey("when reading the request fails", func() {
-			commit := makeCommitFunc(stubCodec{})
+			commit := makeCommitFunc(&stubCodec{})
 			err := commit(errReader{err: io.ErrUnexpectedEOF}, &bytes.Buffer{})
 			So(err, ShouldEqual, io.ErrUnexpectedEOF)
 		})
 
 		Convey("when rendering the response fails", func() {
-			commit := makeCommitFunc(stubCodec{decodeTerm: badTerm{err: errTestTerm}})
+			commit := makeCommitFunc(&stubCodec{decodeTerm: badTerm{err: errTestTerm}})
 			err := commit(bytes.NewBufferString("decode anything"), &bytes.Buffer{})
 			So(err, ShouldEqual, errTestTerm)
 		})
 
 		Convey("when writing the response fails", func() {
-			commit := makeCommitFunc(stubCodec{decodeTerm: atomOK.Apply(engine.NewAtom("ok"))})
+			commit := makeCommitFunc(&stubCodec{decodeTerm: atomOK.Apply(engine.NewAtom("ok"))})
 			err := commit(bytes.NewBufferString("decode anything"), errWriter{err: io.ErrClosedPipe})
 			So(err, ShouldEqual, io.ErrClosedPipe)
 		})
@@ -94,26 +97,35 @@ func TestMakeCommitFunc(t *testing.T) {
 }
 
 func TestHandleRequest(t *testing.T) {
-	codec := stubCodec{decodeTerm: engine.NewAtom("decoded"), encodeTerm: engine.NewAtom("encoded")}
-
 	Convey("Given request dispatch", t, func() {
-		Convey("when decode is requested with one argument", func() {
+		codec := &stubCodec{decodeTerm: engine.NewAtom("decoded"), encodeTerm: engine.NewAtom("encoded")}
+
+		Convey("when decode is requested", func() {
 			term := handleRequest(codec, []byte("decode value"))
 			So(term, ShouldEqual, codec.decodeTerm)
+			So(codec.decodeInput, ShouldResemble, []byte("value"))
 		})
 
-		Convey("when encode is requested with two arguments", func() {
+		Convey("when encode is requested", func() {
 			term := handleRequest(codec, []byte("encode hrp deadbeef"))
 			So(term, ShouldEqual, codec.encodeTerm)
+			So(codec.encodeInput, ShouldResemble, []byte("hrp deadbeef"))
+		})
+
+		Convey("when the payload contains spaces and newlines", func() {
+			term := handleRequest(codec, []byte("decode\n{\"foo\":\"bar baz\"}\n"))
+			So(term, ShouldEqual, codec.decodeTerm)
+			So(codec.decodeInput, ShouldResemble, []byte("{\"foo\":\"bar baz\"}\n"))
 		})
 	})
 }
 
-func TestNormalizeRequestLine(t *testing.T) {
+func TestSplitRequestCommand(t *testing.T) {
 	testCases := []struct {
 		name       string
 		request    []byte
-		expected   []byte
+		command    []byte
+		payload    []byte
 		expectedOK bool
 	}{
 		{
@@ -122,7 +134,12 @@ func TestNormalizeRequestLine(t *testing.T) {
 			expectedOK: false,
 		},
 		{
-			name:       "empty after trimming line ending and spaces",
+			name:       "empty after trimming leading spaces",
+			request:    []byte("   "),
+			expectedOK: false,
+		},
+		{
+			name:       "empty command before line ending",
 			request:    []byte("  \r\n"),
 			expectedOK: false,
 		},
@@ -137,63 +154,110 @@ func TestNormalizeRequestLine(t *testing.T) {
 			expectedOK: false,
 		},
 		{
-			name:       "delete control char is rejected",
-			request:    append([]byte("decode "), 0x7f),
+			name:       "delete control char in command is rejected",
+			request:    []byte("de\x7fcode value"),
 			expectedOK: false,
 		},
 		{
-			name:       "valid request is trimmed",
+			name:       "space separator",
 			request:    []byte("  decode value  \r\n"),
-			expected:   []byte("decode value"),
+			command:    []byte("decode"),
+			payload:    []byte("value  \r\n"),
 			expectedOK: true,
+		},
+		{
+			name:       "line separator",
+			request:    []byte("encode\njson([foo=bar])."),
+			command:    []byte("encode"),
+			payload:    []byte("json([foo=bar])."),
+			expectedOK: true,
+		},
+		{
+			name:       "CRLF separator",
+			request:    []byte("decode\r\n{\"foo\":\"bar\"}"),
+			command:    []byte("decode"),
+			payload:    []byte("{\"foo\":\"bar\"}"),
+			expectedOK: true,
+		},
+		{
+			name:       "CR without LF is rejected",
+			request:    []byte("decode\r{\"foo\":\"bar\"}"),
+			expectedOK: false,
 		},
 	}
 
-	Convey("Given request normalization", t, func() {
+	Convey("Given request command parsing", t, func() {
 		for _, tc := range testCases {
 			Convey(tc.name, func() {
-				line, ok := normalizeRequestLine(tc.request)
+				command, payload, ok := splitRequestCommand(tc.request)
 				So(ok, ShouldEqual, tc.expectedOK)
-				So(line, ShouldResemble, tc.expected)
+				So(command, ShouldResemble, tc.command)
+				So(payload, ShouldResemble, tc.payload)
 			})
 		}
 	})
 }
 
-func TestSplitRequestLine(t *testing.T) {
+func TestSplitBech32Payload(t *testing.T) {
 	testCases := []struct {
 		name     string
-		line     []byte
+		input    []byte
 		expected [][]byte
+		ok       bool
 	}{
 		{
-			name:     "empty line",
-			line:     nil,
-			expected: [][]byte{},
+			name:  "empty payload",
+			input: nil,
+			ok:    false,
 		},
 		{
-			name:     "spaces only",
-			line:     []byte("   "),
-			expected: [][]byte{},
+			name:  "spaces only",
+			input: []byte("   "),
+			ok:    false,
 		},
 		{
 			name:     "multiple tokens with repeated separators",
-			line:     []byte("encode  hrp   deadbeef"),
-			expected: [][]byte{[]byte("encode"), []byte("hrp"), []byte("deadbeef")},
+			input:    []byte("hrp   deadbeef"),
+			expected: [][]byte{[]byte("hrp"), []byte("deadbeef")},
+			ok:       true,
 		},
 		{
 			name:     "trailing spaces are ignored",
-			line:     []byte("decode value   "),
-			expected: [][]byte{[]byte("decode"), []byte("value")},
+			input:    []byte("value   "),
+			expected: [][]byte{[]byte("value")},
+			ok:       true,
+		},
+		{
+			name:  "tabs are rejected",
+			input: []byte("hrp\tdeadbeef"),
+			ok:    false,
+		},
+		{
+			name:  "invalid utf8 is rejected",
+			input: []byte{0xff},
+			ok:    false,
+		},
+		{
+			name:  "control bytes are rejected",
+			input: []byte("hrp \x7f"),
+			ok:    false,
 		},
 	}
 
-	Convey("Given request tokenization", t, func() {
+	Convey("Given Bech32 payload tokenization", t, func() {
 		for _, tc := range testCases {
 			Convey(tc.name, func() {
-				So(splitRequestLine(tc.line), ShouldResemble, tc.expected)
+				tokens, ok := splitBech32Payload(tc.input)
+				So(ok, ShouldEqual, tc.ok)
+				So(tokens, ShouldResemble, tc.expected)
 			})
 		}
+	})
+}
+
+func TestSplitSpaceTokens(t *testing.T) {
+	Convey("Given Bech32 space tokenization", t, func() {
+		So(splitSpaceTokens([]byte("   ")), ShouldResemble, [][]byte{})
 	})
 }
 
@@ -265,6 +329,12 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 			expectedOutput: "error(invalid_request).\n",
 		},
 		{
+			name:           "decode with empty bech32 payload",
+			codecName:      "bech32",
+			request:        []byte("decode "),
+			expectedOutput: "error(invalid_request).\n",
+		},
+		{
 			name:           "encode with insufficient arguments",
 			codecName:      "bech32",
 			request:        []byte("encode axone"),
@@ -322,6 +392,76 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 			request:        []byte("encode axone 123"),
 			expectedOutput: "error(invalid_bytes).\n",
 		},
+
+		// JSON codec - decode tests
+		{
+			name:           "json decode object with whitespace",
+			codecName:      "json",
+			request:        []byte("decode\n{\n  \"foo\": \"bar\",\n  \"ok\": true\n}"),
+			expectedOutput: "ok(json([=(foo,bar),=(ok,@(true))])).\n",
+		},
+		{
+			name:           "json decode space-separated payload is not tokenized",
+			codecName:      "json",
+			request:        []byte("decode {\"foo\":\"bar baz\"}"),
+			expectedOutput: "ok(json([=(foo,'bar baz')])).\n",
+		},
+		{
+			name:           "json decode empty payload as null",
+			codecName:      "json",
+			request:        []byte("decode\n"),
+			expectedOutput: "ok(@(null)).\n",
+		},
+		{
+			name:           "json decode malformed payload",
+			codecName:      "json",
+			request:        []byte("decode\n{&"),
+			expectedOutput: "error(syntax_error(json(malformed_json(1)))).\n",
+		},
+		{
+			name:           "json decode rejects trailing document",
+			codecName:      "json",
+			request:        []byte("decode\n{\"foo\":\"bar\"}{\"foo\":\"bar\"}"),
+			expectedOutput: "error(syntax_error(json(malformed_json(14)))).\n",
+		},
+
+		// JSON codec - encode tests
+		{
+			name:           "json encode object",
+			codecName:      "json",
+			request:        []byte("encode\njson([foo=bar,ok= @(true)])."),
+			expectedOutput: "ok('{\"foo\":\"bar\",\"ok\":true}').\n",
+		},
+		{
+			name:           "json encode malformed prolog term",
+			codecName:      "json",
+			request:        []byte("encode\njson([foo=bar]). trailing"),
+			expectedOutput: "error(syntax_error(prolog(malformed_term))).\n",
+		},
+		{
+			name:           "json encode variable fails fast",
+			codecName:      "json",
+			request:        []byte("encode\nJson."),
+			expectedOutput: "error(instantiation_error).\n",
+		},
+		{
+			name:           "json encode invalid JSON term",
+			codecName:      "json",
+			request:        []byte("encode\nfoo([a=b])."),
+			expectedOutput: "error(type_error(json,foo([=(a,b)]))).\n",
+		},
+		{
+			name:           "json encode invalid number",
+			codecName:      "json",
+			request:        []byte("encode\n1.8e308."),
+			expectedOutput: "error(domain_error(json_number,1.8e+308)).\n",
+		},
+		{
+			name:           "json unknown raw command",
+			codecName:      "json",
+			request:        []byte("unknown\n{}"),
+			expectedOutput: "error(invalid_request).\n",
+		},
 	}
 
 	Convey("Given a codec device filesystem", t, func() {
@@ -332,6 +472,219 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 				So(string(response), ShouldEqual, tc.expectedOutput)
 			})
 		}
+	})
+}
+
+func TestJSONCodecDecode(t *testing.T) {
+	testCases := []struct {
+		name     string
+		payload  []byte
+		expected string
+	}{
+		{
+			name:     "array with primitive values",
+			payload:  []byte(`[1,"two",false,null]`),
+			expected: "ok([1.0,two,@(false),@(null)]).\n",
+		},
+		{
+			name:     "boolean true",
+			payload:  []byte(`true`),
+			expected: "ok(@(true)).\n",
+		},
+		{
+			name:     "number",
+			payload:  []byte(`1.5`),
+			expected: "ok(1.5).\n",
+		},
+		{
+			name:     "unexpected EOF",
+			payload:  []byte(`{"foo":`),
+			expected: "error(syntax_error(json(eof))).\n",
+		},
+	}
+
+	Convey("Given a JSON codec decoder", t, func() {
+		codec := &jsonCodec{}
+		for _, tc := range testCases {
+			Convey(tc.name, func() {
+				So(renderTerm(t, codec.Decode(tc.payload)), ShouldEqual, tc.expected)
+			})
+		}
+	})
+}
+
+func TestJSONCodecEncode(t *testing.T) {
+	testCases := []struct {
+		name     string
+		payload  []byte
+		expected string
+	}{
+		{
+			name:     "atom",
+			payload:  []byte("hello."),
+			expected: "ok('\"hello\"').\n",
+		},
+		{
+			name:     "empty list",
+			payload:  []byte("[]."),
+			expected: "ok([]).\n",
+		},
+		{
+			name:     "integer",
+			payload:  []byte("42."),
+			expected: "ok('42').\n",
+		},
+		{
+			name:     "float",
+			payload:  []byte("1.5."),
+			expected: "ok('1.5').\n",
+		},
+		{
+			name:     "array",
+			payload:  []byte("[foo,42,@(false),@(null),[]]."),
+			expected: "ok('[\"foo\",42,false,null,[]]').\n",
+		},
+		{
+			name:     "malformed term",
+			payload:  []byte("."),
+			expected: "error(syntax_error(prolog(malformed_term))).\n",
+		},
+	}
+
+	Convey("Given a JSON codec encoder", t, func() {
+		codec := &jsonCodec{}
+		for _, tc := range testCases {
+			Convey(tc.name, func() {
+				So(renderTerm(t, codec.Encode(tc.payload)), ShouldEqual, tc.expected)
+			})
+		}
+	})
+}
+
+func TestJSONCodecEncodeWriterErrors(t *testing.T) {
+	testCases := []struct {
+		name       string
+		termSource string
+		failAt     int
+	}{
+		{
+			name:       "object opening",
+			termSource: "json([foo=bar]).",
+			failAt:     0,
+		},
+		{
+			name:       "object key",
+			termSource: "json([foo=bar]).",
+			failAt:     1,
+		},
+		{
+			name:       "object separator",
+			termSource: "json([foo=bar]).",
+			failAt:     2,
+		},
+		{
+			name:       "object value",
+			termSource: "json([foo=bar]).",
+			failAt:     3,
+		},
+		{
+			name:       "object comma",
+			termSource: "json([foo=bar,baz=qux]).",
+			failAt:     4,
+		},
+		{
+			name:       "object closing",
+			termSource: "json([foo=bar]).",
+			failAt:     4,
+		},
+		{
+			name:       "array opening",
+			termSource: "[foo].",
+			failAt:     0,
+		},
+		{
+			name:       "array value",
+			termSource: "[foo].",
+			failAt:     1,
+		},
+		{
+			name:       "array comma",
+			termSource: "[foo,bar].",
+			failAt:     2,
+		},
+		{
+			name:       "array closing",
+			termSource: "[foo].",
+			failAt:     2,
+		},
+	}
+
+	Convey("Given JSON encoder writer failures", t, func() {
+		for _, tc := range testCases {
+			Convey(tc.name, func() {
+				term, err := parseJSONTerm([]byte(tc.termSource))
+				So(err, ShouldBeNil)
+
+				err = encodeTermToJSON(term, &failAtWriter{failAt: tc.failAt, err: io.ErrClosedPipe}, engine.NewEnv())
+				So(err, ShouldEqual, io.ErrClosedPipe)
+			})
+		}
+	})
+}
+
+func TestJSONCodecErrorTerms(t *testing.T) {
+	testCases := []struct {
+		name     string
+		err      error
+		expected string
+	}{
+		{
+			name:     "unmarshal type",
+			err:      &json.UnmarshalTypeError{Offset: 7, Value: "number"},
+			expected: "syntax_error(json(malformed_json(7,number))).\n",
+		},
+		{
+			name:     "EOF",
+			err:      io.EOF,
+			expected: "syntax_error(json(eof)).\n",
+		},
+		{
+			name:     "unknown",
+			err:      errors.New("boom"),
+			expected: "syntax_error(json(unknown)).\n",
+		},
+	}
+
+	Convey("Given JSON error term mapping", t, func() {
+		for _, tc := range testCases {
+			Convey(tc.name, func() {
+				So(renderTerm(t, jsonErrorTerm(tc.err)), ShouldEqual, tc.expected)
+			})
+		}
+
+		Convey("when an encoder error is not a Prolog exception", func() {
+			So(renderTerm(t, exceptionFormal(errors.New("boom"))), ShouldEqual, "system_error.\n")
+		})
+	})
+}
+
+func TestJSONMarshalToStreamErrors(t *testing.T) {
+	Convey("Given JSON marshaling to a stream", t, func() {
+		Convey("when Go JSON rejects the value", func() {
+			var buf bytes.Buffer
+			err := marshalToJSONStream(math.Inf(1), engine.NewAtom("inf"), &buf, engine.NewEnv())
+			So(err, ShouldNotBeNil)
+		})
+	})
+}
+
+func TestJSONEncodeTermValidation(t *testing.T) {
+	Convey("Given JSON term validation", t, func() {
+		Convey("when an unsupported term implementation is encoded", func() {
+			var buf bytes.Buffer
+			err := encodeTermToJSON(unknownTerm{}, &buf, engine.NewEnv())
+			So(renderTerm(t, exceptionFormal(err)), ShouldEqual, "type_error(json,unknown).\n")
+		})
 	})
 }
 
@@ -473,15 +826,18 @@ var bech32ConfigOnce sync.Once
 var errTestTerm = errors.New("term write failure")
 
 type stubCodec struct {
-	decodeTerm engine.Term
-	encodeTerm engine.Term
+	decodeTerm  engine.Term
+	encodeTerm  engine.Term
+	decodeInput []byte
+	encodeInput []byte
 }
 
 func (c stubCodec) Name() string {
 	return "stub"
 }
 
-func (c stubCodec) Decode(_ [][]byte) engine.Term {
+func (c *stubCodec) Decode(input []byte) engine.Term {
+	c.decodeInput = append([]byte(nil), input...)
 	if c.decodeTerm != nil {
 		return c.decodeTerm
 	}
@@ -489,7 +845,8 @@ func (c stubCodec) Decode(_ [][]byte) engine.Term {
 	return engine.NewAtom("decoded")
 }
 
-func (c stubCodec) Encode(_ [][]byte) engine.Term {
+func (c *stubCodec) Encode(input []byte) engine.Term {
+	c.encodeInput = append([]byte(nil), input...)
 	if c.encodeTerm != nil {
 		return c.encodeTerm
 	}
@@ -513,6 +870,21 @@ func (w errWriter) Write(_ []byte) (int, error) {
 	return 0, w.err
 }
 
+type failAtWriter struct {
+	writes int
+	failAt int
+	err    error
+}
+
+func (w *failAtWriter) Write(p []byte) (int, error) {
+	if w.writes == w.failAt {
+		return 0, w.err
+	}
+
+	w.writes++
+	return len(p), nil
+}
+
 type badTerm struct {
 	err error
 }
@@ -523,4 +895,25 @@ func (t badTerm) WriteTerm(_ io.Writer, _ *engine.WriteOptions, _ *engine.Env) e
 
 func (t badTerm) Compare(_ engine.Term, _ *engine.Env) int {
 	return 0
+}
+
+type unknownTerm struct{}
+
+func (t unknownTerm) WriteTerm(w io.Writer, _ *engine.WriteOptions, _ *engine.Env) error {
+	_, err := w.Write([]byte("unknown"))
+	return err
+}
+
+func (t unknownTerm) Compare(_ engine.Term, _ *engine.Env) int {
+	return 0
+}
+
+func renderTerm(t *testing.T, term engine.Term) string {
+	t.Helper()
+
+	bs, err := prologterm.Render(term, true)
+	if err != nil {
+		t.Fatal(err)
+	}
+	return string(bs)
 }

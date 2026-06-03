@@ -1,7 +1,9 @@
 package codec
 
 import (
+	"bytes"
 	"encoding/hex"
+	"unicode/utf8"
 
 	"github.com/axone-protocol/prolog/v3/engine"
 
@@ -37,7 +39,12 @@ func (c *bech32Codec) Name() string {
 // Where:
 //   - HRP is the human-readable part as an atom
 //   - Bytes is a list of byte integers [0..255]
-func (c *bech32Codec) Decode(tokens [][]byte) engine.Term {
+func (c *bech32Codec) Decode(input []byte) engine.Term {
+	tokens, ok := splitBech32Payload(input)
+	if !ok || len(tokens) != 1 {
+		return errInvalidRequest
+	}
+
 	bech32Text := tokens[0]
 	hrp, data, err := sdkbech32.DecodeAndConvert(string(bech32Text))
 	if err != nil {
@@ -61,7 +68,12 @@ func (c *bech32Codec) Decode(tokens [][]byte) engine.Term {
 //
 // The codec validates the hex payload locally and delegates Bech32 formatting
 // to the SDK.
-func (c *bech32Codec) Encode(tokens [][]byte) engine.Term {
+func (c *bech32Codec) Encode(input []byte) engine.Term {
+	tokens, ok := splitBech32Payload(input)
+	if !ok || len(tokens) != 2 {
+		return errInvalidRequest
+	}
+
 	hrpText := tokens[0]
 	hexText := tokens[1]
 
@@ -75,6 +87,49 @@ func (c *bech32Codec) Encode(tokens [][]byte) engine.Term {
 	bech32Address, _ := sdkbech32.ConvertAndEncode(string(hrpText), data)
 
 	return atomOK.Apply(engine.NewAtom(bech32Address))
+}
+
+func splitBech32Payload(input []byte) ([][]byte, bool) {
+	input = bytes.TrimRight(input, "\r\n")
+	input = bytes.Trim(input, " ")
+	if len(input) == 0 || !utf8.Valid(input) {
+		return nil, false
+	}
+
+	for _, b := range input {
+		switch {
+		case b == ' ':
+			continue
+		case b == '\t', b == '\n', b == '\r':
+			return nil, false
+		case b < 0x20 || b == 0x7f:
+			return nil, false
+		}
+	}
+
+	return splitSpaceTokens(input), true
+}
+
+func splitSpaceTokens(line []byte) [][]byte {
+	tokens := make([][]byte, 0, 3)
+
+	for start := 0; start < len(line); {
+		for start < len(line) && line[start] == ' ' {
+			start++
+		}
+		if start >= len(line) {
+			break
+		}
+
+		end := start
+		for end < len(line) && line[end] != ' ' {
+			end++
+		}
+		tokens = append(tokens, line[start:end])
+		start = end
+	}
+
+	return tokens
 }
 
 // decodeHex is a helper to decode hexadecimal text to bytes.
