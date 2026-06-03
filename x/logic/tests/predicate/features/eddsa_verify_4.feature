@@ -53,7 +53,7 @@ Feature: eddsa_verify/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 241587
+      gas_used: 241727
       answer:
         has_more: false
         variables: ["Verified"]
@@ -108,10 +108,35 @@ Feature: eddsa_verify/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4771
+      gas_used: 4809
       answer:
         has_more: false
         variables:
         results:
         - error: "error(type_error(cryptographic_algorithm,secp256k1),eddsa_verify/4)"
+      """
+
+  Scenario: Reject malformed EdDSA option terms
+    This scenario demonstrates that eddsa_verify/4 rejects malformed option terms instead of falling back to defaults.
+
+    Given the program:
+      """ prolog
+      malformed_eddsa_option :-
+        eddsa_verify([], '', [], [encoding(hex, utf8)]).
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/crypto.pl'),
+      malformed_eddsa_option.
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4567
+      answer:
+        has_more: false
+        variables:
+        results:
+        - error: "error(type_error(option,encoding(hex,utf8)),eddsa_verify/4)"
       """

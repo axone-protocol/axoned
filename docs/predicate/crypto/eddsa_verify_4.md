@@ -133,7 +133,7 @@ unsupported_eddsa.
 
 ```  yaml
 height: 42
-gas_used: 4771
+gas_used: 4809
 answer:
   has_more: false
   variables:

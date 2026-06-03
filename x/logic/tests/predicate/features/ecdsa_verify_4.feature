@@ -53,7 +53,7 @@ Feature: ecdsa_verify/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 250389
+      gas_used: 250465
       answer:
         has_more: false
         variables: ["Verified"]
@@ -90,7 +90,7 @@ Feature: ecdsa_verify/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 493026
+      gas_used: 493178
       answer:
         has_more: false
         variables: ["Verified"]
@@ -145,10 +145,35 @@ Feature: ecdsa_verify/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4803
+      gas_used: 4841
       answer:
         has_more: false
         variables:
         results:
         - error: "error(type_error(cryptographic_algorithm,ed25519),ecdsa_verify/4)"
+      """
+
+  Scenario: Reject malformed ECDSA option terms
+    This scenario demonstrates that ecdsa_verify/4 rejects malformed option terms instead of falling back to defaults.
+
+    Given the program:
+      """ prolog
+      malformed_ecdsa_option :-
+        ecdsa_verify([], '', [], [type(secp256k1, extra)]).
+      """
+    Given the query:
+      """ prolog
+      consult('/v1/lib/crypto.pl'),
+      malformed_ecdsa_option.
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4571
+      answer:
+        has_more: false
+        variables:
+        results:
+        - error: "error(type_error(option,type(secp256k1,extra)),ecdsa_verify/4)"
       """

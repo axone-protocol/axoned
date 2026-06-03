@@ -103,7 +103,7 @@ valid_secp256k1(Verified).
 
 ```  yaml
 height: 42
-gas_used: 250389
+gas_used: 250465
 answer:
   has_more: false
   variables: ["Verified"]
@@ -147,7 +147,7 @@ Verified = true.
 
 ```  yaml
 height: 42
-gas_used: 493026
+gas_used: 493178
 answer:
   has_more: false
   variables: ["Verified"]
@@ -216,7 +216,7 @@ unsupported_ecdsa.
 
 ```  yaml
 height: 42
-gas_used: 4803
+gas_used: 4841
 answer:
   has_more: false
   variables:
