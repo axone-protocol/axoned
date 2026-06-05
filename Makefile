@@ -18,12 +18,8 @@ COVER_HTML_FILE        := $(TARGET_FOLDER)/coverage.html
 
 # Docker images
 DOCKER_IMAGE_PROTO        = ghcr.io/cosmos/proto-builder:0.14.0
-DOCKER_IMAGE_BUF          = bufbuild/buf:1.4.0
-DOCKER_PROTO_RUN         := docker run --rm --user $(id -u):$(id -g) -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_PROTO)
-DOCKER_BUF_RUN           := docker run --rm -v $(HOME)/.cache:/root/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_BUF)
+DOCKER_PROTO_RUN         := docker run --rm --user $(shell id -u):$(shell id -g) -e HOME=/tmp -e GOPATH=/tmp/go -e GOBIN=/tmp/go/bin -v $(HOME)/.cache:/tmp/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_PROTO)
 DOCKER_BUILDX_BUILDER     = axone-builder
-DOCKER_IMAGE_MARKDOWNLINT = thegeeklab/markdownlint-cli:0.32.2
-DOCKER_IMAGE_GOTEMPLATE   = hairyhenderson/gomplate:v3.11.3-alpine
 
 # Tools
 TOOL_HEIGHLINER_NAME     := heighliner
@@ -35,15 +31,6 @@ TOOL_COSMOVISOR_NAME     := cosmovisor
 TOOL_COSMOVISOR_VERSION  := v1.7.1
 TOOL_COSMOVISOR_PKG      := cosmossdk.io/tools/$(TOOL_COSMOVISOR_NAME)/cmd/$(TOOL_COSMOVISOR_NAME)@$(TOOL_COSMOVISOR_VERSION)
 TOOL_COSMOVISOR_BIN      := ${TOOLS_FOLDER}/$(TOOL_COSMOVISOR_NAME)/$(TOOL_COSMOVISOR_VERSION)/$(TOOL_COSMOVISOR_NAME)
-
-TOOL_GOLANGCI_NAME       := golangci-lint
-TOOL_GOLANGCI_VERSION    := v2.10.1
-TOOL_GOLANGCI_BIN        := ${TOOLS_FOLDER}/$(TOOL_GOLANGCI_NAME)/$(TOOL_GOLANGCI_VERSION)/$(TOOL_GOLANGCI_NAME)
-
-TOOL_GOFUMPT_NAME        := gofumpt
-TOOL_GOFUMPT_VERSION     := v0.9.2
-TOOL_GOFUMPT_PKG         := mvdan.cc/$(TOOL_GOFUMPT_NAME)@$(TOOL_GOFUMPT_VERSION)
-TOOL_GOFUMPT_BIN         := ${TOOLS_FOLDER}/$(TOOL_GOFUMPT_NAME)/$(TOOL_GOFUMPT_VERSION)/$(TOOL_GOFUMPT_NAME)
 
 # Coverage settings
 COVERPKG := $(shell go list ./x/logic/... | grep -v '/tests/' | tr '\n' ',' | sed 's/,$$//')
@@ -153,12 +140,8 @@ RELEASE_BINARIES = \
 	linux-arm64
 RELEASE_TARGETS = $(addprefix release-binary-, $(RELEASE_BINARIES))
 
-# Handle sed -i on Darwin
-SED_FLAG=
-SHELL_NAME := $(shell uname -s)
-ifeq ($(SHELL_NAME),Darwin)
-	SED_FLAG := ""
-endif
+# Portable in-place sed handling for BSD and GNU sed.
+SED_INPLACE = sed -i.bak
 
 .PHONY: all
 all: help
@@ -171,14 +154,14 @@ lint: lint-go lint-proto ## Lint all available linters
 lint-go: lint-go-golangci lint-go-gofumpt ## Lint go source code
 
 .PHONY: lint-go-golangci
-lint-go-golangci: $(TOOL_GOLANGCI_BIN) ## Lint go source code with golangci-lint
+lint-go-golangci: ## Lint go source code with golangci-lint
 	@$(call echo_msg, 🔍, Inspecting, go source code, [golangci-lint]...)
-	@$(TOOL_GOLANGCI_BIN) run -v
+	@golangci-lint run -v
 
 .PHONY: lint-go-gofumpt
-lint-go-gofumpt: $(TOOL_GOFUMPT_BIN) ## Lint go source code format with gofumpt
+lint-go-gofumpt: ## Lint go source code format with gofumpt
 	@$(call echo_msg, 🔍, Inspecting, go source code, [gofumpt]...)
-	@if [ "$$($(TOOL_GOFUMPT_BIN) -l .)" != "" ]; then \
+	@if [ "$$(gofumpt -l .)" != "" ]; then \
 		echo "❌ Code is not gofumpt!"; \
 		exit 1; \
 	fi
@@ -187,21 +170,21 @@ lint-go-gofumpt: $(TOOL_GOFUMPT_BIN) ## Lint go source code format with gofumpt
 .PHONY: lint-proto
 lint-proto: ## Lint proto files
 	@$(call echo_msg, 🔍, Inspecting, proto files, [buf]...)
-	@$(DOCKER_BUF_RUN) lint proto -v
+	@buf lint proto -v
 
 ## Format:
 .PHONY: format
 format: format-go ## Run all available formatters
 
 .PHONY: format-go
-format-go: $(TOOL_GOFUMPT_BIN) ## Format go files
+format-go: ## Format go files
 	@${call echo_msg, 📐, Formatting, go source code, [gofumpt]...}
-	@$(TOOL_GOFUMPT_BIN) -w -l .
+	@gofumpt -w -l .
 
 .PHONY: format-proto
 format-proto: ## Format proto files
 	@${call echo_msg, 📐, Formatting, proto files, [buf]...}
-	@$(DOCKER_BUF_RUN) format -w
+	@buf format -w
 
 ## Build:
 .PHONY: build
@@ -298,8 +281,10 @@ chain-init: build-go ## Initialize the blockchain with default settings.
 		--chain-id=axone-${CHAIN} \
 		--home "${CHAIN_HOME}"; \
 	\
-	sed -i $(SED_FLAG) "s/\"stake\"/\"uaxone\"/g" "${CHAIN_HOME}/config/genesis.json"; \
-  sed -i $(SED_FLAG) 's/^query-gas-limit = ".*"/query-gas-limit = "1000000"/g' "${CHAIN_HOME}/config/app.toml"; \
+	$(SED_INPLACE) "s/\"stake\"/\"uaxone\"/g" "${CHAIN_HOME}/config/genesis.json"; \
+	rm -f "${CHAIN_HOME}/config/genesis.json.bak"; \
+	$(SED_INPLACE) 's/^query-gas-limit = ".*"/query-gas-limit = "1000000"/g' "${CHAIN_HOME}/config/app.toml"; \
+	rm -f "${CHAIN_HOME}/config/app.toml.bak"; \
 	\
 	MNEMONIC_VALIDATOR="island position immense mom cross enemy grab little deputy tray hungry detect state helmet \
 		tomorrow trap expect admit inhale present vault reveal scene atom"; \
@@ -412,17 +397,9 @@ doc-proto: proto-gen ## Generate the documentation from the Protobuf files
 		DEFAULT_DATASOURCE="./docs/proto/templates/default.yaml" ; \
 		MODULE_DATASOURCE="merge:./$${MODULE}/docs.yaml|$${DEFAULT_DATASOURCE}" ; \
 		DATASOURCE="docs=`[ -f $${MODULE}/docs.yaml ] && echo $$MODULE_DATASOURCE || echo $${DEFAULT_DATASOURCE}`" ; \
-		docker run --rm \
-				-v ${HOME}/.cache:/root/.cache \
-				-v `pwd`:/usr/src/axoned \
-				-w /usr/src/axoned \
-				${DOCKER_IMAGE_GOTEMPLATE} \
-				-d $$DATASOURCE -f docs/$${MODULE}.md -o docs/$${MODULE}.md ; \
+		gomplate -d $$DATASOURCE -f docs/$${MODULE}.md -o docs/$${MODULE}.md ; \
 	done
-	@docker run --rm \
-	  -v `pwd`:/usr/src/axoned \
-	  -w /usr/src/axoned/docs \
-	  ${DOCKER_IMAGE_MARKDOWNLINT} -f proto
+	@markdownlint-cli2 --fix --config docs/.markdownlint.yaml "docs/proto/**/*.md"
 
 .PHONY: doc-command
 doc-command: ## Generate markdown documentation for the command
@@ -431,16 +408,14 @@ doc-command: ## Generate markdown documentation for the command
 	rm -rf $$OUT_FOLDER; \
 	go get ./scripts; \
 	go run ./scripts/. command; \
-	sed -i $(SED_FLAG) 's/(default \"\/.*\/\.axoned\")/(default \"\/home\/john\/\.axoned\")/g' $$OUT_FOLDER/*.md; \
-	sed -i $(SED_FLAG) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' $$OUT_FOLDER/*.md; \
-	sed -i $(SED_FLAG) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' $$OUT_FOLDER/*.md; \
-	sed -i $(SED_FLAG) 's/&lt;appd&gt;/axoned/g' $$OUT_FOLDER/*.md; \
-	sed -i $(SED_FLAG) 's/<appd>/axoned/g' $$OUT_FOLDER/*.md; \
-	sed -i $(SED_FLAG) -E 's| (https?://[a-zA-Z0-9\.\/_=%-]+)| [\1](\1) |g' $$OUT_FOLDER/*.md; \
-	docker run --rm \
-	  -v `pwd`:/usr/src/docs \
-	  -w /usr/src/docs \
-	  ${DOCKER_IMAGE_MARKDOWNLINT} -f $$OUT_FOLDER -c docs/.markdownlint.yaml
+	$(SED_INPLACE) 's/(default \"\/.*\/\.axoned\")/(default \"\/home\/john\/\.axoned\")/g' $$OUT_FOLDER/*.md; \
+	$(SED_INPLACE) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' $$OUT_FOLDER/*.md; \
+	$(SED_INPLACE) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' $$OUT_FOLDER/*.md; \
+	$(SED_INPLACE) 's/&lt;appd&gt;/axoned/g' $$OUT_FOLDER/*.md; \
+	$(SED_INPLACE) 's/<appd>/axoned/g' $$OUT_FOLDER/*.md; \
+	$(SED_INPLACE) -E 's| (https?://[a-zA-Z0-9\.\/\_=%-]+)| [\1](\1) |g' $$OUT_FOLDER/*.md; \
+	rm -f $$OUT_FOLDER/*.md.bak
+	@markdownlint-cli2 --fix --config docs/.markdownlint.yaml "docs/command/**/*.md"
 
 .PHONY: doc-predicate
 doc-predicate: ## Generate markdown documentation for all the predicates (module logic)
@@ -448,11 +423,8 @@ doc-predicate: ## Generate markdown documentation for all the predicates (module
 	@OUT_FOLDER="docs/predicate"; \
 	rm -rf $$OUT_FOLDER; \
 	mkdir -p $$OUT_FOLDER; \
-	go run -mod=readonly ./scripts/. predicate; \
-	docker run --rm \
-		-v `pwd`:/usr/src/docs \
-		-w /usr/src/docs \
-		${DOCKER_IMAGE_MARKDOWNLINT} -f $$OUT_FOLDER -c docs/.markdownlint.yaml
+	go run -mod=readonly ./scripts/. predicate
+	@markdownlint-cli2 --fix --config docs/.markdownlint.yaml "docs/predicate/**/*.md"
 
 
 ## Mock:
@@ -508,19 +480,13 @@ ensure-buildx-builder:
 
 ## Dependencies:
 .PHONY: deps
-deps: deps-$(TOOL_GOLANGCI_NAME) deps-$(TOOL_GOFUMPT_NAME) deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) ## Install all the dependencies (tools, etc.)
+deps: deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) ## Install all the dependencies (tools, etc.)
 
 .PHONY: deps-$(TOOL_HEIGHLINER_NAME)
 deps-heighliner: $(TOOL_HEIGHLINER_BIN) ## Install $TOOL_HEIGHLINER_NAME ($TOOL_HEIGHLINER_VERSION)
 
 .PHONY: deps-$(TOOL_COSMOVISOR_NAME)
 deps-cosmovisor: $(TOOL_COSMOVISOR_BIN) ## Install $TOOL_COSMOVISOR_NAME ($TOOL_COSMOVISOR_VERSION)
-
-.PHONY: deps-$(TOOL_GOLANGCI_NAME)
-deps-golangci-lint: $(TOOL_GOLANGCI_BIN) ## Install $TOOL_GOLANGCI_NAME ($TOOL_GOLANGCI_VERSION)
-
-.PHONY: deps-$(TOOL_GOFUMPT_NAME)
-deps-gofumpt: $(TOOL_GOFUMPT_BIN) ## Install $TOOL_GOFUMPT_NAME ($TOOL_GOFUMPT_VERSION)
 
 $(TOOL_HEIGHLINER_BIN):
 	@${call echo_msg, 📦, Installing, $(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION),...}
@@ -541,18 +507,6 @@ $(TOOL_COSMOVISOR_BIN):
 	@mkdir -p $(dir $(TOOL_COSMOVISOR_BIN))
 	@GOBIN=$(dir $(abspath $(TOOL_COSMOVISOR_BIN))) go install $(TOOL_COSMOVISOR_PKG)
 
-$(TOOL_GOLANGCI_BIN):
-	@$(call echo_msg, 📦, Installing, $(TOOL_GOLANGCI_NAME)@$(TOOL_GOLANGCI_VERSION),...)
-	@curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/$(TOOL_GOLANGCI_VERSION)/install.sh | \
-		sh -s -- -b $(shell go env GOPATH)/bin $(TOOL_GOLANGCI_VERSION)
-	@mkdir -p $(dir $(TOOL_GOLANGCI_BIN))
-	@cp $(shell go env GOPATH)/bin/golangci-lint $(dir $(TOOL_GOLANGCI_BIN))
-
-$(TOOL_GOFUMPT_BIN):
-	@$(call echo_msg, 📦, Installing, $(TOOL_GOFUMPT_NAME)@$(TOOL_GOFUMPT_VERSION),...)
-	@mkdir -p $(dir $(TOOL_GOFUMPT_BIN))
-	@GOBIN=$(dir $(abspath $(TOOL_GOFUMPT_BIN))) go install $(TOOL_GOFUMPT_PKG)
-
 ## Help:
 .PHONY: help
 help: ## Show this help.
@@ -570,10 +524,8 @@ help: ## Show this help.
 		else if (/^## .*$$/) {printf "  ${COLOR_CYAN}%s${COLOR_RESET}\n", substr($$1,4)} \
 		}' $(MAKEFILE_LIST) | envsubst
 	@echo ''
-	@echo 'This Makefile depends on ${COLOR_CYAN}docker${COLOR_RESET}. To install it, please follow the instructions:'
-	@echo '- for ${COLOR_YELLOW}macOS${COLOR_RESET}: https://docs.docker.com/docker-for-mac/install/'
-	@echo '- for ${COLOR_YELLOW}Windows${COLOR_RESET}: https://docs.docker.com/docker-for-windows/install/'
-	@echo '- for ${COLOR_YELLOW}Linux${COLOR_RESET}: https://docs.docker.com/engine/install/'
+	@echo 'This Makefile requires ${COLOR_CYAN}nix${COLOR_RESET} for development tools. Run ${COLOR_YELLOW}nix develop${COLOR_RESET} to enter the dev shell.'
+	@echo 'Docker is only needed for ${COLOR_YELLOW}proto-gen${COLOR_RESET} and ${COLOR_YELLOW}release builds${COLOR_RESET}.'
 
 # $(call echo_msg, <emoji>, <action>, <object>, <context>)
 define echo_msg
