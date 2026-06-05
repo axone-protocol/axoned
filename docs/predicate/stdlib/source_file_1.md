@@ -5,18 +5,45 @@ sidebar_position: 77
 
 # source_file/1
 
+## Module
+
+Built-in predicate.
+
 ## Description
 
-`source_file/1` is a predicate which unifies the given term with the source file that is currently loaded.
+True when File is one of the Prolog source files loaded in the current
+interpreter.
 
 ## Signature
 
 ```text
-source_file(?File) is det
+source_file(?File) is nondet
 ```
 
-where:
+## Examples
 
-- File represents the loaded source file.
+### Match a loaded source file
 
-When File is a variable, solutions are produced in source loading order.
+This scenario demonstrates checking whether a source file has been loaded.
+
+Here are the steps of the scenario:
+
+- **Given** the query:
+
+```  prolog
+consult('/v1/lib/lists.pl'),
+source_file('/v1/lib/lists.pl').
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 4301
+answer:
+  has_more: false
+  variables:
+  results:
+  - substitutions:
+```

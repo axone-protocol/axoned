@@ -64,7 +64,7 @@ valid_ed25519(Verified).
 
 ```  yaml
 height: 42
-gas_used: 235323
+gas_used: 235381
 answer:
   has_more: false
   variables: ["Verified"]
@@ -101,7 +101,7 @@ invalid_ed25519.
 
 ```  yaml
 height: 42
-gas_used: 235291
+gas_used: 235349
 answer:
   has_more: false
   variables:

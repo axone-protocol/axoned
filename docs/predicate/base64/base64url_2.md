@@ -52,7 +52,7 @@ base64url(Decoded, 'PDw_Pz8-Pg').
 
 ```  yaml
 height: 42
-gas_used: 15202
+gas_used: 18435
 answer:
   has_more: false
   variables: ["Encoded", "Decoded"]

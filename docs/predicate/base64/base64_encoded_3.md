@@ -69,7 +69,7 @@ base64_encoded('Hello World', X, []).
 
 ```  yaml
 height: 42
-gas_used: 9043
+gas_used: 9993
 answer:
   has_more: false
   variables: ["X"]
@@ -99,7 +99,7 @@ base64_encoded('Hello World', X, [as(atom)]).
 
 ```  yaml
 height: 42
-gas_used: 9339
+gas_used: 10289
 answer:
   has_more: false
   variables: ["X"]
@@ -132,7 +132,7 @@ base64_encoded('Hello World', X, [as(atom), padding(false)]).
 
 ```  yaml
 height: 42
-gas_used: 9944
+gas_used: 10894
 answer:
   has_more: false
   variables: ["X"]
@@ -166,7 +166,7 @@ base64_encoded('<<???>>', UrlSafe, [as(atom), charset(url)]).
 
 ```  yaml
 height: 42
-gas_used: 13655
+gas_used: 15075
 answer:
   has_more: false
   variables: ["Classic", "UrlSafe"]
@@ -200,7 +200,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', []).
 
 ```  yaml
 height: 42
-gas_used: 9283
+gas_used: 12442
 answer:
   has_more: false
   variables: ["X"]
@@ -233,7 +233,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom)]).
 
 ```  yaml
 height: 42
-gas_used: 10083
+gas_used: 13242
 answer:
   has_more: false
   variables: ["X"]
@@ -262,7 +262,7 @@ base64_encoded('café', X, [as(atom), encoding('iso-8859-1')]).
 
 ```  yaml
 height: 42
-gas_used: 7905
+gas_used: 9100
 answer:
   has_more: false
   variables: ["X"]
@@ -375,7 +375,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom), encoding(unknown)]).
 
 ```  yaml
 height: 42
-gas_used: 10812
+gas_used: 13963
 answer:
   has_more: false
   variables: ["X"]

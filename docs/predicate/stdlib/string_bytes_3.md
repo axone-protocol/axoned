@@ -5,32 +5,45 @@ sidebar_position: 79
 
 # string_bytes/3
 
+## Module
+
+Built-in predicate.
+
 ## Description
 
-`string_bytes/3` is a predicate that unifies a string with a list of bytes, returning true when the \(Unicode\) String is represented by Bytes in Encoding.
+Relates text and its byte representation according to Encoding.
 
-The signature is as follows:
+## Signature
 
 ```text
-string_bytes(?String, ?Bytes, +Encoding)
+string_bytes(?String, ?Bytes, +Encoding) is det
 ```
-
-Where:
-
-- String is the string to convert to bytes. It can be an Atom, string or list of characters codes.
-- Bytes is the list of numbers between 0 and 255 that represent the sequence of bytes.
-- Encoding is the encoding to use for the conversion.
-
-Encoding can be one of the following: \- 'text' considers the string as a sequence of Unicode characters. \- 'octet' considers the string as a sequence of bytes. \- '\<encoding\>' considers the string as a sequence of characters in the given encoding.
-
-At least one of String or Bytes must be instantiated.
 
 ## Examples
 
-```text
-# Convert a string to a list of bytes.
-- string_bytes('Hello World', Bytes, octet).
+### Encode UTF-8 text into bytes
 
-# Convert a list of bytes to a string.
-- string_bytes(String, [72, 101, 108, 108, 111, 32, 87, 111, 114, 108, 100], octet).
+This scenario demonstrates converting text into its UTF-8 byte sequence.
+
+Here are the steps of the scenario:
+
+- **Given** the query:
+
+```  prolog
+string_bytes('aé', Bytes, utf8).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 4392
+answer:
+  has_more: false
+  variables: ["Bytes"]
+  results:
+  - substitutions:
+    - variable: Bytes
+      expression: "[97,195,169]"
 ```
