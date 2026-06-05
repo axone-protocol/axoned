@@ -22,7 +22,7 @@ Feature: eddsa_verify/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 235323
+      gas_used: 235381
       answer:
         has_more: false
         variables: ["Verified"]
@@ -53,7 +53,7 @@ Feature: eddsa_verify/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 241727
+      gas_used: 241785
       answer:
         has_more: false
         variables: ["Verified"]
@@ -83,7 +83,7 @@ Feature: eddsa_verify/4
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 235291
+      gas_used: 235349
       answer:
         has_more: false
         variables:

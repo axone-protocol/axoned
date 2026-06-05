@@ -23,7 +23,7 @@ Feature: json_read/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6651
+      gas_used: 30138
       answer:
         has_more: false
         variables: ["Term"]
@@ -53,7 +53,7 @@ Feature: json_read/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5770
+      gas_used: 8468
       answer:
         has_more: false
         variables: ["Term"]
