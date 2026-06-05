@@ -92,7 +92,8 @@ func TestUpdateParams(t *testing.T) {
 						bankKeeper,
 						func(_ gocontext.Context) (fs.FS, error) {
 							return fsProvider, nil
-						})
+						},
+					)
 
 					msgServer := keeper.NewMsgServerImpl(*logicKeeper)
 
@@ -109,7 +110,8 @@ func TestUpdateParams(t *testing.T) {
 							}
 						})
 					})
-				})
+				},
+			)
 		}
 	})
 }
@@ -146,7 +148,7 @@ func TestStoreProgram(t *testing.T) {
 		}
 		msgServer := keeper.NewMsgServerImpl(*logicKeeper)
 
-		source := "father(bob, alice)."
+		source := testProgramFatherAlice
 		sourceHash := sha256.Sum256([]byte(source))
 		expectedProgramID := hex.EncodeToString(sourceHash[:])
 
@@ -420,7 +422,7 @@ func TestStoreProgramMarshalFailure(t *testing.T) {
 		Convey("when storing a valid source", func() {
 			res, err := msgServer.StoreProgram(testCtx.Ctx, &types.MsgStoreProgram{
 				Publisher: publisher,
-				Source:    "father(bob, alice).",
+				Source:    testProgramFatherAlice,
 			})
 
 			Convey("then it should surface the storage error", func() {

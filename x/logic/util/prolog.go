@@ -73,7 +73,8 @@ func QueryInterpreter(
 				if sdkCtx.GasMeter().IsOutOfGas() {
 					return errorsmod.Wrapf(
 						types.ErrLimitExceeded, "out of gas: %s <%s> (%d/%d)",
-						types.ModuleName, callErr.Error(), sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
+						types.ModuleName, callErr.Error(), sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit(),
+					)
 				}
 				return nil
 			}(); err != nil {
@@ -170,7 +171,8 @@ func AsLimitExceededError(ctx context.Context, err error) error {
 		sdkCtx := sdk.UnwrapSDKContext(ctx)
 		return errorsmod.Wrapf(
 			types.ErrLimitExceeded, "out of gas: %s <%s> (%d/%d)",
-			types.ModuleName, descriptor, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
+			types.ModuleName, descriptor, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit(),
+		)
 	}
 
 	if message, ok := isPanicError(ex.Term()); ok {

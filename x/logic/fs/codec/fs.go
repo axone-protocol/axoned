@@ -28,6 +28,10 @@ var (
 )
 
 const (
+	opOpen               = "open"
+	codecNameBech32      = "bech32"
+	codecNameJSON        = "json"
+	codecNameText        = "text"
 	requestCommandDecode = "decode"
 	requestCommandEncode = "encode"
 
@@ -67,22 +71,22 @@ func NewFS(ctx context.Context) fs.FS {
 }
 
 func (f *vfs) Open(name string) (fs.File, error) {
-	return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
+	return nil, &fs.PathError{Op: opOpen, Path: name, Err: fs.ErrPermission}
 }
 
 func (f *vfs) OpenFile(name string, flag int, _ fs.FileMode) (fs.File, error) {
 	if flag != os.O_RDWR {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: fs.ErrPermission}
 	}
 
 	subpath, err := pathutil.NormalizeSubpath(name)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: err}
 	}
 
 	codec := Get(subpath)
 	if codec == nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrNotExist}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: fs.ErrNotExist}
 	}
 
 	sdkCtx := sdk.UnwrapSDKContext(f.ctx)

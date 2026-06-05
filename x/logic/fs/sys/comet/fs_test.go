@@ -31,11 +31,14 @@ func TestSysCometVFSReadFile(t *testing.T) {
 		expectedAt := []byte(
 			"comet{evidence:[evidence{height:11,time:1712653811,total_voting_power:12,type:1,validator:validator{address:[7,8],power:9}}]," +
 				"last_commit:commit_info{round:3,votes:[vote_info{block_id_flag:2,validator:validator{address:[10,11],power:12}}]}," +
-				"proposer_address:[4,5,6],validators_hash:[1,2,3]}.\n")
+				"proposer_address:[4,5,6],validators_hash:[1,2,3]}.\n",
+		)
 		expectedEvidence := []byte(
-			"[evidence{height:11,time:1712653811,total_voting_power:12,type:1,validator:validator{address:[7,8],power:9}}].\n")
+			"[evidence{height:11,time:1712653811,total_voting_power:12,type:1,validator:validator{address:[7,8],power:9}}].\n",
+		)
 		expectedLastCommit := []byte(
-			"commit_info{round:3,votes:[vote_info{block_id_flag:2,validator:validator{address:[10,11],power:12}}]}.\n")
+			"commit_info{round:3,votes:[vote_info{block_id_flag:2,validator:validator{address:[10,11],power:12}}]}.\n",
+		)
 
 		vfs := NewFS(newTestContext(
 			coreheader.Info{Time: time.Date(2024, 4, 10, 10, 44, 27, 0, time.UTC)},

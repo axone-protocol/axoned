@@ -41,6 +41,9 @@ const (
 	secp256k1PubKeyHex = "026b5450187ee9c63ba9e42cb6018d8469c903aca116178e223de76e49fe63b71c"
 	secp256k1SigHex    = "304402201448201bb4408549b0997f4b9ad9ed36f3cf8bb9c433fc7f3ba48c6b6e" +
 		"39476e022053f7d056f7ffeab9a79f3a36bc2ba969ddd530a3a1495d1ed7bba00039820223"
+
+	expectedOKTrue         = "ok(true).\n"
+	expectedInvalidRequest = "error(invalid_request).\n"
 )
 
 func TestCryptoDeviceFSOpen(t *testing.T) {
@@ -137,17 +140,17 @@ func TestCryptoDeviceFSSignatureResponses(t *testing.T) {
 	}{
 		{
 			name: "valid ed25519 signature",
-			path: "ed25519",
+			path: keyAlgEd25519,
 			request: signatureRequest(
 				ed25519PubKeyHex,
 				"9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d",
 				ed25519SigHex,
 			),
-			expected: "ok(true).\n",
+			expected: expectedOKTrue,
 		},
 		{
 			name: "invalid ed25519 signature",
-			path: "ed25519",
+			path: keyAlgEd25519,
 			request: signatureRequest(
 				ed25519PubKeyHex,
 				"9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9e",
@@ -163,7 +166,7 @@ func TestCryptoDeviceFSSignatureResponses(t *testing.T) {
 				"e50c26e89f734b2ee12041ff27874c901891f74a0f0cf470333312a3034ce3be",
 				secp256r1SigHex,
 			),
-			expected: "ok(true).\n",
+			expected: expectedOKTrue,
 		},
 		{
 			name: "valid secp256k1 signature",
@@ -173,23 +176,23 @@ func TestCryptoDeviceFSSignatureResponses(t *testing.T) {
 				"dece063885d3648078f903b6a3e8989f649dc3368cd9c8d69755ed9dcb6a0995",
 				secp256k1SigHex,
 			),
-			expected: "ok(true).\n",
+			expected: expectedOKTrue,
 		},
 		{
 			name:     "malformed signature request",
-			path:     "ed25519",
+			path:     keyAlgEd25519,
 			request:  []byte("verify bad\n"),
-			expected: "error(invalid_request).\n",
+			expected: expectedInvalidRequest,
 		},
 		{
 			name:     "unsupported signature operation",
-			path:     "ed25519",
+			path:     keyAlgEd25519,
 			request:  []byte("sign 00 00 00\n"),
 			expected: "error(unsupported_operation).\n",
 		},
 		{
 			name: "invalid signature public key",
-			path: "ed25519",
+			path: keyAlgEd25519,
 			request: signatureRequest(
 				"53167ac3fc4b720daa45b04fc73fe752578fa23a10048422d6904b7f4f7bba5b5b",
 				"9b038f8ef6918cbb56040dfda401b56bb1ce79c472e7736e8677758c83367a9d",
@@ -220,52 +223,52 @@ func TestCryptoDeviceFSSignatureRequestValidation(t *testing.T) {
 			{
 				name:     "empty request",
 				request:  []byte{},
-				expected: "error(invalid_request).\n",
+				expected: expectedInvalidRequest,
 			},
 			{
 				name:     "blank request",
 				request:  []byte("   \n"),
-				expected: "error(invalid_request).\n",
+				expected: expectedInvalidRequest,
 			},
 			{
 				name:     "tab separator",
 				request:  []byte("verify\t00 00 00\n"),
-				expected: "error(invalid_request).\n",
+				expected: expectedInvalidRequest,
 			},
 			{
 				name:     "control character",
 				request:  []byte{'v', 'e', 'r', 'i', 'f', 'y', ' ', 0x7f},
-				expected: "error(invalid_request).\n",
+				expected: expectedInvalidRequest,
 			},
 			{
 				name:     "invalid utf8",
 				request:  []byte{0xff},
-				expected: "error(invalid_request).\n",
+				expected: expectedInvalidRequest,
 			},
 			{
 				name:     "missing signature token",
 				request:  []byte("verify 00 00\n"),
-				expected: "error(invalid_request).\n",
+				expected: expectedInvalidRequest,
 			},
 			{
 				name:     "invalid public key hex",
 				request:  []byte("verify gg 00 00\n"),
-				expected: "error(invalid_request).\n",
+				expected: expectedInvalidRequest,
 			},
 			{
 				name:     "invalid message hex",
 				request:  []byte("verify 00 gg 00\n"),
-				expected: "error(invalid_request).\n",
+				expected: expectedInvalidRequest,
 			},
 			{
 				name:     "invalid signature hex",
 				request:  []byte("verify 00 00 gg\n"),
-				expected: "error(invalid_request).\n",
+				expected: expectedInvalidRequest,
 			},
 			{
 				name:     "odd-length signature hex",
 				request:  []byte("verify 00 00 0\n"),
-				expected: "error(invalid_request).\n",
+				expected: expectedInvalidRequest,
 			},
 		}
 

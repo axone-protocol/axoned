@@ -7,6 +7,8 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+const testDefaultValue = "default"
+
 func TestNonZeroOrDefault(t *testing.T) {
 	Convey("Given a value", t, func() {
 		cases := []struct {
@@ -17,8 +19,8 @@ func TestNonZeroOrDefault(t *testing.T) {
 			{nil, 0, 0},
 			{0, 10, 10},
 			{1, 0, 1},
-			{"", "default", "default"},
-			{"hello", "default", "hello"},
+			{"", testDefaultValue, testDefaultValue},
+			{"hello", testDefaultValue, "hello"},
 		}
 		for _, tc := range cases {
 			Convey(fmt.Sprintf("When the value is %v", tc.v), func() {

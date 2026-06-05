@@ -2,6 +2,11 @@
 
 set -eo pipefail
 
+# Resolve Go binary path: prefer GOBIN, then GOPATH/bin, finally fall back to `go env GOPATH`/bin.
+GOBIN_PATH="${GOBIN:-${GOPATH:+${GOPATH}/bin}}"
+GOBIN_PATH="${GOBIN_PATH:-$(go env GOPATH)/bin}"
+export PATH="${GOBIN_PATH}:${PATH}"
+
 protoc_install_proto_gen_doc() {
   echo "Installing protobuf protoc-gen-doc plugin"
   (go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest 2> /dev/null)

@@ -74,7 +74,8 @@ func TestAssertIsGround(t *testing.T) {
 								}
 							})
 						})
-					})
+					},
+				)
 			}
 		})
 	})
@@ -168,7 +169,8 @@ func TestAssertKeyValue(t *testing.T) {
 								}
 							})
 						})
-					})
+					},
+				)
 			}
 		})
 	})

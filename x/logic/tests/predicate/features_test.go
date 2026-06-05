@@ -387,7 +387,8 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 					FS:   newEchoDeviceFS(),
 				},
 			)
-		})
+		},
+	)
 
 	if err := logicKeeper.SetParams(tc.ctx.Ctx, tc.params); err != nil {
 		return nil, err

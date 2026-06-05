@@ -20,7 +20,7 @@ A sequence of coins and period length in seconds. Periods are sequential, in tha
  \},
 ]
 	\}
-		
+
 ```
 axoned tx vesting create-periodic-vesting-account [to_address] [periods_json_file] [flags]
 ```

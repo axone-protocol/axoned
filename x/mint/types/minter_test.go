@@ -105,7 +105,8 @@ func TestNextInflation(t *testing.T) {
 							})
 						}
 					})
-				})
+				},
+			)
 		}
 	})
 }

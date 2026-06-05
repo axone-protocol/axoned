@@ -26,6 +26,8 @@ import (
 	"github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
+const expectedNotExistMessage = "does not exist"
+
 func TestVFS(t *testing.T) {
 	addr := "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa"
 	Convey("Given a bank VFS", t, func() {
@@ -103,10 +105,10 @@ func TestVFS(t *testing.T) {
 				path    string
 				message string
 			}{
-				{name: "non-bank path", path: "invalid/path", message: "does not exist"},
-				{name: "unknown balances collection", path: addr + "/unknown/@", message: "does not exist"},
-				{name: "invalid bech32 address", path: "invalid_addr/balances/@", message: "does not exist"},
-				{name: "missing address segment", path: "/balances/@", message: "does not exist"},
+				{name: "non-bank path", path: "invalid/path", message: expectedNotExistMessage},
+				{name: "unknown balances collection", path: addr + "/unknown/@", message: expectedNotExistMessage},
+				{name: "invalid bech32 address", path: "invalid_addr/balances/@", message: expectedNotExistMessage},
+				{name: "missing address segment", path: "/balances/@", message: expectedNotExistMessage},
 			}
 
 			for _, tc := range cases {

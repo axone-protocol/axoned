@@ -8,6 +8,8 @@ on:
       - 'proto/**/*.proto'
       - 'proto/buf.yaml'
       - 'buf.work.yaml'
+      - 'flake.nix'
+      - 'flake.lock'
       - 'Makefile'
 
   pull_request:
@@ -17,6 +19,8 @@ on:
       - 'proto/**/*.proto'
       - 'proto/buf.yaml'
       - 'buf.work.yaml'
+      - 'flake.nix'
+      - 'flake.lock'
       - 'Makefile'
 
 permissions:
@@ -35,6 +39,9 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install Nix
+        uses: cachix/install-nix-action@08dcb3a5e62fa31e2da3d490afc4176ef55ecd72 # v30
+
       - name: Lint proto files
         run: |
-          make lint-proto
+          nix develop --command make lint-proto

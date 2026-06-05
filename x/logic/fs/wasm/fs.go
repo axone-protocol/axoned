@@ -20,6 +20,7 @@ import (
 var errWasmQueryFailed = errors.New("wasm_query_failed")
 
 const (
+	opOpen           = "open"
 	queryPath        = "query"
 	maxRequestBytes  = 64 * 1024
 	maxResponseBytes = 64 * 1024
@@ -41,22 +42,22 @@ func NewFS(ctx context.Context, wasmKeeper types.WasmKeeper) fs.FS {
 }
 
 func (f *vfs) Open(name string) (fs.File, error) {
-	return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
+	return nil, &fs.PathError{Op: opOpen, Path: name, Err: fs.ErrPermission}
 }
 
 func (f *vfs) OpenFile(name string, flag int, _ fs.FileMode) (fs.File, error) {
 	if flag != os.O_RDWR {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: fs.ErrPermission}
 	}
 
 	subpath, err := pathutil.NormalizeSubpath(name)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: err}
 	}
 
 	contractAddr, err := validateQueryPath(subpath)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: err}
 	}
 
 	sdkCtx := sdk.UnwrapSDKContext(f.ctx)

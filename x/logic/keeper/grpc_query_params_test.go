@@ -83,7 +83,8 @@ func TestGRPCParams(t *testing.T) {
 						bankKeeper,
 						func(_ gocontext.Context) (fs.FS, error) {
 							return fsProvider, nil
-						})
+						},
+					)
 
 					Convey("and given params to the keeper", func() {
 						err := logicKeeper.SetParams(testCtx.Ctx, tc.params)
@@ -103,7 +104,8 @@ func TestGRPCParams(t *testing.T) {
 							})
 						})
 					})
-				})
+				},
+			)
 		}
 	})
 
@@ -121,7 +123,8 @@ func TestGRPCParams(t *testing.T) {
 			nil,
 			nil,
 			nil,
-			nil)
+			nil,
+		)
 
 		Convey("When the query params is called with a nil query", func() {
 			params, err := logicKeeper.Params(testCtx.Ctx, nil)

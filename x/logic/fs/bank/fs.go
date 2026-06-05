@@ -22,6 +22,7 @@ import (
 )
 
 const (
+	opOpen        = "open"
 	balancesPath  = "balances"
 	spendablePath = "spendable"
 	lockedPath    = "locked"
@@ -52,17 +53,17 @@ func (f *vfs) Open(name string) (fs.File, error) {
 
 	subpath, err := pathutil.NormalizeSubpath(name)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: err}
 	}
 
 	addr, fetcher, err := f.validatePath(subpath)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: err}
 	}
 
 	bankKeeper, err := prolog.ContextValue[types.BankKeeper](f.ctx, types.BankKeeperContextKey, nil)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: errVFSUnavailable}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: errVFSUnavailable}
 	}
 
 	return newStreamingFile(f.ctx, name, prolog.ResolveHeaderInfo(sdkCtx).Time, bankKeeper, addr, fetcher), nil

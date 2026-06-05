@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	atomText          = engine.NewAtom("text")
+	atomText          = engine.NewAtom(codecNameText)
 	atomBytes         = engine.NewAtom("bytes")
 	atomTypeCharset   = engine.NewAtom("charset")
 	atomValidEncoding = engine.NewAtom("encoding")
@@ -23,7 +23,7 @@ func init() {
 }
 
 func (c *textCodec) Name() string {
-	return "text"
+	return codecNameText
 }
 
 func (c *textCodec) Encode(payload []byte) engine.Term {

@@ -790,21 +790,29 @@ func tagged(tag string, feature *messages.Scenario) bool {
 	})
 }
 
-func loadFeatures(path string) (map[string]*messages.Feature, error) {
+func loadFeatures(rootPath string) (map[string]*messages.Feature, error) {
 	features := make(map[string]*messages.Feature)
-	err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
-		if err == nil && featureRegEx.MatchString(info.Name()) {
-			bs, err := os.ReadFile(path)
-			if err != nil {
-				return err
-			}
-			r := strings.NewReader(string(bs))
-			gherkinDocument, err := gherkin.ParseGherkinDocument(r, (&messages.Incrementing{}).NewId)
-			if err != nil {
-				return err
-			}
-			features[strings.TrimSuffix(info.Name(), filepath.Ext(info.Name()))] = gherkinDocument.Feature
+	fsys := os.DirFS(rootPath)
+
+	err := fs.WalkDir(fsys, ".", func(filePath string, entry fs.DirEntry, err error) error {
+		if err != nil {
+			return err
 		}
+		if entry.IsDir() || !featureRegEx.MatchString(entry.Name()) {
+			return nil
+		}
+
+		bs, err := fs.ReadFile(fsys, filePath)
+		if err != nil {
+			return err
+		}
+		r := strings.NewReader(string(bs))
+		gherkinDocument, err := gherkin.ParseGherkinDocument(r, (&messages.Incrementing{}).NewId)
+		if err != nil {
+			return err
+		}
+		features[strings.TrimSuffix(entry.Name(), path.Ext(entry.Name()))] = gherkinDocument.Feature
+
 		return nil
 	})
 	if err != nil {

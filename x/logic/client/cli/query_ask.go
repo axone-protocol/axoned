@@ -53,14 +53,16 @@ func CmdQueryAsk() *cobra.Command {
 		&program,
 		"program",
 		"",
-		`reads the program from the given string.`)
+		`reads the program from the given string.`,
+	)
 	//nolint:lll
 	cmd.Flags().Uint64Var(
 		&limit,
 		"limit",
 		1,
 		`limit the maximum number of solutions to return.
-This parameter is constrained by the 'max_result_count' setting in the module configuration, which specifies the maximum number of results that can be requested per query.`)
+This parameter is constrained by the 'max_result_count' setting in the module configuration, which specifies the maximum number of results that can be requested per query.`,
+	)
 
 	flags.AddQueryFlagsToCmd(cmd)
 

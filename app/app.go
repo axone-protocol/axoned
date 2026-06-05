@@ -635,7 +635,8 @@ func New(
 	// must be passed by reference here.
 
 	appModules := make([]module.AppModule, 0, 24)
-	appModules = append(appModules,
+	appModules = append(
+		appModules,
 		genutil.NewAppModule(
 			app.AccountKeeper,
 			app.StakingKeeper,
@@ -667,7 +668,8 @@ func New(
 		ica.NewAppModule(&app.ICAControllerKeeper, &app.ICAHostKeeper),
 		ibctm.AppModule{})
 
-	appModules = append(appModules,
+	appModules = append(
+		appModules,
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper,
 			app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
 		// our modules
@@ -693,7 +695,8 @@ func New(
 					paramsclient.ProposalHandler,
 				},
 			),
-		})
+		},
+	)
 	app.BasicModuleManager.RegisterLegacyAminoCodec(legacyAmino)
 	app.BasicModuleManager.RegisterInterfaces(interfaceRegistry)
 

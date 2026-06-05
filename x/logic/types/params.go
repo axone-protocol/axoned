@@ -32,7 +32,8 @@ func DefaultParams() Params {
 		NewLimits(
 			WithMaxSize(5000),
 			WithMaxResultCount(3),
-			WithMaxVariables(100000)),
+			WithMaxVariables(100000),
+		),
 		DefaultGasPolicy(),
 	)
 }
