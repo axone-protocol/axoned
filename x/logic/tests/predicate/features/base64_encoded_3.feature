@@ -127,7 +127,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 12442
+      gas_used: 12573
       answer:
         has_more: false
         variables: ["X"]
@@ -154,7 +154,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 13242
+      gas_used: 13373
       answer:
         has_more: false
         variables: ["X"]
@@ -178,7 +178,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 9100
+      gas_used: 9195
       answer:
         has_more: false
         variables: ["X"]
@@ -222,7 +222,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 10650
+      gas_used: 10761
       answer:
         has_more: false
         variables: ["X"]
@@ -528,7 +528,7 @@ Feature: base64_encoded/3
     Then the answer we get is:
         """ yaml
         height: 42
-        gas_used: 13963
+        gas_used: 14094
         answer:
           has_more: false
           variables: ["X"]

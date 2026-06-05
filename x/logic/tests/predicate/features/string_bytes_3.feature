@@ -53,7 +53,7 @@ Feature: string_bytes/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5122
+      gas_used: 5217
       answer:
         has_more: false
         variables: ["Bytes"]
@@ -73,7 +73,7 @@ Feature: string_bytes/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5128
+      gas_used: 5223
       answer:
         has_more: false
         variables: ["Bytes"]

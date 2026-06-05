@@ -200,7 +200,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', []).
 
 ```  yaml
 height: 42
-gas_used: 12442
+gas_used: 12573
 answer:
   has_more: false
   variables: ["X"]
@@ -233,7 +233,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom)]).
 
 ```  yaml
 height: 42
-gas_used: 13242
+gas_used: 13373
 answer:
   has_more: false
   variables: ["X"]
@@ -262,7 +262,7 @@ base64_encoded('café', X, [as(atom), encoding('iso-8859-1')]).
 
 ```  yaml
 height: 42
-gas_used: 9100
+gas_used: 9195
 answer:
   has_more: false
   variables: ["X"]
@@ -375,7 +375,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom), encoding(unknown)]).
 
 ```  yaml
 height: 42
-gas_used: 13963
+gas_used: 14094
 answer:
   has_more: false
   variables: ["X"]
