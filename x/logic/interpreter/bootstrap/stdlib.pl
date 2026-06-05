@@ -414,10 +414,11 @@ byte_value(Byte) :-
   throw(error(type_error(byte, Byte), string_bytes/3)).
 
 text_codec_call(Command, Payload, Response) :-
-  open('/v1/dev/codec/text', read_write, Stream, [type(text)]),
-  text_codec_write_request(Stream, Command, Payload),
-  read_term(Stream, Response, []),
-  close(Stream),
+  setup_call_cleanup(
+    open('/v1/dev/codec/text', read_write, Stream, [type(text)]),
+    (text_codec_write_request(Stream, Command, Payload),
+     read_term(Stream, Response, [])),
+    close(Stream)),
   !.
 
 text_codec_write_request(Stream, Command, Payload) :-
