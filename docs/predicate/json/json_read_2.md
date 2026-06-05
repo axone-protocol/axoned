@@ -56,7 +56,7 @@ json_read_from_echo('{"foo":"bar","items":[1,null]}', Term).
 
 ```  yaml
 height: 42
-gas_used: 6651
+gas_used: 30138
 answer:
   has_more: false
   variables: ["Term"]

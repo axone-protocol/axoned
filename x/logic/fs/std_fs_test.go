@@ -49,10 +49,11 @@ func TestStandardMountsLayout(t *testing.T) {
 			paths = append(paths, mount.Path)
 		}
 
-		So(paths, ShouldHaveLength, 8)
+		So(paths, ShouldHaveLength, 9)
 		So(slices.Contains(paths, libPath), ShouldBeTrue)
 		So(slices.Contains(paths, runHeaderPath), ShouldBeTrue)
 		So(slices.Contains(paths, runCometPath), ShouldBeTrue)
+		So(slices.Contains(paths, runSourcePath), ShouldBeTrue)
 		So(slices.Contains(paths, varLibBankPath), ShouldBeTrue)
 		So(slices.Contains(paths, varLibLogicPath), ShouldBeTrue)
 		So(slices.Contains(paths, devCodecPath), ShouldBeTrue)
@@ -98,11 +99,15 @@ func TestNewVFSCanonicalPaths(t *testing.T) {
 		header, err := fs.ReadFile(vfs, runHeaderPath+"/height")
 		So(err, ShouldBeNil)
 
+		sourceFiles, err := fs.ReadFile(vfs, runSourcePath+"/files")
+		So(err, ShouldBeNil)
+
 		programPath := publisherText + "/programs/" + fmtProgramID(programID) + ".pl"
 		program, err := fs.ReadFile(vfs, varLibLogicPath+"/"+programPath)
 		So(err, ShouldBeNil)
 
 		So(string(header), ShouldEqual, "42.\n")
+		So(string(sourceFiles), ShouldEqual, "[].\n")
 		So(string(program), ShouldEqual, source)
 	})
 }

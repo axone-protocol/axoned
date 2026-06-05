@@ -54,7 +54,7 @@ hex_bytes(Hex, Hash).
 
 ```  yaml
 height: 42
-gas_used: 64284
+gas_used: 65436
 answer:
   has_more: false
   variables: ["Hash", "Hex"]

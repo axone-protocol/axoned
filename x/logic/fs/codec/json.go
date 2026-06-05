@@ -7,9 +7,7 @@ import (
 	"fmt"
 	"io"
 	"strconv"
-	"strings"
 
-	goprolog "github.com/axone-protocol/prolog/v3"
 	"github.com/axone-protocol/prolog/v3/engine"
 	"github.com/samber/lo"
 
@@ -18,7 +16,11 @@ import (
 
 var (
 	atomSyntaxError     = engine.NewAtom("syntax_error")
-	atomJSONSyntax      = engine.NewAtom("json")
+	atomJSON            = engine.NewAtom("json")
+	atomAt              = engine.NewAtom("@")
+	atomNull            = engine.NewAtom("null")
+	atomTrue            = engine.NewAtom("true")
+	atomFalse           = engine.NewAtom("false")
 	atomPrologSyntax    = engine.NewAtom("prolog")
 	atomMalformedJSON   = engine.NewAtom("malformed_json")
 	atomMalformedTerm   = engine.NewAtom("malformed_term")
@@ -26,6 +28,12 @@ var (
 	atomUnknown         = engine.NewAtom("unknown")
 	atomValidJSONNumber = engine.NewAtom("json_number")
 	atomSystemError     = engine.NewAtom("system_error")
+)
+
+var (
+	jsonNullTerm  = atomAt.Apply(atomNull)
+	jsonTrueTerm  = atomAt.Apply(atomTrue)
+	jsonFalseTerm = atomAt.Apply(atomFalse)
 )
 
 type jsonCodec struct{}
@@ -46,14 +54,14 @@ func (c *jsonCodec) Decode(payload []byte) engine.Term {
 	}
 	if _, err := decoder.Token(); !errors.Is(err, io.EOF) {
 		return prolog.AtomError.Apply(
-			atomSyntaxError.Apply(atomJSONSyntax.Apply(atomMalformedJSON.Apply(engine.Integer(decoder.InputOffset())))))
+			atomSyntaxError.Apply(atomJSON.Apply(atomMalformedJSON.Apply(engine.Integer(decoder.InputOffset())))))
 	}
 
 	return atomOK.Apply(decoded)
 }
 
 func (c *jsonCodec) Encode(payload []byte) engine.Term {
-	term, err := parseJSONTerm(payload)
+	term, err := parseCodecTerm(payload)
 	if err != nil {
 		return prolog.AtomError.Apply(atomSyntaxError.Apply(atomPrologSyntax.Apply(atomMalformedTerm)))
 	}
@@ -64,19 +72,6 @@ func (c *jsonCodec) Encode(payload []byte) engine.Term {
 	}
 
 	return atomOK.Apply(engine.NewAtom(buf.String()))
-}
-
-func parseJSONTerm(payload []byte) (engine.Term, error) {
-	interpreter := goprolog.New(strings.NewReader(""), io.Discard)
-	parser := engine.NewParser(&interpreter.VM, strings.NewReader(string(payload)))
-	term, err := parser.Term()
-	if err != nil {
-		return nil, err
-	}
-	if parser.More() {
-		return nil, fmt.Errorf("unexpected trailing term")
-	}
-	return term, nil
 }
 
 func encodeTermToJSON(term engine.Term, writer io.Writer, env *engine.Env) error {
@@ -100,7 +95,7 @@ func encodeTermToJSON(term engine.Term, writer io.Writer, env *engine.Env) error
 	case engine.Variable:
 		return engine.InstantiationError(env)
 	default:
-		return engine.TypeError(prolog.AtomTypeJSON, term, env)
+		return engine.TypeError(atomJSON, term, env)
 	}
 }
 
@@ -108,24 +103,24 @@ func encodeCompoundToJSON(term engine.Compound, writer io.Writer, env *engine.En
 	switch {
 	case term.Functor() == prolog.AtomDot:
 		return encodeArrayToJSON(term, writer, env)
-	case term.Functor() == prolog.AtomJSON:
+	case term.Functor() == atomJSON:
 		return encodeObjectToJSON(term, writer, env)
-	case prolog.JSONBool(true).Compare(term, env) == 0:
+	case jsonBool(true).Compare(term, env) == 0:
 		_, err := writer.Write([]byte("true"))
 		return err
-	case prolog.JSONBool(false).Compare(term, env) == 0:
+	case jsonBool(false).Compare(term, env) == 0:
 		_, err := writer.Write([]byte("false"))
 		return err
-	case prolog.JSONNull().Compare(term, env) == 0:
+	case jsonNull().Compare(term, env) == 0:
 		_, err := writer.Write([]byte("null"))
 		return err
 	default:
-		return engine.TypeError(prolog.AtomTypeJSON, term, env)
+		return engine.TypeError(atomJSON, term, env)
 	}
 }
 
 func encodeObjectToJSON(term engine.Compound, writer io.Writer, env *engine.Env) error {
-	if _, err := prolog.AssertJSON(term, env); err != nil {
+	if _, err := assertJSON(term, env); err != nil {
 		return err
 	}
 	if _, err := writer.Write([]byte("{")); err != nil {
@@ -194,7 +189,7 @@ func marshalToJSONStream(data any, term engine.Term, writer io.Writer, env *engi
 func decodeJSONToTerm(decoder *json.Decoder) (engine.Term, error) {
 	token, err := decoder.Token()
 	if errors.Is(err, io.EOF) {
-		return prolog.JSONNull(), nil
+		return jsonNull(), nil
 	}
 	if err != nil {
 		return nil, err
@@ -227,9 +222,9 @@ func decodeJSONToTerm(decoder *json.Decoder) (engine.Term, error) {
 	case float64:
 		return engine.NewFloatFromString(strconv.FormatFloat(token, 'f', -1, 64))
 	case bool:
-		return prolog.JSONBool(token), nil
+		return jsonBool(token), nil
 	case nil:
-		return prolog.JSONNull(), nil
+		return jsonNull(), nil
 	}
 
 	return nil, fmt.Errorf("unexpected token: %v", token)
@@ -266,21 +261,42 @@ func decodeJSONObjectToTerm(decoder *json.Decoder) (engine.Term, error) {
 		terms = append(terms, prolog.AtomKeyValue.Apply(prolog.StringToAtom(key), value))
 	}
 
-	return prolog.AtomJSON.Apply(engine.List(terms...)), nil
+	return atomJSON.Apply(engine.List(terms...)), nil
 }
 
 func jsonErrorTerm(err error) engine.Term {
 	if err, ok := lo.ErrorsAs[*json.SyntaxError](err); ok {
-		return atomSyntaxError.Apply(atomJSONSyntax.Apply(atomMalformedJSON.Apply(engine.Integer(err.Offset))))
+		return atomSyntaxError.Apply(atomJSON.Apply(atomMalformedJSON.Apply(engine.Integer(err.Offset))))
 	}
 	if err, ok := lo.ErrorsAs[*json.UnmarshalTypeError](err); ok {
 		return atomSyntaxError.Apply(
-			atomJSONSyntax.Apply(atomMalformedJSON.Apply(engine.Integer(err.Offset), prolog.StringToAtom(err.Value))))
+			atomJSON.Apply(atomMalformedJSON.Apply(engine.Integer(err.Offset), prolog.StringToAtom(err.Value))))
 	}
 	if errors.Is(err, io.EOF) {
-		return atomSyntaxError.Apply(atomJSONSyntax.Apply(atomEOF))
+		return atomSyntaxError.Apply(atomJSON.Apply(atomEOF))
 	}
-	return atomSyntaxError.Apply(atomJSONSyntax.Apply(atomUnknown))
+	return atomSyntaxError.Apply(atomJSON.Apply(atomUnknown))
+}
+
+func jsonNull() engine.Term {
+	return jsonNullTerm
+}
+
+func jsonBool(b bool) engine.Term {
+	if b {
+		return jsonTrueTerm
+	}
+	return jsonFalseTerm
+}
+
+func assertJSON(term engine.Term, env *engine.Env) (engine.Compound, error) {
+	if compound, ok := env.Resolve(term).(engine.Compound); ok {
+		if compound.Functor() == atomJSON && compound.Arity() == 1 {
+			return compound, nil
+		}
+	}
+
+	return nil, engine.TypeError(atomJSON, term, env)
 }
 
 func exceptionFormal(err error) engine.Term {

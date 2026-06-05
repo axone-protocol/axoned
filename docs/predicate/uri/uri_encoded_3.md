@@ -53,7 +53,7 @@ uri_encoded(path, Decoded, foo).
 
 ```  yaml
 height: 42
-gas_used: 4667
+gas_used: 6255
 answer:
   has_more: false
   variables: ["Decoded"]
@@ -81,7 +81,7 @@ uri_encoded(query_value, 'foo bar', Encoded).
 
 ```  yaml
 height: 42
-gas_used: 5702
+gas_used: 6357
 answer:
   has_more: false
   variables: ["Encoded"]

@@ -55,7 +55,7 @@ json_prolog('{"foo":"bar","ok":true}', Term).
 
 ```  yaml
 height: 42
-gas_used: 6216
+gas_used: 12069
 answer:
   has_more: false
   variables: ["Term"]

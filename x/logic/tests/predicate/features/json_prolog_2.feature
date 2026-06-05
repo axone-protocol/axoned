@@ -14,7 +14,7 @@ Feature: json_prolog/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6216
+      gas_used: 12069
       answer:
         has_more: false
         variables: ["Term"]
@@ -58,7 +58,7 @@ Feature: json_prolog/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5560
+      gas_used: 6957
       answer:
         has_more: false
         variables: ["Term"]

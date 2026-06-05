@@ -14,7 +14,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4667
+      gas_used: 6255
       answer:
         has_more: false
         variables: ["Decoded"]
@@ -37,7 +37,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5702
+      gas_used: 6357
       answer:
         has_more: false
         variables: ["Encoded"]
@@ -59,7 +59,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 8367
+      gas_used: 9292
       answer:
         has_more: false
         variables: ["Encoded"]
@@ -81,7 +81,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 7066
+      gas_used: 7775
       answer:
         has_more: false
         variables: ["Encoded"]
@@ -103,7 +103,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 7215
+      gas_used: 7924
       answer:
         has_more: false
         variables: ["Encoded"]
@@ -125,7 +125,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 7054
+      gas_used: 7763
       answer:
         has_more: false
         variables: ["Encoded"]
@@ -147,7 +147,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6172
+      gas_used: 10658
       answer:
         has_more: false
         variables: ["Decoded"]
@@ -248,7 +248,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5719
+      gas_used: 6374
       answer:
         has_more: false
       """
@@ -265,7 +265,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4880
+      gas_used: 5319
       answer:
         has_more: false
       """
@@ -282,7 +282,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5166
+      gas_used: 5927
       answer:
         has_more: false
         variables: ["Decoded"]

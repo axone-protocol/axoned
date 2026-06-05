@@ -188,6 +188,261 @@ read(Term) :-
 read(Stream, Term) :-
   read_term(Stream, Term, []).
 
+%! read_string(+Stream, ?Length, -String) is det.
+%
+% Reads characters from Stream and unifies String with an atom containing the
+% text read. Length is unified with the number of UTF-8 bytes read. When Length
+% is instantiated to a positive integer, reading stops once at least that many
+% bytes have been read.
+read_string(Stream, Length, String) :-
+  catch(
+    read_string_(Stream, Length, String),
+    error(Formal, _),
+    throw(error(Formal, read_string/3))
+  ).
+
+read_string_(Stream, Length, String) :-
+  read_string_limit(Length, Limit),
+  read_string_chars(Stream, Limit, 0, Chars, ByteLength),
+  atom_chars(Atom, Chars),
+  Length = ByteLength,
+  String = Atom.
+
+read_string_limit(Length, Length) :-
+  integer(Length),
+  Length > 0,
+  !.
+read_string_limit(_, unbounded).
+
+read_string_chars(_, Limit, ByteLength, [], ByteLength) :-
+  read_string_limit_reached(Limit, ByteLength),
+  !.
+read_string_chars(Stream, Limit, CurrentLength, Chars, ByteLength) :-
+  get_char(Stream, Char),
+  ( Char = end_of_file
+  -> Chars = [],
+     ByteLength = CurrentLength
+  ;  string_bytes(Char, Bytes, text),
+     length(Bytes, CharLength),
+     NextLength is CurrentLength + CharLength,
+     Chars = [Char | Rest],
+     read_string_chars(Stream, Limit, NextLength, Rest, ByteLength)
+  ).
+
+read_string_limit_reached(Limit, ByteLength) :-
+  integer(Limit),
+  ByteLength >= Limit.
+
+%! string_bytes(?String, ?Bytes, +Encoding) is det.
+%
+% Relates text and its byte representation according to Encoding.
+string_bytes(String, Bytes, Encoding) :-
+  ( nonvar(String),
+    ( Encoding == text
+    ; Encoding == utf8
+    )
+  -> string_text_bytes(String, Bytes)
+  ; nonvar(String),
+    Encoding == octet
+  -> string_octet_bytes(String, Bytes)
+  ; nonvar(Bytes),
+    Encoding == octet
+  -> bytes_octet_string(Bytes, String)
+  ; nonvar(Bytes),
+    Encoding == text
+  -> bytes_text_string(Bytes, String)
+  ; nonvar(String)
+  -> text_codec_call(encode, text(Encoding, String), Response),
+     text_codec_response(string_bytes/3, Response, Bytes)
+  ; nonvar(Bytes)
+  -> text_codec_call(decode, bytes(Encoding, Bytes), Response),
+     text_codec_response(string_bytes/3, Response, String)
+  ;  throw(error(instantiation_error, string_bytes/3))
+  ).
+
+string_text_bytes(Text, Bytes) :-
+  text_chars(Text, Chars),
+  chars_utf8_bytes(Chars, Bytes).
+
+string_octet_bytes(Text, Bytes) :-
+  text_chars(Text, Chars),
+  chars_octet_bytes(Chars, Bytes).
+
+bytes_octet_string(Bytes, String) :-
+  bytes_chars(Bytes, Chars),
+  String = Chars.
+
+bytes_text_string(Bytes, String) :-
+  utf8_bytes_chars(Bytes, Chars),
+  String = Chars.
+
+text_chars(Text, Chars) :-
+  atom(Text),
+  !,
+  atom_chars(Text, Chars).
+text_chars([], []) :-
+  !.
+text_chars([Head | Tail], Chars) :-
+  atom(Head),
+  !,
+  char_list_chars([Head | Tail], Chars).
+text_chars([Head | Tail], Chars) :-
+  integer(Head),
+  !,
+  code_list_chars([Head | Tail], Chars).
+text_chars(Text, _) :-
+  throw(error(type_error(text, Text), string_bytes/3)).
+
+char_list_chars([], []).
+char_list_chars([Char | Rest], [Char | Chars]) :-
+  atom(Char),
+  atom_length(Char, 1),
+  !,
+  char_list_chars(Rest, Chars).
+char_list_chars([Char | _], _) :-
+  throw(error(type_error(character, Char), string_bytes/3)).
+
+code_list_chars([], []).
+code_list_chars([Code | Rest], [Char | Chars]) :-
+  integer(Code),
+  char_code(Char, Code),
+  !,
+  code_list_chars(Rest, Chars).
+code_list_chars([Code | _], _) :-
+  throw(error(type_error(character_code, Code), string_bytes/3)).
+
+chars_utf8_bytes(Chars, Bytes) :-
+  chars_utf8_bytes_(Chars, Bytes, []).
+
+chars_utf8_bytes_([], Tail, Tail).
+chars_utf8_bytes_([Char | Rest], Bytes, Tail) :-
+  char_code(Char, Code),
+  utf8_code_bytes(Code, Bytes, RestBytes),
+  chars_utf8_bytes_(Rest, RestBytes, Tail).
+
+utf8_code_bytes(Code, [Code | Tail], Tail) :-
+  Code =< 127,
+  !.
+utf8_code_bytes(Code, [B1, B2 | Tail], Tail) :-
+  Code =< 2047,
+  !,
+  B1 is 192 + (Code >> 6),
+  B2 is 128 + (Code /\ 63).
+utf8_code_bytes(Code, [B1, B2, B3 | Tail], Tail) :-
+  Code =< 65535,
+  !,
+  B1 is 224 + (Code >> 12),
+  B2 is 128 + ((Code >> 6) /\ 63),
+  B3 is 128 + (Code /\ 63).
+utf8_code_bytes(Code, [B1, B2, B3, B4 | Tail], Tail) :-
+  B1 is 240 + (Code >> 18),
+  B2 is 128 + ((Code >> 12) /\ 63),
+  B3 is 128 + ((Code >> 6) /\ 63),
+  B4 is 128 + (Code /\ 63).
+
+chars_octet_bytes([], []).
+chars_octet_bytes([Char | Rest], [Byte | Bytes]) :-
+  char_code(Char, Byte),
+  Byte =< 255,
+  !,
+  chars_octet_bytes(Rest, Bytes).
+chars_octet_bytes([Char | _], _) :-
+  char_code(Char, Code),
+  throw(error(type_error(byte, Code), string_bytes/3)).
+
+bytes_chars([], []).
+bytes_chars([Byte | Rest], [Char | Chars]) :-
+  integer(Byte),
+  Byte >= 0,
+  Byte =< 255,
+  char_code(Char, Byte),
+  !,
+  bytes_chars(Rest, Chars).
+bytes_chars([Byte | _], _) :-
+  throw(error(type_error(byte, Byte), string_bytes/3)).
+
+utf8_bytes_chars([], []).
+utf8_bytes_chars([Byte | Rest], [Char | Chars]) :-
+  byte_value(Byte),
+  utf8_byte_char(Byte, Rest, Code, Next),
+  char_code(Char, Code),
+  utf8_bytes_chars(Next, Chars).
+
+utf8_byte_char(Byte, Rest, Byte, Rest) :-
+  Byte =< 127,
+  !.
+utf8_byte_char(Byte, [B2 | Rest], Code, Rest) :-
+  Byte >= 194,
+  Byte =< 223,
+  utf8_continuation_byte(B2),
+  !,
+  Code is ((Byte /\ 31) << 6) + (B2 /\ 63).
+utf8_byte_char(Byte, [B2, B3 | Rest], Code, Rest) :-
+  Byte >= 224,
+  Byte =< 239,
+  utf8_continuation_byte(B2),
+  utf8_continuation_byte(B3),
+  Code is ((Byte /\ 15) << 12) + ((B2 /\ 63) << 6) + (B3 /\ 63),
+  Code >= 2048,
+  ( Code < 55296
+  ; Code > 57343
+  ),
+  !.
+utf8_byte_char(Byte, [B2, B3, B4 | Rest], Code, Rest) :-
+  Byte >= 240,
+  Byte =< 244,
+  utf8_continuation_byte(B2),
+  utf8_continuation_byte(B3),
+  utf8_continuation_byte(B4),
+  Code is ((Byte /\ 7) << 18) + ((B2 /\ 63) << 12) + ((B3 /\ 63) << 6) + (B4 /\ 63),
+  Code >= 65536,
+  Code =< 1114111,
+  !.
+utf8_byte_char(_, Rest, 65533, Rest).
+
+utf8_continuation_byte(Byte) :-
+  byte_value(Byte),
+  Byte >= 128,
+  Byte =< 191.
+
+byte_value(Byte) :-
+  integer(Byte),
+  Byte >= 0,
+  Byte =< 255,
+  !.
+byte_value(Byte) :-
+  throw(error(type_error(byte, Byte), string_bytes/3)).
+
+text_codec_call(Command, Payload, Response) :-
+  setup_call_cleanup(
+    open('/v1/dev/codec/text', read_write, Stream, [type(text)]),
+    (text_codec_write_request(Stream, Command, Payload),
+     read_term(Stream, Response, [])),
+    close(Stream)),
+  !.
+
+text_codec_write_request(Stream, Command, Payload) :-
+  atom_chars(Command, CommandChars),
+  text_codec_put_chars(Stream, CommandChars),
+  put_char(Stream, '\n'),
+  write_term(Stream, Payload, [quoted(true)]),
+  put_char(Stream, '.').
+
+text_codec_response(_, ok(Value), Target) :-
+  !,
+  copy_term(Value, Copy),
+  Target = Copy.
+text_codec_response(Context, error(Formal), _) :-
+  !,
+  throw(error(Formal, Context)).
+text_codec_response(Context, _, _) :-
+  throw(error(system_error, Context)).
+
+text_codec_put_chars(_, []).
+text_codec_put_chars(Stream, [Char | Rest]) :-
+  put_char(Stream, Char),
+  text_codec_put_chars(Stream, Rest).
+
 % write_term(+Term, +Options) is det.
 %
 % Writes Term to the current output stream with Options.
@@ -665,6 +920,31 @@ term_to_atom_rbracket_char(Char) :-
 
 term_to_atom_pipe_char(Char) :-
   char_code(Char, 124).
+
+%! source_file(?File) is nondet.
+%
+% True when File is one of the Prolog source files loaded in the current
+% interpreter.
+source_file(File) :-
+  ( var(File)
+  -> source_file_sources(Files),
+     source_file_member(File, Files)
+  ; atom(File)
+  -> source_file_sources(Files),
+     source_file_member(File, Files)
+  ;  throw(error(type_error(atom, File), source_file/1))
+  ).
+
+source_file_sources(Files) :-
+  setup_call_cleanup(
+    open('/v1/run/source/files', read, Stream, [type(text)]),
+    read_term(Stream, Files, []),
+    close(Stream)
+  ).
+
+source_file_member(File, [File | _]).
+source_file_member(File, [_ | Rest]) :-
+  source_file_member(File, Rest).
 
 %! atomic_list_concat(+List, ?Atom) is det.
 %

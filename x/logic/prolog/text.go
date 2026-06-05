@@ -131,9 +131,3 @@ func StringToOctetListTerm(s string, env *engine.Env) (engine.Term, error) {
 
 	return engine.List(terms...), nil
 }
-
-// StringToByteListTerm converts a string (utf8) to a term representing a list of bytes.
-// This is equivalent to the prolog encoding 'text'.
-func StringToByteListTerm(s string) engine.Term {
-	return BytesToByteListTerm([]byte(s))
-}

@@ -5,8 +5,6 @@ import "github.com/axone-protocol/prolog/v3/engine"
 var (
 	// AtomAs is the term used to indicate the as encoding type option.
 	AtomAs = engine.NewAtom("as")
-	// AtomAt are terms with principal functor (@)/1 used to represent special values in json objects.
-	AtomAt = engine.NewAtom("@")
 	// AtomDID is the atom `did`, used for DID structured terms such as did(Method, MethodSpecificId, Path, Query, Fragment).
 	AtomDID = engine.NewAtom("did")
 	// AtomDot is the term used to represent the dot in a list.
@@ -25,10 +23,6 @@ var (
 	AtomFragment = engine.NewAtom("fragment")
 	// AtomHex is the term used to indicate the hexadecimal encoding type option.
 	AtomHex = engine.NewAtom("hex")
-	// AtomJSON are terms with principal functor json/1 used to represent json objects.
-	AtomJSON = engine.NewAtom("json")
-	// AtomNull is the term null.
-	AtomNull = engine.NewAtom("null")
 	// AtomOctet is the term used to indicate the byte encoding type option.
 	AtomOctet = engine.NewAtom("octet")
 	// AtomPadding is the term used to indicate the padding encoding type option.

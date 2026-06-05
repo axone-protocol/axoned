@@ -14,4 +14,6 @@ const (
 	BankKeeperContextKey = ContextKey("bankKeeper")
 	// IOCoeffContextKey is the context key for the I/O gas coefficient used by devices.
 	IOCoeffContextKey = ContextKey("ioCoeff")
+	// SourceFilesProviderContextKey is the context key for the provider of currently loaded Prolog source files.
+	SourceFilesProviderContextKey = ContextKey("sourceFilesProvider")
 )
