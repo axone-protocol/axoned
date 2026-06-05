@@ -12,6 +12,7 @@ import (
 	logiccrypto "github.com/axone-protocol/axoned/v15/x/logic/fs/crypto"
 	logicembeddedfs "github.com/axone-protocol/axoned/v15/x/logic/fs/embedded"
 	logicshare "github.com/axone-protocol/axoned/v15/x/logic/fs/share"
+	logicsource "github.com/axone-protocol/axoned/v15/x/logic/fs/source"
 	logicsyscomet "github.com/axone-protocol/axoned/v15/x/logic/fs/sys/comet"
 	logicsysheader "github.com/axone-protocol/axoned/v15/x/logic/fs/sys/header"
 	logicvfs "github.com/axone-protocol/axoned/v15/x/logic/fs/vfs"
@@ -27,6 +28,7 @@ const (
 	libPath         = v1Root + "/lib"
 	runHeaderPath   = v1Root + "/run/header"
 	runCometPath    = v1Root + "/run/comet"
+	runSourcePath   = v1Root + "/run/source"
 	varLibBankPath  = v1Root + "/var/lib/bank"
 	varLibLogicPath = v1Root + "/var/lib/logic/users"
 	devCodecPath    = v1Root + "/dev/codec"
@@ -73,17 +75,19 @@ func StandardMounts(ctx goctx.Context, wasmKeeper logictypes.WasmKeeper, program
 	libFS := logicembeddedfs.NewFS(logiclib.Files)
 	headerFS := logicsysheader.NewFS(ctx)
 	cometFS := logicsyscomet.NewFS(ctx)
+	sourceFS := logicsource.NewFS(ctx)
 	bankFS := logicbank.NewFS(ctx)
 	codecFS := logiccodec.NewFS(ctx)
 	cryptoFS := logiccrypto.NewFS(ctx)
 	wasmFS := logicwasm.NewFS(ctx, wasmKeeper)
 	shareFS := logicshare.NewFS(ctx, programKeeper)
 
-	mounts := make([]Mount, 0, 8)
+	mounts := make([]Mount, 0, 9)
 	mounts = append(mounts,
 		Mount{Path: libPath, FS: libFS},
 		Mount{Path: runHeaderPath, FS: headerFS},
 		Mount{Path: runCometPath, FS: cometFS},
+		Mount{Path: runSourcePath, FS: sourceFS},
 		Mount{Path: varLibBankPath, FS: bankFS},
 		Mount{Path: devCodecPath, FS: codecFS},
 		Mount{Path: devCryptoPath, FS: cryptoFS},

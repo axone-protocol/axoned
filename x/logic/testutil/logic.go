@@ -9,9 +9,11 @@ import (
 	"github.com/axone-protocol/prolog/v3/engine"
 
 	logicembeddedfs "github.com/axone-protocol/axoned/v15/x/logic/fs/embedded"
+	logicsource "github.com/axone-protocol/axoned/v15/x/logic/fs/source"
 	logicvfs "github.com/axone-protocol/axoned/v15/x/logic/fs/vfs"
 	"github.com/axone-protocol/axoned/v15/x/logic/interpreter/bootstrap"
 	logiclib "github.com/axone-protocol/axoned/v15/x/logic/lib"
+	logictypes "github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
 type TermResults map[string]prolog.TermString
@@ -82,6 +84,10 @@ func NewComprehensiveInterpreterMust(ctx context.Context) *prolog.Interpreter {
 	pathFS := logicvfs.New()
 	if err := pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)); err != nil {
 		panic(fmt.Errorf("failed to mount /v1/lib: %w", err))
+	}
+	sourceCtx := context.WithValue(ctx, logictypes.SourceFilesProviderContextKey, logicsource.FilesProvider(i.LoadedSources))
+	if err := pathFS.Mount("/v1/run/source", logicsource.NewFS(sourceCtx)); err != nil {
+		panic(fmt.Errorf("failed to mount /v1/run/source: %w", err))
 	}
 	i.FS = pathFS
 

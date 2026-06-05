@@ -12,6 +12,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	logicsource "github.com/axone-protocol/axoned/v15/x/logic/fs/source"
 	"github.com/axone-protocol/axoned/v15/x/logic/interpreter"
 	"github.com/axone-protocol/axoned/v15/x/logic/interpreter/bootstrap"
 	"github.com/axone-protocol/axoned/v15/x/logic/meter"
@@ -76,7 +77,15 @@ func (k Keeper) queryInterpreter(
 
 // newInterpreter creates a new interpreter properly configured.
 func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolog.Interpreter, fmt.Stringer, error) {
-	sdkctx := sdk.UnwrapSDKContext(ctx).WithValue(types.IOCoeffContextKey, params.GetGasPolicy().IoCoeff)
+	var loadedSourcesInterpreter *prolog.Interpreter
+	sdkctx := sdk.UnwrapSDKContext(ctx).
+		WithValue(types.IOCoeffContextKey, params.GetGasPolicy().IoCoeff).
+		WithValue(types.SourceFilesProviderContextKey, logicsource.FilesProvider(func() []string {
+			if loadedSourcesInterpreter == nil {
+				return nil
+			}
+			return loadedSourcesInterpreter.LoadedSources()
+		}))
 	ctx = sdkctx
 
 	var userOutputBuffer writerStringer
@@ -111,6 +120,7 @@ func (k Keeper) newInterpreter(ctx context.Context, params types.Params) (*prolo
 	}
 
 	i, err := interpreter.New(options...)
+	loadedSourcesInterpreter = i
 
 	return i, userOutputBuffer, err
 }
