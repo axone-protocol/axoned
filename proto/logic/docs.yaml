@@ -131,125 +131,14 @@ description: |
 
   ## Virtual File System (VFS)
 
-  A key concept of the module is the VFS exposed to the Prolog VM through `open/4` and `consult/1`.
+  The Prolog VM evaluates programs against a Virtual File System (VFS) exposed by the AXONE blockchain. For most users,
+  the important point is that reusable logic is loaded with `consult/1`: built-in libraries and published user programs
+  are both consumed as Prolog sources.
 
-  Prolog code does not access the node's real file system. It only sees the capabilities explicitly mounted by the
-  host under a canonical namespace rooted at `/v1`.
+  Users normally interact with the predicates provided by those libraries rather than with VFS paths directly. The
+  consumer-facing VFS catalog is maintained in the predicate documentation.
 
-  This makes the module easier to understand:
-
-  - if a resource is visible through the VFS, Prolog can use it;
-  - if it is not mounted in the VFS, it does not exist from the program's perspective.
-
-  The namespace follows a stable layout:
-
-  - `/v1/lib`: immutable host-provided Prolog libraries;
-  - `/v1/run`: invocation-scoped runtime snapshots;
-  - `/v1/var/lib`: persistent chain-backed data exposed as files;
-  - `/v1/dev`: transactional device-like capabilities.
-
-  In several mounts, the special path segment `@` denotes the canonical aggregate representation of a resource.
-
-  ## `/v1/lib`: Built-In Prolog Libraries
-
-  The module ships with reusable Prolog libraries that can be loaded explicitly with `consult/1`.
-
-  Available libraries include:
-
-  - `/v1/lib/apply.pl`: higher-order helpers such as `maplist/2..7` and `foldl/4..7`;
-  - `/v1/lib/bank.pl`: helpers for account balances;
-  - `/v1/lib/bech32.pl`: Bech32 encode/decode helpers;
-  - `/v1/lib/chain.pl`: helpers exposing header and Comet block information;
-  - `/v1/lib/crypto.pl`: small crypto-adjacent helpers such as hexadecimal conversions;
-  - `/v1/lib/dev.pl`: low-level helpers for transactional VFS devices;
-  - `/v1/lib/error.pl`: error and type-checking helpers;
-  - `/v1/lib/lists.pl`: list processing helpers;
-  - `/v1/lib/type.pl`: type predicates used by the other libraries;
-  - `/v1/lib/wasm.pl`: helpers for CosmWasm smart queries.
-
-  Example:
-
-  ```prolog
-  :- consult('/v1/lib/chain.pl').
-
-  current_chain(ChainID) :-
-    header_info(Header),
-    ChainID = Header.chain_id.
-  ```
-
-  These libraries are regular Prolog sources. They are not magical special forms: users load them explicitly and can
-  combine them with their own predicates.
-
-  ## `/v1/run`: Runtime Snapshots
-
-  `/v1/run` exposes information tied to the current query execution context.
-
-  The standard mounts are:
-
-  - `/v1/run/header`
-  - `/v1/run/comet`
-
-  Examples of readable paths include:
-
-  - `/v1/run/header/@`
-  - `/v1/run/header/height`
-  - `/v1/run/header/hash`
-  - `/v1/run/header/time`
-  - `/v1/run/header/chain_id`
-  - `/v1/run/header/app_hash`
-  - `/v1/run/comet/@`
-  - `/v1/run/comet/validators_hash`
-  - `/v1/run/comet/proposer_address`
-  - `/v1/run/comet/evidence`
-  - `/v1/run/comet/last_commit`
-
-  These files are read-only snapshots. They are intended for logical inspection, not mutation.
-
-  Example:
-
-  ```prolog
-  :- consult('/v1/lib/chain.pl').
-
-  block_height(Height) :-
-    header_info(Header),
-    Height = Header.height.
-  ```
-
-  ## `/v1/var/lib`: Persistent Chain-Backed Data
-
-  `/v1/var/lib` exposes data backed by blockchain state, still through file-like paths.
-
-  The standard mounts currently include:
-
-  - `/v1/var/lib/bank`
-  - `/v1/var/lib/logic/users`
-
-  ### Bank Data
-
-  Bank balances are exposed under paths such as:
-
-  - `/v1/var/lib/bank/<address>/balances/@`
-  - `/v1/var/lib/bank/<address>/spendable/@`
-  - `/v1/var/lib/bank/<address>/locked/@`
-
-  The `bank.pl` library wraps those paths into higher-level predicates:
-
-  - `bank_balances/2`
-  - `bank_spendable_balances/2`
-  - `bank_locked_balances/2`
-
-  Example:
-
-  ```prolog
-  :- consult('/v1/lib/bank.pl').
-
-  rich_account(Address) :-
-    bank_spendable_balances(Address, Balances),
-    member(uaxone-Amount, Balances),
-    Amount > 1000000.
-  ```
-
-  ### Published User Programs
+  ## Published User Programs
 
   User-published programs are exposed under:
 
@@ -265,57 +154,6 @@ description: |
   :- consult('/v1/var/lib/logic/users/axone1.../programs/<program_id>.pl').
   ```
 
-  ## `/v1/dev`: Transactional Devices
-
-  `/v1/dev` exposes interactive capabilities through file-like request/response devices.
-
-  This is where the Axone Prolog VM extension for `read_write` streams becomes important. In Axone, `open/4` can open a
-  resource in `read_write` mode, which allows half-duplex transactional I/O:
-
-  1. write a request;
-  2. trigger the device on first read;
-  3. read back the response.
-
-  This pattern is used for deterministic host capabilities that are easier to model as devices than as plain predicates.
-
-  Standard device mounts include:
-
-  - `/v1/dev/codec/<codec>`
-  - `/v1/dev/wasm/<contract_address>/query`
-
-  In most cases, users should prefer the provided helper libraries rather than interact with devices directly.
-
-  ### Codec Devices
-
-  Codec devices are mounted under `/v1/dev/codec`. For example, the Bech32 helper library delegates encoding and
-  decoding to the `bech32` codec device.
-
-  Users typically do not open those devices themselves. Instead they use predicates such as:
-
-  - `bech32_address/2`
-  - `hex_bytes/2`
-
-  ### WASM Query Devices
-
-  CosmWasm smart queries are exposed through:
-
-  ```text
-  /v1/dev/wasm/<contract_address>/query
-  ```
-
-  The recommended user-facing helper is `wasm_query/3` from `/v1/lib/wasm.pl`.
-
-  Example:
-
-  ```prolog
-  :- consult('/v1/lib/wasm.pl').
-
-  contract_query(Address, RequestBytes, ResponseBytes) :-
-    wasm_query(Address, RequestBytes, ResponseBytes).
-  ```
-
-  The device is query-only. It lets users ask a contract for data, not execute transactions.
-
   ## `consult/1` and Reuse
 
   `consult/1` is the main mechanism for composing logic from multiple sources.
@@ -324,7 +162,10 @@ description: |
 
   - built-in libraries from `/v1/lib`;
   - chain-backed published programs from `/v1/var/lib/logic/users/...`;
-  - lists of files, just as in regular Prolog.
+  - an explicit Prolog list of known source paths.
+
+  The VFS cannot be enumerated from Prolog. To discover published programs, use the module query endpoints such as
+  `Programs` and `ProgramsByPublisher`, then load the selected program path with `consult/1`.
 
   This is the idiomatic way to build reusable logic on top of the module. In other words, `StoreProgram` does not create
   a new query endpoint by itself; it publishes a source file that later queries can load with `consult/1`.
@@ -468,15 +309,13 @@ description: |
   The `logic` module should be understood as a user-facing Prolog query engine for blockchain data, backed by:
 
   - a deterministic Axone Prolog VM;
-  - a capability-oriented VFS;
+  - a VFS-backed library loading model;
   - built-in Prolog libraries;
-  - query-only devices for advanced integrations;
   - immutable, on-chain published user programs that can be reused as libraries.
 
   If you want to understand how to use the module, the central ideas are simple:
 
   - write Prolog;
   - load libraries with `consult/1`;
-  - inspect chain capabilities through `/v1`;
   - publish reusable sources with `StoreProgram`;
   - execute logic with `Ask`.
