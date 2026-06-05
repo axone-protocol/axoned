@@ -61,7 +61,8 @@ func MockAuthQueryServiceWithAddresses(mock *MockAuthQueryService, addresses []s
 					}
 
 					return anyV
-				})
+				},
+			)
 
 			return &authtypes.QueryAccountsResponse{
 				Accounts: accounts,

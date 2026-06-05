@@ -13,6 +13,8 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+const testBlockPath = "block"
+
 type recordingFS struct {
 	lastOpen string
 }
@@ -232,7 +234,7 @@ func TestFileSystemRoute(t *testing.T) {
 
 			So(err, ShouldBeNil)
 			So(mounted, ShouldEqual, sys)
-			So(subpath, ShouldEqual, "block")
+			So(subpath, ShouldEqual, testBlockPath)
 		})
 
 		Convey("when routing exact mount path /v1/sys", func() {
@@ -256,7 +258,7 @@ func TestFileSystemRoute(t *testing.T) {
 
 			So(err, ShouldBeNil)
 			So(mounted, ShouldEqual, sys)
-			So(subpath, ShouldEqual, "block")
+			So(subpath, ShouldEqual, testBlockPath)
 		})
 
 		Convey("when routing /", func() {
@@ -350,7 +352,7 @@ func TestFileSystemOpenDispatch(t *testing.T) {
 			_, err := v.Open("v1/sys/block")
 
 			So(err, ShouldBeNil)
-			So(sys.lastOpen, ShouldEqual, "block")
+			So(sys.lastOpen, ShouldEqual, testBlockPath)
 		})
 
 		Convey("when opening a missing mount", func() {
@@ -385,13 +387,13 @@ func TestFileSystemOpenFileDispatch(t *testing.T) {
 			_, err := v.OpenFile("/v1/sys/block", 42, 0o640)
 
 			So(err, ShouldBeNil)
-			So(sys.lastOpenFilePath, ShouldEqual, "block")
+			So(sys.lastOpenFilePath, ShouldEqual, testBlockPath)
 			So(sys.lastFlag, ShouldEqual, 42)
 			So(sys.lastPerm, ShouldEqual, 0o640)
 		})
 
 		Convey("when mounted OpenFile fails", func() {
-			sys.openFileErr = &fs.PathError{Op: "open", Path: "block", Err: fs.ErrPermission}
+			sys.openFileErr = &fs.PathError{Op: "open", Path: testBlockPath, Err: fs.ErrPermission}
 			_, err := v.OpenFile("/v1/sys/block", 42, 0o640)
 
 			So(err, ShouldNotBeNil)
@@ -466,11 +468,11 @@ func TestFileSystemReadFileDispatch(t *testing.T) {
 
 			So(err, ShouldBeNil)
 			So(string(content), ShouldEqual, "payload")
-			So(sys.lastReadFile, ShouldEqual, "block")
+			So(sys.lastReadFile, ShouldEqual, testBlockPath)
 		})
 
 		Convey("when mounted ReadFile fails", func() {
-			sys.readFileErr = &fs.PathError{Op: "open", Path: "block", Err: fs.ErrPermission}
+			sys.readFileErr = &fs.PathError{Op: "open", Path: testBlockPath, Err: fs.ErrPermission}
 			_, err := v.ReadFile("/v1/sys/block")
 
 			So(err, ShouldNotBeNil)
@@ -548,8 +550,8 @@ func TestWrappedFileStatAndClose(t *testing.T) {
 	Convey("Given a wrapped file with stat/close errors", t, func() {
 		v := New()
 		underlying := &flakyFile{
-			statErr:  &fs.PathError{Op: "stat", Path: "block", Err: fs.ErrPermission},
-			closeErr: &fs.PathError{Op: "close", Path: "block", Err: fs.ErrPermission},
+			statErr:  &fs.PathError{Op: "stat", Path: testBlockPath, Err: fs.ErrPermission},
+			closeErr: &fs.PathError{Op: "close", Path: testBlockPath, Err: fs.ErrPermission},
 		}
 		So(v.Mount("/v1/sys", &openOnlyFS{openFile: underlying}), ShouldBeNil)
 

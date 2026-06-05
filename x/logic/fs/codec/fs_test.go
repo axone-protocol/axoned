@@ -32,11 +32,18 @@ import (
 	logictypes "github.com/axone-protocol/axoned/v15/x/logic/types"
 )
 
+const (
+	expectedInvalidRequest  = "error(invalid_request).\n"
+	expectedMalformedProlog = "error(syntax_error(prolog(malformed_term))).\n"
+	testJSONFooBarTerm      = "json([foo=bar])."
+	testListFooTerm         = "[foo]."
+)
+
 func TestAll(t *testing.T) {
 	Convey("Given the codec registry", t, func() {
-		So(slices.Contains(All(), "bech32"), ShouldBeTrue)
-		So(slices.Contains(All(), "json"), ShouldBeTrue)
-		So(slices.Contains(All(), "text"), ShouldBeTrue)
+		So(slices.Contains(All(), codecNameBech32), ShouldBeTrue)
+		So(slices.Contains(All(), codecNameJSON), ShouldBeTrue)
+		So(slices.Contains(All(), codecNameText), ShouldBeTrue)
 	})
 }
 
@@ -44,7 +51,7 @@ func TestCodecDeviceFSOpen(t *testing.T) {
 	vfs := NewFS(newSDKContext())
 
 	Convey("Given a codec device filesystem", t, func() {
-		_, err := vfs.Open("bech32")
+		_, err := vfs.Open(codecNameBech32)
 		So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
 	})
 }
@@ -58,7 +65,7 @@ func TestCodecDeviceFSOpenFileValidation(t *testing.T) {
 
 	Convey("Given a codec device filesystem", t, func() {
 		Convey("when opening with unsupported mode", func() {
-			_, err := ofs.OpenFile("bech32", os.O_RDONLY, 0)
+			_, err := ofs.OpenFile(codecNameBech32, os.O_RDONLY, 0)
 			So(errors.Is(err, fs.ErrPermission), ShouldBeTrue)
 		})
 
@@ -169,7 +176,7 @@ func TestSplitRequestCommand(t *testing.T) {
 			name:       "line separator",
 			request:    []byte("encode\njson([foo=bar])."),
 			command:    []byte("encode"),
-			payload:    []byte("json([foo=bar])."),
+			payload:    []byte(testJSONFooBarTerm),
 			expectedOK: true,
 		},
 		{
@@ -300,69 +307,69 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 		// Protocol-level validation (codec-agnostic)
 		{
 			name:           "empty request",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        nil,
-			expectedOutput: "error(invalid_request).\n",
+			expectedOutput: expectedInvalidRequest,
 		},
 		{
 			name:           "unknown command",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("unknown"),
-			expectedOutput: "error(invalid_request).\n",
+			expectedOutput: expectedInvalidRequest,
 		},
 		{
 			name:           "malformed UTF-8",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte{0xff},
-			expectedOutput: "error(invalid_request).\n",
+			expectedOutput: expectedInvalidRequest,
 		},
 		{
 			name:           "tab separator not allowed",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("encode\taxone\t00"),
-			expectedOutput: "error(invalid_request).\n",
+			expectedOutput: expectedInvalidRequest,
 		},
 		{
 			name:           "decode with insufficient arguments",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("decode"),
-			expectedOutput: "error(invalid_request).\n",
+			expectedOutput: expectedInvalidRequest,
 		},
 		{
 			name:           "decode with empty bech32 payload",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("decode "),
-			expectedOutput: "error(invalid_request).\n",
+			expectedOutput: expectedInvalidRequest,
 		},
 		{
 			name:           "encode with insufficient arguments",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("encode axone"),
-			expectedOutput: "error(invalid_request).\n",
+			expectedOutput: expectedInvalidRequest,
 		},
 		{
 			name:           "encode with too many arguments",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("encode hrp hex extra"),
-			expectedOutput: "error(invalid_request).\n",
+			expectedOutput: expectedInvalidRequest,
 		},
 
 		// Bech32 codec - decode tests
 		{
 			name:           "bech32 decode valid address",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("decode axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4"),
 			expectedOutput: "ok(-(axone,[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30])).\n",
 		},
 		{
 			name:           "bech32 decode with whitespace normalization",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("  decode   axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4  \r\n"),
 			expectedOutput: "ok(-(axone,[163,167,23,244,162,175,49,162,170,15,181,141,68,134,141,168,18,56,247,30])).\n",
 		},
 		{
 			name:           "bech32 decode invalid payload",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("decode bad"),
 			expectedOutput: "error(invalid_bech32).\n",
 		},
@@ -370,25 +377,25 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 		// Bech32 codec - encode tests
 		{
 			name:           "bech32 encode valid bytes",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("encode axone a3a717f4a2af31a2aa0fb58d44868da81238f71e"),
 			expectedOutput: "ok(axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4).\n",
 		},
 		{
 			name:           "bech32 encode with uppercase hex",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("encode axone A3A717F4A2AF31A2AA0FB58D44868DA81238F71E"),
 			expectedOutput: "ok(axone15wn30a9z4uc692s0kkx5fp5d4qfr3ac77gvjg4).\n",
 		},
 		{
 			name:           "bech32 encode invalid hex characters",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("encode axone 0011zz"),
 			expectedOutput: "error(invalid_bytes).\n",
 		},
 		{
 			name:           "bech32 encode odd-length hex",
-			codecName:      "bech32",
+			codecName:      codecNameBech32,
 			request:        []byte("encode axone 123"),
 			expectedOutput: "error(invalid_bytes).\n",
 		},
@@ -396,31 +403,31 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 		// JSON codec - decode tests
 		{
 			name:           "json decode object with whitespace",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("decode\n{\n  \"foo\": \"bar\",\n  \"ok\": true\n}"),
 			expectedOutput: "ok(json([=(foo,bar),=(ok,@(true))])).\n",
 		},
 		{
 			name:           "json decode space-separated payload is not tokenized",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("decode {\"foo\":\"bar baz\"}"),
 			expectedOutput: "ok(json([=(foo,'bar baz')])).\n",
 		},
 		{
 			name:           "json decode empty payload as null",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("decode\n"),
 			expectedOutput: "ok(@(null)).\n",
 		},
 		{
 			name:           "json decode malformed payload",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("decode\n{&"),
 			expectedOutput: "error(syntax_error(json(malformed_json(1)))).\n",
 		},
 		{
 			name:           "json decode rejects trailing document",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("decode\n{\"foo\":\"bar\"}{\"foo\":\"bar\"}"),
 			expectedOutput: "error(syntax_error(json(malformed_json(14)))).\n",
 		},
@@ -428,117 +435,117 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 		// JSON codec - encode tests
 		{
 			name:           "json encode object",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("encode\njson([foo=bar,ok= @(true)])."),
 			expectedOutput: "ok('{\"foo\":\"bar\",\"ok\":true}').\n",
 		},
 		{
 			name:           "json encode malformed prolog term",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("encode\njson([foo=bar]). trailing"),
-			expectedOutput: "error(syntax_error(prolog(malformed_term))).\n",
+			expectedOutput: expectedMalformedProlog,
 		},
 		{
 			name:           "json encode variable fails fast",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("encode\nJson."),
 			expectedOutput: "error(instantiation_error).\n",
 		},
 		{
 			name:           "json encode invalid JSON term",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("encode\nfoo([a=b])."),
 			expectedOutput: "error(type_error(json,foo([=(a,b)]))).\n",
 		},
 		{
 			name:           "json encode invalid number",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("encode\n1.8e308."),
 			expectedOutput: "error(domain_error(json_number,1.8e+308)).\n",
 		},
 		{
 			name:           "json unknown raw command",
-			codecName:      "json",
+			codecName:      codecNameJSON,
 			request:        []byte("unknown\n{}"),
-			expectedOutput: "error(invalid_request).\n",
+			expectedOutput: expectedInvalidRequest,
 		},
 
 		// Text codec tests
 		{
 			name:           "text encode utf8",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("encode\ntext(utf8, aap)."),
 			expectedOutput: "ok([97,97,112]).\n",
 		},
 		{
 			name:           "text decode utf8",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("decode\nbytes(utf8, [97,97,112])."),
 			expectedOutput: "ok([a,a,p]).\n",
 		},
 		{
 			name:           "text encode text",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("encode\ntext(text, 'ù')."),
 			expectedOutput: "ok([195,185]).\n",
 		},
 		{
 			name:           "text decode text",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("decode\nbytes(text, [195,185])."),
 			expectedOutput: "ok([ù]).\n",
 		},
 		{
 			name:           "text encode octet",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("encode\ntext(octet, 'ù')."),
 			expectedOutput: "ok([249]).\n",
 		},
 		{
 			name:           "text decode octet",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("decode\nbytes(octet, [249])."),
 			expectedOutput: "ok([ù]).\n",
 		},
 		{
 			name:           "text encode utf-16le",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("encode\ntext('utf-16le', '今日は')."),
 			expectedOutput: "ok([202,78,229,101,111,48]).\n",
 		},
 		{
 			name:           "text decode utf-16be",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("decode\nbytes('utf-16be', [0,97,0,97,0,112])."),
 			expectedOutput: "ok([a,a,p]).\n",
 		},
 		{
 			name:           "text encode invalid charset",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("encode\ntext(foo, aap)."),
 			expectedOutput: "error(type_error(charset,foo)).\n",
 		},
 		{
 			name:           "text decode invalid byte",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("decode\nbytes(latin2, [400])."),
 			expectedOutput: "error(type_error(byte,400)).\n",
 		},
 		{
 			name:           "text encode malformed term",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("encode\ntext(utf8, aap). trailing"),
-			expectedOutput: "error(syntax_error(prolog(malformed_term))).\n",
+			expectedOutput: expectedMalformedProlog,
 		},
 		{
 			name:           "text encode invalid request term",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("encode\nfoo(utf8, aap)."),
-			expectedOutput: "error(invalid_request).\n",
+			expectedOutput: expectedInvalidRequest,
 		},
 		{
 			name:           "text decode invalid bytes term",
-			codecName:      "text",
+			codecName:      codecNameText,
 			request:        []byte("decode\nbytes(utf8, foo(bar))."),
 			expectedOutput: "error(type_error(list,foo(bar))).\n",
 		},
@@ -570,7 +577,7 @@ func TestCodecDeviceFSGasMetering(t *testing.T) {
 	}
 
 	Convey("Given a codec device filesystem with I/O gas metering", t, func() {
-		file, err := ofs.OpenFile("bech32", os.O_RDWR, 0)
+		file, err := ofs.OpenFile(codecNameBech32, os.O_RDWR, 0)
 		So(err, ShouldBeNil)
 		defer file.Close()
 

@@ -79,7 +79,8 @@ func WithError(exception engine.Exception, err error, env *engine.Env) engine.Ex
 			return engine.NewException(term.Functor().Apply(
 				term.Arg(0),
 				StringToCharacterListTerm(err.Error()),
-				term.Arg(1)), env)
+				term.Arg(1),
+			), env)
 		}
 	}
 	return exception

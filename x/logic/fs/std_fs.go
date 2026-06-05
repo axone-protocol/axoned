@@ -83,7 +83,8 @@ func StandardMounts(ctx goctx.Context, wasmKeeper logictypes.WasmKeeper, program
 	shareFS := logicshare.NewFS(ctx, programKeeper)
 
 	mounts := make([]Mount, 0, 9)
-	mounts = append(mounts,
+	mounts = append(
+		mounts,
 		Mount{Path: libPath, FS: libFS},
 		Mount{Path: runHeaderPath, FS: headerFS},
 		Mount{Path: runCometPath, FS: cometFS},

@@ -32,7 +32,7 @@ func TestQueryProgram(t *testing.T) {
 		programID := mustDecodeHex(t, programIDHex)
 
 		err := logicKeeper.SetStoredProgram(sdkCtx, programID, types.StoredProgram{
-			Source:     "foo.",
+			Source:     testProgramFoo,
 			CreatedAt:  42,
 			SourceSize: 4,
 		})

@@ -83,7 +83,8 @@ func Test_validateBounds(t *testing.T) {
 							})
 						}
 					})
-				})
+				},
+			)
 		}
 	})
 }

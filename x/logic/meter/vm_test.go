@@ -104,7 +104,7 @@ func TestVMMeter(t *testing.T) {
 }
 
 func matchesTerm(actual, expected engine.Term) bool {
-	_, ok := ((*engine.Env)(nil)).Unify(actual, expected)
+	_, ok := (*engine.Env)(nil).Unify(actual, expected)
 
 	return ok
 }

@@ -10,6 +10,8 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+const testEchoName = "echo"
+
 func TestHalfDuplexLifecycle(t *testing.T) {
 	Convey("Given a half-duplex file with a valid request and response", t, func() {
 		commitCalls := 0
@@ -288,7 +290,7 @@ func TestHalfDuplexStat(t *testing.T) {
 
 		info, err := file.Stat()
 		So(err, ShouldBeNil)
-		So(info.Name(), ShouldEqual, "echo")
+		So(info.Name(), ShouldEqual, testEchoName)
 		So(info.Size(), ShouldEqual, int64(0))
 		So(info.Mode(), ShouldEqual, fs.FileMode(0o666))
 		So(info.ModTime(), ShouldEqual, modTime)
@@ -303,8 +305,8 @@ func TestBaseName(t *testing.T) {
 			path string
 			want string
 		}{
-			{path: "/v1/dev/echo", want: "echo"},
-			{path: "echo", want: "echo"},
+			{path: "/v1/dev/echo", want: testEchoName},
+			{path: testEchoName, want: testEchoName},
 			{path: "/", want: ""},
 		}
 

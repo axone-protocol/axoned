@@ -10,6 +10,8 @@ import (
 	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/iface"
 )
 
+const opMount = "mount"
+
 // OpenFileFS is implemented by file systems that support opening files with flags.
 type OpenFileFS = iface.OpenFileFS
 
@@ -44,17 +46,17 @@ func New() *FileSystem {
 // Mount mounts a filesystem at the given prefix.
 func (v *FileSystem) Mount(prefix string, fsys fs.FS) error {
 	if fsys == nil {
-		return &fs.PathError{Op: "mount", Path: prefix, Err: fs.ErrInvalid}
+		return &fs.PathError{Op: opMount, Path: prefix, Err: fs.ErrInvalid}
 	}
 
 	canonicalPrefix, err := normalizePath(prefix)
 	if err != nil {
-		return &fs.PathError{Op: "mount", Path: prefix, Err: err}
+		return &fs.PathError{Op: opMount, Path: prefix, Err: err}
 	}
 
 	for _, m := range v.mounts {
 		if m.Prefix == canonicalPrefix {
-			return &fs.PathError{Op: "mount", Path: prefix, Err: fs.ErrExist}
+			return &fs.PathError{Op: opMount, Path: prefix, Err: fs.ErrExist}
 		}
 	}
 

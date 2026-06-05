@@ -2,6 +2,8 @@
 
 set -eo pipefail
 
+export PATH="${GOBIN:-${GOPATH}/bin}:${PATH}"
+
 protoc_install_proto_gen_doc() {
   echo "Installing protobuf protoc-gen-doc plugin"
   (go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc@latest 2> /dev/null)

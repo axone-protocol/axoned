@@ -28,7 +28,7 @@ func init() {
 
 // Name returns the codec identifier.
 func (c *bech32Codec) Name() string {
-	return "bech32"
+	return codecNameBech32
 }
 
 // Decode processes a Bech32 decode request.

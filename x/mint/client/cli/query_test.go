@@ -22,6 +22,14 @@ import (
 	mintcli "github.com/axone-protocol/axoned/v15/x/mint/client/cli"
 )
 
+const (
+	testJSONOutputName = "json output"
+	testTextOutputName = "text output"
+	testJSONOutputFlag = `[--height=1 --output=json]`
+	testTextOutputFlag = `[--height=1 --output=text]`
+	testNilOutput      = `<nil>`
+)
+
 func TestGetCmdQueryParams(t *testing.T) {
 	Convey("Given the params query command", t, func() {
 		encCfg := testutilmod.MakeTestEncodingConfig(mint.AppModuleBasic{})
@@ -44,15 +52,15 @@ func TestGetCmdQueryParams(t *testing.T) {
 			expectedOutput string
 		}{
 			{
-				"json output",
+				testJSONOutputName,
 				[]string{fmt.Sprintf("--%s=1", flags.FlagHeight), fmt.Sprintf("--%s=json", flags.FlagOutput)},
-				`[--height=1 --output=json]`,
+				testJSONOutputFlag,
 				`{"mint_denom":"","inflation_coef":"0","blocks_per_year":"0","inflation_max":null,"inflation_min":null}`,
 			},
 			{
-				"text output",
+				testTextOutputName,
 				[]string{fmt.Sprintf("--%s=1", flags.FlagHeight), fmt.Sprintf("--%s=text", flags.FlagOutput)},
-				`[--height=1 --output=text]`,
+				testTextOutputFlag,
 				`blocks_per_year: "0"
 inflation_coef: "0"
 inflation_max: null
@@ -108,16 +116,16 @@ func TestGetCmdQueryInflation(t *testing.T) {
 			expectedOutput string
 		}{
 			{
-				"json output",
+				testJSONOutputName,
 				[]string{fmt.Sprintf("--%s=1", flags.FlagHeight), fmt.Sprintf("--%s=json", flags.FlagOutput)},
-				`[--height=1 --output=json]`,
-				`<nil>`,
+				testJSONOutputFlag,
+				testNilOutput,
 			},
 			{
-				"text output",
+				testTextOutputName,
 				[]string{fmt.Sprintf("--%s=1", flags.FlagHeight), fmt.Sprintf("--%s=text", flags.FlagOutput)},
-				`[--height=1 --output=text]`,
-				`<nil>`,
+				testTextOutputFlag,
+				testNilOutput,
 			},
 		}
 
@@ -168,16 +176,16 @@ func TestGetCmdQueryAnnualProvisions(t *testing.T) {
 			expectedOutput string
 		}{
 			{
-				"json output",
+				testJSONOutputName,
 				[]string{fmt.Sprintf("--%s=1", flags.FlagHeight), fmt.Sprintf("--%s=json", flags.FlagOutput)},
-				`[--height=1 --output=json]`,
-				`<nil>`,
+				testJSONOutputFlag,
+				testNilOutput,
 			},
 			{
-				"text output",
+				testTextOutputName,
 				[]string{fmt.Sprintf("--%s=1", flags.FlagHeight), fmt.Sprintf("--%s=text", flags.FlagOutput)},
-				`[--height=1 --output=text]`,
-				`<nil>`,
+				testTextOutputFlag,
+				testNilOutput,
 			},
 		}
 

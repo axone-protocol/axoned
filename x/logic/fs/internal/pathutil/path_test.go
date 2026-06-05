@@ -9,6 +9,11 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+const (
+	testFooPath       = "foo.pl"
+	testNestedBarPath = "nested/bar.pl"
+)
+
 func TestNormalizeSubpath(t *testing.T) {
 	Convey("Given normalization cases", t, func() {
 		cases := []struct {
@@ -19,10 +24,10 @@ func TestNormalizeSubpath(t *testing.T) {
 			{in: "", want: "."},
 			{in: ".", want: "."},
 			{in: "/", want: "."},
-			{in: "foo.pl", want: "foo.pl"},
-			{in: "/foo.pl", want: "foo.pl"},
-			{in: "nested/bar.pl", want: "nested/bar.pl"},
-			{in: "nested/./bar.pl", want: "nested/bar.pl"},
+			{in: testFooPath, want: testFooPath},
+			{in: "/foo.pl", want: testFooPath},
+			{in: testNestedBarPath, want: testNestedBarPath},
+			{in: "nested/./bar.pl", want: testNestedBarPath},
 			{in: "../secret", wantErr: fs.ErrPermission},
 			{in: "nested/../secret", wantErr: fs.ErrPermission},
 		}

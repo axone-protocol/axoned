@@ -8,6 +8,8 @@ import (
 	"time"
 )
 
+const opOpen = "open"
+
 var errInvalidRequest = errors.New("invalid_request")
 
 type echoDeviceFS struct{}
@@ -17,16 +19,16 @@ func newEchoDeviceFS() fs.FS {
 }
 
 func (f *echoDeviceFS) Open(name string) (fs.File, error) {
-	return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
+	return nil, &fs.PathError{Op: opOpen, Path: name, Err: fs.ErrPermission}
 }
 
 func (f *echoDeviceFS) OpenFile(name string, flag int, _ fs.FileMode) (fs.File, error) {
 	if name != "." {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrNotExist}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: fs.ErrNotExist}
 	}
 
 	if flag != os.O_RDWR {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: fs.ErrPermission}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: fs.ErrPermission}
 	}
 
 	return &echoDeviceFile{name: "echo"}, nil

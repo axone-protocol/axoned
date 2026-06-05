@@ -85,7 +85,7 @@ func TestJSONCodecEncode(t *testing.T) {
 		{
 			name:     "malformed term",
 			payload:  []byte("."),
-			expected: "error(syntax_error(prolog(malformed_term))).\n",
+			expected: expectedMalformedProlog,
 		},
 	}
 
@@ -107,22 +107,22 @@ func TestJSONCodecEncodeWriterErrors(t *testing.T) {
 	}{
 		{
 			name:       "object opening",
-			termSource: "json([foo=bar]).",
+			termSource: testJSONFooBarTerm,
 			failAt:     0,
 		},
 		{
 			name:       "object key",
-			termSource: "json([foo=bar]).",
+			termSource: testJSONFooBarTerm,
 			failAt:     1,
 		},
 		{
 			name:       "object separator",
-			termSource: "json([foo=bar]).",
+			termSource: testJSONFooBarTerm,
 			failAt:     2,
 		},
 		{
 			name:       "object value",
-			termSource: "json([foo=bar]).",
+			termSource: testJSONFooBarTerm,
 			failAt:     3,
 		},
 		{
@@ -132,17 +132,17 @@ func TestJSONCodecEncodeWriterErrors(t *testing.T) {
 		},
 		{
 			name:       "object closing",
-			termSource: "json([foo=bar]).",
+			termSource: testJSONFooBarTerm,
 			failAt:     4,
 		},
 		{
 			name:       "array opening",
-			termSource: "[foo].",
+			termSource: testListFooTerm,
 			failAt:     0,
 		},
 		{
 			name:       "array value",
-			termSource: "[foo].",
+			termSource: testListFooTerm,
 			failAt:     1,
 		},
 		{
@@ -152,7 +152,7 @@ func TestJSONCodecEncodeWriterErrors(t *testing.T) {
 		},
 		{
 			name:       "array closing",
-			termSource: "[foo].",
+			termSource: testListFooTerm,
 			failAt:     2,
 		},
 	}

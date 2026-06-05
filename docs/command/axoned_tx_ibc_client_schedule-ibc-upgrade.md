@@ -68,6 +68,7 @@ Please specify a unique name and height for the upgrade to take effect.
 			]
 		 \}
 		
+
 ```
 axoned tx ibc client schedule-ibc-upgrade [name] [height] [path/to/upgraded_client_state.json] [flags]
 ```

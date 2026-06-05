@@ -16,7 +16,7 @@ import (
 
 var (
 	atomSyntaxError     = engine.NewAtom("syntax_error")
-	atomJSON            = engine.NewAtom("json")
+	atomJSON            = engine.NewAtom(codecNameJSON)
 	atomAt              = engine.NewAtom("@")
 	atomNull            = engine.NewAtom("null")
 	atomTrue            = engine.NewAtom("true")
@@ -43,7 +43,7 @@ func init() {
 }
 
 func (c *jsonCodec) Name() string {
-	return "json"
+	return codecNameJSON
 }
 
 func (c *jsonCodec) Decode(payload []byte) engine.Term {
@@ -54,7 +54,8 @@ func (c *jsonCodec) Decode(payload []byte) engine.Term {
 	}
 	if _, err := decoder.Token(); !errors.Is(err, io.EOF) {
 		return prolog.AtomError.Apply(
-			atomSyntaxError.Apply(atomJSON.Apply(atomMalformedJSON.Apply(engine.Integer(decoder.InputOffset())))))
+			atomSyntaxError.Apply(atomJSON.Apply(atomMalformedJSON.Apply(engine.Integer(decoder.InputOffset())))),
+		)
 	}
 
 	return atomOK.Apply(decoded)
@@ -270,7 +271,8 @@ func jsonErrorTerm(err error) engine.Term {
 	}
 	if err, ok := lo.ErrorsAs[*json.UnmarshalTypeError](err); ok {
 		return atomSyntaxError.Apply(
-			atomJSON.Apply(atomMalformedJSON.Apply(engine.Integer(err.Offset), prolog.StringToAtom(err.Value))))
+			atomJSON.Apply(atomMalformedJSON.Apply(engine.Integer(err.Offset), prolog.StringToAtom(err.Value))),
+		)
 	}
 	if errors.Is(err, io.EOF) {
 		return atomSyntaxError.Apply(atomJSON.Apply(atomEOF))

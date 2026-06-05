@@ -6,6 +6,8 @@ import (
 	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/pathutil"
 )
 
+const opOpen = "open"
+
 type vfs struct {
 	fsys fs.FS
 }
@@ -23,12 +25,12 @@ func NewFS(fsys fs.FS) fs.ReadFileFS {
 func (f *vfs) Open(name string) (fs.File, error) {
 	subpath, err := pathutil.NormalizeSubpath(name)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: err}
 	}
 
 	file, err := f.fsys.Open(subpath)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: pathutil.UnwrapPathError(err)}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: pathutil.UnwrapPathError(err)}
 	}
 
 	return file, nil
@@ -37,12 +39,12 @@ func (f *vfs) Open(name string) (fs.File, error) {
 func (f *vfs) ReadFile(name string) ([]byte, error) {
 	subpath, err := pathutil.NormalizeSubpath(name)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: err}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: err}
 	}
 
 	content, err := fs.ReadFile(f.fsys, subpath)
 	if err != nil {
-		return nil, &fs.PathError{Op: "open", Path: name, Err: pathutil.UnwrapPathError(err)}
+		return nil, &fs.PathError{Op: opOpen, Path: name, Err: pathutil.UnwrapPathError(err)}
 	}
 
 	return content, nil

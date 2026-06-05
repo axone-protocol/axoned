@@ -24,7 +24,8 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryAskRequest) (response *ty
 			if gasError, ok := r.(storetypes.ErrorOutOfGas); ok {
 				response, err = nil, errorsmod.Wrapf(
 					types.ErrLimitExceeded, "out of gas: %s <%s> (%d/%d)",
-					types.ModuleName, gasError.Descriptor, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit())
+					types.ModuleName, gasError.Descriptor, sdkCtx.GasMeter().GasConsumed(), sdkCtx.GasMeter().Limit(),
+				)
 
 				return
 			}
@@ -44,7 +45,8 @@ func (k Keeper) Ask(ctx goctx.Context, req *types.QueryAskRequest) (response *ty
 		params,
 		req.Program,
 		req.Query,
-		req.Limit)
+		req.Limit,
+	)
 }
 
 func checkLimits(request *types.QueryAskRequest, limits types.Limits) error {
