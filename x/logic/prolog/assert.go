@@ -1,58 +1,15 @@
 package prolog
 
 import (
-	"strings"
 	"unicode/utf8"
 
 	"github.com/axone-protocol/prolog/v3/engine"
-	"github.com/samber/lo"
-
-	"github.com/axone-protocol/axoned/v15/x/logic/util"
 )
-
-// PredicateMatches returns a function that matches the given predicate against the given other predicate.
-// If the other predicate contains a slash, it is matched as is. Otherwise, the other predicate is matched against the
-// first part of the given predicate.
-// For example:
-//   - matchPredicate("foo/0")("foo/0") -> true
-//   - matchPredicate("foo/0")("foo/1") -> false
-//   - matchPredicate("foo/0")("foo") -> true
-//   - matchPredicate("foo/0")("bar") -> false
-//
-// The function is curried, and is a binary relation that is reflexive, associative (but not commutative).
-func PredicateMatches(this string) func(string) bool {
-	return func(that string) bool {
-		if strings.Contains(that, "/") {
-			return this == that
-		}
-		return strings.Split(this, "/")[0] == that
-	}
-}
 
 // IsList returns true if the given term is a list.
 func IsList(term engine.Term, env *engine.Env) bool {
 	_, err := AssertList(term, env)
 	return err == nil
-}
-
-// IsEmptyList returns true if the given term is an empty list.
-func IsEmptyList(term engine.Term, env *engine.Env) bool {
-	if v, ok := env.Resolve(term).(engine.Atom); ok {
-		return v == AtomEmptyList
-	}
-	return false
-}
-
-// IsGround returns true if the given term holds no free variables.
-func IsGround(term engine.Term, env *engine.Env) bool {
-	_, err := AssertIsGround(term, env)
-	return err == nil
-}
-
-func AreGround(terms []engine.Term, env *engine.Env) bool {
-	return lo.EveryBy(terms, func(t engine.Term) bool {
-		return IsGround(t, env)
-	})
 }
 
 // AssertIsGround resolves a term and returns it if it is ground.
@@ -151,12 +108,6 @@ func AssertList(term engine.Term, env *engine.Env) (engine.Term, error) {
 	return nil, engine.TypeError(AtomTypeList, term, env)
 }
 
-// AssertPair resolves a term as a pair and returns the pair components.
-// If conversion fails, the function returns nil and the error.
-func AssertPair(term engine.Term, env *engine.Env) (engine.Term, engine.Term, error) {
-	return assertTuple2WithFunctor(term, AtomPair, AtomTypePair, env)
-}
-
 // AssertKeyValue resolves a term as a key-value and returns its components, the key as an atom,
 // and the value as a term.
 // If conversion fails, the function returns nil and the error.
@@ -188,33 +139,4 @@ func assertTuple2WithFunctor(
 	}
 
 	return nil, nil, engine.TypeError(functorType, term, env)
-}
-
-// AssertURIComponent resolves a term as a URI component and returns it as an URIComponent.
-func AssertURIComponent(term engine.Term, env *engine.Env) (util.URIComponent, error) {
-	switch v := env.Resolve(term); v {
-	case AtomQueryValue:
-		return util.QueryValueComponent, nil
-	case AtomFragment:
-		return util.FragmentComponent, nil
-	case AtomPath:
-		return util.PathComponent, nil
-	case AtomSegment:
-		return util.SegmentComponent, nil
-	default:
-		return 0, engine.TypeError(AtomTypeURIComponent, term, env)
-	}
-}
-
-// AssertStream resolves a term as a stream and returns it as an engine.Stream.
-// If conversion fails, the function returns nil and the error.
-func AssertStream(stream engine.Term, env *engine.Env) (*engine.Stream, error) {
-	switch st := env.Resolve(stream).(type) {
-	case engine.Variable:
-		return nil, engine.InstantiationError(env)
-	case *engine.Stream:
-		return st, nil
-	default:
-		return nil, engine.TypeError(AtomTypeStream, stream, env)
-	}
 }

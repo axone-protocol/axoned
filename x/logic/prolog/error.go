@@ -15,9 +15,6 @@ var (
 	// AtomTypeCharacterCode is the term used to represent the character code type.
 	// A character code type is a single character identified by its code point (a number) in the Unicode standard.
 	AtomTypeCharacterCode = engine.NewAtom("character_code")
-	// AtomTypeCharset is the term used to represent the charset type.
-	// A charset type is a set of characters identified by its name in the IANA standard.
-	AtomTypeCharset = engine.NewAtom("charset")
 	// AtomTypeCryptographicAlgorithm is the term used to represent the cryptographic algorithm type.
 	AtomTypeCryptographicAlgorithm = engine.NewAtom("cryptographic_algorithm")
 	// AtomTypeDID is the term used to represent the DID type.
@@ -30,8 +27,6 @@ var (
 	// An IO mode specifies the direction of the IO operation represented as an atom.
 	// Possible values are: read, write, append.
 	AtomTypeIOMode = engine.NewAtom("io_mode")
-	// AtomTypeStream is the term used to represent the stream type.
-	AtomTypeStream = engine.NewAtom("stream")
 	// AtomTypeText is the term used to represent the text type.
 	// A text type is either an atom, a list of characters or a list of character codes.
 	AtomTypeText = AtomText
@@ -43,48 +38,16 @@ var (
 	// An option is a compound with the name of the option as functor and one term argument which is
 	// the value of the option. For instance: opt(v).
 	AtomTypeOption = engine.NewAtom("option")
-	// AtomTypePair is the term used to indicate the pair type.
-	AtomTypePair = engine.NewAtom("pair")
 	// AtomTypeKeyValue is the term used to indicate the key-value type.
 	AtomTypeKeyValue = engine.NewAtom("key_value")
-	// AtomTypeJSON is the term used to indicate the json type.
-	AtomTypeJSON = engine.NewAtom("json")
-	// AtomTypeURIComponent is the term used to represent the URI component type.
-	AtomTypeURIComponent = engine.NewAtom("uri_component")
 	// AtomTypeBoolean is the term used to represent the boolean type.
 	AtomTypeBoolean = engine.NewAtom("boolean")
 )
 
-var (
-	// AtomValidEncoding is the atom denoting a valid encoding.
-	// The valid encoding atom is a compound with the name of the encoding which is a valid encoding with
-	// regard to the predicate where it is used.
-	//
-	// For instance: encoding(utf8), encoding(hex).
-	AtomValidEncoding = engine.NewAtom("encoding")
-	// AtomValidEmptyList is the atom denoting a valid empty list.
-	AtomValidEmptyList = engine.NewAtom("empty_list")
-)
-
-// ValidEncoding returns a term representing the valid encoding with the given name.
-func ValidEncoding(encoding string) engine.Term {
-	return AtomValidEncoding.Apply(engine.NewAtom(encoding))
-}
-
-func ValidEmptyList() engine.Term {
-	return AtomValidEmptyList
-}
-
-var (
-	// AtomResourceContext is the atom denoting the "context" resource.
-	// The context resource is a contextual data that contains all information needed to
-	// process a request and produce a response with the blockchain.
-	AtomResourceContext = engine.NewAtom("resource_context")
-	// AtomResourceModule is the atom denoting the "module" resource.
-	// The module resource is the representation of the module with which the interaction is made.
-	// The module resource is denoted as a compound with the name of the module.
-	AtomResourceModule = engine.NewAtom("resource_module")
-)
+// AtomResourceContext is the atom denoting the "context" resource.
+// The context resource is a contextual data that contains all information needed to
+// process a request and produce a response with the blockchain.
+var AtomResourceContext = engine.NewAtom("resource_context")
 
 // ResourceContext returns a term representing the context resource.
 func ResourceContext() engine.Term {
@@ -94,11 +57,6 @@ func ResourceContext() engine.Term {
 // ResourceContextValue returns a term representing the context resource with the given key.
 func ResourceContextValue(key string) engine.Term {
 	return AtomResourceContext.Apply(engine.NewAtom(key))
-}
-
-// ResourceModule returns a term representing the module resource with the given name.
-func ResourceModule(module string) engine.Term {
-	return AtomResourceModule.Apply(engine.NewAtom(module))
 }
 
 var (
@@ -112,13 +70,6 @@ var (
 )
 
 var AtomObjectTypeSourceSink = engine.NewAtom("source_sink")
-
-// ErrorTerm returns a term representing the given error, suitable for use in the
-// syntax_error/2 predicate.
-// TODO: to be improved with specific error types.
-func ErrorTerm(err error) engine.Term {
-	return StringToCharacterListTerm(err.Error())
-}
 
 // WithError adds the error term to the exception term if possible.
 // TODO: wait for ichiban/prolog to offer a better way to do this.
