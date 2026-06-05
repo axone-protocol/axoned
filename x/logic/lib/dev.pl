@@ -6,6 +6,7 @@
 %! dev_call(+Path, +Type, :WriteGoal, :ReadGoal) is det.
 %
 % Executes a transactional device call following a half-duplex protocol.
+% See [VFS overview](../vfs) for the consumer-facing path catalog and device protocol.
 %
 % ## Overview
 %
