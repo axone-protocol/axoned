@@ -422,8 +422,8 @@ doc-command: ## Generate markdown documentation for the command
 doc-predicate: ## Generate markdown documentation for all the predicates (module logic)
 	@${call echo_msg, 📖, Generating, documentation, for Predicates}
 	@OUT_FOLDER="docs/predicate"; \
-	rm -rf $$OUT_FOLDER; \
 	mkdir -p $$OUT_FOLDER; \
+	find $$OUT_FOLDER -mindepth 1 -maxdepth 1 -type d -exec rm -rf {} +; \
 	go run -mod=readonly ./scripts/. predicate
 	@markdownlint-cli2 --fix --config docs/.markdownlint.yaml "docs/predicate/**/*.md"
 

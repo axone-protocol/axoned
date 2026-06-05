@@ -18,6 +18,7 @@ Load this module before using the predicate:
 ## Description
 
 Executes a transactional device call following a half-duplex protocol.
+See [VFS overview](../vfs) for the consumer-facing path catalog and device protocol.
 
 ## Overview
 
