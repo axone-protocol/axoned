@@ -414,6 +414,7 @@ doc-command: ## Generate markdown documentation for the command
 	$(SED_INPLACE) 's/&lt;appd&gt;/axoned/g' $$OUT_FOLDER/*.md; \
 	$(SED_INPLACE) 's/<appd>/axoned/g' $$OUT_FOLDER/*.md; \
 	$(SED_INPLACE) -E 's| (https?://[a-zA-Z0-9\.\/\_=%-]+)| [\1](\1) |g' $$OUT_FOLDER/*.md; \
+	perl -0pi -e 's/(?:\n[ \t]*){3,}/\n\n/g' $$OUT_FOLDER/*.md; \
 	rm -f $$OUT_FOLDER/*.md.bak
 	@markdownlint-cli2 --fix --config docs/.markdownlint.yaml "docs/command/**/*.md"
 

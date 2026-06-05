@@ -10,7 +10,7 @@ Parameters:
 		   group-id: unique id of the group
 		   member-address: account address of the group member
 		   Note, the '--from' flag is ignored as it is implied from [member-address]
-		
+
 ```
 axoned tx group leave-group [member-address] [group-id] [flags]
 ```

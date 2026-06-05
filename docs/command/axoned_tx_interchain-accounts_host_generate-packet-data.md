@@ -29,7 +29,6 @@ axoned tx interchain-accounts host generate-packet-data '{
     ]
 }' --memo memo --encoding proto3json
 
-
 axoned tx interchain-accounts host generate-packet-data '[{
     "@type":"/cosmos.bank.v1beta1.MsgSend",
     "from_address":"cosmos15ccshhmp0gsx29qpqq6g4zmltnnvgmyu9ueuadh9y2nc5zj0szls5gtddz",
