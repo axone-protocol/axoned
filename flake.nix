@@ -26,6 +26,7 @@
         {
           default = pkgs.mkShell {
             packages = [
+              pkgs.bash-language-server
               pkgs.buf
               pkgs.git
               pkgs.gnumake
@@ -33,11 +34,16 @@
               pkgs.gofumpt
               pkgs.golangci-lint
               pkgs.gomplate
+              pkgs.gopls
               pkgs.jq
               pkgs.markdownlint-cli2
+              pkgs.marksman
+              pkgs.nil
               pkgs.protobuf
+              pkgs.protobuf-language-server
               pkgs.protoc-gen-go
               pkgs.protoc-gen-go-grpc
+              pkgs.yaml-language-server
             ];
 
             shellHook = ''
