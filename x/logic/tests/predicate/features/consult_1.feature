@@ -44,7 +44,7 @@ Feature: consult/1
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5028
+      gas_used: 5020
       answer:
         has_more: false
         variables:

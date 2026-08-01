@@ -14,7 +14,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6255
+      gas_used: 6235
       answer:
         has_more: false
         variables: ["Decoded"]
@@ -37,7 +37,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6357
+      gas_used: 6337
       answer:
         has_more: false
         variables: ["Encoded"]
@@ -59,7 +59,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 9292
+      gas_used: 9272
       answer:
         has_more: false
         variables: ["Encoded"]
@@ -81,7 +81,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 7775
+      gas_used: 7755
       answer:
         has_more: false
         variables: ["Encoded"]
@@ -103,7 +103,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 7924
+      gas_used: 7904
       answer:
         has_more: false
         variables: ["Encoded"]
@@ -125,7 +125,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 7763
+      gas_used: 7743
       answer:
         has_more: false
         variables: ["Encoded"]
@@ -147,7 +147,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 10658
+      gas_used: 10638
       answer:
         has_more: false
         variables: ["Decoded"]
@@ -197,8 +197,8 @@ Feature: uri_encoded/3
         - error: "error(instantiation_error,uri_encoded/3)"
       """
 
-  Scenario: Error on an invalid text value in encode mode
-    This scenario demonstrates the error returned when the plain-text value is not a text term.
+  Scenario: Error on an invalid atom value in encode mode
+    This scenario demonstrates the error returned when the plain value is not an atom.
 
     Given the query:
       """ prolog
@@ -209,15 +209,15 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4644
+      gas_used: 4582
       answer:
         has_more: false
         results:
-        - error: "error(type_error(text,compound(2)),uri_encoded/3)"
+        - error: "error(type_error(atom,compound(2)),uri_encoded/3)"
       """
 
-  Scenario: Error on an invalid text value in decode mode
-    This scenario demonstrates the error returned when the encoded value is not a text term.
+  Scenario: Error on an invalid atom value in decode mode
+    This scenario demonstrates the error returned when the encoded value is not an atom.
 
     Given the query:
       """ prolog
@@ -228,12 +228,12 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4720
+      gas_used: 4658
       answer:
         has_more: false
         variables: ["Decoded"]
         results:
-        - error: "error(type_error(text,compound(2)),uri_encoded/3)"
+        - error: "error(type_error(atom,compound(2)),uri_encoded/3)"
       """
 
   Scenario: Fail on mismatching fully ground values
@@ -248,12 +248,12 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6374
+      gas_used: 6354
       answer:
         has_more: false
       """
 
-  Scenario: Fail when the encoded target is a non-unifiable non-text term in encode mode
+  Scenario: Fail when the encoded target is a non-unifiable non-atom term in encode mode
     This scenario demonstrates that encode mode computes the encoded atom and then simply fails on unification.
 
     Given the query:
@@ -265,7 +265,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5319
+      gas_used: 5299
       answer:
         has_more: false
       """
@@ -282,7 +282,7 @@ Feature: uri_encoded/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5927
+      gas_used: 5907
       answer:
         has_more: false
         variables: ["Decoded"]

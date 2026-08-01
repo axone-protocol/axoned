@@ -14,7 +14,7 @@ Feature: json_prolog/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 12069
+      gas_used: 12208
       answer:
         has_more: false
         variables: ["Term"]
@@ -37,7 +37,7 @@ Feature: json_prolog/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 11049
+      gas_used: 11061
       answer:
         has_more: false
         variables: ["Json"]
@@ -58,12 +58,31 @@ Feature: json_prolog/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6957
+      gas_used: 7149
       answer:
         has_more: false
         variables: ["Term"]
         results:
         - error: "error(syntax_error(json(malformed_json(1))),json_prolog/2)"
+      """
+
+  Scenario: Reject JSON character codes
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/json.pl'),
+      json_prolog([123,125], Term).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4536
+      answer:
+        has_more: false
+        variables: ["Term"]
+        results:
+        - error: "error(type_error(atom,[123,125]),json_prolog/2)"
       """
 
   Scenario: Reject invalid Prolog JSON terms
@@ -77,7 +96,7 @@ Feature: json_prolog/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 8034
+      gas_used: 8046
       answer:
         has_more: false
         variables: ["Json"]
@@ -96,7 +115,7 @@ Feature: json_prolog/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4191
+      gas_used: 4203
       answer:
         has_more: false
         variables: ["Json", "Term"]

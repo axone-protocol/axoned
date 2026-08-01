@@ -85,9 +85,11 @@ crypto_hash_data_bytes(octet, Data, Bytes) :-
   Bytes = Data.
 crypto_hash_data_bytes(utf8, Data, Bytes) :-
   !,
+  must_be(atom, Data),
   string_bytes(Data, Bytes, utf8).
 crypto_hash_data_bytes(text, Data, Bytes) :-
   !,
+  must_be(atom, Data),
   string_bytes(Data, Bytes, text).
 crypto_hash_data_bytes(Encoding, _, _) :-
   ( atom(Encoding)
@@ -115,7 +117,9 @@ crypto_hash_dev_call(Path, DataBytes, HashBytes) :-
 % - `type(+Algorithm)` selects `ed25519` (default);
 % - `encoding(+Encoding)` selects how Data is interpreted, defaulting to `hex`.
 %
-% Supported encodings are `hex`, `octet`, `utf8`, and `text`.
+% Supported encodings are `hex`, `octet`, `utf8`, and `text`. Textual data
+% (`hex`, `utf8`, and `text`) is represented as an atom; `octet` data is
+% represented as a list of bytes.
 eddsa_verify(PubKey, Data, Signature, Options) :-
   crypto_verify(
     eddsa_verify/4,
@@ -138,7 +142,9 @@ eddsa_verify(PubKey, Data, Signature, Options) :-
 % - `type(+Algorithm)` selects `secp256r1` (default) or `secp256k1`;
 % - `encoding(+Encoding)` selects how Data is interpreted, defaulting to `hex`.
 %
-% Supported encodings are `hex`, `octet`, `utf8`, and `text`.
+% Supported encodings are `hex`, `octet`, `utf8`, and `text`. Textual data
+% (`hex`, `utf8`, and `text`) is represented as an atom; `octet` data is
+% represented as a list of bytes.
 ecdsa_verify(PubKey, Data, Signature, Options) :-
   crypto_verify(
     ecdsa_verify/4,
@@ -227,9 +233,11 @@ crypto_verify_data_bytes(Context, octet, Data, Bytes) :-
   Bytes = Data.
 crypto_verify_data_bytes(Context, utf8, Data, Bytes) :-
   !,
+  with_context(Context, must_be(atom, Data)),
   with_context(Context, string_bytes(Data, Bytes, utf8)).
 crypto_verify_data_bytes(Context, text, Data, Bytes) :-
   !,
+  with_context(Context, must_be(atom, Data)),
   with_context(Context, string_bytes(Data, Bytes, text)).
 crypto_verify_data_bytes(Context, Encoding, _, _) :-
   ( atom(Encoding)
@@ -303,16 +311,16 @@ crypto_verify_response(Context, _) :-
 
 %! hex_bytes(?Hex, ?Bytes) is det.
 %
-% Relates a hexadecimal text representation to a list of bytes.
+% Relates a hexadecimal atom representation to a list of bytes.
 %
-% - Hex may be an atom, a list of characters, or a list of character codes.
+% - Hex is an atom.
 % - Bytes is a proper list of integers in [0,255].
 % - At least one argument must be instantiated.
 % - When converting Bytes to Hex, Hex is returned as a lowercase atom.
 hex_bytes(Hex, Bytes) :-
   ( nonvar(Hex)
-  -> with_context(hex_bytes/2, must_be(text, Hex)),
-     hex_text_chars(Hex, Chars),
+  -> with_context(hex_bytes/2, must_be(atom, Hex)),
+     atom_chars(Hex, Chars),
      hex_chars_bytes(Chars, Hex, DecodedBytes),
      ( nonvar(Bytes)
      -> with_context(hex_bytes/2, must_be(list(byte), Bytes)),
@@ -326,19 +334,6 @@ hex_bytes(Hex, Bytes) :-
      Hex = HexAtom
   ; throw(error(instantiation_error, hex_bytes/2))
   ).
-
-hex_text_chars(Hex, Chars) :-
-  ( atom(Hex)
-  -> atom_chars(Hex, Chars)
-  ; has_type(chars, Hex)
-  -> Chars = Hex
-  ; hex_codes_chars(Hex, Chars)
-  ).
-
-hex_codes_chars([], []).
-hex_codes_chars([Code | Rest], [Char | Chars]) :-
-  char_code(Char, Code),
-  hex_codes_chars(Rest, Chars).
 
 hex_chars_bytes([], _, []).
 hex_chars_bytes([_], Hex, _) :-
