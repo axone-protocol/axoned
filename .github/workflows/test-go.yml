@@ -6,6 +6,8 @@ on:
     paths:
       - '.github/workflows/test-go.yml'
       - '**/*.go'
+      - 'x/logic/**/*.pl'
+      - 'x/logic/tests/predicate/features/**/*.feature'
       - 'go.mod'
       - 'go.sum'
       - 'Makefile'
@@ -15,6 +17,8 @@ on:
     paths:
       - '.github/workflows/test-go.yml'
       - '**/*.go'
+      - 'x/logic/**/*.pl'
+      - 'x/logic/tests/predicate/features/**/*.feature'
       - 'go.mod'
       - 'go.sum'
       - 'Makefile'
