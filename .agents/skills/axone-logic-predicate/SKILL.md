@@ -51,6 +51,22 @@ For `/v1/dev/...` endpoints, keep the protocol aligned with the existing half-du
 
 ## Implementation patterns
 
+### Public textual representation
+
+Public domain predicates must use atoms as the canonical representation for
+textual inputs and outputs. Do not make a public predicate accept atoms,
+character lists, and character code lists through a broad `text` contract unless
+representation conversion is the predicate's explicit purpose.
+
+- Use `must_be(atom, Value)` at public predicate boundaries for textual values.
+- Return textual values as atoms.
+- Keep byte payloads as `list(byte)` when the API is explicitly byte-oriented.
+- Leave conversion predicates such as `atom_chars/2`, `atom_codes/2`,
+  `string_bytes/3`, and stream-reading helpers responsible for representation
+  conversion.
+- Require callers to perform explicit conversions before calling domain
+  predicates when they hold character lists or code lists.
+
 ### Pure Prolog predicate
 
 - Add or update a library file in `x/logic/lib/*.pl`
