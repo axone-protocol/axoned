@@ -17,9 +17,11 @@ Load this module before using the predicate:
 
 ## Description
 
-Relates JSON text with its canonical Prolog representation.
+Relates JSON text atoms with their canonical Prolog representation.
 
-Json is text: an atom, a list of characters, or a list of character codes.
+Json is an atom. Use explicit conversion predicates such as `atom_chars/2`,
+`atom_codes/2`, or `string_bytes/3` when another textual representation is
+needed.
 
 The canonical representation for Term is:
 
@@ -55,7 +57,7 @@ json_prolog('{"foo":"bar","ok":true}', Term).
 
 ```  yaml
 height: 42
-gas_used: 12069
+gas_used: 12208
 answer:
   has_more: false
   variables: ["Term"]
@@ -83,7 +85,7 @@ json_prolog(Json, json([foo=bar,ok= @(true)])).
 
 ```  yaml
 height: 42
-gas_used: 11049
+gas_used: 11061
 answer:
   has_more: false
   variables: ["Json"]

@@ -24,8 +24,9 @@ Encoded is the URI encoding for Value.
 Component specifies the URI component where the value is used. It is one of
 `query_value`, `fragment`, `path` or `segment`.
 
-Value and Encoded may be atoms, lists of characters, or lists of character
-codes. Generated values are returned as atoms.
+Value and Encoded are atoms. Use explicit conversion predicates such as
+`atom_chars/2`, `atom_codes/2`, or `string_bytes/3` when another textual
+representation is needed.
 
 ## Signature
 
@@ -53,7 +54,7 @@ uri_encoded(path, Decoded, foo).
 
 ```  yaml
 height: 42
-gas_used: 6255
+gas_used: 6235
 answer:
   has_more: false
   variables: ["Decoded"]
@@ -81,7 +82,7 @@ uri_encoded(query_value, 'foo bar', Encoded).
 
 ```  yaml
 height: 42
-gas_used: 6357
+gas_used: 6337
 answer:
   has_more: false
   variables: ["Encoded"]

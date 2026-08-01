@@ -19,10 +19,10 @@ Load this module before using the predicate:
 
 base64url(-Plain, +Encoded) is det.
 
-Relates a text value to its URL-safe Base64 representation.
+Relates an atom to its URL-safe Base64 atom representation.
 
 The predicate is equivalent to `base64_encoded/3` with options
-`[as(atom), encoding(utf8), charset(url), padding(false)]`.
+`[encoding(utf8), charset(url), padding(false)]`.
 
 ## Signature
 
@@ -32,9 +32,9 @@ base64url(+Plain, -Encoded) is det
 
 ## Examples
 
-### Encode and decode a string into a Base64 encoded atom in URL-Safe mode
+### Encode and decode an atom into a Base64 encoded atom in URL-Safe mode
 
-This scenario demonstrates how to encode an decode a plain string into a Base64-encoded atom using the `base64url/2`
+This scenario demonstrates how to encode and decode a plain atom into a Base64-encoded atom using the `base64url/2`
 predicate.
 
 Here are the steps of the scenario:
@@ -52,7 +52,7 @@ base64url(Decoded, 'PDw_Pz8-Pg').
 
 ```  yaml
 height: 42
-gas_used: 18554
+gas_used: 15694
 answer:
   has_more: false
   variables: ["Encoded", "Decoded"]

@@ -17,9 +17,9 @@ Load this module before using the predicate:
 
 ## Description
 
-Relates a hexadecimal text representation to a list of bytes.
+Relates a hexadecimal atom representation to a list of bytes.
 
-- Hex may be an atom, a list of characters, or a list of character codes.
+- Hex is an atom.
 - Bytes is a proper list of integers in [0,255].
 - At least one argument must be instantiated.
 - When converting Bytes to Hex, Hex is returned as a lowercase atom.
@@ -50,7 +50,7 @@ hex_bytes('501ACE', Bytes).
 
 ```  yaml
 height: 42
-gas_used: 5016
+gas_used: 4929
 answer:
   has_more: false
   variables: ["Bytes"]

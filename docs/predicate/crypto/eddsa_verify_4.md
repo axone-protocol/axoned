@@ -26,7 +26,9 @@ Options may be a single option term or a list of option terms:
 - `type(+Algorithm)` selects `ed25519` (default);
 - `encoding(+Encoding)` selects how Data is interpreted, defaulting to `hex`.
 
-Supported encodings are `hex`, `octet`, `utf8`, and `text`.
+Supported encodings are `hex`, `octet`, `utf8`, and `text`. Textual data
+(`hex`, `utf8`, and `text`) is represented as an atom; `octet` data is
+represented as a list of bytes.
 
 ## Signature
 
@@ -64,7 +66,7 @@ valid_ed25519(Verified).
 
 ```  yaml
 height: 42
-gas_used: 235381
+gas_used: 235116
 answer:
   has_more: false
   variables: ["Verified"]
@@ -101,7 +103,7 @@ invalid_ed25519.
 
 ```  yaml
 height: 42
-gas_used: 235349
+gas_used: 235084
 answer:
   has_more: false
   variables:

@@ -78,7 +78,7 @@ current_predicate(header_info/1).
 
 ```  yaml
 height: 42
-gas_used: 5028
+gas_used: 5020
 answer:
   has_more: false
   variables:
