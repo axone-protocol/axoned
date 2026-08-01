@@ -14,7 +14,7 @@ Feature: hex_bytes/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 5016
+      gas_used: 4929
       answer:
         has_more: false
         variables: ["Bytes"]
@@ -47,8 +47,8 @@ Feature: hex_bytes/2
             expression: "'501ace'"
       """
 
-  Scenario: Decode hexadecimal character codes into bytes
-    This scenario demonstrates that hex_bytes/2 accepts a list of character codes as hexadecimal input.
+  Scenario: Reject hexadecimal character codes
+    This scenario demonstrates that callers must explicitly convert character codes to an atom before calling hex_bytes/2.
 
     Given the query:
       """ prolog
@@ -59,14 +59,12 @@ Feature: hex_bytes/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 6091
+      gas_used: 4622
       answer:
         has_more: false
         variables: ["Bytes"]
         results:
-        - substitutions:
-          - variable: Bytes
-            expression: "[80,26,206]"
+        - error: "error(type_error(atom,[53,48,49,65,67,69]),hex_bytes/2)"
       """
 
   Scenario: Reject an invalid hexadecimal sequence
@@ -81,7 +79,7 @@ Feature: hex_bytes/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 4932
+      gas_used: 4845
       answer:
         has_more: false
         variables: ["Bytes"]

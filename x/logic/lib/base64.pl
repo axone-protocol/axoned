@@ -6,7 +6,7 @@
 %! base64_encoded(+Plain, -Encoded, +Options) is det.
 %! base64_encoded(-Plain, +Encoded, +Options) is det.
 %
-% Relates a text value to its Base64-encoded representation as specified by
+% Relates an atom to its Base64-encoded atom representation as specified by
 % [RFC 4648](https://rfc-editor.org/rfc/rfc4648.html).
 %
 % The predicate follows a functional direction:
@@ -14,24 +14,26 @@
 % - otherwise, when `Encoded` is instantiated, it decodes `Encoded` into `Plain`;
 % - otherwise, it throws `instantiation_error`.
 %
-% `Plain` may be an atom, a list of characters, or a list of character codes.
-% `Encoded` may be an atom, a list of characters, or a list of character codes.
+% `Plain` and `Encoded` are atoms. Use explicit conversion predicates such as
+% `atom_chars/2`, `atom_codes/2`, or `string_bytes/3` when another textual
+% representation is needed.
 %
 % Supported options are:
 % - `charset(+Charset)` where `Charset` is `classic` (default) or `url`;
 % - `padding(+Boolean)` where `Boolean` is `true` (default) or `false`;
-% - `as(+Type)` where `Type` is `string` (default) or `atom`;
 % - `encoding(+Encoding)` to translate between text and bytes, defaulting to `utf8`.
 base64_encoded(Plain, Encoded, Options) :-
-  with_context(base64_encoded/3, base64_options(Options, Charset, Padding, As, Encoding)),
+  with_context(base64_encoded/3, base64_options(Options, Charset, Padding, Encoding)),
   ( nonvar(Plain)
-  -> with_context(base64_encoded/3, string_bytes(Plain, PlainBytes, Encoding)),
+  -> with_context(base64_encoded/3, must_be(atom, Plain)),
+     with_context(base64_encoded/3, string_bytes(Plain, PlainBytes, Encoding)),
      phrase(base64_bytes(Padding, PlainBytes, Charset), EncodedCodes),
-     base64_encoded_output(As, Encoded, EncodedCodes)
+     atom_codes(Encoded, EncodedCodes)
   ; nonvar(Encoded)
-  -> with_context(base64_encoded/3, string_bytes(Encoded, EncodedCodes, text)),
+  -> with_context(base64_encoded/3, must_be(atom, Encoded)),
+     atom_codes(Encoded, EncodedCodes),
      ( phrase(base64_bytes(Padding, PlainBytes, Charset), EncodedCodes)
-     -> base64_decoded_output(As, Plain, PlainBytes, Encoding)
+     -> base64_decoded_atom(Plain, PlainBytes, Encoding)
      ;  throw(error(domain_error(encoding(base64), Encoded), base64_encoded/3))
      )
   ; throw(error(instantiation_error, base64_encoded/3))
@@ -41,22 +43,19 @@ base64_encoded(Plain, Encoded, Options) :-
 %! base64url(+Plain, -Encoded) is det.
 %! base64url(-Plain, +Encoded) is det.
 %
-% Relates a text value to its URL-safe Base64 representation.
+% Relates an atom to its URL-safe Base64 atom representation.
 %
 % The predicate is equivalent to `base64_encoded/3` with options
-% `[as(atom), encoding(utf8), charset(url), padding(false)]`.
+% `[encoding(utf8), charset(url), padding(false)]`.
 base64url(Plain, Encoded) :-
-  base64_encoded(Plain, Encoded, [as(atom), encoding(utf8), charset(url), padding(false)]).
+  base64_encoded(Plain, Encoded, [encoding(utf8), charset(url), padding(false)]).
 
-base64_options(Options, Charset, Padding, As, Encoding) :-
+base64_options(Options, Charset, Padding, Encoding) :-
   base64_option(charset, Options, classic, Charset),
   must_be(atom, Charset),
   base64_charset(Charset),
   base64_option(padding, Options, true, Padding),
   base64_padding(Padding),
-  base64_option(as, Options, string, As),
-  must_be(atom, As),
-  base64_output_type(As),
   base64_option(encoding, Options, utf8, Encoding),
   must_be(atom, Encoding).
 
@@ -92,7 +91,6 @@ base64_option_match(Name, Option, Value) :-
 
 base64_option_known(charset(_)).
 base64_option_known(padding(_)).
-base64_option_known(as(_)).
 base64_option_known(encoding(_)).
 
 base64_charset(classic).
@@ -105,26 +103,9 @@ base64_padding(false).
 base64_padding(Padding) :-
   throw(error(domain_error(padding, Padding), base64_encoded/3)).
 
-base64_output_type(string).
-base64_output_type(atom).
-base64_output_type(As) :-
-  throw(error(domain_error(as, As), base64_encoded/3)).
-
-base64_encoded_output(atom, Encoded, Codes) :-
-  atom_codes(Encoded, Codes).
-base64_encoded_output(string, Encoded, Codes) :-
-  base64_codes_chars(Codes, Encoded).
-
-base64_decoded_output(atom, Plain, Bytes, Encoding) :-
+base64_decoded_atom(Plain, Bytes, Encoding) :-
   with_context(base64_encoded/3, string_bytes(Chars, Bytes, Encoding)),
   atom_chars(Plain, Chars).
-base64_decoded_output(string, Plain, Bytes, Encoding) :-
-  with_context(base64_encoded/3, string_bytes(Plain, Bytes, Encoding)).
-
-base64_codes_chars([], []).
-base64_codes_chars([Code | Rest], [Char | Chars]) :-
-  char_code(Char, Code),
-  base64_codes_chars(Rest, Chars).
 
 base64_bytes(Padding, Input, Charset) -->
   { nonvar(Input) },

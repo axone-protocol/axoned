@@ -27,7 +27,9 @@ Options may be a single option term or a list of option terms:
 - `type(+Algorithm)` selects `secp256r1` (default) or `secp256k1`;
 - `encoding(+Encoding)` selects how Data is interpreted, defaulting to `hex`.
 
-Supported encodings are `hex`, `octet`, `utf8`, and `text`.
+Supported encodings are `hex`, `octet`, `utf8`, and `text`. Textual data
+(`hex`, `utf8`, and `text`) is represented as an atom; `octet` data is
+represented as a list of bytes.
 
 ## Signature
 
@@ -65,7 +67,7 @@ valid_secp256r1(Verified).
 
 ```  yaml
 height: 42
-gas_used: 246079
+gas_used: 245814
 answer:
   has_more: false
   variables: ["Verified"]
@@ -103,7 +105,7 @@ valid_secp256k1(Verified).
 
 ```  yaml
 height: 42
-gas_used: 250523
+gas_used: 250258
 answer:
   has_more: false
   variables: ["Verified"]
@@ -147,7 +149,7 @@ Verified = true.
 
 ```  yaml
 height: 42
-gas_used: 493294
+gas_used: 492764
 answer:
   has_more: false
   variables: ["Verified"]
@@ -184,7 +186,7 @@ invalid_secp256r1.
 
 ```  yaml
 height: 42
-gas_used: 246047
+gas_used: 245782
 answer:
   has_more: false
   variables:

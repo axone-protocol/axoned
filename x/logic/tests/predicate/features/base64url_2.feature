@@ -2,8 +2,8 @@ Feature: base64url/2
   This feature is to test the base64url/2 predicate.
 
   @great_for_documentation
-  Scenario: Encode and decode a string into a Base64 encoded atom in URL-Safe mode
-  This scenario demonstrates how to encode an decode a plain string into a Base64-encoded atom using the `base64url/2`
+  Scenario: Encode and decode an atom into a Base64 encoded atom in URL-Safe mode
+  This scenario demonstrates how to encode and decode a plain atom into a Base64-encoded atom using the `base64url/2`
   predicate.
 
     Given the query:
@@ -16,7 +16,7 @@ Feature: base64url/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 18554
+      gas_used: 15694
       answer:
         has_more: false
         variables: ["Encoded", "Decoded"]
@@ -40,7 +40,7 @@ Feature: base64url/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 8896
+      gas_used: 7396
       answer:
         has_more: false
         variables: ["X"]
@@ -61,7 +61,7 @@ Feature: base64url/2
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 8198
+      gas_used: 6827
       answer:
         has_more: false
         variables: ["X"]

@@ -19,7 +19,7 @@ Load this module before using the predicate:
 
 base64_encoded(-Plain, +Encoded, +Options) is det.
 
-Relates a text value to its Base64-encoded representation as specified by
+Relates an atom to its Base64-encoded atom representation as specified by
 [RFC 4648](https://rfc-editor.org/rfc/rfc4648.html).
 
 The predicate follows a functional direction:
@@ -28,14 +28,14 @@ The predicate follows a functional direction:
 - otherwise, when `Encoded` is instantiated, it decodes `Encoded` into `Plain`;
 - otherwise, it throws `instantiation_error`.
 
-`Plain` may be an atom, a list of characters, or a list of character codes.
-`Encoded` may be an atom, a list of characters, or a list of character codes.
+`Plain` and `Encoded` are atoms. Use explicit conversion predicates such as
+`atom_chars/2`, `atom_codes/2`, or `string_bytes/3` when another textual
+representation is needed.
 
 Supported options are:
 
 - `charset(+Charset)` where `Charset` is `classic` (default) or `url`;
 - `padding(+Boolean)` where `Boolean` is `true` (default) or `false`;
-- `as(+Type)` where `Type` is `string` (default) or `atom`;
 - `encoding(+Encoding)` to translate between text and bytes, defaulting to `utf8`.
 
 ## Signature
@@ -46,12 +46,12 @@ base64_encoded(+Plain, -Encoded, +Options) is det
 
 ## Examples
 
-### Encode a string into a Base64 encoded string (with default options)
+### Encode an atom into a Base64 encoded atom with default options
 
-This scenario demonstrates how to encode a plain string into its Base64 representation using the `base64_encoded/3`
+This scenario demonstrates how to encode a plain atom into its Base64 representation using the `base64_encoded/3`
 predicate. The default options are used, meaning:
 
-- The output is returned as a list of characters (`as(string)`).
+- The output is returned as an atom.
 - Padding characters (`=`) are included (`padding(true)`).
 - The classic Base64 character set is used (`charset(classic)`), not the URL-safe variant.
 
@@ -69,21 +69,19 @@ base64_encoded('Hello World', X, []).
 
 ```  yaml
 height: 42
-gas_used: 9993
+gas_used: 9406
 answer:
   has_more: false
   variables: ["X"]
   results:
   - substitutions:
     - variable: X
-      expression: "['S','G','V',s,b,'G','8',g,'V','2','9',y,b,'G','Q',=]"
+      expression: "'SGVsbG8gV29ybGQ='"
 ```
 
-### Encode a string into a Base64 encoded atom
+### Reject the removed output-shape option
 
-This scenario demonstrates how to encode a plain string into a Base64-encoded atom using the `base64_encoded/3`
-predicate. The `as(atom)` option is specified, so the result is returned as a Prolog atom instead of a character
-list. All other options use their default values.
+This scenario demonstrates that `base64_encoded/3` has a single textual output shape: atom.
 
 Here are the steps of the scenario:
 
@@ -99,22 +97,20 @@ base64_encoded('Hello World', X, [as(atom)]).
 
 ```  yaml
 height: 42
-gas_used: 10289
+gas_used: 4407
 answer:
   has_more: false
   variables: ["X"]
   results:
-  - substitutions:
-    - variable: X
-      expression: "'SGVsbG8gV29ybGQ='"
+  - error: "error(type_error(option,as(atom)),base64_encoded/3)"
+    substitutions:
 ```
 
 ### Encode a string into a Base64 encoded atom without padding
 
-This scenario demonstrates how to encode a plain string into a Base64-encoded atom using the `base64_encoded/3` predicate
+This scenario demonstrates how to encode a plain atom into a Base64-encoded atom using the `base64_encoded/3` predicate
 with custom options. The following options are used:
 
-- `as(atom)` – the result is returned as a Prolog atom.
 - `padding(false)` – padding characters (`=`) are omitted.
 - The classic Base64 character set is used by default (`charset(classic)`).
 
@@ -124,7 +120,7 @@ Here are the steps of the scenario:
 
 ```  prolog
 consult('/v1/lib/base64.pl'),
-base64_encoded('Hello World', X, [as(atom), padding(false)]).
+base64_encoded('Hello World', X, [padding(false)]).
 ```
 
 - **When** the query is run
@@ -132,7 +128,7 @@ base64_encoded('Hello World', X, [as(atom), padding(false)]).
 
 ```  yaml
 height: 42
-gas_used: 10894
+gas_used: 9982
 answer:
   has_more: false
   variables: ["X"]
@@ -142,12 +138,11 @@ answer:
       expression: "'SGVsbG8gV29ybGQ'"
 ```
 
-### Encode a String into a Base64 encoded atom in URL-Safe mode
+### Encode an atom into a Base64 encoded atom in URL-Safe mode
 
-This scenario demonstrates how to encode a plain string into a Base64-encoded atom using the `base64_encoded/3` predicate
+This scenario demonstrates how to encode a plain atom into a Base64-encoded atom using the `base64_encoded/3` predicate
 with URL-safe encoding. The following options are used:
 
-- `as(atom)` – the result is returned as a Prolog atom.
 - `charset(url)` – the URL-safe Base64 alphabet is used (e.g., `-` and `_` instead of `+` and `/`).
 - Padding characters are included by default (`padding(true)`).
 
@@ -157,8 +152,8 @@ Here are the steps of the scenario:
 
 ```  prolog
 consult('/v1/lib/base64.pl'),
-base64_encoded('<<???>>', Classic, [as(atom), charset(classic)]),
-base64_encoded('<<???>>', UrlSafe, [as(atom), charset(url)]).
+base64_encoded('<<???>>', Classic, [charset(classic)]),
+base64_encoded('<<???>>', UrlSafe, [charset(url)]).
 ```
 
 - **When** the query is run
@@ -166,7 +161,7 @@ base64_encoded('<<???>>', UrlSafe, [as(atom), charset(url)]).
 
 ```  yaml
 height: 42
-gas_used: 15075
+gas_used: 13251
 answer:
   has_more: false
   variables: ["Classic", "UrlSafe"]
@@ -178,11 +173,11 @@ answer:
       expression: "'PDw_Pz8-Pg=='"
 ```
 
-### Decode a Base64 encoded String into plain text
+### Decode a Base64 encoded atom into a plain atom
 
-This scenario demonstrates how to decode a Base64-encoded value back into plain text using the `base64_encoded/3` predicate.
-The encoded input can be provided as a character list or an atom. In this example, default options are used:
-•	The result (plain text) is returned as a character list (`as(string)`).
+This scenario demonstrates how to decode a Base64-encoded atom back into plain text using the `base64_encoded/3` predicate.
+In this example, default options are used:
+•	The result is returned as an atom.
 •	Padding characters in the input are allowed (`padding(true)`).
 •	The classic Base64 character set is used (`charset(classic)`).
 
@@ -200,22 +195,21 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', []).
 
 ```  yaml
 height: 42
-gas_used: 12573
+gas_used: 11090
 answer:
   has_more: false
   variables: ["X"]
   results:
   - substitutions:
     - variable: X
-      expression: "['H',e,l,l,o,' ','W',o,r,l,d]"
+      expression: "'Hello World'"
 ```
 
-### Decode a Base64 Encoded string into a plain atom
+### Decode a Base64 encoded atom with explicit defaults
 
-This scenario demonstrates how to decode a Base64-encoded value back into plain text using the `base64_encoded/3` predicate,
-with the result returned as a Prolog atom. The following options are used:
+This scenario demonstrates how to decode a Base64-encoded value back into plain text using the `base64_encoded/3` predicate.
+The following options are used:
 
-- `as(atom)` – the decoded plain text is returned as an atom.
 - `padding(true)` – padding characters in the input are allowed (default).
 - `charset(classic)` – the classic Base64 character set is used (default).
 
@@ -225,7 +219,7 @@ Here are the steps of the scenario:
 
 ```  prolog
 consult('/v1/lib/base64.pl'),
-base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom)]).
+base64_encoded(X, 'SGVsbG8gV29ybGQ=', [padding(true), charset(classic)]).
 ```
 
 - **When** the query is run
@@ -233,7 +227,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom)]).
 
 ```  yaml
 height: 42
-gas_used: 13373
+gas_used: 12032
 answer:
   has_more: false
   variables: ["X"]
@@ -254,7 +248,7 @@ Here are the steps of the scenario:
 
 ```  prolog
 consult('/v1/lib/base64.pl'),
-base64_encoded('café', X, [as(atom), encoding('iso-8859-1')]).
+base64_encoded('café', X, [encoding('iso-8859-1')]).
 ```
 
 - **When** the query is run
@@ -262,7 +256,7 @@ base64_encoded('café', X, [as(atom), encoding('iso-8859-1')]).
 
 ```  yaml
 height: 42
-gas_used: 9195
+gas_used: 8279
 answer:
   has_more: false
   variables: ["X"]
@@ -291,7 +285,7 @@ base64_encoded('Hello World', X, [charset(bad)]).
 
 ```  yaml
 height: 42
-gas_used: 4445
+gas_used: 4439
 answer:
   has_more: false
   variables: ["X"]
@@ -319,7 +313,7 @@ base64_encoded('Hello World', X, [padding(bad)]).
 
 ```  yaml
 height: 42
-gas_used: 4776
+gas_used: 4770
 answer:
   has_more: false
   variables: ["X"]
@@ -328,10 +322,9 @@ answer:
     substitutions:
 ```
 
-### Error on incorrect as option
+### Error on removed as option
 
-This scenario demonstrates how the `base64_encoded/3` predicate behaves when an invalid value is provided for the
-`as` option.
+This scenario demonstrates how the `base64_encoded/3` predicate behaves when the removed `as` option is provided.
 
 Here are the steps of the scenario:
 
@@ -347,12 +340,12 @@ base64_encoded('Hello World', X, [as(bad)]).
 
 ```  yaml
 height: 42
-gas_used: 5207
+gas_used: 4406
 answer:
   has_more: false
   variables: ["X"]
   results:
-  - error: "error(domain_error(as,bad),base64_encoded/3)"
+  - error: "error(type_error(option,as(bad)),base64_encoded/3)"
     substitutions:
 ```
 
@@ -367,7 +360,7 @@ Here are the steps of the scenario:
 
 ```  prolog
 consult('/v1/lib/base64.pl'),
-base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom), encoding(unknown)]).
+base64_encoded(X, 'SGVsbG8gV29ybGQ=', [encoding(unknown)]).
 ```
 
 - **When** the query is run
@@ -375,7 +368,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [as(atom), encoding(unknown)]).
 
 ```  yaml
 height: 42
-gas_used: 14094
+gas_used: 11778
 answer:
   has_more: false
   variables: ["X"]
@@ -403,7 +396,7 @@ base64_encoded(X, 'SGVsbG8gV29ybGQ=', [encoding(bad, 'very bad')]).
 
 ```  yaml
 height: 42
-gas_used: 4447
+gas_used: 4439
 answer:
   has_more: false
   variables: ["X"]
@@ -431,7 +424,7 @@ base64_encoded('Hello World', X, [chatset(classic)]).
 
 ```  yaml
 height: 42
-gas_used: 4423
+gas_used: 4415
 answer:
   has_more: false
   variables: ["X"]

@@ -15,7 +15,7 @@ Feature: crypto_data_hash/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 65436
+      gas_used: 65533
       answer:
         has_more: false
         variables: ["Hash", "Hex"]
@@ -42,7 +42,7 @@ Feature: crypto_data_hash/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 147034
+      gas_used: 147228
       answer:
         has_more: false
         variables: ["Sha512Bytes", "Md5Bytes", "Sha512", "Md5"]
@@ -73,7 +73,7 @@ Feature: crypto_data_hash/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 130018
+      gas_used: 129923
       answer:
         has_more: false
         variables: ["HashFromHex", "HashFromOctet", "HexFromHex", "HexFromOctet"]
@@ -89,6 +89,26 @@ Feature: crypto_data_hash/3
             expression: "b94d27b9934d3e08a52e52d7da7dabfac484efe37a5380ee9088f7ace2efcde9"
       """
 
+  Scenario: Reject character codes for textual hash data
+    This scenario demonstrates that textual encodings require atoms; use encoding(octet) for byte lists.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/crypto.pl'),
+      crypto_data_hash([104,101,108,108,111], Hash, []).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 4920
+      answer:
+        has_more: false
+        variables: ["Hash"]
+        results:
+        - error: "error(type_error(atom,[104,101,108,108,111]),crypto_data_hash/3)"
+      """
+
   Scenario: Match a computed hash against an expected value
     This scenario demonstrates that crypto_data_hash/3 can verify a provided digest.
 
@@ -102,7 +122,7 @@ Feature: crypto_data_hash/3
     Then the answer we get is:
       """ yaml
       height: 42
-      gas_used: 18117
+      gas_used: 18127
       answer:
         has_more: false
         variables: ["Expected"]

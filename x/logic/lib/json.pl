@@ -6,9 +6,11 @@
 
 %! json_prolog(?Json, ?Term) is det.
 %
-% Relates JSON text with its canonical Prolog representation.
+% Relates JSON text atoms with their canonical Prolog representation.
 %
-% Json is text: an atom, a list of characters, or a list of character codes.
+% Json is an atom. Use explicit conversion predicates such as `atom_chars/2`,
+% `atom_codes/2`, or `string_bytes/3` when another textual representation is
+% needed.
 %
 % The canonical representation for Term is:
 % - JSON objects are represented as `json(NameValueList)`;
@@ -18,7 +20,8 @@
 % - JSON booleans and null are represented as `@(true)`, `@(false)`, and `@(null)`.
 json_prolog(Json, Term) :-
   ( nonvar(Json)
-  -> with_context(json_prolog/2, string_bytes(Json, JsonBytes, text)),
+  -> with_context(json_prolog/2, must_be(atom, Json)),
+     with_context(json_prolog/2, string_bytes(Json, JsonBytes, text)),
      json_decode_bytes(json_prolog/2, JsonBytes, Term)
   ; nonvar(Term)
   -> json_encode_term(json_prolog/2, Term, Json)

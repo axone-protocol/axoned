@@ -11,8 +11,9 @@
 % Component specifies the URI component where the value is used. It is one of
 % `query_value`, `fragment`, `path` or `segment`.
 %
-% Value and Encoded may be atoms, lists of characters, or lists of character
-% codes. Generated values are returned as atoms.
+% Value and Encoded are atoms. Use explicit conversion predicates such as
+% `atom_chars/2`, `atom_codes/2`, or `string_bytes/3` when another textual
+% representation is needed.
 uri_encoded(Component, Value, Encoded) :-
   uri_component(Component, URIComponent),
   ( nonvar(Value)
@@ -42,14 +43,14 @@ uri_component(Component, _) :-
   throw(error(type_error(uri_component, Component), uri_encoded/3)).
 
 uri_encode(Component, Value, Encoded) :-
-  with_context(uri_encoded/3, must_be(text, Value)),
+  with_context(uri_encoded/3, must_be(atom, Value)),
   with_context(uri_encoded/3, string_bytes(Value, ValueBytes, text)),
   uri_escape_bytes(Component, ValueBytes, EncodedBytes),
   atom_codes(EncodedAtom, EncodedBytes),
   Encoded = EncodedAtom.
 
 uri_decode(Value, Encoded) :-
-  with_context(uri_encoded/3, must_be(text, Encoded)),
+  with_context(uri_encoded/3, must_be(atom, Encoded)),
   with_context(uri_encoded/3, string_bytes(Encoded, EncodedBytes, text)),
   uri_unescape_bytes(Encoded, EncodedBytes, DecodedBytes),
   with_context(uri_encoded/3, string_bytes(DecodedChars, DecodedBytes, text)),
