@@ -14,7 +14,6 @@
 [![build-go](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/build-go.yml?label=build-go&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/build-go.yml)
 [![test-go](https://img.shields.io/github/actions/workflow/status/axone-protocol/axoned/test-go.yml?label=test-go&style=for-the-badge&logo=github)](https://github.com/axone-protocol/axoned/actions/workflows/test-go.yml)
 [![codecov](https://img.shields.io/codecov/c/github/axone-protocol/axoned?style=for-the-badge&token=O3FJO5QDCA&logo=codecov)](https://codecov.io/gh/axone-protocol/axoned)
-[![Go Report Card](https://goreportcard.com/badge/github.com/axone-protocol/axoned/v15?style=for-the-badge)](https://goreportcard.com/report/github.com/axone-protocol/axoned/v15)
 [![docker-pull](https://img.shields.io/docker/pulls/axoneprotocol/axoned?label=downloads&style=for-the-badge&logo=docker)](https://hub.docker.com/r/axoneprotocol/axoned)
 [![Godoc Reference](https://img.shields.io/badge/godoc-reference-blue.svg?logo=go&logoColor=white&labelColor=gray&label=&style=for-the-badge)](https://pkg.go.dev/github.com/axone-protocol/axoned/v15)
 
