@@ -395,7 +395,7 @@ var tempDir = func() string {
 }
 
 // sanitizeProtoRegistry removes all the unused proto definitions from the global registry to avoid surprises as the
-// cosmos sdk rely on it.
+// cosmos sdk relies on it.
 func sanitizeProtoRegistry() {
 	safeRegistry := new(protoregistry.Files)
 	protoregistry.GlobalFiles.RangeFiles(func(d protoreflect.FileDescriptor) bool {
