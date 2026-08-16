@@ -1,0 +1,67 @@
+name: Lint / Nix
+
+on:
+  workflow_call:
+
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/lint-nix.yml
+      - flake.lock
+      - flake.nix
+      - '**/*.nix'
+
+  pull_request:
+    branches: [main]
+    paths:
+      - .github/workflows/lint-nix.yml
+      - flake.lock
+      - flake.nix
+      - '**/*.nix'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: check-nix-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  check-nix:
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          persist-credentials: false
+
+      - name: Set up Nix
+        uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
+
+      - name: Check flake
+        run: |
+          set -o pipefail
+
+          nix flake check \
+            --all-systems \
+            --show-trace \
+            --print-build-logs \
+            2>&1 | tee /tmp/nix-flake-check.log
+
+      - name: Reject Nix warnings
+        run: |
+          if grep -Ei '(^|[^[:alpha:]])warning:' /tmp/nix-flake-check.log; then
+            echo "::error::Nix emitted one or more warnings"
+            exit 1
+          fi
+
+      - name: Check formatting
+        run: |
+          mapfile -t nix_files < <(git ls-files '*.nix')
+          nix develop --command nixfmt --check "${nix_files[@]}"
+
+      - name: Statix
+        run: nix develop --command statix check .
+
+      - name: Deadnix
+        run: nix develop --command deadnix --fail .

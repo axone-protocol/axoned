@@ -10,7 +10,6 @@
     let
       supportedSystems = [
         "aarch64-darwin"
-        "x86_64-darwin"
         "x86_64-linux"
         "aarch64-linux"
       ];
@@ -28,6 +27,7 @@
             packages = [
               pkgs.bash-language-server
               pkgs.buf
+              pkgs.deadnix
               pkgs.git
               pkgs.gnumake
               pkgs.go_1_25
@@ -39,10 +39,12 @@
               pkgs.markdownlint-cli2
               pkgs.marksman
               pkgs.nil
+              pkgs.nixfmt
               pkgs.protobuf
               pkgs.protobuf-language-server
               pkgs.protoc-gen-go
               pkgs.protoc-gen-go-grpc
+              pkgs.statix
               pkgs.yaml-language-server
             ];
 

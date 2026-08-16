@@ -58,6 +58,7 @@ The `axoned` blockchain currently supports the following builds:
 | Linux        | arm64    |           ✅           |
 | Windows      | amd64    | ️🚫<br/> Not supported |
 
+> Intel Darwin is not supported by the Nix development environment.
 > Note: as the blockchain depends on [CosmWasm/wasmvm](https://github.com/CosmWasm/wasmvm), we only support the targets
 > supported by this project.
 
