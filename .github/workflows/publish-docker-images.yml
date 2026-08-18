@@ -29,6 +29,12 @@ concurrency:
 
 jobs:
   publish-docker-images:
+    permissions:
+      artifact-metadata: write
+      attestations: write
+      contents: read
+      id-token: write
+      packages: write
     runs-on: ubuntu-22.04
     steps:
       - name: Check out repository
@@ -66,10 +72,21 @@ jobs:
           password: ${{ secrets.DOCKER_HUB_REGISTRY_TOKEN }}
 
       - name: Build and publish image(s)
+        id: docker_build
         uses: docker/build-push-action@53b7df96c91f9c12dcc8a07bcb9ccacbed38856a # v7
         with:
           context: .
           platforms: linux/amd64,linux/arm64
+          provenance: mode=max
           push: true
+          sbom: true
           tags: ${{ steps.docker_metadata.outputs.tags }}
           labels: ${{ steps.docker_metadata.outputs.labels }}
+
+      - name: Attest release image provenance
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-name: ghcr.io/${{ github.repository }}
+          subject-digest: ${{ steps.docker_build.outputs.digest }}
+          push-to-registry: true
