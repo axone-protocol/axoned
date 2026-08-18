@@ -25,14 +25,18 @@
         {
           default = pkgs.mkShell {
             packages = [
+              pkgs.act
+              pkgs.actionlint
               pkgs.bash-language-server
               pkgs.buf
               pkgs.deadnix
+              pkgs.docker-client
               pkgs.git
               pkgs.gnumake
               pkgs.go_1_25
               pkgs.gofumpt
               pkgs.golangci-lint
+              pkgs.gh
               pkgs.gomplate
               pkgs.gopls
               pkgs.jq
@@ -40,11 +44,13 @@
               pkgs.marksman
               pkgs.nil
               pkgs.nixfmt
+              pkgs.nodejs_24
               pkgs.protobuf
               pkgs.protobuf-language-server
               pkgs.protoc-gen-go
               pkgs.protoc-gen-go-grpc
               pkgs.statix
+              pkgs.uv
               pkgs.yaml-language-server
             ];
 
