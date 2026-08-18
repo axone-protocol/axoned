@@ -89,6 +89,23 @@ make install
 docker run -ti --rm axoneprotocol/axoned --help
 ```
 
+Release images published to GHCR and Docker Hub include an SPDX software bill of materials (SBOM) and SLSA build
+provenance. The provenance of a GHCR release image is also signed by GitHub Actions and can be verified against this
+repository:
+
+```sh
+AXONED_IMAGE=ghcr.io/axone-protocol/axoned:X.Y.Z
+docker login ghcr.io
+gh attestation verify "oci://${AXONED_IMAGE}" --repo axone-protocol/axoned
+```
+
+The SBOM and build provenance attached to an image can be inspected with Docker Buildx:
+
+```sh
+docker buildx imagetools inspect "${AXONED_IMAGE}" --format '{{ json .SBOM }}'
+docker buildx imagetools inspect "${AXONED_IMAGE}" --format '{{ json .Provenance }}'
+```
+
 ## Developing & contributing
 
 `axoned` is written in [Go] and built using [Cosmos SDK]. A number of smart contracts are also deployed on the
