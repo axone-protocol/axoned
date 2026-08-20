@@ -6,7 +6,9 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"reflect"
 	"strconv"
+	"strings"
 
 	"github.com/axone-protocol/prolog/v3/engine"
 	"github.com/samber/lo"
@@ -28,7 +30,10 @@ var (
 	atomUnknown         = engine.NewAtom("unknown")
 	atomValidJSONNumber = engine.NewAtom("json_number")
 	atomSystemError     = engine.NewAtom("system_error")
+	jsonNumberType      = reflect.TypeFor[json.Number]()
 )
+
+const jsonNumber = "number"
 
 var (
 	jsonNullTerm  = atomAt.Apply(atomNull)
@@ -48,6 +53,7 @@ func (c *jsonCodec) Name() string {
 
 func (c *jsonCodec) Decode(payload []byte) engine.Term {
 	decoder := json.NewDecoder(bytes.NewReader(payload))
+	decoder.UseNumber()
 	decoded, err := decodeJSONToTerm(decoder)
 	if err != nil {
 		return prolog.AtomError.Apply(jsonErrorTerm(err))
@@ -86,11 +92,7 @@ func encodeTermToJSON(term engine.Term, writer io.Writer, env *engine.Env) error
 	case engine.Integer:
 		return marshalToJSONStream(t, term, writer, env)
 	case engine.Float:
-		float, err := strconv.ParseFloat(t.String(), 64)
-		if err != nil {
-			return engine.DomainError(atomValidJSONNumber, t, env)
-		}
-		return marshalToJSONStream(float, term, writer, env)
+		return marshalJSONNumberToStream(t.String(), term, writer, env)
 	case engine.Compound:
 		return encodeCompoundToJSON(t, writer, env)
 	case engine.Variable:
@@ -187,6 +189,15 @@ func marshalToJSONStream(data any, term engine.Term, writer io.Writer, env *engi
 	return err
 }
 
+func marshalJSONNumberToStream(number string, term engine.Term, writer io.Writer, env *engine.Env) error {
+	bs, err := json.Marshal(json.Number(number))
+	if err != nil {
+		return engine.DomainError(atomValidJSONNumber, term, env)
+	}
+	_, err = writer.Write(bs)
+	return err
+}
+
 func decodeJSONToTerm(decoder *json.Decoder) (engine.Term, error) {
 	token, err := decoder.Token()
 	if errors.Is(err, io.EOF) {
@@ -220,8 +231,15 @@ func decodeJSONToTerm(decoder *json.Decoder) (engine.Term, error) {
 		}
 	case string:
 		return prolog.StringToAtom(token), nil
-	case float64:
-		return engine.NewFloatFromString(strconv.FormatFloat(token, 'f', -1, 64))
+	case json.Number:
+		if !isDecimal128Exact(token.String()) {
+			return nil, malformedJSONNumberError(decoder.InputOffset())
+		}
+		float, err := engine.NewFloatFromString(token.String())
+		if err != nil {
+			return nil, malformedJSONNumberError(decoder.InputOffset())
+		}
+		return float, nil
 	case bool:
 		return jsonBool(token), nil
 	case nil:
@@ -229,6 +247,26 @@ func decodeJSONToTerm(decoder *json.Decoder) (engine.Term, error) {
 	}
 
 	return nil, fmt.Errorf("unexpected token: %v", token)
+}
+
+func isDecimal128Exact(number string) bool {
+	coefficient := number
+	if exponent := strings.IndexAny(coefficient, "eE"); exponent >= 0 {
+		coefficient = coefficient[:exponent]
+	}
+	coefficient = strings.TrimPrefix(coefficient, "-")
+	coefficient = strings.ReplaceAll(coefficient, ".", "")
+	coefficient = strings.Trim(coefficient, "0")
+
+	return len(coefficient) <= 34
+}
+
+func malformedJSONNumberError(offset int64) *json.UnmarshalTypeError {
+	return &json.UnmarshalTypeError{
+		Value:  jsonNumber,
+		Type:   jsonNumberType,
+		Offset: offset,
+	}
 }
 
 func decodeJSONArrayToTerm(decoder *json.Decoder) (engine.Term, error) {
