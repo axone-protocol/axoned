@@ -1,0 +1,73 @@
+name: Scan / Docker Image
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - '.github/workflows/scan-docker-image.yml'
+      - '.dockerignore'
+      - 'Dockerfile'
+      - 'app/**'
+      - 'cmd/**'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'proto/**'
+      - 'scripts/**'
+      - 'version'
+      - 'x/**'
+
+  pull_request:
+    branches: [main]
+    paths:
+      - '.github/workflows/scan-docker-image.yml'
+      - '.dockerignore'
+      - 'Dockerfile'
+      - 'app/**'
+      - 'cmd/**'
+      - 'go.mod'
+      - 'go.sum'
+      - 'Makefile'
+      - 'proto/**'
+      - 'scripts/**'
+      - 'version'
+      - 'x/**'
+
+  schedule:
+    - cron: '23 20 * * 3'
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  scan-docker-image:
+    permissions:
+      contents: read
+      security-events: write
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Build Docker image
+        run: docker build --tag ghcr.io/${{ github.repository }}:${{ github.sha }} .
+
+      - name: Scan Docker image with Trivy
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
+        with:
+          image-ref: ghcr.io/${{ github.repository }}:${{ github.sha }}
+          format: sarif
+          output: trivy-results.sarif
+          severity: CRITICAL,HIGH
+          limit-severities-for-sarif: true
+
+      - name: Upload Trivy scan results
+        uses: github/codeql-action/upload-sarif@ff2f1c621b7f889edc0d3c761ac2e6a3f8cdb0dd # v4
+        with:
+          sarif_file: trivy-results.sarif
