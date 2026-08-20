@@ -42,17 +42,8 @@ plugins:
   - - "@semantic-release/exec"
     - prepareCmd: |
         ./scripts/bump-module.sh
-  - - "@semantic-release/exec"
-    - prepareCmd: |
-        make release-assets
   - - "@semantic-release/github"
     - successComment: false
-      assets:
-        - path: "./target/release/axoned-*-linux-amd64"
-        - path: "./target/release/axoned-*-linux-amd64.tar.gz"
-        - path: "./target/release/axoned-*-linux-arm64"
-        - path: "./target/release/axoned-*-linux-arm64.tar.gz"
-        - path: "./target/release/sha256sum.txt"
   - - "@semantic-release/git"
     - assets:
         - README.md

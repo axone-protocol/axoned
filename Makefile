@@ -469,9 +469,10 @@ $(RELEASE_TARGETS): ensure-buildx-builder
 
 release-checksums:
 	@${call echo_msg, 🔑, Generating, release binary ${COLOR_YELLOW}checksums}
-	@rm ${RELEASE_FOLDER}/sha256sum.txt; \
-	for asset in `ls ${RELEASE_FOLDER}`; do \
-		shasum -a 256 ${RELEASE_FOLDER}/$$asset >> ${RELEASE_FOLDER}/sha256sum.txt; \
+	@rm -f ${RELEASE_FOLDER}/sha256sum.txt; \
+	cd ${RELEASE_FOLDER}; \
+	for asset in *; do \
+		shasum -a 256 "$$asset" >> sha256sum.txt; \
 	done;
 
 ensure-buildx-builder:

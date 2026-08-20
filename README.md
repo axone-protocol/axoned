@@ -69,6 +69,13 @@ All releases can be found [here](https://github.com/axone-protocol/axoned/releas
 `axoned` follows the [Semantic Versioning 2.0.0](https://semver.org/) to determine when and how the version changes, and
 we also apply the philosophical principles of [release early - release often](https://en.wikipedia.org/wiki/Release_early,_release_often).
 
+Newly published release binaries are accompanied by an SPDX SBOM and signed SLSA provenance. A downloaded binary can be
+verified against this repository:
+
+```sh
+gh attestation verify ./axoned-X.Y.Z-linux-amd64 --repo axone-protocol/axoned
+```
+
 ## Install
 
 ### From release
