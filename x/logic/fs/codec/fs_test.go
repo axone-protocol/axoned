@@ -458,10 +458,10 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 			expectedOutput: "error(type_error(json,foo([=(a,b)]))).\n",
 		},
 		{
-			name:           "json encode invalid number",
+			name:           "json encode decimal128 number",
 			codecName:      codecNameJSON,
 			request:        []byte("encode\n1.8e308."),
-			expectedOutput: "error(domain_error(json_number,1.8e+308)).\n",
+			expectedOutput: "ok('1.8e+308').\n",
 		},
 		{
 			name:           "json unknown raw command",

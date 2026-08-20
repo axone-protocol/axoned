@@ -13,6 +13,12 @@ import (
 	. "github.com/smartystreets/goconvey/convey"
 )
 
+const (
+	integerLargerThanJavaScriptSafeInteger = "integer larger than JavaScript safe integer"
+	exponentFormDecimal                    = "exponent-form decimal"
+	inexactDecimal128Number                = "12345678901234567890123456789012345"
+)
+
 func TestJSONCodecDecode(t *testing.T) {
 	testCases := []struct {
 		name     string
@@ -30,9 +36,34 @@ func TestJSONCodecDecode(t *testing.T) {
 			expected: "ok(@(true)).\n",
 		},
 		{
-			name:     "number",
+			name:     jsonNumber,
 			payload:  []byte(`1.5`),
 			expected: "ok(1.5).\n",
+		},
+		{
+			name:     "decimal preserves 34 significant digits",
+			payload:  []byte(`12345678901234567890.12345678901234`),
+			expected: "ok(12345678901234567890.12345678901234).\n",
+		},
+		{
+			name:     integerLargerThanJavaScriptSafeInteger,
+			payload:  []byte(`9007199254740993`),
+			expected: "ok(9007199254740993.0).\n",
+		},
+		{
+			name:     exponentFormDecimal,
+			payload:  []byte(`1.234567890123456789012345678901234e+12`),
+			expected: "ok(1234567890123.456789012345678901234).\n",
+		},
+		{
+			name:     "number exceeding decimal128 bounds",
+			payload:  []byte(`1e6145`),
+			expected: "error(syntax_error(json(malformed_json(6,number)))).\n",
+		},
+		{
+			name:     "number exceeding decimal128 precision",
+			payload:  []byte(inexactDecimal128Number),
+			expected: "error(syntax_error(json(malformed_json(35,number)))).\n",
 		},
 		{
 			name:     "unexpected EOF",
@@ -78,6 +109,21 @@ func TestJSONCodecEncode(t *testing.T) {
 			expected: "ok('1.5').\n",
 		},
 		{
+			name:     "decimal preserves 34 significant digits",
+			payload:  []byte("12345678901234567890.12345678901234."),
+			expected: "ok('12345678901234567890.12345678901234').\n",
+		},
+		{
+			name:     integerLargerThanJavaScriptSafeInteger,
+			payload:  []byte("9007199254740993.0."),
+			expected: "ok('9007199254740993.0').\n",
+		},
+		{
+			name:     exponentFormDecimal,
+			payload:  []byte("1.234567890123456789012345678901234e+12."),
+			expected: "ok('1234567890123.456789012345678901234').\n",
+		},
+		{
 			name:     "array",
 			payload:  []byte("[foo,42,@(false),@(null),[]]."),
 			expected: "ok('[\"foo\",42,false,null,[]]').\n",
@@ -94,6 +140,56 @@ func TestJSONCodecEncode(t *testing.T) {
 		for _, tc := range testCases {
 			Convey(tc.name, func() {
 				So(renderTerm(t, codec.Encode(tc.payload)), ShouldEqual, tc.expected)
+			})
+		}
+	})
+}
+
+func TestJSONCodecNumberRoundTrip(t *testing.T) {
+	testCases := []struct {
+		name        string
+		payload     []byte
+		expected    string
+		expectError bool
+	}{
+		{
+			name:     "decimal with 34 significant digits",
+			payload:  []byte(`12345678901234567890.12345678901234`),
+			expected: `12345678901234567890.12345678901234`,
+		},
+		{
+			name:     integerLargerThanJavaScriptSafeInteger,
+			payload:  []byte(`9007199254740993`),
+			expected: `9007199254740993`,
+		},
+		{
+			name:     exponentFormDecimal,
+			payload:  []byte(`1.234567890123456789012345678901234e+12`),
+			expected: `1234567890123.456789012345678901234`,
+		},
+		{
+			name:        "number exceeding decimal128 precision",
+			payload:     []byte(inexactDecimal128Number),
+			expectError: true,
+		},
+	}
+
+	Convey("Given JSON numbers", t, func() {
+		for _, tc := range testCases {
+			Convey(tc.name, func() {
+				decoder := json.NewDecoder(bytes.NewReader(tc.payload))
+				decoder.UseNumber()
+				term, err := decodeJSONToTerm(decoder)
+				if tc.expectError {
+					So(err, ShouldNotBeNil)
+					return
+				}
+				So(err, ShouldBeNil)
+
+				var buf bytes.Buffer
+				err = encodeTermToJSON(term, &buf, engine.NewEnv())
+				So(err, ShouldBeNil)
+				So(buf.String(), ShouldEqual, tc.expected)
 			})
 		}
 	})
