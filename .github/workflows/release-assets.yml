@@ -1,0 +1,83 @@
+name: Release / Assets
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.release.tag_name }}
+  cancel-in-progress: false
+
+jobs:
+  release-assets:
+    if: startsWith(github.event.release.tag_name, 'v')
+    permissions:
+      attestations: write
+      contents: write
+      id-token: write
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Check out release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.release.tag_name }}
+
+      - name: Resolve release version
+        id: release
+        run: echo "version=$(cat version)" >> "$GITHUB_OUTPUT"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@bb05f3f5519dd87d3ba754cc423b652a5edd6d2c # v4
+
+      - name: Build release assets
+        run: make release-assets
+
+      - name: Generate amd64 binary SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          file: target/release/axoned-${{ steps.release.outputs.version }}-linux-amd64
+          format: spdx-json
+          output-file: target/release/axoned-${{ steps.release.outputs.version }}-linux-amd64.spdx.json
+          syft-version: v1.51.0
+          upload-artifact: false
+          upload-release-assets: false
+
+      - name: Generate arm64 binary SBOM
+        uses: anchore/sbom-action@e22c389904149dbc22b58101806040fa8d37a610 # v0.24.0
+        with:
+          file: target/release/axoned-${{ steps.release.outputs.version }}-linux-arm64
+          format: spdx-json
+          output-file: target/release/axoned-${{ steps.release.outputs.version }}-linux-arm64.spdx.json
+          syft-version: v1.51.0
+          upload-artifact: false
+          upload-release-assets: false
+
+      - name: Regenerate release checksums
+        run: make release-checksums
+
+
+      - name: Attest release artifact provenance
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-checksums: target/release/sha256sum.txt
+
+      - name: Attest amd64 binary SBOM
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: target/release/axoned-${{ steps.release.outputs.version }}-linux-amd64
+          sbom-path: target/release/axoned-${{ steps.release.outputs.version }}-linux-amd64.spdx.json
+
+      - name: Attest arm64 binary SBOM
+        uses: actions/attest@1e69f48acb82d1966a394da916b4c1698aa569d6 # v4.2.2
+        with:
+          subject-path: target/release/axoned-${{ steps.release.outputs.version }}-linux-arm64
+          sbom-path: target/release/axoned-${{ steps.release.outputs.version }}-linux-arm64.spdx.json
+
+      - name: Publish release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: gh release upload "$RELEASE_TAG" target/release/* --clobber
