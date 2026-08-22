@@ -2,11 +2,32 @@
   description = "AXONE Protocol blockchain development environment";
 
   inputs = {
+    cosmovisor = {
+      url = "github:cosmos/cosmos-sdk/tools/cosmovisor/v1.7.1";
+      flake = false;
+    };
+    heighliner = {
+      url = "github:strangelove-ventures/heighliner/v1.7.4";
+      flake = false;
+    };
+    mock = {
+      url = "github:uber/mock/v0.6.0";
+      flake = false;
+    };
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-26.05";
+    nixpkgsGo124.url = "github:NixOS/nixpkgs/nixos-25.11";
   };
 
   outputs =
-    { nixpkgs, ... }:
+    {
+      self,
+      cosmovisor,
+      heighliner,
+      mock,
+      nixpkgs,
+      nixpkgsGo124,
+      ...
+    }:
     let
       supportedSystems = [
         "aarch64-darwin"
@@ -17,6 +38,38 @@
       forAllSystems = nixpkgs.lib.genAttrs supportedSystems;
     in
     {
+      packages = forAllSystems (
+        system:
+        let
+          pkgs = nixpkgs.legacyPackages.${system};
+          go124 = nixpkgsGo124.legacyPackages.${system}.go_1_24;
+        in
+        {
+          cosmovisor = (pkgs.buildGoModule.override { go = go124; }) {
+            pname = "cosmovisor";
+            version = "1.7.1";
+            src = cosmovisor;
+            modRoot = "tools/cosmovisor";
+            subPackages = [ "cmd/cosmovisor" ];
+            env.CGO_ENABLED = 0;
+            vendorHash = "sha256-DXgFvjm1fDHtDwPNfLIPi2vMdZTi3bYN7cgR1dgdgLk=";
+          };
+          heighliner = pkgs.buildGoModule {
+            pname = "heighliner";
+            version = "1.7.4";
+            src = heighliner;
+            vendorHash = "sha256-Sa/lCa7IFcnIGNKCPvFeQke6dNOycK6vjg5gmHOOdic=";
+          };
+          mockgen = pkgs.buildGoModule {
+            pname = "mockgen";
+            version = "0.6.0";
+            src = mock;
+            subPackages = [ "mockgen" ];
+            vendorHash = "sha256-Cf7lKfMuPFT/I1apgChUNNCG2C7SrW7ncF8OusbUs+A=";
+          };
+        }
+      );
+
       devShells = forAllSystems (
         system:
         let
@@ -25,6 +78,9 @@
         {
           default = pkgs.mkShell {
             packages = [
+              self.packages.${system}.cosmovisor
+              self.packages.${system}.heighliner
+              self.packages.${system}.mockgen
               pkgs.act
               pkgs.actionlint
               pkgs.bash-language-server

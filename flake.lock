@@ -1,5 +1,56 @@
 {
   "nodes": {
+    "cosmovisor": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1739377715,
+        "narHash": "sha256-ys4WwzX/JY9lEDyw+Ia3g/gikz6//Cpla1KjX4TbPEc=",
+        "owner": "cosmos",
+        "repo": "cosmos-sdk",
+        "rev": "f072ecaba61468d7bad864b92721116f72d4e8a6",
+        "type": "github"
+      },
+      "original": {
+        "owner": "cosmos",
+        "ref": "tools/cosmovisor/v1.7.1",
+        "repo": "cosmos-sdk",
+        "type": "github"
+      }
+    },
+    "heighliner": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1752268462,
+        "narHash": "sha256-qfmsmbYL4C3JRskrJENt672ZxmxmlUD+z74f8AwRm5M=",
+        "owner": "strangelove-ventures",
+        "repo": "heighliner",
+        "rev": "fa0a3452afcaaa5ef1a0de53a860c7af92454447",
+        "type": "github"
+      },
+      "original": {
+        "owner": "strangelove-ventures",
+        "ref": "v1.7.4",
+        "repo": "heighliner",
+        "type": "github"
+      }
+    },
+    "mock": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1755529084,
+        "narHash": "sha256-gYUL+ucnKQncudQDcRt8aDqM7xE5XSKHh4X0qFrvfGs=",
+        "owner": "uber",
+        "repo": "mock",
+        "rev": "2d1c58167e30f380cf78e44a43b100a14767e817",
+        "type": "github"
+      },
+      "original": {
+        "owner": "uber",
+        "ref": "v0.6.0",
+        "repo": "mock",
+        "type": "github"
+      }
+    },
     "nixpkgs": {
       "locked": {
         "lastModified": 1780453794,
@@ -16,9 +67,29 @@
         "type": "github"
       }
     },
+    "nixpkgsGo124": {
+      "locked": {
+        "lastModified": 1782847189,
+        "narHash": "sha256-twXPFqFsrrY5r28Zh7Homgcp2gUMBgQ6WDS98Q/3xFI=",
+        "owner": "NixOS",
+        "repo": "nixpkgs",
+        "rev": "b6018f87da91d19d0ab4cf979885689b469cdd41",
+        "type": "github"
+      },
+      "original": {
+        "owner": "NixOS",
+        "ref": "nixos-25.11",
+        "repo": "nixpkgs",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
-        "nixpkgs": "nixpkgs"
+        "cosmovisor": "cosmovisor",
+        "heighliner": "heighliner",
+        "mock": "mock",
+        "nixpkgs": "nixpkgs",
+        "nixpkgsGo124": "nixpkgsGo124"
       }
     }
   },

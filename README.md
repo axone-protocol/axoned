@@ -120,10 +120,10 @@ AXONE blockchain and hosted in the [axone-protocol/contracts](https://github.com
 
 ### Prerequisites
 
-- install [Go] `1.25+` following instructions from the [official Go documentation](https://golang.org/doc/install);
-- use [gofumpt](https://github.com/mvdan/gofumpt) as formatter. You can integrate it in your favorite IDE following these [instructions](https://github.com/mvdan/gofumpt#installation) or invoke the makefile `make format-go`;
-- verify that [Docker] is properly installed and if not, follow the [instructions](https://docs.docker.com) for your environment;
-- verify that [`make`](https://fr.wikipedia.org/wiki/Make) is properly installed if you intend to use the provided `Makefile`.
+- install [Nix](https://nixos.org/download/);
+- install [direnv](https://direnv.net/) and [nix-direnv](https://github.com/nix-community/nix-direnv), then run `direnv allow` from the repository root;
+- without `direnv`, enter the development shell with `nix develop` before invoking `make`;
+- verify that [Docker] is properly installed and running if you use Docker-related targets.
 
 ### Makefile
 
@@ -172,16 +172,10 @@ Targets:
     mock                Generate all the mocks (for tests)
   Release:
     release-assets      Generate release assets
-  Dependencies:
-    deps                Install all the dependencies (tools, etc.)
-    deps-heighliner     Install heighliner (v1.7.4)
-    deps-cosmovisor     Install cosmovisor (v1.7.1)
-    deps-golangci-lint  Install golangci-lint (v2.10.1)
-    deps-gofumpt        Install gofumpt (v0.9.2)
   Help:
     help                Show this help.
 
-This Makefile depends on docker. To install it, please follow the instructions:
+This Makefile uses tools provided by the Nix development environment. Docker remains a host dependency:
 - for macOS: https://docs.docker.com/docker-for-mac/install/
 - for Windows: https://docs.docker.com/docker-for-windows/install/
 - for Linux: https://docs.docker.com/engine/install/
@@ -199,8 +193,8 @@ The binary will be generated under the folder `target/dist`.
 
 ### Build a docker image
 
-This project leverages [heighliner](https://github.com/strangelove-ventures/heighliner) to simplify the management and
-creation of production-grade container images. To build a Docker image, use the `build-docker` target in the `Makefile`:
+This project leverages [heighliner](https://github.com/strangelove-ventures/heighliner), provided by the Nix development
+environment, to simplify the management and creation of production-grade container images:
 
 ```sh
 make build-docker

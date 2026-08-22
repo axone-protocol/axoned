@@ -9,7 +9,6 @@ LEDGER_ENABLED         ?= true
 TARGET_FOLDER           = target
 DIST_FOLDER             = $(TARGET_FOLDER)/dist
 RELEASE_FOLDER          = $(TARGET_FOLDER)/release
-TOOLS_FOLDER            = $(TARGET_FOLDER)/tools
 E2E_PKG_FOLDER         ?= ./x/logic/tests/...
 COVER_UNIT_FILE        := $(TARGET_FOLDER)/coverage.unit.txt
 COVER_E2E_FILE         := $(TARGET_FOLDER)/coverage.e2e.txt
@@ -21,16 +20,6 @@ DOCKER_IMAGE_PROTO        = ghcr.io/cosmos/proto-builder:0.14.0
 DOCKER_PROTO_RUN         := docker run --rm --user $(shell id -u):$(shell id -g) -e HOME=/tmp -e GOPATH=/tmp/go -e GOBIN=/tmp/go/bin -v $(HOME)/.cache:/tmp/.cache -v $(PWD):/workspace --workdir /workspace $(DOCKER_IMAGE_PROTO)
 DOCKER_BUILDX_BUILDER     = axone-builder
 
-# Tools
-TOOL_HEIGHLINER_NAME     := heighliner
-TOOL_HEIGHLINER_VERSION  := v1.7.4
-TOOL_HEIGHLINER_PKG      := github.com/strangelove-ventures/$(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION)
-TOOL_HEIGHLINER_BIN      := ${TOOLS_FOLDER}/$(TOOL_HEIGHLINER_NAME)/$(TOOL_HEIGHLINER_VERSION)/$(TOOL_HEIGHLINER_NAME)
-
-TOOL_COSMOVISOR_NAME     := cosmovisor
-TOOL_COSMOVISOR_VERSION  := v1.7.1
-TOOL_COSMOVISOR_PKG      := cosmossdk.io/tools/$(TOOL_COSMOVISOR_NAME)/cmd/$(TOOL_COSMOVISOR_NAME)@$(TOOL_COSMOVISOR_VERSION)
-TOOL_COSMOVISOR_BIN      := ${TOOLS_FOLDER}/$(TOOL_COSMOVISOR_NAME)/$(TOOL_COSMOVISOR_VERSION)/$(TOOL_COSMOVISOR_NAME)
 
 # Coverage settings
 COVERPKG := $(shell go list ./x/logic/... | grep -v '/tests/' | tr '\n' ',' | sed 's/,$$//')
@@ -198,9 +187,9 @@ build-go: ## Build node executable for the current environment (default build)
 build-go-all: $(ENVIRONMENTS_TARGETS) ## Build node executables for all available environments
 
 .PHONY: build-docker
-build-docker: $(TOOL_HEIGHLINER_BIN) ## Build docker image
+build-docker: ## Build docker image
 	@${call echo_msg, 🐳, Building, docker image,...}
-	@$(TOOL_HEIGHLINER_BIN) build -c axone --local -f .heighliner/chains.yaml
+	@heighliner build -c axone --local -f .heighliner/chains.yaml
 
 $(ENVIRONMENTS_TARGETS):
 	@GOOS=$(word 3, $(subst -, ,$@)); \
@@ -320,9 +309,9 @@ chain-stop: ## Stop the blockchain
 	@killall axoned
 
 .PHONY: chain-upgrade
-chain-upgrade: build-go deps-$(TOOL_COSMOVISOR_NAME) ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION.
+chain-upgrade: build-go ## Test the chain upgrade from the given FROM_VERSION to the given TO_VERSION.
 	@${call echo_msg, 🔄, Upgrading, chain ${CHAIN}, from ${COLOR_YELLOW}${FROM_VERSION} to ${COLOR_YELLOW}${TO_VERSION}}
-	@killall $(TOOL_COSMOVISOR_BIN) || \
+	@killall cosmovisor 2>/dev/null || true; \
 	rm -rf ${TARGET_FOLDER}/${FROM_VERSION}; \
 	git clone -b ${FROM_VERSION} https://$(MODULE_AXONED).git ${TARGET_FOLDER}/${FROM_VERSION}; \
 	${call echo_msg, 🏗️, Building, binary,  ${COLOR_YELLOW}${FROM_VERSION}}; \
@@ -332,14 +321,14 @@ chain-upgrade: build-go deps-$(TOOL_COSMOVISOR_NAME) ## Test the chain upgrade f
 	cd ../../; \
 	make chain-init CHAIN_BINARY=$$BINARY_OLD; \
 	\
-	${call echo_msg, 👩‍🚀, Preparing, $(TOOL_COSMOVISOR_BIN)}; \
+	${call echo_msg, 👩‍🚀, Preparing, cosmovisor}; \
 	export DAEMON_NAME=${DAEMON_NAME}; \
 	export DAEMON_HOME=${DAEMON_HOME}; \
 	\
 	cat <<< $$(jq '.app_state.gov.params.voting_period = "20s"' ${CHAIN_HOME}/config/genesis.json) > ${CHAIN_HOME}/config/genesis.json; \
 	\
-	$(TOOL_COSMOVISOR_BIN) init $$BINARY_OLD; \
-	$(TOOL_COSMOVISOR_BIN) run start --moniker ${CHAIN_MONIKER} \
+	cosmovisor init $$BINARY_OLD; \
+	cosmovisor run start --moniker ${CHAIN_MONIKER} \
 		--home ${DAEMON_HOME} \
 		--log_level debug & \
 	sleep 10; \
@@ -406,8 +395,7 @@ doc-command: ## Generate markdown documentation for the command
 	@${call echo_msg, 📖, Generating, documentation, for the CLI}
 	@OUT_FOLDER="docs/command"; \
 	rm -rf $$OUT_FOLDER; \
-	go get ./scripts; \
-	go run ./scripts/. command; \
+	go run -mod=readonly ./scripts/. command; \
 	$(SED_INPLACE) 's/(default \"\/.*\/\.axoned\")/(default \"\/home\/john\/\.axoned\")/g' $$OUT_FOLDER/*.md; \
 	$(SED_INPLACE) 's/node\ name\ (default\ \".*\")/node\ name\ (default\ \"my-machine\")/g' $$OUT_FOLDER/*.md; \
 	$(SED_INPLACE) 's/IP\ (default\ \".*\")/IP\ (default\ \"127.0.0.1\")/g' $$OUT_FOLDER/*.md; \
@@ -432,7 +420,6 @@ doc-predicate: ## Generate markdown documentation for all the predicates (module
 .PHONY: mock
 mock: ## Generate all the mocks (for tests)
 	@${call echo_msg, 🧱, Generating, mocks}
-	@go install go.uber.org/mock/mockgen@v0.5.0
 	@mockgen -source=x/mint/types/expected_keepers.go -package testutil -destination x/mint/testutil/expected_keepers_mocks.go
 	@mockgen -source=x/vesting/types/expected_keepers.go -package testutil -destination x/vesting/testutil/expected_keepers_mocks.go
 	@mockgen -source=x/logic/types/expected_keepers.go -package testutil -destination x/logic/testutil/expected_keepers_mocks.go
@@ -480,34 +467,6 @@ ensure-buildx-builder:
 	@docker buildx ls | sed '1 d' | cut -f 1 -d ' ' | grep -q ${DOCKER_BUILDX_BUILDER} || \
 	docker buildx create --name ${DOCKER_BUILDX_BUILDER}
 
-## Dependencies:
-.PHONY: deps
-deps: deps-$(TOOL_HEIGHLINER_NAME) deps-$(TOOL_COSMOVISOR_NAME) ## Install all the dependencies (tools, etc.)
-
-.PHONY: deps-$(TOOL_HEIGHLINER_NAME)
-deps-heighliner: $(TOOL_HEIGHLINER_BIN) ## Install $TOOL_HEIGHLINER_NAME ($TOOL_HEIGHLINER_VERSION)
-
-.PHONY: deps-$(TOOL_COSMOVISOR_NAME)
-deps-cosmovisor: $(TOOL_COSMOVISOR_BIN) ## Install $TOOL_COSMOVISOR_NAME ($TOOL_COSMOVISOR_VERSION)
-
-$(TOOL_HEIGHLINER_BIN):
-	@${call echo_msg, 📦, Installing, $(TOOL_HEIGHLINER_NAME)@$(TOOL_HEIGHLINER_VERSION),...}
-	@mkdir -p $(dir $(TOOL_HEIGHLINER_BIN))
-	CUR_DIR=$(shell pwd) && \
-	TEMP_DIR=$(shell mktemp -d) && \
-	GIT_URL=https://$(firstword $(subst @, ,$(TOOL_HEIGHLINER_PKG))).git && \
-	GIT_TAG=$(word 2,$(subst @, ,$(TOOL_HEIGHLINER_PKG))) && \
-	git clone --branch $$GIT_TAG --depth 1 $$GIT_URL $$TEMP_DIR && \
-	cd $$TEMP_DIR && \
-	make build && \
-	cd $$CUR_DIR && \
-	mv $$TEMP_DIR/heighliner $(TOOL_HEIGHLINER_BIN) && \
-	rm -rf $$TEMP_DIR
-
-$(TOOL_COSMOVISOR_BIN):
-	@${call echo_msg, 📦, Installing, $(TOOL_COSMOVISOR_NAME)@$(TOOL_COSMOVISOR_VERSION),...}
-	@mkdir -p $(dir $(TOOL_COSMOVISOR_BIN))
-	@GOBIN=$(dir $(abspath $(TOOL_COSMOVISOR_BIN))) go install $(TOOL_COSMOVISOR_PKG)
 
 ## Help:
 .PHONY: help
@@ -517,16 +476,12 @@ help: ## Show this help.
 	@echo '  ${COLOR_YELLOW}make${COLOR_RESET} ${COLOR_GREEN}<target>${COLOR_RESET}'
 	@echo ''
 	@echo 'Targets:'
-	@$(foreach V,$(sort $(.VARIABLES)), \
-		$(if $(filter-out environment% default automatic,$(origin $V)), \
-			$(if $(filter TOOL_%,$V), \
-				export $V="$($V)";))) \
-	awk 'BEGIN {FS = ":.*?## "} { \
+	@awk 'BEGIN {FS = ":.*?## "} { \
 		if (/^[a-zA-Z_-]+:.*?##.*$$/) {printf "    ${COLOR_YELLOW}%-20s${COLOR_GREEN}%s${COLOR_RESET}\n", $$1, $$2} \
 		else if (/^## .*$$/) {printf "  ${COLOR_CYAN}%s${COLOR_RESET}\n", substr($$1,4)} \
 		}' $(MAKEFILE_LIST) | envsubst
 	@echo ''
-	@echo 'This Makefile requires ${COLOR_CYAN}nix${COLOR_RESET} for development tools. Run ${COLOR_YELLOW}nix develop${COLOR_RESET} to enter the dev shell.'
+	@echo 'This Makefile requires Nix for development tools. Run ${COLOR_YELLOW}direnv allow${COLOR_RESET} once, or ${COLOR_YELLOW}nix develop${COLOR_RESET} before invoking Make.'
 	@echo 'Docker is only needed for ${COLOR_YELLOW}proto-gen${COLOR_RESET} and ${COLOR_YELLOW}release builds${COLOR_RESET}.'
 
 # $(call echo_msg, <emoji>, <action>, <object>, <context>)
