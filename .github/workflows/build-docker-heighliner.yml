@@ -5,6 +5,8 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/build-docker-heighliner.yml'
+      - flake.lock
+      - flake.nix
       - '.heighliner/**'
       - 'app/**'
       - 'cmd/**'
@@ -20,6 +22,8 @@ on:
     branches: [main]
     paths:
       - '.github/workflows/build-docker-heighliner.yml'
+      - flake.lock
+      - flake.nix
       - '.heighliner/**'
       - 'app/**'
       - 'cmd/**'
@@ -47,6 +51,8 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Set up Nix
+        uses: DeterminateSystems/nix-installer-action@ef8a148080ab6020fd15196c2084a2eea5ff2d25 # v22
+
       - name: Build docker image for Heighliner
-        run: |
-          make build-docker
+        run: nix develop --command make build-docker
