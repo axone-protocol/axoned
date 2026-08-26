@@ -31,6 +31,9 @@ The canonical representation for Term is:
 - JSON numbers are represented as numbers;
 - JSON booleans and null are represented as `@(true)`, `@(false)`, and `@(null)`.
 
+Empty JSON text is invalid and raises `syntax_error(json(eof))`. Use the atom
+`null` when decoding a JSON null value.
+
 ## Signature
 
 ```text
@@ -93,4 +96,30 @@ answer:
   - substitutions:
     - variable: Json
       expression: "'{\"foo\":\"bar\",\"ok\":true}'"
+```
+
+### Reject empty JSON text
+
+Empty input is not a JSON value. Use the atom `null` to decode JSON null.
+
+Here are the steps of the scenario:
+
+- **Given** the query:
+
+```  prolog
+consult('/v1/lib/json.pl'),
+json_prolog('', Term).
+```
+
+- **When** the query is run
+- **Then** the answer we get is:
+
+```  yaml
+height: 42
+gas_used: 6624
+answer:
+  has_more: false
+  variables: ["Term"]
+  results:
+  - error: "error(syntax_error(json(eof)),json_prolog/2)"
 ```

@@ -19,6 +19,8 @@ Load this module before using the predicate:
 
 Reads JSON text from Stream and unifies Term with its canonical Prolog representation.
 
+An empty stream is invalid and raises `syntax_error(json(eof))`.
+
 ## Signature
 
 ```text
