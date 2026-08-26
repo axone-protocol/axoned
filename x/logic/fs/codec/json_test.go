@@ -66,9 +66,14 @@ func TestJSONCodecDecode(t *testing.T) {
 			expected: "error(syntax_error(json(malformed_json(35,number)))).\n",
 		},
 		{
+			name:     "empty payload",
+			payload:  nil,
+			expected: expectedJSONEOF,
+		},
+		{
 			name:     "unexpected EOF",
 			payload:  []byte(`{"foo":`),
-			expected: "error(syntax_error(json(eof))).\n",
+			expected: expectedJSONEOF,
 		},
 	}
 

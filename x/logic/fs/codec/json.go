@@ -200,9 +200,6 @@ func marshalJSONNumberToStream(number string, term engine.Term, writer io.Writer
 
 func decodeJSONToTerm(decoder *json.Decoder) (engine.Term, error) {
 	token, err := decoder.Token()
-	if errors.Is(err, io.EOF) {
-		return jsonNull(), nil
-	}
 	if err != nil {
 		return nil, err
 	}

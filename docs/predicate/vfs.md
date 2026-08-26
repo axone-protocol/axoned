@@ -192,6 +192,10 @@ Canonical JSON terms use `json(NameValueList)` for objects, lists for arrays,
 atoms for strings, numbers for JSON numbers, and `@(true)`, `@(false)`, and
 `@(null)` for booleans and null.
 
+Empty decode payloads are rejected with `error(syntax_error(json(eof)))`.
+Callers that previously used an empty payload to represent JSON null must send
+the literal `null` instead.
+
 ### `/v1/dev/codec/text`
 
 The text codec converts between Prolog textual values and byte lists. It backs

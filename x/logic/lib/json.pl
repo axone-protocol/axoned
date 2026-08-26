@@ -18,6 +18,9 @@
 % - JSON strings are represented as atoms;
 % - JSON numbers are represented as numbers;
 % - JSON booleans and null are represented as `@(true)`, `@(false)`, and `@(null)`.
+%
+% Empty JSON text is invalid and raises `syntax_error(json(eof))`. Use the atom
+% `null` when decoding a JSON null value.
 json_prolog(Json, Term) :-
   ( nonvar(Json)
   -> with_context(json_prolog/2, must_be(atom, Json)),
@@ -31,6 +34,8 @@ json_prolog(Json, Term) :-
 %! json_read(+Stream, ?Term) is det.
 %
 % Reads JSON text from Stream and unifies Term with its canonical Prolog representation.
+%
+% An empty stream is invalid and raises `syntax_error(json(eof))`.
 json_read(Stream, Term) :-
   with_context(json_read/2, read_string(Stream, _, Json)),
   with_context(json_read/2, string_bytes(Json, JsonBytes, text)),

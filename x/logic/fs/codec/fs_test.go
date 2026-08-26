@@ -35,6 +35,7 @@ import (
 const (
 	expectedInvalidRequest  = "error(invalid_request).\n"
 	expectedMalformedProlog = "error(syntax_error(prolog(malformed_term))).\n"
+	expectedJSONEOF         = "error(syntax_error(json(eof))).\n"
 	testJSONFooBarTerm      = "json([foo=bar])."
 	testListFooTerm         = "[foo]."
 )
@@ -414,10 +415,10 @@ func TestCodecDeviceFSFunctional(t *testing.T) {
 			expectedOutput: "ok(json([=(foo,'bar baz')])).\n",
 		},
 		{
-			name:           "json decode empty payload as null",
+			name:           "json decode rejects empty payload",
 			codecName:      codecNameJSON,
 			request:        []byte("decode\n"),
-			expectedOutput: "ok(@(null)).\n",
+			expectedOutput: expectedJSONEOF,
 		},
 		{
 			name:           "json decode malformed payload",

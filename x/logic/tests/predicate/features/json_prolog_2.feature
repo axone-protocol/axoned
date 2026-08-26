@@ -66,6 +66,27 @@ Feature: json_prolog/2
         - error: "error(syntax_error(json(malformed_json(1))),json_prolog/2)"
       """
 
+  @great_for_documentation
+  Scenario: Reject empty JSON text
+    Empty input is not a JSON value. Use the atom `null` to decode JSON null.
+
+    Given the query:
+      """ prolog
+      consult('/v1/lib/json.pl'),
+      json_prolog('', Term).
+      """
+    When the query is run
+    Then the answer we get is:
+      """ yaml
+      height: 42
+      gas_used: 6624
+      answer:
+        has_more: false
+        variables: ["Term"]
+        results:
+        - error: "error(syntax_error(json(eof)),json_prolog/2)"
+      """
+
   Scenario: Reject JSON character codes
 
     Given the query:
