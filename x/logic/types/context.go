@@ -12,6 +12,8 @@ const (
 	AuthQueryServiceContextKey = ContextKey("authQueryService")
 	// BankKeeperContextKey is the context key for the bank keeper.
 	BankKeeperContextKey = ContextKey("bankKeeper")
+	// StakingQueryServiceContextKey is the context key for the staking query service.
+	StakingQueryServiceContextKey = ContextKey("stakingQueryService")
 	// IOCoeffContextKey is the context key for the I/O gas coefficient used by devices.
 	IOCoeffContextKey = ContextKey("ioCoeff")
 	// SourceFilesProviderContextKey is the context key for the provider of currently loaded Prolog source files.

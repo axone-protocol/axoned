@@ -32,7 +32,8 @@ func (k Keeper) enhanceContext(ctx context.Context) context.Context {
 		WithValue(types.InterfaceRegistryContextKey, k.interfaceRegistry).
 		WithValue(types.AuthKeeperContextKey, k.authKeeper).
 		WithValue(types.AuthQueryServiceContextKey, k.authQueryService).
-		WithValue(types.BankKeeperContextKey, k.bankKeeper)
+		WithValue(types.BankKeeperContextKey, k.bankKeeper).
+		WithValue(types.StakingQueryServiceContextKey, k.stakingQueryService)
 }
 
 func (k Keeper) execute(

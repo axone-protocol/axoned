@@ -385,19 +385,15 @@ func TestGRPCAsk(t *testing.T) {
 					So(pathFS.Mount("/v1/lib", logicembeddedfs.NewFS(logiclib.Files)), ShouldBeNil)
 					So(pathFS.Mount("/v1/run/header", logicsysheader.NewFS(testCtx.Ctx)), ShouldBeNil)
 
-					logicKeeper := keeper.NewKeeper(
-						encCfg.Codec,
+					logicKeeper := keeper.NewKeeper(encCfg.Codec,
 						encCfg.InterfaceRegistry,
 						key,
 						key,
 						authtypes.NewModuleAddress(govtypes.ModuleName),
 						accountKeeper,
-						authQueryService,
-						bankKeeper,
-						func(_ gocontext.Context) (fs.FS, error) {
+						authQueryService, bankKeeper, nil, func(_ gocontext.Context) (fs.FS, error) {
 							return pathFS, nil
-						},
-					)
+						})
 
 					params := types.DefaultParams()
 					params.Limits.MaxResultCount = tc.maxResultCount
@@ -462,6 +458,7 @@ func TestGRPCAsk(t *testing.T) {
 			key,
 			key,
 			authtypes.NewModuleAddress(govtypes.ModuleName),
+			nil,
 			nil,
 			nil,
 			nil,

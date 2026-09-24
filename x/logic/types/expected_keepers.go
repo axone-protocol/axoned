@@ -5,6 +5,7 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	auth "github.com/cosmos/cosmos-sdk/x/auth/types"
+	staking "github.com/cosmos/cosmos-sdk/x/staking/types"
 )
 
 // AccountKeeper defines the expected account keeper used for simulations (noalias).
@@ -22,6 +23,18 @@ type BankKeeper interface {
 	GetAllBalances(ctx context.Context, addr sdk.AccAddress) sdk.Coins
 	SpendableCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins
 	LockedCoins(ctx context.Context, addr sdk.AccAddress) sdk.Coins
+}
+
+// StakingQueryService defines the staking queries exposed to logic programs.
+type StakingQueryService interface {
+	DelegatorDelegations(
+		ctx context.Context, req *staking.QueryDelegatorDelegationsRequest,
+	) (*staking.QueryDelegatorDelegationsResponse, error)
+	DelegatorUnbondingDelegations(
+		ctx context.Context, req *staking.QueryDelegatorUnbondingDelegationsRequest,
+	) (*staking.QueryDelegatorUnbondingDelegationsResponse, error)
+	Redelegations(ctx context.Context, req *staking.QueryRedelegationsRequest) (*staking.QueryRedelegationsResponse, error)
+	Params(ctx context.Context, req *staking.QueryParamsRequest) (*staking.QueryParamsResponse, error)
 }
 
 // WasmKeeper defines the expected interface needed to request smart contracts.

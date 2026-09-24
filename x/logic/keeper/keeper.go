@@ -23,16 +23,17 @@ type (
 		// the address capable of executing a MsgUpdateParams message. Typically, this should be the x/gov module account.
 		authority sdk.AccAddress
 
-		authKeeper       types.AccountKeeper
-		authQueryService types.AuthQueryService
-		bankKeeper       types.BankKeeper
-		fsProvider       fs.Provider
+		authKeeper          types.AccountKeeper
+		authQueryService    types.AuthQueryService
+		bankKeeper          types.BankKeeper
+		stakingQueryService types.StakingQueryService
+		fsProvider          fs.Provider
 	}
 )
 
 func NewKeeper(cdc codec.BinaryCodec, interfaceRegistry cdctypes.InterfaceRegistry, storeKey, memKey storetypes.StoreKey,
 	authority sdk.AccAddress, authKeeper types.AccountKeeper, authQueryService types.AuthQueryService, bankKeeper types.BankKeeper,
-	fsProvider fs.Provider,
+	stakingQueryService types.StakingQueryService, fsProvider fs.Provider,
 ) *Keeper {
 	// ensure gov module account is set and is not nil
 	if err := sdk.VerifyAddressFormat(authority); err != nil {
@@ -40,15 +41,16 @@ func NewKeeper(cdc codec.BinaryCodec, interfaceRegistry cdctypes.InterfaceRegist
 	}
 
 	return &Keeper{
-		cdc:               cdc,
-		interfaceRegistry: interfaceRegistry,
-		storeKey:          storeKey,
-		memKey:            memKey,
-		authority:         authority,
-		authKeeper:        authKeeper,
-		authQueryService:  authQueryService,
-		bankKeeper:        bankKeeper,
-		fsProvider:        fsProvider,
+		cdc:                 cdc,
+		interfaceRegistry:   interfaceRegistry,
+		storeKey:            storeKey,
+		memKey:              memKey,
+		authority:           authority,
+		authKeeper:          authKeeper,
+		authQueryService:    authQueryService,
+		bankKeeper:          bankKeeper,
+		stakingQueryService: stakingQueryService,
+		fsProvider:          fsProvider,
 	}
 }
 

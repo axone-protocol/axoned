@@ -72,19 +72,15 @@ func TestGRPCParams(t *testing.T) {
 					bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 					fsProvider := logictestutil.NewMockFS(ctrl)
 
-					logicKeeper := keeper.NewKeeper(
-						encCfg.Codec,
+					logicKeeper := keeper.NewKeeper(encCfg.Codec,
 						encCfg.InterfaceRegistry,
 						key,
 						key,
 						authtypes.NewModuleAddress(govtypes.ModuleName),
 						accountKeeper,
-						authQueryService,
-						bankKeeper,
-						func(_ gocontext.Context) (fs.FS, error) {
+						authQueryService, bankKeeper, nil, func(_ gocontext.Context) (fs.FS, error) {
 							return fsProvider, nil
-						},
-					)
+						})
 
 					Convey("and given params to the keeper", func() {
 						err := logicKeeper.SetParams(testCtx.Ctx, tc.params)
@@ -120,6 +116,7 @@ func TestGRPCParams(t *testing.T) {
 			key,
 			key,
 			authtypes.NewModuleAddress(govtypes.ModuleName),
+			nil,
 			nil,
 			nil,
 			nil,

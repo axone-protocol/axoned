@@ -37,6 +37,7 @@ func TestGenesisRoundTripStoredPrograms(t *testing.T) {
 			nil,
 			nil,
 			nil,
+			nil,
 			func(_ context.Context) (fs.FS, error) {
 				return fstest.MapFS{}, nil
 			},

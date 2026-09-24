@@ -81,19 +81,15 @@ func TestUpdateParams(t *testing.T) {
 					bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 					fsProvider := logictestutil.NewMockFS(ctrl)
 
-					logicKeeper := keeper.NewKeeper(
-						encCfg.Codec,
+					logicKeeper := keeper.NewKeeper(encCfg.Codec,
 						encCfg.InterfaceRegistry,
 						key,
 						key,
 						authtypes.NewModuleAddress(govtypes.ModuleName),
 						accountKeeper,
-						authQueryService,
-						bankKeeper,
-						func(_ gocontext.Context) (fs.FS, error) {
+						authQueryService, bankKeeper, nil, func(_ gocontext.Context) (fs.FS, error) {
 							return fsProvider, nil
-						},
-					)
+						})
 
 					msgServer := keeper.NewMsgServerImpl(*logicKeeper)
 
@@ -130,19 +126,15 @@ func TestStoreProgram(t *testing.T) {
 		bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 		fsProvider := logictestutil.NewMockFS(ctrl)
 
-		logicKeeper := keeper.NewKeeper(
-			encCfg.Codec,
+		logicKeeper := keeper.NewKeeper(encCfg.Codec,
 			encCfg.InterfaceRegistry,
 			key,
 			key,
 			authtypes.NewModuleAddress(govtypes.ModuleName),
 			accountKeeper,
-			authQueryService,
-			bankKeeper,
-			func(_ gocontext.Context) (fs.FS, error) {
+			authQueryService, bankKeeper, nil, func(_ gocontext.Context) (fs.FS, error) {
 				return fsProvider, nil
-			},
-		)
+			})
 		if err := logicKeeper.SetParams(testCtx.Ctx, types.DefaultParams()); err != nil {
 			t.Fatal(err)
 		}
@@ -400,19 +392,15 @@ func TestStoreProgramMarshalFailure(t *testing.T) {
 		bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
 		fsProvider := logictestutil.NewMockFS(ctrl)
 
-		logicKeeper := keeper.NewKeeper(
-			failingMarshalCodec{BinaryCodec: encCfg.Codec},
+		logicKeeper := keeper.NewKeeper(failingMarshalCodec{BinaryCodec: encCfg.Codec},
 			encCfg.InterfaceRegistry,
 			key,
 			key,
 			authtypes.NewModuleAddress(govtypes.ModuleName),
 			accountKeeper,
-			authQueryService,
-			bankKeeper,
-			func(_ gocontext.Context) (fs.FS, error) {
+			authQueryService, bankKeeper, nil, func(_ gocontext.Context) (fs.FS, error) {
 				return fsProvider, nil
-			},
-		)
+			})
 		err := logicKeeper.SetParams(testCtx.Ctx, types.DefaultParams())
 		So(err, ShouldBeNil)
 

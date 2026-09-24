@@ -539,6 +539,7 @@ func New(
 		app.AccountKeeper,
 		authkeeper.NewQueryServer(app.AccountKeeper),
 		app.BankKeeper,
+		stakingkeeper.NewQuerier(app.StakingKeeper),
 		app.provideFS,
 	)
 

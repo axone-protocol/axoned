@@ -50,6 +50,7 @@ func TestMigrator_Migrate4to5(t *testing.T) {
 					nil,
 					nil,
 					nil,
+					nil,
 				)
 
 				expectedParams := types.NewParams(

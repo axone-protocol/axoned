@@ -462,6 +462,7 @@ func newQueryKeeperWithStoreKey(t *testing.T) (*keeper.Keeper, sdk.Context, *sto
 		nil,
 		nil,
 		nil,
+		nil,
 	)
 
 	return logicKeeper, testCtx.Ctx, key
