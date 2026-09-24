@@ -62,12 +62,44 @@ type testCase struct {
 	accountKeeper       *logictestutil.MockAccountKeeper
 	authQueryService    *logictestutil.MockAuthQueryService
 	bankKeeper          *logictestutil.MockBankKeeper
-	stakingQueryService *logictestutil.MockStakingQueryService
+	stakingQueryService *featureStakingQueryService
 	wasmKeeper          *logictestutil.MockWasmKeeper
 	publishedLibs       []publishedLib
 	params              types.Params
 	request             types.QueryAskRequest
 	got                 *types.QueryAskResponse
+}
+
+type featureStakingQueryService struct {
+	delegatorAddress string
+	delegations      []stakingtypes.DelegationResponse
+}
+
+func (s *featureStakingQueryService) DelegatorDelegations(
+	_ context.Context, request *stakingtypes.QueryDelegatorDelegationsRequest,
+) (*stakingtypes.QueryDelegatorDelegationsResponse, error) {
+	if request.DelegatorAddr != s.delegatorAddress {
+		return nil, fmt.Errorf("unexpected delegator address %s", request.DelegatorAddr)
+	}
+	return &stakingtypes.QueryDelegatorDelegationsResponse{DelegationResponses: s.delegations}, nil
+}
+
+func (*featureStakingQueryService) DelegatorUnbondingDelegations(
+	context.Context, *stakingtypes.QueryDelegatorUnbondingDelegationsRequest,
+) (*stakingtypes.QueryDelegatorUnbondingDelegationsResponse, error) {
+	return nil, errors.New("unexpected unbonding delegations query")
+}
+
+func (*featureStakingQueryService) Redelegations(
+	context.Context, *stakingtypes.QueryRedelegationsRequest,
+) (*stakingtypes.QueryRedelegationsResponse, error) {
+	return nil, errors.New("unexpected redelegations query")
+}
+
+func (*featureStakingQueryService) Params(
+	context.Context, *stakingtypes.QueryParamsRequest,
+) (*stakingtypes.QueryParamsResponse, error) {
+	return nil, errors.New("unexpected staking params query")
 }
 
 type publishedLib struct {
@@ -274,17 +306,8 @@ func givenTheAccountHasTheFollowingStakingDelegations(ctx context.Context, addre
 	}
 
 	service := testCaseFromContext(ctx).stakingQueryService
-	service.EXPECT().
-		DelegatorDelegations(gomock.Any(), gomock.Any()).
-		DoAndReturn(func(
-			_ context.Context, request *stakingtypes.QueryDelegatorDelegationsRequest,
-		) (*stakingtypes.QueryDelegatorDelegationsResponse, error) {
-			if request.DelegatorAddr != address {
-				return nil, fmt.Errorf("unexpected delegator address %s", request.DelegatorAddr)
-			}
-			return &stakingtypes.QueryDelegatorDelegationsResponse{DelegationResponses: delegations}, nil
-		}).
-		AnyTimes()
+	service.delegatorAddress = address
+	service.delegations = delegations
 
 	return nil
 }
@@ -365,7 +388,7 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 			ctrl := gomock.NewController(t)
 			accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
 			bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
-			stakingQueryService := logictestutil.NewMockStakingQueryService(ctrl)
+			stakingQueryService := &featureStakingQueryService{}
 			wasmKeeper := logictestutil.NewMockWasmKeeper(ctrl)
 
 			header := testCtx.Ctx.BlockHeader()
