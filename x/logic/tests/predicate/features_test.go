@@ -31,6 +31,7 @@ import (
 	moduletestutil "github.com/cosmos/cosmos-sdk/types/module/testutil"
 	authtypes "github.com/cosmos/cosmos-sdk/x/auth/types"
 	govtypes "github.com/cosmos/cosmos-sdk/x/gov/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 
 	"github.com/axone-protocol/axoned/v15/x/logic"
 	logicfs "github.com/axone-protocol/axoned/v15/x/logic/fs"
@@ -57,15 +58,16 @@ func TestFeatures(t *testing.T) {
 }
 
 type testCase struct {
-	ctx              sdktestutil.TestContext
-	accountKeeper    *logictestutil.MockAccountKeeper
-	authQueryService *logictestutil.MockAuthQueryService
-	bankKeeper       *logictestutil.MockBankKeeper
-	wasmKeeper       *logictestutil.MockWasmKeeper
-	publishedLibs    []publishedLib
-	params           types.Params
-	request          types.QueryAskRequest
-	got              *types.QueryAskResponse
+	ctx                 sdktestutil.TestContext
+	accountKeeper       *logictestutil.MockAccountKeeper
+	authQueryService    *logictestutil.MockAuthQueryService
+	bankKeeper          *logictestutil.MockBankKeeper
+	stakingQueryService *logictestutil.MockStakingQueryService
+	wasmKeeper          *logictestutil.MockWasmKeeper
+	publishedLibs       []publishedLib
+	params              types.Params
+	request             types.QueryAskRequest
+	got                 *types.QueryAskResponse
 }
 
 type publishedLib struct {
@@ -247,6 +249,46 @@ func givenTheAccountHasTheFollowingLockedBalances(ctx context.Context, address s
 	return nil
 }
 
+func givenTheAccountHasTheFollowingStakingDelegations(ctx context.Context, address string, table *godog.Table) error {
+	if _, err := sdk.AccAddressFromBech32(address); err != nil {
+		return fmt.Errorf("invalid delegator address %s: %w", address, err)
+	}
+	if len(table.Rows) < 1 {
+		return fmt.Errorf("delegations table must have at least a header row")
+	}
+
+	delegations := make([]stakingtypes.DelegationResponse, 0, len(table.Rows)-1)
+	for i := 1; i < len(table.Rows); i++ {
+		row := table.Rows[i]
+		if len(row.Cells) != 3 {
+			return fmt.Errorf("row %d must contain validator, denom, and amount", i)
+		}
+		amount, ok := math.NewIntFromString(row.Cells[2].Value)
+		if !ok || amount.IsNegative() {
+			return fmt.Errorf("row %d has invalid amount %s", i, row.Cells[2].Value)
+		}
+		delegations = append(delegations, stakingtypes.DelegationResponse{
+			Delegation: stakingtypes.Delegation{ValidatorAddress: row.Cells[0].Value},
+			Balance:    sdk.NewCoin(row.Cells[1].Value, amount),
+		})
+	}
+
+	service := testCaseFromContext(ctx).stakingQueryService
+	service.EXPECT().
+		DelegatorDelegations(gomock.Any(), gomock.Any()).
+		DoAndReturn(func(
+			_ context.Context, request *stakingtypes.QueryDelegatorDelegationsRequest,
+		) (*stakingtypes.QueryDelegatorDelegationsResponse, error) {
+			if request.DelegatorAddr != address {
+				return nil, fmt.Errorf("unexpected delegator address %s", request.DelegatorAddr)
+			}
+			return &stakingtypes.QueryDelegatorDelegationsResponse{DelegationResponses: delegations}, nil
+		}).
+		AnyTimes()
+
+	return nil
+}
+
 func whenTheQueryIsRun(ctx context.Context) error {
 	tc := testCaseFromContext(ctx)
 
@@ -323,6 +365,7 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 			ctrl := gomock.NewController(t)
 			accountKeeper := logictestutil.NewMockAccountKeeper(ctrl)
 			bankKeeper := logictestutil.NewMockBankKeeper(ctrl)
+			stakingQueryService := logictestutil.NewMockStakingQueryService(ctrl)
 			wasmKeeper := logictestutil.NewMockWasmKeeper(ctrl)
 
 			header := testCtx.Ctx.BlockHeader()
@@ -338,11 +381,12 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 			})
 
 			tc := testCase{
-				ctx:           testCtx,
-				accountKeeper: accountKeeper,
-				bankKeeper:    bankKeeper,
-				wasmKeeper:    wasmKeeper,
-				params:        logicKeeperParams(),
+				ctx:                 testCtx,
+				accountKeeper:       accountKeeper,
+				bankKeeper:          bankKeeper,
+				stakingQueryService: stakingQueryService,
+				wasmKeeper:          wasmKeeper,
+				params:              logicKeeperParams(),
 			}
 
 			return testCaseToContext(ctx, tc), nil
@@ -354,6 +398,7 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 		ctx.Given(`the account "([^"]+)" has the following balances:`, givenTheAccountHasTheFollowingBalances)
 		ctx.Given(`the account "([^"]+)" has the following spendable balances:`, givenTheAccountHasTheFollowingSpendableBalances)
 		ctx.Given(`the account "([^"]+)" has the following locked balances:`, givenTheAccountHasTheFollowingLockedBalances)
+		ctx.Given(`the account "([^"]+)" has the following staking delegations:`, givenTheAccountHasTheFollowingStakingDelegations)
 		ctx.Given(`the query:`, givenTheQuery)
 		ctx.Given(`the program:`, givenTheProgram)
 		ctx.Given(`the user Prolog library published by "([^"]+)" is:`, givenTheUserPrologLibraryPublishedBy)
@@ -377,6 +422,7 @@ func newQueryClient(ctx context.Context) (types.QueryServiceClient, error) {
 		tc.accountKeeper,
 		tc.authQueryService,
 		tc.bankKeeper,
+		tc.stakingQueryService,
 		func(ctx context.Context) (fs.FS, error) {
 			return logicfs.NewVFS(
 				ctx,
