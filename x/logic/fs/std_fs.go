@@ -13,6 +13,7 @@ import (
 	logicembeddedfs "github.com/axone-protocol/axoned/v15/x/logic/fs/embedded"
 	logicshare "github.com/axone-protocol/axoned/v15/x/logic/fs/share"
 	logicsource "github.com/axone-protocol/axoned/v15/x/logic/fs/source"
+	logicstaking "github.com/axone-protocol/axoned/v15/x/logic/fs/staking"
 	logicsyscomet "github.com/axone-protocol/axoned/v15/x/logic/fs/sys/comet"
 	logicsysheader "github.com/axone-protocol/axoned/v15/x/logic/fs/sys/header"
 	logicvfs "github.com/axone-protocol/axoned/v15/x/logic/fs/vfs"
@@ -25,15 +26,16 @@ const (
 	v1Root = "/v1"
 
 	// Canonical host namespace paths.
-	libPath         = v1Root + "/lib"
-	runHeaderPath   = v1Root + "/run/header"
-	runCometPath    = v1Root + "/run/comet"
-	runSourcePath   = v1Root + "/run/source"
-	varLibBankPath  = v1Root + "/var/lib/bank"
-	varLibLogicPath = v1Root + "/var/lib/logic/users"
-	devCodecPath    = v1Root + "/dev/codec"
-	devCryptoPath   = v1Root + "/dev/crypto"
-	devWasmPath     = v1Root + "/dev/wasm"
+	libPath           = v1Root + "/lib"
+	runHeaderPath     = v1Root + "/run/header"
+	runCometPath      = v1Root + "/run/comet"
+	runSourcePath     = v1Root + "/run/source"
+	varLibBankPath    = v1Root + "/var/lib/bank"
+	varLibStakingPath = v1Root + "/var/lib/staking"
+	varLibLogicPath   = v1Root + "/var/lib/logic/users"
+	devCodecPath      = v1Root + "/dev/codec"
+	devCryptoPath     = v1Root + "/dev/crypto"
+	devWasmPath       = v1Root + "/dev/wasm"
 )
 
 // Mount defines a filesystem mounted at an absolute path in the logic VFS.
@@ -77,12 +79,13 @@ func StandardMounts(ctx goctx.Context, wasmKeeper logictypes.WasmKeeper, program
 	cometFS := logicsyscomet.NewFS(ctx)
 	sourceFS := logicsource.NewFS(ctx)
 	bankFS := logicbank.NewFS(ctx)
+	stakingFS := logicstaking.NewFS(ctx)
 	codecFS := logiccodec.NewFS(ctx)
 	cryptoFS := logiccrypto.NewFS(ctx)
 	wasmFS := logicwasm.NewFS(ctx, wasmKeeper)
 	shareFS := logicshare.NewFS(ctx, programKeeper)
 
-	mounts := make([]Mount, 0, 9)
+	mounts := make([]Mount, 0, 10)
 	mounts = append(
 		mounts,
 		Mount{Path: libPath, FS: libFS},
@@ -90,6 +93,7 @@ func StandardMounts(ctx goctx.Context, wasmKeeper logictypes.WasmKeeper, program
 		Mount{Path: runCometPath, FS: cometFS},
 		Mount{Path: runSourcePath, FS: sourceFS},
 		Mount{Path: varLibBankPath, FS: bankFS},
+		Mount{Path: varLibStakingPath, FS: stakingFS},
 		Mount{Path: devCodecPath, FS: codecFS},
 		Mount{Path: devCryptoPath, FS: cryptoFS},
 		Mount{Path: devWasmPath, FS: wasmFS},

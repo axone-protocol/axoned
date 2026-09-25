@@ -49,12 +49,13 @@ func TestStandardMountsLayout(t *testing.T) {
 			paths = append(paths, mount.Path)
 		}
 
-		So(paths, ShouldHaveLength, 9)
+		So(paths, ShouldHaveLength, 10)
 		So(slices.Contains(paths, libPath), ShouldBeTrue)
 		So(slices.Contains(paths, runHeaderPath), ShouldBeTrue)
 		So(slices.Contains(paths, runCometPath), ShouldBeTrue)
 		So(slices.Contains(paths, runSourcePath), ShouldBeTrue)
 		So(slices.Contains(paths, varLibBankPath), ShouldBeTrue)
+		So(slices.Contains(paths, varLibStakingPath), ShouldBeTrue)
 		So(slices.Contains(paths, varLibLogicPath), ShouldBeTrue)
 		So(slices.Contains(paths, devCodecPath), ShouldBeTrue)
 		So(slices.Contains(paths, devCryptoPath), ShouldBeTrue)

@@ -11,6 +11,9 @@ import (
 
 func TestMaxWasmSizeParsing(t *testing.T) {
 	const defaultMaxWasmSize = 42
+	originalWasmMaxSize := wasmtypes.MaxWasmSize
+	t.Cleanup(func() { wasmtypes.MaxWasmSize = originalWasmMaxSize })
+	originalMaxWasmSize := MaxWasmSize
 
 	Convey("Given a test cases", t, func() {
 		cases := []struct {
@@ -41,10 +44,21 @@ func TestMaxWasmSizeParsing(t *testing.T) {
 					})
 
 					Reset(func() {
-						wasmtypes.MaxWasmSize = defaultMaxWasmSize
+						MaxWasmSize = originalMaxWasmSize
+						wasmtypes.MaxWasmSize = originalWasmMaxSize
 					})
 				})
 			}
 		})
+	})
+}
+
+func TestMakeEncodingConfigConstructsApp(t *testing.T) {
+	Convey("Given the test encoding configuration", t, func() {
+		encodingConfig := MakeEncodingConfig(t)
+
+		So(encodingConfig.Codec, ShouldNotBeNil)
+		So(encodingConfig.InterfaceRegistry, ShouldNotBeNil)
+		So(encodingConfig.TxConfig, ShouldNotBeNil)
 	})
 }

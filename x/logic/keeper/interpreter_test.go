@@ -39,6 +39,7 @@ func TestNewInterpreterBootstrapIsFree(t *testing.T) {
 			nil,
 			nil,
 			nil,
+			nil,
 			func(context.Context) (fs.FS, error) {
 				return fstest.MapFS{}, nil
 			},
@@ -141,6 +142,7 @@ func TestNewInterpreterConsultsPublishedUserProgram(t *testing.T) {
 			key,
 			key,
 			authtypes.NewModuleAddress(govtypes.ModuleName),
+			nil,
 			nil,
 			nil,
 			nil,

@@ -133,6 +133,23 @@ state. `<address>` must be a valid account Bech32 address.
 Amounts are integers when they fit in `int64`; larger amounts are atoms
 preserving the full decimal value.
 
+## `/v1/var/lib/staking/<delegator>`
+
+The `/v1/var/lib/staking/<delegator>` paths expose staking-module positions for
+an account. `<delegator>` must be a valid account Bech32 address.
+
+| Field | Value |
+| --- | --- |
+| Paths | `/v1/var/lib/staking/<delegator>/delegations/@`, `/v1/var/lib/staking/<delegator>/unbonding_delegations/@`, `/v1/var/lib/staking/<delegator>/redelegations/@` |
+| Open mode | `read` |
+| Stream type | Text |
+| Response | A stream of Prolog terms, one term per staking position |
+| Recommended predicates | `staking_delegations/2`, `staking_unbonding_delegations/2`, `staking_redelegations/2`, and `staking_positions/2` from `/v1/lib/staking.pl` |
+
+The capability covers active delegations, unbonding delegations, and
+redelegations. Delegation rewards are distribution-module state and are not
+included.
+
 ## `/v1/var/lib/logic/users/<publisher>/programs/<program_id>.pl`
 
 Published logic programs are exposed as Prolog source files. This lets a program
