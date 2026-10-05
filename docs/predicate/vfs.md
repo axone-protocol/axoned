@@ -144,11 +144,35 @@ an account. `<delegator>` must be a valid account Bech32 address.
 | Open mode | `read` |
 | Stream type | Text |
 | Response | A stream of Prolog terms, one term per staking position |
-| Recommended predicates | `staking_delegations/2`, `staking_unbonding_delegations/2`, `staking_redelegations/2`, and `staking_positions/2` from `/v1/lib/staking.pl` |
+| Recommended predicates | `staking_delegations/2`, `staking_unbonding_delegations/2`, `staking_redelegations/2`, `staking_delegations_to_bonded_validators/2`, and `staking_bonded_delegated_balance/2` from `/v1/lib/staking.pl` |
 
-The capability covers active delegations, unbonding delegations, and
-redelegations. Delegation rewards are distribution-module state and are not
-included.
+Delegations include all validator bond statuses. They do not imply that the
+validator belongs to the active staking validator set. The bonded predicates
+join delegations with the `bonded` validator view below; they do not add a jailed
+filter. Unbonding and redelegation entries are lifecycle information, not extra
+delegated balances to add to this total. Rewards belong to the distribution
+module and are not included.
+
+Coin amounts use `coin(Denom, Amount)`. Amounts are integers when they fit in
+`int64`, otherwise decimal atoms. The bonded balance predicate preserves exact
+precision, rejects mismatching denominations, and returns `coin(BondDenom, 0)`
+for an empty eligible collection.
+
+## `/v1/var/lib/staking/validators/<status>/@`
+
+This read-only text stream exposes validators with the requested Cosmos bond
+status. `<status>` is `bonded`, `unbonding`, or `unbonded`. The query is paginated
+and each term is `validator{operator: Operator, status: Status}`, where Operator
+is the validator operator address atom. Jailed status is not a separate filter.
+
+Use `staking_validators/2` to select a bond status, or
+`staking_bonded_validators/1` for `BOND_STATUS_BONDED`.
+
+## `/v1/var/lib/staking/params/@`
+
+This read-only text snapshot exposes `staking_params{bond_denom: Denom}`.
+`staking_bonded_delegated_balance/2` uses it to give zero balances their staking
+denomination and to prevent addition across denominations.
 
 ## `/v1/var/lib/logic/users/<publisher>/programs/<program_id>.pl`
 

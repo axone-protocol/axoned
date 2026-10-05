@@ -1,5 +1,5 @@
 ---
-sidebar_position: 1
+sidebar_position: 3
 ---
 [//]: # (This file is auto-generated. Please do not modify it yourself.)
 
@@ -17,7 +17,7 @@ Load this module before using the predicate:
 
 ## Description
 
-Unifies Delegations with the active staking delegations of Delegator.
+Unifies Delegations with all staking delegations of Delegator, regardless of validator status.
 Delegator must be an AXONE account address atom in Bech32 format.
 
 Each item has the shape:
@@ -37,7 +37,7 @@ staking_delegations(+Delegator, -Delegations) is det
 
 ## Examples
 
-### Query active delegations of an account
+### Query all delegations of an account
 
 Here are the steps of the scenario:
 
@@ -54,6 +54,13 @@ Here are the steps of the scenario:
 | validator | denom |
 | axonevaloper1validator | uaxone |
 
+- **And** the staking validators:
+
+| key | value |
+| --- | ----- |
+| operator | status |
+| axonevaloper1validator | unbonded |
+
 - **Given** the query:
 
 ```  prolog
@@ -61,11 +68,9 @@ staking_delegations('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', Delegations)
 ```
 
 - **When** the query is run
-- **Then** the answer we get is:
+- **Then** the logical answer we get is:
 
 ```  yaml
-height: 42
-gas_used: 9022
 answer:
   has_more: false
   variables: ["Delegations"]
