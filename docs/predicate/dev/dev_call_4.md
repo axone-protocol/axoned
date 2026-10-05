@@ -89,6 +89,23 @@ This scenario demonstrates the typical successful usage of dev_call/4:
 - The read goal commits the request and reads the response
 - The device echoes back the exact bytes sent
 
+Here is the feature setup:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/dev.pl').
+
+echo(Bytes, Echoed) :-
+  dev_call('/v1/dev/echo', binary, write_bytes(Bytes), read_bytes(Echoed)).
+
+write_bytes(Stream, Bytes) :-
+  dev_write_bytes(Stream, Bytes).
+
+read_bytes(Stream, Bytes) :-
+  dev_read_bytes(Stream, Bytes).
+```
+
 Here are the steps of the scenario:
 
 - **Given** the query:
@@ -116,6 +133,23 @@ answer:
 
 This scenario illustrates the half-duplex protocol requirement:
 the device expects at least one write before the first read commits.
+
+Here is the feature setup:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/dev.pl').
+
+echo(Bytes, Echoed) :-
+  dev_call('/v1/dev/echo', binary, write_bytes(Bytes), read_bytes(Echoed)).
+
+write_bytes(Stream, Bytes) :-
+  dev_write_bytes(Stream, Bytes).
+
+read_bytes(Stream, Bytes) :-
+  dev_read_bytes(Stream, Bytes).
+```
 
 Here are the steps of the scenario:
 
@@ -159,6 +193,23 @@ answer:
 
 This scenario demonstrates that once the first read commits the request,
 the device transitions to read-only mode and rejects further writes.
+
+Here is the feature setup:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/dev.pl').
+
+echo(Bytes, Echoed) :-
+  dev_call('/v1/dev/echo', binary, write_bytes(Bytes), read_bytes(Echoed)).
+
+write_bytes(Stream, Bytes) :-
+  dev_write_bytes(Stream, Bytes).
+
+read_bytes(Stream, Bytes) :-
+  dev_read_bytes(Stream, Bytes).
+```
 
 Here are the steps of the scenario:
 
@@ -204,6 +255,23 @@ answer:
 
 This scenario shows that after commit, multiple read operations
 can progressively consume the response stream until EOF.
+
+Here is the feature setup:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/dev.pl').
+
+echo(Bytes, Echoed) :-
+  dev_call('/v1/dev/echo', binary, write_bytes(Bytes), read_bytes(Echoed)).
+
+write_bytes(Stream, Bytes) :-
+  dev_write_bytes(Stream, Bytes).
+
+read_bytes(Stream, Bytes) :-
+  dev_read_bytes(Stream, Bytes).
+```
 
 Here are the steps of the scenario:
 

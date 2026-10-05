@@ -14,6 +14,7 @@ Feature: staking_delegations_to_bonded_validators/2
       | axonevaloper1unbonding   | unbonding | false  |
       | axonevaloper1unbonded    | unbonded  | false  |
 
+  @great_for_documentation
   Scenario: Keep balances and order for bonded validators only
     Given the account "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa" has the following staking delegations:
       | validator               | denom  | amount |

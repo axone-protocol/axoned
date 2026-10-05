@@ -29,3 +29,55 @@ Unbondings, redelegation entries, rewards, and bank balances are excluded.
 ```text
 staking_bonded_delegated_balance(+Delegator, -Balance) is det
 ```
+
+## Examples
+
+### Sum bonded delegations including a jailed bonded validator
+
+Here is the feature setup:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/staking.pl').
+```
+
+- **And** the staking bond denomination is "ustake"
+- **And** the staking validators:
+
+| operator | status | jailed |
+| --- | --- | --- |
+| axonevaloper1bonded | bonded | false |
+| axonevaloper1jailed | bonded | true |
+| axonevaloper1unbonding | unbonding | false |
+| axonevaloper1unbonded | unbonded | false |
+
+Here are the steps of the scenario:
+
+- **Given** the account "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa" has the following staking delegations:
+
+| validator | denom | amount |
+| --- | --- | --- |
+| axonevaloper1unbonding | ustake | 900 |
+| axonevaloper1jailed | ustake | 75 |
+| axonevaloper1unbonded | ustake | 800 |
+| axonevaloper1bonded | ustake | 25 |
+
+- **And** the query:
+
+```  prolog
+staking_bonded_delegated_balance('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', Balance).
+```
+
+- **When** the query is run
+- **Then** the logical answer we get is:
+
+```  yaml
+answer:
+  has_more: false
+  variables: [Balance]
+  results:
+  - substitutions:
+    - variable: Balance
+      expression: "coin(ustake,100)"
+```

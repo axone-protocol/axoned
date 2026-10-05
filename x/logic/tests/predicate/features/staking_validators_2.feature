@@ -13,7 +13,25 @@ Feature: staking_validators/2
       | axonevaloper1unbonding   | unbonding | false  |
       | axonevaloper1unbonded    | unbonded  | false  |
 
-  Scenario Outline: Select validators with the requested bond status
+  @great_for_documentation
+  Scenario: Select bonded validators including jailed validators
+    Given the query:
+      """ prolog
+      staking_validators(bonded, Validators).
+      """
+    When the query is run
+    Then the logical answer we get is:
+      """ yaml
+      answer:
+        has_more: false
+        variables: [Validators]
+        results:
+        - substitutions:
+          - variable: Validators
+            expression: "[validator{operator:axonevaloper1bonded,status:bonded},validator{operator:axonevaloper1jailed,status:bonded}]"
+      """
+
+  Scenario Outline: Select non-bonded validators with the requested bond status
     Given the query:
       """ prolog
       staking_validators(<Status>, Validators).
@@ -31,7 +49,6 @@ Feature: staking_validators/2
       """
     Examples:
       | Status    | Validators                                                                                                        |
-      | bonded    | [validator{operator:axonevaloper1bonded,status:bonded},validator{operator:axonevaloper1jailed,status:bonded}]         |
       | unbonding | [validator{operator:axonevaloper1unbonding,status:unbonding}]                                                       |
       | unbonded  | [validator{operator:axonevaloper1unbonded,status:unbonded}]                                                         |
 

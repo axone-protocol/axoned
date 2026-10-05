@@ -49,17 +49,15 @@ Here are the steps of the scenario:
 
 - **And** the account "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa" has the following staking delegations:
 
-| key | value |
-| --- | ----- |
-| validator | denom |
-| axonevaloper1validator | uaxone |
+| validator | denom | amount |
+| --- | --- | --- |
+| axonevaloper1validator | uaxone | 1250000 |
 
 - **And** the staking validators:
 
-| key | value |
-| --- | ----- |
-| operator | status |
-| axonevaloper1validator | unbonded |
+| operator | status | jailed |
+| --- | --- | --- |
+| axonevaloper1validator | unbonded | false |
 
 - **Given** the query:
 

@@ -27,3 +27,45 @@ bonded means membership in the active staking validator set, not an unjailed gua
 ```text
 staking_validators(+Status, -Validators) is det
 ```
+
+## Examples
+
+### Select bonded validators including jailed validators
+
+Here is the feature setup:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/staking.pl').
+```
+
+- **And** the staking validators:
+
+| operator | status | jailed |
+| --- | --- | --- |
+| axonevaloper1bonded | bonded | false |
+| axonevaloper1jailed | bonded | true |
+| axonevaloper1unbonding | unbonding | false |
+| axonevaloper1unbonded | unbonded | false |
+
+Here are the steps of the scenario:
+
+- **Given** the query:
+
+```  prolog
+staking_validators(bonded, Validators).
+```
+
+- **When** the query is run
+- **Then** the logical answer we get is:
+
+```  yaml
+answer:
+  has_more: false
+  variables: [Validators]
+  results:
+  - substitutions:
+    - variable: Validators
+      expression: "[validator{operator:axonevaloper1bonded,status:bonded},validator{operator:axonevaloper1jailed,status:bonded}]"
+```

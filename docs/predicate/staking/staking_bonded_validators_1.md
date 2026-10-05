@@ -25,3 +25,44 @@ whose bond status is still bonded. This is staking_validators(bonded, Validators
 ```text
 staking_bonded_validators(-Validators) is det
 ```
+
+## Examples
+
+### Include jailed validators if their bond status is still bonded
+
+Here is the feature setup:
+
+- **Given** the program:
+
+```  prolog
+:- consult('/v1/lib/staking.pl').
+```
+
+Here are the steps of the scenario:
+
+- **Given** the staking validators:
+
+| operator | status | jailed |
+| --- | --- | --- |
+| axonevaloper1bonded | bonded | false |
+| axonevaloper1jailed | bonded | true |
+| axonevaloper1unbonding | unbonding | false |
+
+- **And** the query:
+
+```  prolog
+staking_bonded_validators(Validators).
+```
+
+- **When** the query is run
+- **Then** the logical answer we get is:
+
+```  yaml
+answer:
+  has_more: false
+  variables: [Validators]
+  results:
+  - substitutions:
+    - variable: Validators
+      expression: "[validator{operator:axonevaloper1bonded,status:bonded},validator{operator:axonevaloper1jailed,status:bonded}]"
+```

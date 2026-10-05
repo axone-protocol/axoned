@@ -14,6 +14,7 @@ Feature: staking_bonded_delegated_balance/2
       | axonevaloper1unbonding   | unbonding | false  |
       | axonevaloper1unbonded    | unbonded  | false  |
 
+  @great_for_documentation
   Scenario: Sum bonded delegations including a jailed bonded validator
     Given the account "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa" has the following staking delegations:
       | validator               | denom  | amount |

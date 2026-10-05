@@ -7,6 +7,7 @@ Feature: staking_bonded_validators/1
       :- consult('/v1/lib/staking.pl').
       """
 
+  @great_for_documentation
   Scenario: Include jailed validators if their bond status is still bonded
     Given the staking validators:
       | operator                | status    | jailed |
