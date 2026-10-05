@@ -1,8 +1,8 @@
 Feature: staking_delegations/2
-  Query active staking delegations of an account.
+  Query all staking delegations of an account, regardless of validator bond status.
 
   @great_for_documentation
-  Scenario: Query active delegations of an account
+  Scenario: Query all delegations of an account
     Given the program:
       """ prolog
       :- consult('/v1/lib/staking.pl').
@@ -10,15 +10,16 @@ Feature: staking_delegations/2
     And the account "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa" has the following staking delegations:
       | validator             | denom  | amount  |
       | axonevaloper1validator | uaxone | 1250000 |
+    And the staking validators:
+      | operator              | status   | jailed |
+      | axonevaloper1validator | unbonded | false  |
     Given the query:
       """ prolog
       staking_delegations('axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa', Delegations).
       """
     When the query is run
-    Then the answer we get is:
+    Then the logical answer we get is:
       """ yaml
-      height: 42
-      gas_used: 9022
       answer:
         has_more: false
         variables: ["Delegations"]
@@ -38,10 +39,8 @@ Feature: staking_delegations/2
       staking_delegations(42, _).
       """
     When the query is run
-    Then the answer we get is:
+    Then the logical answer we get is:
       """ yaml
-      height: 42
-      gas_used: 4445
       answer:
         has_more: false
         results:

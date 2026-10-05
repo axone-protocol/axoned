@@ -73,6 +73,8 @@ type testCase struct {
 type featureStakingQueryService struct {
 	delegatorAddress string
 	delegations      []stakingtypes.DelegationResponse
+	validators       []stakingtypes.Validator
+	bondDenom        string
 }
 
 func (s *featureStakingQueryService) DelegatorDelegations(
@@ -96,10 +98,25 @@ func (*featureStakingQueryService) Redelegations(
 	return nil, errors.New("unexpected redelegations query")
 }
 
-func (*featureStakingQueryService) Params(
+func (s *featureStakingQueryService) Params(
 	context.Context, *stakingtypes.QueryParamsRequest,
 ) (*stakingtypes.QueryParamsResponse, error) {
-	return nil, errors.New("unexpected staking params query")
+	if s.bondDenom == "" {
+		return nil, errors.New("unexpected staking params query")
+	}
+	return &stakingtypes.QueryParamsResponse{Params: stakingtypes.Params{BondDenom: s.bondDenom}}, nil
+}
+
+func (s *featureStakingQueryService) Validators(
+	_ context.Context, request *stakingtypes.QueryValidatorsRequest,
+) (*stakingtypes.QueryValidatorsResponse, error) {
+	var validators []stakingtypes.Validator
+	for _, validator := range s.validators {
+		if validator.Status.String() == request.Status {
+			validators = append(validators, validator)
+		}
+	}
+	return &stakingtypes.QueryValidatorsResponse{Validators: validators}, nil
 }
 
 type publishedLib struct {
@@ -312,6 +329,38 @@ func givenTheAccountHasTheFollowingStakingDelegations(ctx context.Context, addre
 	return nil
 }
 
+func givenTheStakingValidators(ctx context.Context, table *godog.Table) error {
+	service := testCaseFromContext(ctx).stakingQueryService
+	for i, row := range table.Rows[1:] {
+		if len(row.Cells) != 3 {
+			return fmt.Errorf("validator row %d must contain operator, status, and jailed", i)
+		}
+		status, ok := stakingtypes.BondStatus_value["BOND_STATUS_"+strings.ToUpper(row.Cells[1].Value)]
+		if !ok || status == int32(stakingtypes.Unspecified) {
+			return fmt.Errorf("invalid validator status %s", row.Cells[1].Value)
+		}
+		service.validators = append(service.validators, stakingtypes.Validator{
+			OperatorAddress: row.Cells[0].Value,
+			Status:          stakingtypes.BondStatus(status),
+			Jailed:          row.Cells[2].Value == "true",
+		})
+	}
+	return nil
+}
+
+func givenTheStakingBondDenom(ctx context.Context, denom string) error {
+	testCaseFromContext(ctx).stakingQueryService.bondDenom = denom
+	return nil
+}
+
+func theLogicalAnswerWeGetIs(ctx context.Context, want *godog.DocString) error {
+	wantAnswer := &types.QueryAskResponse{}
+	if err := parseDocStringYaml(want, wantAnswer); err != nil {
+		return err
+	}
+	return assert(testCaseFromContext(ctx).got.Answer, ShouldResemble, wantAnswer.Answer)
+}
+
 func whenTheQueryIsRun(ctx context.Context) error {
 	tc := testCaseFromContext(ctx)
 
@@ -422,12 +471,15 @@ func initializeScenario(t *testing.T) func(ctx *godog.ScenarioContext) {
 		ctx.Given(`the account "([^"]+)" has the following spendable balances:`, givenTheAccountHasTheFollowingSpendableBalances)
 		ctx.Given(`the account "([^"]+)" has the following locked balances:`, givenTheAccountHasTheFollowingLockedBalances)
 		ctx.Given(`the account "([^"]+)" has the following staking delegations:`, givenTheAccountHasTheFollowingStakingDelegations)
+		ctx.Given(`the staking validators:`, givenTheStakingValidators)
+		ctx.Given(`the staking bond denomination is "([^"]+)"`, givenTheStakingBondDenom)
 		ctx.Given(`the query:`, givenTheQuery)
 		ctx.Given(`the program:`, givenTheProgram)
 		ctx.Given(`the user Prolog library published by "([^"]+)" is:`, givenTheUserPrologLibraryPublishedBy)
 		ctx.When(`^the query is run$`, whenTheQueryIsRun)
 		ctx.When(`^the query is run \(limited to (\d+) solutions\)$`, whenTheQueryIsRunLimitedToNSolutions)
 		ctx.Then(`the answer we get is:`, theAnswerWeGetIs)
+		ctx.Then(`the logical answer we get is:`, theLogicalAnswerWeGetIs)
 	}
 }
 
