@@ -89,7 +89,7 @@
               pkgs.docker-client
               pkgs.git
               pkgs.gnumake
-              pkgs.go_1_25
+              pkgs.go_1_26
               pkgs.gofumpt
               pkgs.golangci-lint
               pkgs.gh
