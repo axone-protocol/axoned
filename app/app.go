@@ -545,8 +545,10 @@ func New(
 	var noAuthzModule ibcporttypes.IBCModule
 	icaStackBuilder := ibcporttypes.NewIBCStackBuilder(app.IBCKeeper.ChannelKeeper)
 	icaStackBuilder.Base(
-		icacontroller.NewIBCMiddlewareWithAuth(noAuthzModule, app.ICAControllerKeeper)).Next(
-		icacontroller.NewIBCMiddlewareWithAuth(icaControllerStack, app.ICAControllerKeeper)).Next(
+		icacontroller.NewIBCMiddlewareWithAuth(noAuthzModule, app.ICAControllerKeeper),
+	).Next(
+		icacontroller.NewIBCMiddlewareWithAuth(icaControllerStack, app.ICAControllerKeeper),
+	).Next(
 		ibccallbacks.NewIBCMiddleware(wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas),
 	)
 	icaControllerStack = icaStackBuilder.Build()
@@ -563,7 +565,8 @@ func New(
 	var transferStack ibcporttypes.IBCModule
 	transferStackBuilder := ibcporttypes.NewIBCStackBuilder(app.IBCKeeper.ChannelKeeper)
 	transferStackBuilder.Base(
-		transfer.NewIBCModule(app.TransferKeeper)).Next(
+		transfer.NewIBCModule(app.TransferKeeper),
+	).Next(
 		ibccallbacks.NewIBCMiddleware(wasmStackIBCHandler, wasm.DefaultMaxIBCCallbackGas),
 	)
 	transferStack = transferStackBuilder.Build()
