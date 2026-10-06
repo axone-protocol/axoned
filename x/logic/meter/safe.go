@@ -3,7 +3,7 @@ package meter
 import (
 	"sync"
 
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 )
 
 // safeMeterDecorater is a wrapper around storetypes.GasMeter that provides go-routine-safe access to the underlying gas meter.

@@ -7,8 +7,8 @@ package testutil
 import (
 	reflect "reflect"
 
-	signing "cosmossdk.io/x/tx/signing"
 	types "github.com/cosmos/cosmos-sdk/codec/types"
+	signing "github.com/cosmos/cosmos-sdk/x/tx/signing"
 	proto "github.com/cosmos/gogoproto/proto"
 	gomock "go.uber.org/mock/gomock"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

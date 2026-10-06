@@ -17,9 +17,8 @@ import (
 
 	corecomet "cosmossdk.io/core/comet"
 	coreheader "cosmossdk.io/core/header"
-	"cosmossdk.io/log"
-	"cosmossdk.io/store"
-	"cosmossdk.io/store/metrics"
+	"cosmossdk.io/log/v2"
+	"github.com/cosmos/cosmos-sdk/store/v2"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -140,7 +139,7 @@ func TestSysCometVFSErrors(t *testing.T) {
 
 func newTestContext(headerInfo coreheader.Info, cometInfo corecomet.BlockInfo) sdk.Context {
 	db := dbm.NewMemDB()
-	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
+	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger())
 
 	ctx := sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger()).WithHeaderInfo(headerInfo)
 	if cometInfo != nil {

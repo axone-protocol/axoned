@@ -18,9 +18,8 @@ import (
 	tmproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	coreheader "cosmossdk.io/core/header"
-	"cosmossdk.io/log"
-	"cosmossdk.io/store"
-	"cosmossdk.io/store/metrics"
+	"cosmossdk.io/log/v2"
+	"github.com/cosmos/cosmos-sdk/store/v2"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -368,7 +367,7 @@ func readAllFromCryptoDevice(t *testing.T, ofs fsiface.OpenFileFS, path string, 
 }
 
 func newSDKContext() sdk.Context {
-	stateStore := store.NewCommitMultiStore(dbm.NewMemDB(), log.NewNopLogger(), metrics.NewNoOpMetrics())
+	stateStore := store.NewCommitMultiStore(dbm.NewMemDB(), log.NewNopLogger())
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
 	return ctx.WithHeaderInfo(coreheader.Info{
 		Height: 42,

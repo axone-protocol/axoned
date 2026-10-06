@@ -2,7 +2,6 @@ package cmd
 
 import (
 	"errors"
-	"io"
 	"os"
 	"strings"
 
@@ -17,7 +16,7 @@ import (
 
 	cmtcfg "github.com/cometbft/cometbft/config"
 
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	confixcmd "cosmossdk.io/tools/confix/cmd"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -272,13 +271,12 @@ func overwriteFlagDefaults(c *cobra.Command, defaults map[string]string) {
 func newApp(
 	logger log.Logger,
 	db dbm.DB,
-	traceStore io.Writer,
 	appOpts servertypes.AppOptions,
 ) servertypes.Application {
 	baseappOptions := server.DefaultBaseappOptions(appOpts)
 
 	return app.New(
-		logger, db, traceStore, true,
+		logger, db, nil, true,
 		appOpts,
 		baseappOptions...,
 	)
@@ -288,7 +286,6 @@ func newApp(
 func appExport(
 	logger log.Logger,
 	db dbm.DB,
-	traceStore io.Writer,
 	height int64,
 	forZeroHeight bool,
 	jailAllowedAddrs []string,
@@ -314,7 +311,7 @@ func appExport(
 	axoneApp = app.New(
 		logger,
 		db,
-		traceStore,
+		nil,
 		height == -1,
 		appOpts,
 	)

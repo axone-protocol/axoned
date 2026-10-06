@@ -13,10 +13,9 @@ import (
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	errorsmod "cosmossdk.io/errors"
-	"cosmossdk.io/log"
-	"cosmossdk.io/store"
-	"cosmossdk.io/store/metrics"
-	storetypes "cosmossdk.io/store/types"
+	"cosmossdk.io/log/v2"
+	"github.com/cosmos/cosmos-sdk/store/v2"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
@@ -148,7 +147,7 @@ func TestMeterDescriptor(t *testing.T) {
 
 func newSDKContextWithGasMeter(gasMeter storetypes.GasMeter) sdk.Context {
 	db := dbm.NewMemDB()
-	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
+	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger())
 
 	return sdk.NewContext(stateStore, cmtproto.Header{}, false, log.NewNopLogger()).WithGasMeter(gasMeter)
 }

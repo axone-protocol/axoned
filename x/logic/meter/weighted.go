@@ -3,7 +3,7 @@ package meter
 import (
 	"math"
 
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 )
 
 // weightedMeterDecorator is decorator that wraps a gas meter and adds a weight multiplier to the consumed gas.

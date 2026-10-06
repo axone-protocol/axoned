@@ -6,9 +6,9 @@ import (
 
 	"github.com/samber/lo"
 
-	"cosmossdk.io/store/prefix"
-	storetypes "cosmossdk.io/store/types"
-	upgradetypes "cosmossdk.io/x/upgrade/types"
+	"github.com/cosmos/cosmos-sdk/store/v2/prefix"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
+	upgradetypes "github.com/cosmos/cosmos-sdk/x/upgrade/types"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/codec/types"
@@ -22,6 +22,7 @@ var upgrades = []string{
 	"v11.0.0",
 	"v13.0.0",
 	"v15.0.0",
+	"v16.0.0",
 }
 
 // registerUpgradeHandlers registers the chain upgrade handlers.
