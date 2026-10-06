@@ -4,15 +4,15 @@ FROM golang:1.26.5-alpine3.23@sha256:622e56dbc11a8cfe87cafa2331e9a201877271cbff9
 WORKDIR /src
 
 # CosmWasm: see https://github.com/CosmWasm/wasmvm/releases
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v3.0.2/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
-ADD https://github.com/CosmWasm/wasmvm/releases/download/v3.0.2/libwasmvm_muslc.x86_64.a /lib/libwasmvm_muslc.x86_64.a
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v3.0.8/libwasmvm_muslc.aarch64.a /lib/libwasmvm_muslc.aarch64.a
+ADD https://github.com/CosmWasm/wasmvm/releases/download/v3.0.8/libwasmvm_muslc.x86_64.a /lib/libwasmvm_muslc.x86_64.a
 
 SHELL ["/bin/ash", "-o", "pipefail", "-c"]
 # hadolint ignore=DL3018
 RUN \
-    apk add --no-cache ca-certificates=20251003-r0 build-base=0.5-r3 git=2.52.0-r0 linux-headers=6.16.12-r0 \
- && sha256sum /lib/libwasmvm_muslc.aarch64.a | grep b9df5056ab9f61d3f9b944060b44e893d7ade7dad6ff134b36276be0f9a4185a \
- && sha256sum /lib/libwasmvm_muslc.x86_64.a | grep b249396cf884b207f49f46bcf5b8d1fd73b8618eebbe35afb8bf60a8bb24f30a
+    apk add --no-cache ca-certificates=20260909-r0 build-base=0.5-r3 git=2.52.0-r0 linux-headers=6.16.12-r0 \
+ && sha256sum /lib/libwasmvm_muslc.aarch64.a | grep c73a0d5d340e35188e138584ddd6662a160902adef1b08b209e38d16b43a4c28 \
+ && sha256sum /lib/libwasmvm_muslc.x86_64.a | grep b2299c85d49faccf3dcbb84984f30f55e8870111df98c10f017f86204d007470
 
 COPY . /src/
 
