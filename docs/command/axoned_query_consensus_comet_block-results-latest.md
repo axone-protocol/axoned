@@ -1,15 +1,9 @@
-## axoned query staking historical-info
+## axoned query consensus comet block-results-latest
 
-Query historical info at given height
-
-```
-axoned query staking historical-info [height] [flags]
-```
-
-### Examples
+Query for the latest block results
 
 ```
-$ axoned query staking historical-info 5
+axoned query consensus comet block-results-latest [flags]
 ```
 
 ### Options
@@ -18,7 +12,7 @@ $ axoned query staking historical-info 5
       --grpc-addr string         the gRPC endpoint to use for this chain
       --grpc-insecure            allow gRPC over insecure channels, if not the server must use TLS
       --height int               Use a specific height to query state at (this can error if the node is pruning state)
-  -h, --help                     help for historical-info
+  -h, --help                     help for block-results-latest
       --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "os")
       --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
       --no-indent                Do not indent JSON output
@@ -28,4 +22,4 @@ $ axoned query staking historical-info 5
 
 ### SEE ALSO
 
-* [axoned query staking](axoned_query_staking.md)	 - Querying commands for the staking module
+* [axoned query consensus comet](axoned_query_consensus_comet.md)	 - Querying commands for the cosmos.base.tendermint.v1beta1.Service service

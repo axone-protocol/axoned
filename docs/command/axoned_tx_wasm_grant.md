@@ -1,6 +1,6 @@
 ## axoned tx wasm grant
 
-Grant a authz permission
+Grant an authz permission
 
 ### Options
 

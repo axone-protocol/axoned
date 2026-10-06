@@ -26,6 +26,6 @@ axoned query staking [flags]
 * [axoned query staking redelegation](axoned_query_staking_redelegation.md)	 - Query a redelegation record based on delegator and a source and destination validator address
 * [axoned query staking unbonding-delegation](axoned_query_staking_unbonding-delegation.md)	 - Query an unbonding-delegation record based on delegator and validator address
 * [axoned query staking unbonding-delegations](axoned_query_staking_unbonding-delegations.md)	 - Query all unbonding-delegations records for one delegator
-* [axoned query staking unbonding-delegations-from](axoned_query_staking_unbonding-delegations-from.md)	 - Query all unbonding delegatations from a validator
+* [axoned query staking unbonding-delegations-from](axoned_query_staking_unbonding-delegations-from.md)	 - Query all unbonding delegations from a validator
 * [axoned query staking validator](axoned_query_staking_validator.md)	 - Query a validator
 * [axoned query staking validators](axoned_query_staking_validators.md)	 - Query for all validators

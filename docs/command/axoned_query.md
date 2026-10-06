@@ -27,7 +27,6 @@ axoned query [flags]
 * [axoned query evidence](axoned_query_evidence.md)	 - Querying commands for the evidence module
 * [axoned query feegrant](axoned_query_feegrant.md)	 - Querying commands for the feegrant module
 * [axoned query gov](axoned_query_gov.md)	 - Querying commands for the gov module
-* [axoned query group](axoned_query_group.md)	 - Querying commands for the group module
 * [axoned query ibc](axoned_query_ibc.md)	 - Querying commands for the IBC module
 * [axoned query ibc-transfer](axoned_query_ibc-transfer.md)	 - IBC fungible token transfer query subcommands
 * [axoned query interchain-accounts](axoned_query_interchain-accounts.md)	 - IBC interchain accounts query subcommands

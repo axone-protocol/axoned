@@ -24,10 +24,8 @@ axoned tx [flags]
 * [axoned tx decode](axoned_tx_decode.md)	 - Decode a binary encoded transaction string
 * [axoned tx distribution](axoned_tx_distribution.md)	 - Distribution transactions subcommands
 * [axoned tx encode](axoned_tx_encode.md)	 - Encode transactions generated offline
-* [axoned tx evidence](axoned_tx_evidence.md)	 - Evidence transaction subcommands
 * [axoned tx feegrant](axoned_tx_feegrant.md)	 - Feegrant transactions sub-commands
 * [axoned tx gov](axoned_tx_gov.md)	 - Governance transactions subcommands
-* [axoned tx group](axoned_tx_group.md)	 - Group transaction subcommands
 * [axoned tx ibc](axoned_tx_ibc.md)	 - IBC transaction subcommands
 * [axoned tx ibc-transfer](axoned_tx_ibc-transfer.md)	 - IBC fungible token transfer transaction subcommands
 * [axoned tx interchain-accounts](axoned_tx_interchain-accounts.md)	 - IBC interchain accounts transaction subcommands
