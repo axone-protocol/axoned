@@ -79,8 +79,8 @@ func verifySignatureWithCurve(curve elliptic.Curve, pubKey, msg, sig []byte) (bo
 
 	pk := &ecdsa.PublicKey{
 		Curve: curve,
-		X:     x, //nolint:staticcheck // Required for custom secp256k1 curves.
-		Y:     y, //nolint:staticcheck // Required for custom secp256k1 curves.
+		X:     x,
+		Y:     y,
 	}
 
 	return ecc.VerifyASN1(pk, msg, sig), nil
