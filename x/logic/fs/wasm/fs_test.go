@@ -19,8 +19,8 @@ import (
 
 	coreheader "cosmossdk.io/core/header"
 	"cosmossdk.io/log/v2"
-	"github.com/cosmos/cosmos-sdk/store/v2"
 
+	"github.com/cosmos/cosmos-sdk/store/v2"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/axone-protocol/axoned/v15/x/logic/fs/internal/devfile"

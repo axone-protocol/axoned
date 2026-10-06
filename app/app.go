@@ -594,9 +594,7 @@ func New(
 	// NOTE: Any module instantiated in the module manager that is later modified
 	// must be passed by reference here.
 
-	appModules := make([]module.AppModule, 0, 24)
-	appModules = append(
-		appModules,
+	app.ModuleManager = module.NewManager(
 		genutil.NewAppModule(
 			app.AccountKeeper,
 			app.StakingKeeper,
@@ -618,26 +616,16 @@ func New(
 		params.NewAppModule(app.ParamsKeeper), //nolint:staticcheck // x/params is deprecated upstream; retained until SDK replacement
 		consensus.NewAppModule(appCodec, app.ConsensusParamsKeeper),
 		circuit.NewAppModule(appCodec, app.CircuitKeeper),
-	)
-
-	appModules = append(appModules,
 		ibc.NewAppModule(app.IBCKeeper),
 		transfer.NewAppModule(app.TransferKeeper),
 		ica.NewAppModule(app.ICAControllerKeeper, app.ICAHostKeeper),
-		ibctm.NewAppModule(tmLightClientModule))
-
-	appModules = append(
-		appModules,
+		ibctm.NewAppModule(tmLightClientModule),
 		wasm.NewAppModule(appCodec, &app.WasmKeeper, app.StakingKeeper, app.AccountKeeper, app.BankKeeper,
 			app.MsgServiceRouter(), app.GetSubspace(wasmtypes.ModuleName)),
 		// our modules
 		vesting.NewAppModule(app.AccountKeeper, app.BankKeeper),
 		mint.NewAppModule(appCodec, app.MintKeeper, app.AccountKeeper),
 		logicmodule.NewAppModule(appCodec, app.LogicKeeper, app.AccountKeeper, app.BankKeeper, app.GetSubspace(logicmoduletypes.ModuleName)),
-	)
-
-	app.ModuleManager = module.NewManager(
-		appModules...,
 	)
 
 	// BasicModuleManager defines the module BasicManager in charge of setting up basic,
@@ -824,7 +812,7 @@ func New(
 		if err := app.LoadLatestVersion(); err != nil {
 			panic(err.Error())
 		}
-		ctx := app.NewUncachedContext(true, tmproto.Header{})
+		ctx := app.NewContextLegacy(true, tmproto.Header{})
 
 		// Initialize pinned codes in wasmvm as they are not persisted there
 		if err := app.WasmKeeper.InitializePinnedCodes(ctx); err != nil {

@@ -7,9 +7,9 @@ import (
 	wasmTypes "github.com/CosmWasm/wasmd/x/wasm/types"
 
 	corestoretypes "cosmossdk.io/core/store"
+
 	circuitante "github.com/cosmos/cosmos-sdk/contrib/x/circuit/ante"
 	circuitkeeper "github.com/cosmos/cosmos-sdk/contrib/x/circuit/keeper"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth/ante"
 

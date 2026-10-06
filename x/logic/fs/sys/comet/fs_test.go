@@ -18,9 +18,9 @@ import (
 	corecomet "cosmossdk.io/core/comet"
 	coreheader "cosmossdk.io/core/header"
 	"cosmossdk.io/log/v2"
-	"github.com/cosmos/cosmos-sdk/store/v2"
 
 	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/store/v2"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 

@@ -337,8 +337,7 @@ func assertJSON(term engine.Term, env *engine.Env) (engine.Compound, error) {
 }
 
 func exceptionFormal(err error) engine.Term {
-	var exception engine.Exception
-	if errors.As(err, &exception) {
+	if exception, ok := errors.AsType[engine.Exception](err); ok {
 		if compound, ok := exception.Term().(engine.Compound); ok &&
 			compound.Functor() == prolog.AtomError && compound.Arity() >= 1 {
 			return compound.Arg(0)

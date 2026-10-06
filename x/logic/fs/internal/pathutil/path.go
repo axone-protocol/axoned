@@ -35,8 +35,7 @@ func NormalizeSubpath(name string) (string, error) {
 
 // UnwrapPathError returns the underlying error when err is an *fs.PathError.
 func UnwrapPathError(err error) error {
-	var pathErr *fs.PathError
-	if errors.As(err, &pathErr) {
+	if pathErr, ok := errors.AsType[*fs.PathError](err); ok {
 		return pathErr.Err
 	}
 
