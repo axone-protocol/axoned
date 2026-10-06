@@ -662,6 +662,7 @@ func renderFeatureExamples(feature *messages.Feature) string {
 	}
 
 	scenarioDocs := make([]string, 0)
+	backgroundSteps := featureBackgroundSteps(feature)
 	for _, child := range feature.Children {
 		scenario := child.Scenario
 		if scenario == nil || !tagged("@great_for_documentation", scenario) {
@@ -676,28 +677,14 @@ func renderFeatureExamples(feature *messages.Feature) string {
 			out.WriteString(description + "\n\n")
 		}
 
-		out.WriteString("Here are the steps of the scenario:\n\n")
-		for _, step := range scenario.Steps {
-			fmt.Fprintf(&out, "- **%s** %s\n", strings.TrimSpace(step.Keyword), step.Text)
-
-			if step.DocString != nil {
-				mediaType := step.DocString.MediaType
-				if mediaType == "" {
-					mediaType = "text"
-				}
-				fmt.Fprintf(&out, "\n``` %s\n%s\n```\n", mediaType, step.DocString.Content)
-			}
-
-			if step.DataTable != nil {
-				out.WriteString("\n| key | value |\n| --- | ----- |\n")
-				for _, row := range step.DataTable.Rows {
-					if len(row.Cells) < 2 {
-						continue
-					}
-					fmt.Fprintf(&out, "| %s | %s |\n", row.Cells[0].Value, row.Cells[1].Value)
-				}
-			}
+		if len(backgroundSteps) > 0 {
+			out.WriteString("Here is the feature setup:\n\n")
+			renderFeatureSteps(&out, backgroundSteps)
+			out.WriteString("\n")
 		}
+
+		out.WriteString("Here are the steps of the scenario:\n\n")
+		renderFeatureSteps(&out, scenario.Steps)
 
 		scenarioDocs = append(scenarioDocs, strings.TrimRight(out.String(), "\n"))
 	}
@@ -707,6 +694,62 @@ func renderFeatureExamples(feature *messages.Feature) string {
 	}
 
 	return "## Examples\n\n" + strings.Join(scenarioDocs, "\n\n")
+}
+
+func featureBackgroundSteps(feature *messages.Feature) []*messages.Step {
+	for _, child := range feature.Children {
+		if child.Background != nil {
+			return child.Background.Steps
+		}
+	}
+
+	return nil
+}
+
+func renderFeatureSteps(out *strings.Builder, steps []*messages.Step) {
+	for _, step := range steps {
+		fmt.Fprintf(out, "- **%s** %s\n", strings.TrimSpace(step.Keyword), step.Text)
+
+		if step.DocString != nil {
+			mediaType := step.DocString.MediaType
+			if mediaType == "" {
+				mediaType = "text"
+			}
+			fmt.Fprintf(out, "\n``` %s\n%s\n```\n", mediaType, step.DocString.Content)
+		}
+
+		if step.DataTable != nil {
+			renderFeatureDataTable(out, step.DataTable)
+		}
+	}
+}
+
+func renderFeatureDataTable(out *strings.Builder, table *messages.DataTable) {
+	if len(table.Rows) == 0 {
+		return
+	}
+
+	columns := len(table.Rows[0].Cells)
+	out.WriteString("\n")
+	renderFeatureTableRow(out, table.Rows[0].Cells, columns)
+	for range columns {
+		out.WriteString("| --- ")
+	}
+	out.WriteString("|\n")
+	for _, row := range table.Rows[1:] {
+		renderFeatureTableRow(out, row.Cells, columns)
+	}
+}
+
+func renderFeatureTableRow(out *strings.Builder, cells []*messages.TableCell, columns int) {
+	for index := range columns {
+		value := ""
+		if index < len(cells) {
+			value = strings.ReplaceAll(cells[index].Value, "|", "\\|")
+		}
+		fmt.Fprintf(out, "| %s ", value)
+	}
+	out.WriteString("|\n")
 }
 
 func createRenderer(ctx map[string]any) (*gomarkdoc.Renderer, error) {

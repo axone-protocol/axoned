@@ -3,6 +3,8 @@ package staking
 import (
 	"context"
 	"errors"
+	"io/fs"
+	"strings"
 	"testing"
 	"time"
 
@@ -157,12 +159,60 @@ func TestVFS(t *testing.T) {
 			So(string(data), ShouldContainSubstring, "entries:[]")
 		})
 
+		Convey("when reading paginated validators for each bond status", func() {
+			for _, status := range []stakingtypes.BondStatus{stakingtypes.Bonded, stakingtypes.Unbonding, stakingtypes.Unbonded} {
+				service.validators = func(
+					_ context.Context, request *stakingtypes.QueryValidatorsRequest,
+				) (*stakingtypes.QueryValidatorsResponse, error) {
+					So(request.Status, ShouldEqual, status.String())
+					So(request.Pagination.Limit, ShouldEqual, pageSize)
+					if len(request.Pagination.Key) == 0 {
+						return &stakingtypes.QueryValidatorsResponse{
+							Validators: []stakingtypes.Validator{{OperatorAddress: "axonevaloper1first", Status: status}},
+							Pagination: &query.PageResponse{NextKey: []byte{1}},
+						}, nil
+					}
+					So(request.Pagination.Key, ShouldResemble, []byte{1})
+					return &stakingtypes.QueryValidatorsResponse{
+						Validators: []stakingtypes.Validator{{OperatorAddress: "axonevaloper1jailed", Status: status, Jailed: true}},
+					}, nil
+				}
+				statusName := strings.ToLower(strings.TrimPrefix(status.String(), "BOND_STATUS_"))
+				data, err := stakingFS.ReadFile("validators/" + statusName + "/@")
+				So(err, ShouldBeNil)
+				So(string(data), ShouldEqual,
+					"validator{operator:axonevaloper1first,status:"+statusName+"}.\n"+
+						"validator{operator:axonevaloper1jailed,status:"+statusName+"}.\n")
+			}
+		})
+
+		Convey("when reading the staking bond denomination", func() {
+			service.params = func(context.Context, *stakingtypes.QueryParamsRequest) (*stakingtypes.QueryParamsResponse, error) {
+				return &stakingtypes.QueryParamsResponse{Params: stakingtypes.Params{BondDenom: "ustake"}}, nil
+			}
+			data, err := stakingFS.ReadFile("params/@")
+			So(err, ShouldBeNil)
+			So(string(data), ShouldEqual, "staking_params{bond_denom:ustake}.\n")
+		})
+
+		Convey("when reading a staking bond denomination that needs quoting", func() {
+			service.params = func(context.Context, *stakingtypes.QueryParamsRequest) (*stakingtypes.QueryParamsResponse, error) {
+				return &stakingtypes.QueryParamsResponse{Params: stakingtypes.Params{BondDenom: "ibc/ABC"}}, nil
+			}
+			data, err := stakingFS.ReadFile("params/@")
+			So(err, ShouldBeNil)
+			So(string(data), ShouldEqual, "staking_params{bond_denom:'ibc/ABC'}.\n")
+		})
+
 		Convey("when reading an invalid path", func() {
 			for _, name := range []string{
 				"../" + delegatorAddress + "/delegations/@",
 				"not-an-address/delegations/@",
 				delegatorAddress + "/delegations",
 				delegatorAddress + "/unknown/@",
+				"validators/unknown/@",
+				"validators/bonded",
+				"params/unknown",
 			} {
 				_, err := stakingFS.ReadFile(name)
 				So(err, ShouldNotBeNil)
@@ -176,6 +226,11 @@ func TestVFSQueryErrors(t *testing.T) {
 		sdk.GetConfig().SetBech32PrefixForAccount("axone", "axonepub")
 		queryErr := errors.New("query failed")
 		service := &stakingQueryServiceStub{
+			validators: func(
+				context.Context, *stakingtypes.QueryValidatorsRequest,
+			) (*stakingtypes.QueryValidatorsResponse, error) {
+				return nil, queryErr
+			},
 			delegations: func(
 				context.Context, *stakingtypes.QueryDelegatorDelegationsRequest,
 			) (*stakingtypes.QueryDelegatorDelegationsResponse, error) {
@@ -207,6 +262,8 @@ func TestVFSQueryErrors(t *testing.T) {
 
 		_, err = stakingFS.ReadFile(delegatorAddress + "/redelegations/@")
 		So(errors.Is(err, queryErr), ShouldBeTrue)
+		_, err = stakingFS.ReadFile("validators/bonded/@")
+		So(errors.Is(err, queryErr), ShouldBeTrue)
 
 		paramsErr := errors.New("params query failed")
 		service.params = func(context.Context, *stakingtypes.QueryParamsRequest) (*stakingtypes.QueryParamsResponse, error) {
@@ -215,6 +272,9 @@ func TestVFSQueryErrors(t *testing.T) {
 		_, err = stakingFS.Open(delegatorAddress + "/unbonding_delegations/@")
 		So(errors.Is(err, paramsErr), ShouldBeTrue)
 		_, err = stakingFS.Open(delegatorAddress + "/redelegations/@")
+		So(errors.Is(err, paramsErr), ShouldBeTrue)
+		_, err = stakingFS.Open("params/@")
+		So(err, ShouldHaveSameTypeAs, &fs.PathError{})
 		So(errors.Is(err, paramsErr), ShouldBeTrue)
 	})
 }
@@ -240,6 +300,9 @@ func newTestContext() sdk.Context {
 }
 
 type stakingQueryServiceStub struct {
+	validators func(
+		context.Context, *stakingtypes.QueryValidatorsRequest,
+	) (*stakingtypes.QueryValidatorsResponse, error)
 	delegations func(
 		context.Context, *stakingtypes.QueryDelegatorDelegationsRequest,
 	) (*stakingtypes.QueryDelegatorDelegationsResponse, error)
@@ -288,4 +351,10 @@ func (s *stakingQueryServiceStub) Params(
 		return nil, errors.New("unexpected params query")
 	}
 	return s.params(ctx, request)
+}
+
+func (s *stakingQueryServiceStub) Validators(
+	ctx context.Context, request *stakingtypes.QueryValidatorsRequest,
+) (*stakingtypes.QueryValidatorsResponse, error) {
+	return s.validators(ctx, request)
 }

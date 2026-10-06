@@ -5,6 +5,8 @@ import (
 	"path/filepath"
 	"testing"
 
+	messages "github.com/cucumber/messages/go/v21"
+
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -115,5 +117,34 @@ func TestWriteToFileCreatesParentDirectories(t *testing.T) {
 		err := writeToFile(target, "content")
 
 		So(err, ShouldBeNil)
+	})
+}
+
+func TestRenderFeatureExamples(t *testing.T) {
+	Convey("Given a tagged scenario with feature setup", t, func() {
+		feature := &messages.Feature{Children: []*messages.FeatureChild{
+			{Background: &messages.Background{Steps: []*messages.Step{{
+				Keyword: "Given ",
+				Text:    "the staking validators:",
+				DataTable: &messages.DataTable{Rows: []*messages.TableRow{
+					{Cells: []*messages.TableCell{{Value: "operator"}, {Value: "status"}, {Value: "jailed"}}},
+					{Cells: []*messages.TableCell{{Value: "axonevaloper1jailed"}, {Value: "bonded"}, {Value: "true"}}},
+				}},
+			}}}},
+			{Scenario: &messages.Scenario{
+				Name:  "Select bonded validators",
+				Tags:  []*messages.Tag{{Name: "@great_for_documentation"}},
+				Steps: []*messages.Step{{Keyword: "When ", Text: "the query is run"}},
+			}},
+		}}
+
+		got := renderFeatureExamples(feature)
+
+		Convey("it renders setup before the scenario and retains every table column", func() {
+			So(got, ShouldContainSubstring, "Here is the feature setup:")
+			So(got, ShouldContainSubstring, "| operator | status | jailed |\n| --- | --- | --- |\n| axonevaloper1jailed | bonded | true |")
+			So(got, ShouldNotContainSubstring, "| --- | --- | --- |\n\n| axonevaloper1jailed | bonded | true |")
+			So(got, ShouldContainSubstring, "Here are the steps of the scenario:")
+		})
 	})
 }

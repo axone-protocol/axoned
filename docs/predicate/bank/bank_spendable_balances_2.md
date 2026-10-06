@@ -64,9 +64,8 @@ Here are the steps of the scenario:
 
 - **And** the account "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa" has the following spendable balances:
 
-| key | value |
-| --- | ----- |
 | denom | amount |
+| --- | --- |
 | uaxone | 700 |
 | uatom | 250 |
 
@@ -105,9 +104,8 @@ Here are the steps of the scenario:
 
 - **And** the account "axone1wze8mn5nsgl9qrgazq6a92fvh7m5e6ps372aep" has the following spendable balances:
 
-| key | value |
-| --- | ----- |
 | denom | amount |
+| --- | --- |
 
 - **Given** the query:
 
@@ -148,9 +146,8 @@ spendable_has_coin(Address, Denom, Amount) :-
 
 - **And** the account "axone1ffd5wx65l407yvm478cxzlgygw07h79sw4jwpa" has the following spendable balances:
 
-| key | value |
-| --- | ----- |
 | denom | amount |
+| --- | --- |
 | uaxone | 1000 |
 | uatom | 500 |
 

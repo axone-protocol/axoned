@@ -27,6 +27,7 @@ type BankKeeper interface {
 
 // StakingQueryService defines the staking queries exposed to logic programs.
 type StakingQueryService interface {
+	Validators(ctx context.Context, req *staking.QueryValidatorsRequest) (*staking.QueryValidatorsResponse, error)
 	DelegatorDelegations(
 		ctx context.Context, req *staking.QueryDelegatorDelegationsRequest,
 	) (*staking.QueryDelegatorDelegationsResponse, error)
