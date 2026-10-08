@@ -38,6 +38,13 @@ jobs:
       - name: Set up Nix
         uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
 
+      - name: Cache Nix lint environment
+        uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+        with:
+          primary-key: nix-v1-${{ runner.os }}-lint-${{ hashFiles('flake.lock', 'flake.nix') }}
+          restore-prefixes-first-match: |
+            nix-v1-${{ runner.os }}-lint-
+
       - name: Check flake
         run: |
           set -o pipefail
@@ -58,10 +65,10 @@ jobs:
       - name: Check formatting
         run: |
           mapfile -t nix_files < <(git ls-files '*.nix')
-          nix develop --command nixfmt --check "${nix_files[@]}"
+          nix develop .#lint --command nixfmt --check "${nix_files[@]}"
 
       - name: Statix
-        run: nix develop --command statix check .
+        run: nix develop .#lint --command statix check .
 
       - name: Deadnix
-        run: nix develop --command deadnix --fail .
+        run: nix develop .#lint --command deadnix --fail .
