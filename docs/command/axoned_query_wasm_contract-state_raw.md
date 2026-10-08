@@ -4,7 +4,7 @@ Prints out internal state for key of a contract given its address
 
 ### Synopsis
 
-Prints out internal state for of a contract given its address
+Prints out internal state of a contract given its address
 
 ```
 axoned query wasm contract-state raw [bech32_address] [key] [flags]

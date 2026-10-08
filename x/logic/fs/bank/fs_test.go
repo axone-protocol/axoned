@@ -15,11 +15,10 @@ import (
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	coreheader "cosmossdk.io/core/header"
-	"cosmossdk.io/log"
+	"cosmossdk.io/log/v2"
 	"cosmossdk.io/math"
-	"cosmossdk.io/store"
-	"cosmossdk.io/store/metrics"
 
+	"github.com/cosmos/cosmos-sdk/store/v2"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/axone-protocol/axoned/v15/x/logic/testutil"
@@ -187,7 +186,7 @@ func TestVFS(t *testing.T) {
 
 func newTestContext() sdk.Context {
 	db := dbm.NewMemDB()
-	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
+	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger())
 	headerInfo := coreheader.Info{
 		Height: 42,
 		Time:   time.Date(2024, 4, 10, 10, 44, 27, 0, time.UTC),

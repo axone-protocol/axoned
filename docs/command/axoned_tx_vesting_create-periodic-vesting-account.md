@@ -4,7 +4,7 @@ Create a new vesting account funded with an allocation of tokens.
 
 ### Synopsis
 
-A sequence of coins and period length in seconds. Periods are sequential, in that the duration of of a period only starts at the end of the previous period. The duration of the first period starts upon account creation. For instance, the following periods.json file shows 20 "test" coins vesting 30 days apart from each other.
+A sequence of coins and period length in seconds. Periods are sequential, in that the duration of a period only starts at the end of the previous period. The duration of the first period starts upon account creation. For instance, the following periods.json file shows 20 "test" coins vesting 30 days apart from each other.
 		Where periods.json contains:
 
 		An array of coin strings and unix epoch times for coins to vest
@@ -38,7 +38,7 @@ axoned tx vesting create-periodic-vesting-account [to_address] [periods_json_fil
       --fees string                 Fees to pay along with transaction; eg: 10uatom
       --from string                 Name or address of private key with which to sign
       --gas string                  gas limit to set per-transaction; set to "auto" to calculate sufficient gas automatically. Note: "auto" option doesn't always report accurate results. Set a valid coin value to adjust the result. Can be used instead of "fees". (default 200000)
-      --gas-adjustment float        adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored  (default 1)
+      --gas-adjustment float        adjustment factor to be multiplied against the estimate returned by the tx simulation; if the gas limit is set manually this flag is ignored (default 1)
       --gas-prices string           Gas prices in decimal format to determine the transaction fee (e.g. 0.1uatom)
       --generate-only               Build an unsigned transaction and write it to STDOUT (when enabled, the local Keybase only accessed when providing a key name)
   -h, --help                        help for create-periodic-vesting-account
@@ -51,7 +51,7 @@ axoned tx vesting create-periodic-vesting-account [to_address] [periods_json_fil
   -o, --output string               Output format (text|json) (default "json")
   -s, --sequence uint               The sequence number of the signing account (offline mode only)
       --sign-mode string            Choose sign mode (direct|amino-json|direct-aux|textual), this is an advanced feature
-      --timeout-duration duration   TimeoutDuration is the duration the transaction will be considered valid in the mempool. The transaction's unordered nonce will be set to the time of transaction creation + the duration value passed. If the transaction is still in the mempool, and the block time has passed the time of submission + TimeoutTimestamp, the transaction will be rejected.
+      --timeout-duration duration   TimeoutDuration is the duration the transaction will be considered valid in the mempool. The transaction's unordered nonce will be set to the time of transaction creation + the duration value passed. If the transaction is still in the mempool, and the block time has passed the time of submission + TimeoutDuration, the transaction will be rejected.
       --timeout-height uint         DEPRECATED: Please use --timeout-duration instead. Set a block timeout height to prevent the tx from being committed past a certain height
       --tip string                  Tip is the amount that is going to be transferred to the fee payer on the target chain. This flag is only valid when used with --aux, and is ignored if the target chain didn't enable the TipDecorator
       --unordered                   Enable unordered transaction delivery; must be used in conjunction with --timeout-duration

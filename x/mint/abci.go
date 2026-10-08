@@ -13,6 +13,7 @@ import (
 
 // BeginBlocker mints new tokens for the previous block.
 func BeginBlocker(ctx context.Context, k keeper.Keeper) error {
+	//nolint:staticcheck // Legacy telemetry remains supported in SDK v0.54.
 	defer telemetry.ModuleMeasureSince(types.ModuleName, time.Now(), telemetry.MetricKeyBeginBlocker)
 
 	// fetch stored params
@@ -59,6 +60,7 @@ func BeginBlocker(ctx context.Context, k keeper.Keeper) error {
 	}
 
 	if mintedCoin.Amount.IsInt64() {
+		//nolint:staticcheck // Legacy telemetry remains supported in SDK v0.54.
 		defer telemetry.ModuleSetGauge(types.ModuleName, float32(mintedCoin.Amount.Int64()), "minted_tokens")
 	}
 

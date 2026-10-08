@@ -265,8 +265,7 @@ func (f *halfDuplexFile) pathError(op string, err error) error {
 		return err
 	}
 
-	var pathErr *fs.PathError
-	if errors.As(err, &pathErr) {
+	if _, ok := errors.AsType[*fs.PathError](err); ok {
 		return err
 	}
 

@@ -11,10 +11,9 @@ import (
 	cmtproto "github.com/cometbft/cometbft/proto/tendermint/types"
 
 	coreheader "cosmossdk.io/core/header"
-	"cosmossdk.io/log"
-	"cosmossdk.io/store"
-	"cosmossdk.io/store/metrics"
+	"cosmossdk.io/log/v2"
 
+	"github.com/cosmos/cosmos-sdk/store/v2"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
@@ -81,7 +80,7 @@ func TestResolveHeaderInfo(t *testing.T) {
 
 func newSDKContext(header cmtproto.Header) sdk.Context {
 	db := dbm.NewMemDB()
-	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger(), metrics.NewNoOpMetrics())
+	stateStore := store.NewCommitMultiStore(db, log.NewNopLogger())
 
 	return sdk.NewContext(stateStore, header, false, log.NewNopLogger())
 }

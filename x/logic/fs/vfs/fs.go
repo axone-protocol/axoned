@@ -222,8 +222,7 @@ func wrapPathError(op, path string, err error) error {
 		return err
 	}
 
-	var pathErr *fs.PathError
-	if errors.As(err, &pathErr) {
+	if pathErr, ok := errors.AsType[*fs.PathError](err); ok {
 		err = pathErr.Err
 	}
 

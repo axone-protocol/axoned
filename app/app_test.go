@@ -5,8 +5,13 @@ import (
 	"testing"
 
 	wasmtypes "github.com/CosmWasm/wasmd/x/wasm/types"
+	dbm "github.com/cosmos/cosmos-db"
 
 	. "github.com/smartystreets/goconvey/convey"
+
+	"cosmossdk.io/log/v2"
+
+	simtestutil "github.com/cosmos/cosmos-sdk/testutil/sims"
 )
 
 func TestMaxWasmSizeParsing(t *testing.T) {
@@ -60,5 +65,30 @@ func TestMakeEncodingConfigConstructsApp(t *testing.T) {
 		So(encodingConfig.Codec, ShouldNotBeNil)
 		So(encodingConfig.InterfaceRegistry, ShouldNotBeNil)
 		So(encodingConfig.TxConfig, ShouldNotBeNil)
+	})
+}
+
+func TestRetiredModulesAreDisabled(t *testing.T) {
+	Convey("Given an initialized application", t, func() {
+		application := New(
+			log.NewNopLogger(),
+			dbm.NewMemDB(),
+			nil,
+			true,
+			simtestutil.NewAppOptionsWithFlagHome(t.TempDir()),
+		)
+
+		Convey("The group and capability modules should not be executable", func() {
+			_, hasGroupModule := application.ModuleManager.Modules[legacyGroupStoreKey]
+			_, hasCapabilityModule := application.ModuleManager.Modules[legacyCapabilityStoreKey]
+
+			So(hasGroupModule, ShouldBeFalse)
+			So(hasCapabilityModule, ShouldBeFalse)
+		})
+
+		Convey("Their legacy stores should remain mounted for data recovery", func() {
+			So(application.GetKey(legacyGroupStoreKey), ShouldNotBeNil)
+			So(application.GetKey(legacyCapabilityStoreKey), ShouldNotBeNil)
+		})
 	})
 }

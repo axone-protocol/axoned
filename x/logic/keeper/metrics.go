@@ -34,11 +34,12 @@ func telemetryPredicateCallCounterHookFn() engine.HookFunc {
 			return nil
 		}
 
+		//nolint:staticcheck // Legacy telemetry remains supported in SDK v0.54.
 		telemetry.IncrCounterWithLabels(
 			metricsKeys,
 			1,
 			[]metrics.Label{
-				telemetry.NewLabel(labelPredicate, predicate),
+				{Name: labelPredicate, Value: predicate},
 			},
 		)
 
@@ -52,6 +53,7 @@ func telemetryPredicateDurationHookFn() engine.HookFunc {
 	return func(opcode engine.Opcode, operand engine.Term, _ *engine.Env) error {
 		if opcode != engine.OpCall {
 			if predicate != "" {
+				//nolint:staticcheck // Legacy telemetry remains supported in SDK v0.54.
 				telemetry.MeasureSince(start, append(metricsKeys, predicate)...)
 				predicate = ""
 				start = time.Time{}
@@ -64,7 +66,7 @@ func telemetryPredicateDurationHookFn() engine.HookFunc {
 			return nil
 		}
 
-		start = telemetry.Now()
+		start = telemetry.Now() //nolint:staticcheck // Legacy telemetry remains supported in SDK v0.54.
 
 		return nil
 	}

@@ -1,6 +1,6 @@
 ## axoned debug pubkey-raw
 
-Decode a ED25519 or secp256k1 pubkey from hex, base64, or bech32
+Decode an ED25519 or secp256k1 pubkey from hex, base64, or bech32
 
 ### Synopsis
 

@@ -6,7 +6,7 @@ import (
 
 	"github.com/axone-protocol/prolog/v3/engine"
 
-	storetypes "cosmossdk.io/store/types"
+	storetypes "github.com/cosmos/cosmos-sdk/store/v2/types"
 )
 
 const defaultCoeff = uint64(1)

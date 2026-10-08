@@ -1,6 +1,6 @@
 ## axoned query staking unbonding-delegations-from
 
-Query all unbonding delegatations from a validator
+Query all unbonding delegations from a validator
 
 ### Synopsis
 
@@ -19,18 +19,20 @@ $ axoned query staking unbonding-delegations-from [val-addr]
 ### Options
 
 ```
-      --grpc-addr string   the gRPC endpoint to use for this chain
-      --grpc-insecure      allow gRPC over insecure channels, if not the server must use TLS
-      --height int         Use a specific height to query state at (this can error if the node is pruning state)
-  -h, --help               help for unbonding-delegations-from
-      --no-indent          Do not indent JSON output
-      --node string        <host>:<port> to CometBFT RPC interface for this chain (default "tcp://localhost:26657")
-  -o, --output string      Output format (text|json) (default "text")
-      --page-count-total   
-      --page-key binary    
-      --page-limit uint    
-      --page-offset uint   
-      --page-reverse       
+      --grpc-addr string         the gRPC endpoint to use for this chain
+      --grpc-insecure            allow gRPC over insecure channels, if not the server must use TLS
+      --height int               Use a specific height to query state at (this can error if the node is pruning state)
+  -h, --help                     help for unbonding-delegations-from
+      --keyring-backend string   Select keyring's backend (os|file|kwallet|pass|test|memory) (default "os")
+      --keyring-dir string       The client Keyring directory; if omitted, the default 'home' directory will be used
+      --no-indent                Do not indent JSON output
+      --node string              <host>:<port> to CometBFT RPC interface for this chain (default "tcp://localhost:26657")
+  -o, --output string            Output format (text|json) (default "text")
+      --page-count-total         
+      --page-key binary          
+      --page-limit uint          
+      --page-offset uint         
+      --page-reverse             
 ```
 
 ### SEE ALSO

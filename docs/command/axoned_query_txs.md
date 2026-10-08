@@ -30,7 +30,7 @@ $ axoned query txs --query "message.sender='cosmos1...' AND message.action='with
   -h, --help               help for txs
       --limit int          Query number of transactions results per page returned (default 100)
       --node string        <host>:<port> to CometBFT RPC interface for this chain (default "tcp://localhost:26657")
-      --order_by string    The ordering semantics (asc|dsc)
+      --order_by string    The ordering semantics (asc|desc)
   -o, --output string      Output format (text|json) (default "text")
       --page int           Query a specific page of paginated results (default 1)
       --query string       The transactions events query per Tendermint's query semantics
