@@ -45,4 +45,4 @@ jobs:
 
       - name: Lint proto files
         run: |
-          nix develop --command make lint-proto
+          nix develop .#lint --command make lint-proto

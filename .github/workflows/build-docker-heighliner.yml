@@ -55,4 +55,4 @@ jobs:
         uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
 
       - name: Build docker image for Heighliner
-        run: nix develop --command make build-docker
+        run: nix develop .#docker --command make build-docker

@@ -58,10 +58,10 @@ jobs:
       - name: Check formatting
         run: |
           mapfile -t nix_files < <(git ls-files '*.nix')
-          nix develop --command nixfmt --check "${nix_files[@]}"
+          nix develop .#lint --command nixfmt --check "${nix_files[@]}"
 
       - name: Statix
-        run: nix develop --command statix check .
+        run: nix develop .#lint --command statix check .
 
       - name: Deadnix
-        run: nix develop --command deadnix --fail .
+        run: nix develop .#lint --command deadnix --fail .

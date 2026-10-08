@@ -58,15 +58,15 @@ jobs:
 
       - name: Generate command documentation
         run: |
-          nix develop --command make doc-command
+          nix develop .#doc --command make doc-command
 
       - name: Generate proto and documentation
         run: |
-          nix develop --command make doc-proto
+          nix develop .#doc --command make doc-proto
 
       - name: Generate predicates documentation
         run: |
-          nix develop --command make doc-predicate
+          nix develop .#doc --command make doc-predicate
 
       - name: Check Git diff in generated files (proto + docs)
         run: |

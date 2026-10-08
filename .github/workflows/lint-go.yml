@@ -48,11 +48,11 @@ jobs:
 
       - name: Lint go code (golangci-lint)
         run: |
-          nix develop --command make lint-go-golangci
+          nix develop .#lint --command make lint-go-golangci
 
       - name: Verify Go modules are tidy
         run: |
-          nix develop --command go mod tidy
+          nix develop .#lint --command go mod tidy
           if ! git diff --quiet -- go.mod go.sum; then
             echo "❌ go.mod or go.sum are out of date"
             git --no-pager diff -- go.mod go.sum
@@ -62,4 +62,4 @@ jobs:
 
       - name: Lint go code (gofumpt)
         run: |
-          nix develop --command make lint-go-gofumpt
+          nix develop .#lint --command make lint-go-gofumpt
