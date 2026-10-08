@@ -87,7 +87,13 @@
           proto = pkgs.mkShell {
             inputsFrom = [ base ];
 
-            packages = [ pkgs.buf ];
+            packages = [
+              pkgs.buf
+              pkgs.protobuf
+              pkgs.protobuf-language-server
+              pkgs.protoc-gen-go
+              pkgs.protoc-gen-go-grpc
+            ];
           };
 
           doc = pkgs.mkShell {
@@ -102,10 +108,11 @@
           };
 
           lint = pkgs.mkShell {
-            inputsFrom = [ proto ];
+            inputsFrom = [ base ];
 
             packages = [
               pkgs.actionlint
+              pkgs.buf
               pkgs.deadnix
               pkgs.gofumpt
               pkgs.golangci-lint
@@ -129,6 +136,7 @@
               doc
               docker
               lint
+              proto
             ];
 
             packages = [
@@ -142,10 +150,6 @@
               pkgs.marksman
               pkgs.nil
               pkgs.nodejs_24
-              pkgs.protobuf
-              pkgs.protobuf-language-server
-              pkgs.protoc-gen-go
-              pkgs.protoc-gen-go-grpc
               pkgs.uv
               pkgs.yaml-language-server
             ];
