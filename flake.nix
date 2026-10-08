@@ -75,37 +75,77 @@
         let
           pkgs = nixpkgs.legacyPackages.${system};
         in
-        {
-          default = pkgs.mkShell {
+        rec {
+          base = pkgs.mkShell {
             packages = [
-              self.packages.${system}.cosmovisor
-              self.packages.${system}.heighliner
-              self.packages.${system}.mockgen
-              pkgs.act
-              pkgs.actionlint
-              pkgs.bash-language-server
-              pkgs.buf
-              pkgs.deadnix
-              pkgs.docker-client
               pkgs.git
               pkgs.gnumake
               pkgs.go_1_26
+            ];
+          };
+
+          proto = pkgs.mkShell {
+            inputsFrom = [ base ];
+
+            packages = [ pkgs.buf ];
+          };
+
+          doc = pkgs.mkShell {
+            inputsFrom = [ base ];
+
+            packages = [
+              pkgs.docker-client
+              pkgs.gomplate
+              pkgs.markdownlint-cli2
+              pkgs.perl
+            ];
+          };
+
+          lint = pkgs.mkShell {
+            inputsFrom = [ proto ];
+
+            packages = [
+              pkgs.actionlint
+              pkgs.deadnix
               pkgs.gofumpt
               pkgs.golangci-lint
+              pkgs.markdownlint-cli2
+              pkgs.nixfmt
+              pkgs.statix
+            ];
+          };
+
+          docker = pkgs.mkShell {
+            packages = [
+              self.packages.${system}.heighliner
+              pkgs.docker-client
+              pkgs.git
+              pkgs.gnumake
+            ];
+          };
+
+          default = pkgs.mkShell {
+            inputsFrom = [
+              doc
+              docker
+              lint
+            ];
+
+            packages = [
+              self.packages.${system}.cosmovisor
+              self.packages.${system}.mockgen
+              pkgs.act
+              pkgs.bash-language-server
               pkgs.gh
-              pkgs.gomplate
               pkgs.gopls
               pkgs.jq
-              pkgs.markdownlint-cli2
               pkgs.marksman
               pkgs.nil
-              pkgs.nixfmt
               pkgs.nodejs_24
               pkgs.protobuf
               pkgs.protobuf-language-server
               pkgs.protoc-gen-go
               pkgs.protoc-gen-go-grpc
-              pkgs.statix
               pkgs.uv
               pkgs.yaml-language-server
             ];
