@@ -46,6 +46,13 @@ jobs:
       - name: Install Nix
         uses: cachix/install-nix-action@13d8dd58da0234aa297dedd986986ccb8e7f3e24 # v31.11.1
 
+      - name: Cache Nix lint environment
+        uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+        with:
+          primary-key: nix-v1-${{ runner.os }}-lint-${{ hashFiles('flake.lock', 'flake.nix') }}
+          restore-prefixes-first-match: |
+            nix-v1-${{ runner.os }}-lint-
+
       - name: Lint go code (golangci-lint)
         run: |
           nix develop .#lint --command make lint-go-golangci

@@ -54,5 +54,12 @@ jobs:
       - name: Set up Nix
         uses: DeterminateSystems/nix-installer-action@3138316df39ed29be04236d7ffc686fa525866aa # v23
 
+      - name: Cache Nix docker environment
+        uses: nix-community/cache-nix-action@7df957e333c1e5da7721f60227dbba6d06080569 # v7
+        with:
+          primary-key: nix-v1-${{ runner.os }}-docker-${{ hashFiles('flake.lock', 'flake.nix') }}
+          restore-prefixes-first-match: |
+            nix-v1-${{ runner.os }}-docker-
+
       - name: Build docker image for Heighliner
         run: nix develop .#docker --command make build-docker
